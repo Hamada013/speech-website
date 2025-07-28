@@ -59,7 +59,6 @@
       margin: 3em auto;
       align-items: stretch;
     }
-    /* Style for cards */
     .form-card {
       background: #fcfdff;
       border-radius: 16px;
@@ -115,6 +114,7 @@
     .form-card-link:hover {
       background: #3496d8;
     }
+
     /* First 3 cards: centered in first row, columns 2-4 */
     .form-card.card1 { grid-column: 2 / 3; grid-row: 1 / 2; }
     .form-card.card2 { grid-column: 3 / 4; grid-row: 1 / 2; }
@@ -133,11 +133,19 @@
       }
       .form-card { grid-column: auto !important; grid-row: auto !important; }
     }
+
     @media (max-width: 540px) {
       .forms-list { gap: 1em; }
-      .form-card { min-height: 220px; padding: 20px 7px 14px 7px; }
-      .form-card img { width: 50px; height:50px;}
+      .form-card {
+        min-height: 220px;
+        padding: 20px 7px 14px 7px;
+      }
+      .form-card img {
+        width: 50px;
+        height: 50px;
+      }
     }
+
     .about-contact {
       margin-top: 2.5em;
       font-size: 1.09em;
@@ -145,9 +153,41 @@
       color: #3e4666;
       text-align: center;
     }
+
     .about-contact a {
       color: #3496d8;
       text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      .forms-list {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.2em;
+        padding: 0 1em;
+      }
+
+      .form-card {
+        width: 100%;
+        max-width: 420px;
+        aspect-ratio: auto;
+        grid-column: auto !important;
+        grid-row: auto !important;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .form-card-title {
+        font-size: 1.05em;
+      }
+      .form-card-desc {
+        font-size: 0.92em;
+      }
+      .form-card-link {
+        font-size: 1em;
+        padding: 8px 18px;
+      }
     }
   </style>
 </head>
@@ -165,7 +205,6 @@
       <div class="subtitle">All digital assessment and intake forms</div>
     </div>
     <div class="forms-list">
-      <!-- Row 1: centered 3 -->
       <div class="form-card card1">
         <img src="images/language.gif" alt="Language forms icon">
         <div class="form-card-title">Language</div>
@@ -184,7 +223,6 @@
         <div class="form-card-desc">Assessment for autism spectrum.</div>
         <a class="form-card-link" href="forms/asd/index.html" target="_blank" rel="noopener">ASD</a>
       </div>
-      <!-- Row 2: 5 cards full width -->
       <div class="form-card card4">
         <img src="images/baby-smile.gif" alt="Child icon">
         <div class="form-card-title">Child Case History</div>
