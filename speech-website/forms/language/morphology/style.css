@@ -1,0 +1,356 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Noto Sans Arabic', sans-serif;
+  background: #f7f9fc;
+  color: #222;
+  direction: rtl;
+  text-align: right;
+  line-height: 1.4;
+}
+
+main {
+  max-width: 960px;
+  margin: 1rem auto 2rem;
+  padding: 0 1rem;
+}
+
+/* ... (كود CSS الموجود لديك) ... */
+
+#form-title {
+  font-weight: 700;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  text-align: center; /* توسيط النص داخل الـ H1 */
+  position: relative;
+  display: block; /* لضمان أخذ الـ H1 العرض الكامل وتوسيطه بالـ margin: auto; */
+  cursor: pointer;
+  margin-left: auto; /* توسيط الـ H1 نفسه */
+  margin-right: auto; /* توسيط الـ H1 نفسه */
+  width: fit-content; /* يجعل عرض الـ H1 بحجم محتواه لكي يعمل الـ margin: auto; بشكل سليم */
+  /* أو يمكنك تحديد عرض ثابت مثلاً width: 50%; */
+}
+
+#form-title::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 3px;
+  background-color: transparent;
+  position: absolute;
+  left: 0;
+  bottom: -6px; /* مسافة تحت النص */
+  transition: background-color 0.3s ease;
+}
+
+#form-title:hover::after {
+  background-color: orange;
+}
+
+/* إضافة مسافة علوية كبيرة للنموذج لإنشاء مسافة فاضية قبل بدء التقييم */
+form#main-form {
+  margin-top: 50px; /* يمكنك زيادة هذه القيمة لزيادة المسافة */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ... (بقية كود CSS لديك) ... */
+
+#form-title:hover::after {
+  background-color: orange;
+}
+
+.required {
+  color: #e74c3c;
+  margin-left: 0.25rem;
+}
+
+form#main-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.card-section {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.card-header {
+  background-color: #43a6f8;
+  color: white;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  font-size: 1.25rem;
+  user-select: none;
+}
+
+.card-body {
+  padding: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* نصوص الحقول */
+label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+textarea {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-family: 'Noto Sans Arabic', sans-serif;
+  font-size: 1rem;
+  direction: rtl;
+  text-align: right;
+  outline-color: transparent;
+  transition: outline-color 0.2s ease, border-color 0.2s ease;
+}
+
+input[readonly] {
+  background-color: #eee;
+  cursor: default;
+}
+
+input:focus,
+textarea:focus {
+  outline-color: #43a6f8;
+  border-color: #43a6f8;
+}
+
+/* البطاقات للسمات الصرفية */
+.features-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.feature-card {
+  background: white;
+  border: 1px solid #43a6f8;
+  border-radius: 10px;
+  padding: 1rem;
+  width: calc(33% - 1rem);
+  box-shadow: 0 2px 6px rgba(67, 166, 248, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  user-select: none;
+  min-height: 180px;
+}
+
+.feature-name-ar {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #1864c0;
+  margin-bottom: 0.15rem;
+}
+
+.feature-name-en {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #555;
+  text-align: center;
+  margin-bottom: 0.6rem;
+  user-select: none;
+  min-height: 20px;
+}
+
+.feature-norm-age {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 0.8rem;
+  user-select: none;
+  text-align: center;
+}
+
+.feature-example {
+  font-size: 0.95rem;
+  color: #333;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.feature-example .highlight-blue {
+  color: #287bde;
+  font-weight: 700;
+  user-select: text;
+}
+
+/* أزرار نعم/لا */
+.presence-row {
+  margin-top: auto;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.presence-btn {
+  font-weight: 700;
+  padding: 0.5rem 1.2rem;
+  border-radius: 9999px;
+  border: 2px solid #43a6f8;
+  background-color: transparent;
+  color: #43a6f8;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-size: 1rem;
+  flex: 1 1 50%;
+  text-align: center;
+}
+
+/* زر "نعم" */
+.presence-btn.yes:hover {
+  background-color: #287bde; /* أزرق */
+  color: white;
+}
+.presence-btn.yes.selected {
+  background-color: #43a6f8;
+  color: white;
+  border-color: #357acc;
+}
+
+/* زر "لا" */
+.presence-btn.no:hover {
+  background-color: orange;
+  color: white;
+}
+.presence-btn.no.selected {
+  background-color: orange;
+  color: white;
+  border-color: orange;
+}
+
+.presence-btn:focus-visible {
+  outline: 3px solid #357acc;
+  outline-offset: 2px;
+}
+
+/* أزرار التصرف */
+.actions {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-start;
+}
+
+#export-btn,
+#show-refs-btn {
+  background-color: #43a6f8;
+  color: white;
+  border: none;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#export-btn:hover,
+#show-refs-btn:hover {
+  background-color: #f5af00;
+}
+
+/* مودال المراجع */
+.refs-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.refs-modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  width: 90%;
+  box-sizing: border-box;
+  position: relative;
+  font-size: 1rem;
+  color: #222;
+}
+
+.close-modal {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  font-size: 1.8rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #333;
+  font-weight: 700;
+  user-select: none;
+}
+
+.refs-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.refs-table-container th,
+.refs-table-container td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: right;
+  font-size: 0.9rem;
+}
+
+.refs-table-container th {
+  background-color: #43a6f8;
+  color: white;
+  font-weight: 700;
+  user-select: none;
+}
+
+.refs-list h3 {
+  margin-top: 0.8rem;
+}
+
+.refs-list p {
+  font-style: italic;
+  color: #555;
+}
+
+@media (max-width: 900px) {
+  .feature-card {
+    width: calc(50% - 1rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .feature-card {
+    width: 100%;
+  }
+}

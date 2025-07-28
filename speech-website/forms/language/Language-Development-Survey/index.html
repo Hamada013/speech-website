@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Vocabulary Survey</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 id="form-title">Vocabulary Survey</h1>
+      <div class="lang-toggle">
+        <button id="lang-en-btn" class="lang-btn active">EN</button>
+        <button id="lang-ar-btn" class="lang-btn">AR</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- Basic Information Section -->
+      <section class="card">
+        <h2>Basic Information</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="child-name">Child's Name</label>
+            <input type="text" id="child-name">
+          </div>
+          <div class="form-group">
+            <label for="parent-name">Parent's Name</label>
+            <input type="text" id="parent-name">
+          </div>
+          <div class="form-group">
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob">
+          </div>
+          <div class="form-group">
+            <label for="date">Assessment Date</label>
+            <input type="date" id="date">
+          </div>
+          <div class="form-group">
+            <label for="examiner-name">Examiner's Name</label>
+            <input type="text" id="examiner-name">
+          </div>
+        </div>
+      </section>
+
+      <!-- Age Group Selection -->
+      <section class="card">
+        <h2>Select Age Group</h2>
+        <div class="form-group">
+          <select id="age-group-select">
+            <option value="">-- Select Age Group --</option>
+            <option value="0-6">0-6 Months</option>
+            <option value="7-12">7-12 Months</option>
+            <option value="13-18">13-18 Months</option>
+            <option value="19-24">19-24 Months</option>
+            <option value="2-3">2-3 Years</option>
+            <option value="3-4">3-4 Years</option>
+            <option value="4-5">4-5 Years</option>
+            <option value="5-6">5-6 Years</option>
+            <option value="6-7">6-7 Years</option>
+          </select>
+          <button id="instructions-btn" class="pill">Instructions</button>
+        </div>
+      </section>
+
+      <!-- Current Evaluation Section -->
+      <section id="current-evaluation" class="card" style="display:none">
+        <div class="evaluation-header">
+          <h2 id="evaluation-title"></h2>
+          <button id="change-age-btn" class="pill">Change Age Group</button>
+        </div>
+        <div id="skills-container"></div>
+        <button id="generate-summary-btn" class="generate-btn">Generate Summary</button>
+      </section>
+
+      <!-- Findings Summary Section -->
+      <section id="findings-summary" class="card" style="display:none">
+        <h2>Findings Summary</h2>
+        <div id="summary-content"></div>
+        <div class="evaluate-another">
+          <p>Would you like to evaluate another age group?</p>
+          <div class="action-buttons">
+            <button id="evaluate-yes-btn" class="pill">Yes</button>
+            <button id="evaluate-no-btn" class="pill">No, Export Report</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- All Evaluations Container -->
+      <div id="all-evaluations"></div>
+    </main>
+
+    <!-- Instructions Modal -->
+    <div id="instructions-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>For each skill listed below, please select the skill if your child demonstrates it spontaneously. If the skill is not present, leave it unselected. When you complete the checklist for the selected age group, a summary will list the skills that are missing. You may then choose to evaluate another age group or export the findings.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

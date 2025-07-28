@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>DDK Assessment with Stopwatch</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1 id="form-title">Diadochokinetic Syllable Rates Assessment</h1>
+      <p class="description" id="form-description">A tool for timing syllable repetition rates with normative comparisons.</p>
+      
+      <div class="toggle-wrapper">
+        <label id="label-en" for="lang-toggle">English</label>
+        <div class="toggle-switch">
+          <input id="lang-toggle" type="checkbox">
+          <span class="slider"></span>
+        </div>
+        <label id="label-ar" for="lang-toggle">العربية</label>
+      </div>
+    </header>
+    
+    <div class="tabs">
+      <div class="tab active" data-tab="assessment">Assessment</div>
+      <div class="tab" data-tab="results">Results</div>
+      <div class="tab" data-tab="norms">Normative Data</div>
+    </div>
+    
+    <div class="tab-content active" id="assessment-tab">
+      <form id="main-form" novalidate>
+        <!-- Basic Information -->
+        <div class="form-section">
+          <div class="section-header" data-i18n="basic-info-header">Basic Information</div>
+          <div class="section-body">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="client-name" data-i18n="label-name">Name:</label>
+                <input type="text" id="client-name" placeholder="Enter client name">
+              </div>
+              <div class="form-group">
+                <label for="client-age" data-i18n="label-age">Age:</label>
+                <input type="number" id="client-age" min="3" max="13" required placeholder="Enter age">
+              </div>
+              <div class="form-group">
+                <label for="assessment-date" data-i18n="label-date">Date:</label>
+                <input type="date" id="assessment-date">
+              </div>
+              <div class="form-group">
+                <label for="examiner-name" data-i18n="label-examiner">Examiner's Name:</label>
+                <input type="text" id="examiner-name" placeholder="Enter examiner name">
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="form-section">
+          <div class="section-header" data-i18n="instructions-header">Instructions</div>
+          <div class="section-body">
+            <p id="instructions-text">Time the number of seconds it takes the client to complete each task the prescribed number of repetitions using the built-in stopwatch. Normative values are provided for both pediatric clients (under 7 years) and older children (6-13 years). For pediatric clients, norms are expressed as repetitions per second (rps) based on Hickman (1997) and Robbins & Klee (1987), while for older children, norms are given as the number of seconds to complete a fixed set of repetitions based on Fletcher (1972).</p>
+          </div>
+        </div>
+        
+        <!-- Tasks -->
+        <div class="form-section">
+          <div class="section-header" data-i18n="tasks-header">DDK Task Measurements</div>
+          <div class="section-body">
+            <!-- Pediatric Tasks (Ages 3-6) -->
+            <div class="task-group-header" data-i18n="pediatric-tasks">Pediatric Tasks (Ages 3-6)</div>
+            <table class="task-table">
+              <thead>
+                <tr>
+                  <th data-i18n="task-syllable">Syllable</th>
+                  <th data-i18n="task-repetitions">Repetitions</th>
+                  <th data-i18n="task-stopwatch">Stopwatch</th>
+                  <th data-i18n="task-seconds">Seconds</th>
+                  <th data-i18n="task-feedback">Feedback</th>
+                </tr>
+              </thead>
+              <tbody id="pediatric-tasks-body">
+                <!-- Rows will be inserted here -->
+              </tbody>
+            </table>
+            
+            <!-- Older Children Tasks (Ages 6-13) -->
+            <div class="task-group-header" data-i18n="older-tasks">Older Children Tasks (Ages 6-13)</div>
+            <table class="task-table">
+              <thead>
+                <tr>
+                  <th data-i18n="task-syllable">Syllable</th>
+                  <th data-i18n="task-repetitions">Repetitions</th>
+                  <th data-i18n="task-stopwatch">Stopwatch</th>
+                  <th data-i18n="task-seconds">Seconds</th>
+                  <th data-i18n="task-feedback">Feedback</th>
+                </tr>
+              </thead>
+              <tbody id="older-tasks-body">
+                <!-- Rows will be inserted here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Summary -->
+        <div class="form-section">
+          <div class="section-header" data-i18n="summary-header">Summary of Findings</div>
+          <div class="section-body summary-section">
+            <textarea id="summary-text" placeholder="Enter overall summary of findings..."></textarea>
+          </div>
+        </div>
+      </form>
+      
+      <div class="actions">
+        <button type="button" id="analyze-btn" class="action-btn">
+          <i class="fas fa-calculator"></i> Generate Report
+        </button>
+        <button type="button" id="export-btn" class="action-btn secondary" data-i18n="export-btn">
+          <i class="fas fa-file-export"></i> Export Data
+        </button>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="results-tab">
+      <div class="results-card">
+        <div class="results-header">Assessment Results</div>
+        <div id="results-content">
+          <!-- Results will be inserted here -->
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="norms-tab">
+      <div class="form-section">
+        <div class="section-header">Normative Data Reference</div>
+        <div class="section-body">
+          <h3>Pediatric DDK Norms (Repetitions per Second)</h3>
+          <p><em>Based on Hickman, 1997 and Robbins & Klee, 1987</em></p>
+          <table class="norms-table">
+            <thead>
+              <tr>
+                <th>Age (Years)</th>
+                <th>/pʌ/ (M ± SD)</th>
+                <th>/tʌ/ (M ± SD)</th>
+                <th>/kʌ/ (M ± SD)</th>
+                <th>/pʌtʌkʌ/ (M ± SD)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>3</td>
+                <td>2.9 ± 0.6</td>
+                <td>2.9 ± 0.6</td>
+                <td>2.7 ± 0.6</td>
+                <td>1.8 ± 0.4</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>3.5 ± 0.7</td>
+                <td>3.5 ± 0.7</td>
+                <td>3.3 ± 0.7</td>
+                <td>2.3 ± 0.5</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>4.0 ± 0.8</td>
+                <td>4.0 ± 0.8</td>
+                <td>3.8 ± 0.8</td>
+                <td>2.7 ± 0.6</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>4.5 ± 0.9</td>
+                <td>4.5 ± 0.9</td>
+                <td>4.3 ± 0.9</td>
+                <td>3.1 ± 0.7</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <h3 style="margin-top: 30px;">Older Children DDK Norms (Seconds)</h3>
+          <p><em>Based on Fletcher, 1972</em></p>
+          <table class="norms-table">
+            <thead>
+              <tr>
+                <th>Age (Years)</th>
+                <th>/pʌ/ (M ± SD)</th>
+                <th>/tʌ/ (M ± SD)</th>
+                <th>/kʌ/ (M ± SD)</th>
+                <th>/pʌtʌkʌ/ (M ± SD)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>6</td>
+                <td>5.8 ± 1.0</td>
+                <td>5.9 ± 1.0</td>
+                <td>6.5 ± 1.0</td>
+                <td>10.3 ± 1.2</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>5.3 ± 1.0</td>
+                <td>5.4 ± 1.0</td>
+                <td>6.0 ± 1.0</td>
+                <td>9.8 ± 1.1</td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td>5.0 ± 0.9</td>
+                <td>5.1 ± 0.9</td>
+                <td>5.7 ± 0.9</td>
+                <td>9.2 ± 1.0</td>
+              </tr>
+              <tr>
+                <td>9</td>
+                <td>4.7 ± 0.9</td>
+                <td>4.8 ± 0.9</td>
+                <td>5.3 ± 0.9</td>
+                <td>8.7 ± 0.9</td>
+              </tr>
+              <tr>
+                <td>10</td>
+                <td>4.5 ± 0.9</td>
+                <td>4.6 ± 0.9</td>
+                <td>5.0 ± 0.9</td>
+                <td>8.4 ± 0.9</td>
+              </tr>
+              <tr>
+                <td>11</td>
+                <td>4.3 ± 0.9</td>
+                <td>4.4 ± 0.9</td>
+                <td>4.8 ± 0.9</td>
+                <td>8.1 ± 0.8</td>
+              </tr>
+              <tr>
+                <td>12</td>
+                <td>4.1 ± 0.9</td>
+                <td>4.2 ± 0.9</td>
+                <td>4.6 ± 0.9</td>
+                <td>7.8 ± 0.8</td>
+              </tr>
+              <tr>
+                <td>13</td>
+                <td>4.0 ± 0.9</td>
+                <td>4.1 ± 0.9</td>
+                <td>4.5 ± 0.9</td>
+                <td>7.5 ± 0.7</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div> 
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

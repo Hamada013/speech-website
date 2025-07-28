@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>استبيان مهارات الفهم السمعي</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    /* عام */
+    body {
+      font-family: 'Noto Sans Arabic', sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    main {
+      background: #fff;
+      padding: 20px 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    /* عنوان النموذج */
+    #form-title {
+      text-align: center;
+      color: #43a6f8;
+      margin-bottom: 25px;
+    }
+
+    /* قسم المعلومات الأساسية */
+    .basic-info-section h2 {
+      color: #43a6f8;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #43a6f8;
+      padding-bottom: 5px;
+      font-weight: 700;
+    }
+
+    .basic-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      row-gap: 15px;
+      column-gap: 15px;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .basic-info-grid label {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .basic-info-grid input[type="text"],
+    .basic-info-grid input[type="date"] {
+      padding: 8px 12px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      transition: border-color 0.3s;
+    }
+
+    .basic-info-grid input[type="text"]:focus,
+    .basic-info-grid input[type="date"]:focus {
+      border-color: #43a6f8;
+      outline: none;
+    }
+
+    /* بطاقة المجموعة */
+    .group-card {
+      border: 1px solid #43a6f8;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      padding: 15px 20px;
+      background: #f0f8ff;
+    }
+
+    .group-header {
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: #0d47a1;
+      border-bottom: 2px solid #43a6f8;
+      padding-bottom: 8px;
+      margin-bottom: 15px;
+    }
+
+    /* بند المهارة */
+    .skill-item {
+      background: white;
+      border-radius: 8px;
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .skill-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+
+    .instructions-btn {
+      background-color: #43a6f8;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 5px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.3s;
+    }
+
+    .instructions-btn:hover {
+      background-color: #1a73e8;
+    }
+
+    .instructions-text {
+      background: #dbeeff;
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+      color: #0a3c7c;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    /* أزرار الاختيار */
+    .answer-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .answer-button {
+      flex: 1;
+      padding: 10px 0;
+      border-radius: 25px;
+      border: 2px solid #43a6f8;
+      background: white;
+      color: #43a6f8;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+      text-align: center;
+      user-select: none;
+    }
+
+    .answer-button.selected {
+      background-color: #43a6f8;
+      color: white;
+    }
+
+    /* أزرار التصدير */
+    .actions {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    #export-btn {
+      background-color: #43a6f8;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #export-btn:hover {
+      background-color: #1a73e8;
+    }
+
+    /* تقرير النتائج */
+    #report-section {
+      margin-top: 30px;
+      background: #f0f8ff;
+      padding: 15px 20px;
+      border-radius: 10px;
+      border: 1px solid #43a6f8;
+      display: none;
+    }
+
+    #report-output {
+      white-space: pre-wrap;
+      font-family: 'Noto Sans Arabic', monospace;
+      color: #0d47a1;
+    }
+
+    /* استجابة تصميم الهواتف */
+    @media (max-width: 600px) {
+      .basic-info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1 id="form-title">استبيان مهارات الفهم السمعي</h1>
+
+    <section class="basic-info-section">
+      <h2>المعلومات الأساسية</h2>
+      <div class="basic-info-grid">
+        <label for="childName">اسم الطفل:</label>
+        <input type="text" id="childName" placeholder="أدخل اسم الطفل" />
+
+        <label for="parentName">اسم ولي الأمر:</label>
+        <input type="text" id="parentName" placeholder="أدخل اسم ولي الأمر" />
+
+        <label for="dob">تاريخ الميلاد:</label>
+        <input type="date" id="dob" />
+
+        <label for="surveyDate">تاريخ تعبئة الاستبيان:</label>
+        <input type="date" id="surveyDate" />
+      </div>
+    </section>
+
+    <section id="skills-container"></section>
+
+    <div class="actions">
+      <button type="button" id="export-btn">تصدير التقرير</button>
+    </div>
+
+    <section id="report-section">
+      <h2>تقرير النتائج</h2>
+      <pre id="report-output"></pre>
+    </section>
+  </main>
+
+  <script>
+    // بيانات المهارات موزعة حسب الفئات العمرية
+    const skillGroups = [
+      {
+        label: "من 0 إلى 2 شهور",
+        items: [
+          { number: 1, text: "يصدر أصواتًا غير بكائية (مثل الغرغرة أو الأصوات الحلقيّة)" },
+          { number: 2, text: "يُهدئ نفسه بأصوات مثل الهمهمة أو الغرغرة" },
+          { number: 3, text: "يُصدر أصواتًا عندما يُحضن أو يُحمل" },
+          { number: 4, text: "يُصدر أصواتًا كرد فعل للصوت البشري" }
+        ]
+      },
+      {
+        label: "من 3 إلى 5 شهور",
+        items: [
+          { number: 5, text: "يبدأ بتكرار الأصوات الحلقيّة والفمية (مثل آغو، آها)" },
+          { number: 6, text: "يصدر سلسلة من الأصوات المتماثلة (مثل با با با)" },
+          { number: 7, text: "يُظهر اختلافًا في نغمة الصوت أثناء اللعب أو التعبير" },
+          { number: 8, text: "يستخدم الأصوات لجذب الانتباه أو التعبير عن المشاعر" }
+        ]
+      },
+      {
+        label: "من 6 إلى 8 شهور",
+        items: [
+          { number: 9, text: "يصدر أصواتًا متنوعة (مثل دا، ما، با)" },
+          { number: 10, text: "يُقلد بعض الأصوات التي يسمعها من البالغين" },
+          { number: 11, text: "يستخدم الصوت للتعبير عن الرغبة أو عدم الراحة" },
+          { number: 12, text: "يبدأ بتوجيه الأصوات نحو الأشخاص أو الأشياء" }
+        ]
+      },
+      {
+        label: "من 9 إلى 12 شهرًا",
+        items: [
+          { number: 13, text: "ينتج كلمات بسيطة مثل (ماما، بابا) بدلالة واضحة" },
+          { number: 14, text: "يستخدم الإيماءات إلى جانب الأصوات للتواصل" },
+          { number: 15, text: "يصدر أصواتًا استجابة للأسئلة أو الحديث" },
+          { number: 16, text: "يستخدم أصواتًا مختلفة حسب السياق (مثل الضحك، الصراخ، النداء)" }
+        ]
+      },
+      {
+        label: "من 13 إلى 15 شهرًا",
+        items: [
+          { number: 17, text: "ينتج ما لا يقل عن 3-5 كلمات ذات معنى" },
+          { number: 18, text: "يستخدم الكلمات للإشارة إلى الأشياء أو الأشخاص" },
+          { number: 19, text: "يستخدم الكلمات للتعبير عن الرغبات والاحتياجات" },
+          { number: 20, text: "يبدأ في استخدام بعض الكلمات بشكل تلقائي في المواقف اليومية" }
+        ]
+      },
+      {
+        label: "من 16 إلى 18 شهرًا",
+        items: [
+          { number: 21, text: "ينتج حوالي 10-20 كلمة مفهومة" },
+          { number: 22, text: "يستخدم ضمائر بسيطة (مثل: أنا، أنت)" },
+          { number: 23, text: "يستخدم التعابير البسيطة (مثل: مرحبًا، باي، شكراً)" },
+          { number: 24, text: "يقلد كلمات جديدة يسمعها من المحيطين به" }
+        ]
+      },
+      {
+        label: "من 19 إلى 21 شهرًا",
+        items: [
+          { number: 25, text: "ينتج أكثر من 25 كلمة بشكل مستقل" },
+          { number: 26, text: "يبدأ في ربط كلمتين لتكوين جملة بسيطة" },
+          { number: 27, text: "يستخدم نغمة الصوت للتعبير عن المشاعر أو الطلبات" },
+          { number: 28, text: "يسمي بعض الصور أو الأجسام المألوفة بدلالة صحيحة" }
+        ]
+      },
+      {
+        label: "من 22 إلى 24 شهرًا",
+        items: [
+          { number: 29, text: "يستخدم جملًا من كلمتين أو أكثر للتعبير عن نفسه" },
+          { number: 30, text: "يستخدم كلمات للتعبير عن الرفض أو الموافقة (مثل: لا، نعم)" },
+          { number: 31, text: "يطرح أسئلة بسيطة (مثل: فين، مين)" },
+          { number: 32, text: "يستخدم كلمات تعبر عن الرغبات (مثل: أريد، أعطني)" }
+        ]
+      },
+      {
+        label: "من 25 إلى 30 شهرًا",
+        items: [
+          { number: 33, text: "ينتج أكثر من 50 كلمة متنوعة" },
+          { number: 34, text: "يستخدم الأفعال في الجمل (مثل: أكل، نام، راح)" },
+          { number: 35, text: "يستخدم صفات لوصف الأشياء (مثل: كبير، حلو)" },
+          { number: 36, text: "يستخدم الضمائر بشكل صحيح نسبيًا (أنا، هو، هي)" }
+        ]
+      },
+      {
+        label: "من 31 إلى 36 شهرًا",
+        items: [
+          { number: 37, text: "يستخدم جملًا من ثلاث كلمات أو أكثر" },
+          { number: 38, text: "يشارك في محادثات قصيرة مع البالغين أو الأطفال" },
+          { number: 39, text: "يستخدم زمن المضارع والماضي في الحديث" },
+          { number: 40, text: "يستخدم كلمات للربط (مثل: و، ثم)" }
+        ]
+      },
+      {
+        label: "من 37 إلى 42 شهرًا",
+        items: [
+          { number: 41, text: "يطرح أسئلة تبدأ بـ (لماذا، كيف)" },
+          { number: 42, text: "يستخدم تعابير لغوية أكثر تعقيدًا" },
+          { number: 43, text: "يبدأ باستخدام الأفعال المساعدة (كان، صار)" },
+          { number: 44, text: "يستخدم الجمل الوصفية لرواية الأحداث" }
+        ]
+      },
+      {
+        label: "من 43 إلى 48 شهرًا",
+        items: [
+          { number: 45, text: "يروي قصة بسيطة باستخدام تسلسل منطقي" },
+          { number: 46, text: "يستخدم المفردات الخاصة بالمكان والزمان" },
+          { number: 47, text: "يستخدم التراكيب النحوية بشكل متنوع" },
+          { number: 48, text: "يتحدث بطلاقة نسبية مع وضوح لغوي" }
+        ]
+      },
+      {
+        label: "من 49 إلى 60 شهرًا",
+        items: [
+          { number: 49, text: "يستخدم اللغة للتفاوض أو طلب التفسير" },
+          { number: 50, text: "يستخدم الضمائر وأزمنة الأفعال بدقة" },
+          { number: 51, text: "يربط بين الأحداث باستخدام أدوات الربط" },
+          { number: 52, text: "يعبر عن أفكاره ومشاعره بجمل واضحة" },
+          { number: 53, text: "يروي قصة كاملة بتسلسل واضح" },
+          { number: 54, text: "يستخدم مفردات متنوعة في مواضيع مختلفة" },
+          { number: 55, text: "يُظهر مهارات الحوار مثل الدور والاستجابة" },
+          { number: 56, text: "يناقش تفاصيل تجاربه اليومية" },
+          { number: 57, text: "يستخدم اللغة للإقناع أو التبرير" },
+          { number: 58, text: "يطرح أسئلة من أجل الفهم والاستيضاح" },
+          { number: 59, text: "يستجيب لأسئلة (ماذا، متى، أين، كيف، لماذا) بدقة" },
+          { number: 60, text: "يتحدث باستخدام تسلسل سردي واضح وبنية لغوية متقدمة" }
+        ]
+      }
+    ];
+
+    // متغيرات التحكم
+    const responses = {};
+    const showInstructions = {};
+
+    // الحاوية الرئيسية
+    const skillsContainer = document.getElementById("skills-container");
+
+    // دالة عرض المهارات
+    function renderSkills() {
+      skillsContainer.innerHTML = "";
+
+      skillGroups.forEach(group => {
+        const groupCard = document.createElement("div");
+        groupCard.className = "group-card";
+
+        const groupHeader = document.createElement("h3");
+        groupHeader.className = "group-header";
+        groupHeader.textContent = group.label;
+        groupCard.appendChild(groupHeader);
+
+        group.items.forEach(item => {
+          const skillItem = document.createElement("div");
+          skillItem.className = "skill-item";
+
+          // رأس البند مع الرقم والنص
+          const skillHeader = document.createElement("div");
+          skillHeader.className = "skill-header";
+
+          const skillText = document.createElement("p");
+          skillText.textContent = `${item.number}. ${item.text}`;
+          skillHeader.appendChild(skillText);
+
+          // زر التعليمات (فارغ حالياً، يمكن إضافة تعليمات لكل بند مستقبلاً)
+          const instrBtn = document.createElement("button");
+          instrBtn.className = "instructions-btn";
+          instrBtn.textContent = "تعليمات";
+          instrBtn.addEventListener("click", () => {
+            showInstructions[item.number] = !showInstructions[item.number];
+            renderSkills();
+          });
+          skillHeader.appendChild(instrBtn);
+
+          skillItem.appendChild(skillHeader);
+
+          // إذا التعليمات مفعلة، عرض نص التعليمات (فارغ الآن)
+          if (showInstructions[item.number]) {
+            const instrText = document.createElement("pre");
+            instrText.className = "instructions-text";
+            instrText.textContent = item.instruction || "لا توجد تعليمات متاحة لهذا البند.";
+            skillItem.appendChild(instrText);
+          }
+
+          // أزرار الإجابة (يوجد - لايوجد - غير محدد)
+          const answerButtonsDiv = document.createElement("div");
+          answerButtonsDiv.className = "answer-buttons";
+
+          ["يوجد", "لايوجد", "غير محدد"].forEach(option => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "answer-button";
+            if (responses[item.number] === option) {
+              btn.classList.add("selected");
+            }
+            btn.textContent = option;
+            btn.addEventListener("click", () => {
+              responses[item.number] = option;
+              renderSkills();
+            });
+            answerButtonsDiv.appendChild(btn);
+          });
+
+          skillItem.appendChild(answerButtonsDiv);
+
+          groupCard.appendChild(skillItem);
+        });
+
+        skillsContainer.appendChild(groupCard);
+      });
+    }
+
+    // دالة تصدير التقرير
+    function exportReport() {
+      const childName = document.getElementById("childName").value.trim() || "غير مدخل";
+      const parentName = document.getElementById("parentName").value.trim() || "غير مدخل";
+      const dob = document.getElementById("dob").value || "غير مدخل";
+      const surveyDate = document.getElementById("surveyDate").value || "غير مدخل";
+
+      let report = `تقرير استبيان مهارات الفهم السمعي\n\n`;
+      report += `اسم الطفل: ${childName}\n`;
+      report += `اسم ولي الأمر: ${parentName}\n`;
+      report += `تاريخ الميلاد: ${dob}\n`;
+      report += `تاريخ تعبئة الاستبيان: ${surveyDate}\n\n`;
+
+      // تجميع النتائج
+      const has = [];
+      const notHas = [];
+      const undefinedHas = [];
+
+      for (const [key, value] of Object.entries(responses)) {
+        if (value === "يوجد") has.push(key);
+        else if (value === "لايوجد") notHas.push(key);
+        else undefinedHas.push(key);
+      }
+
+      report += `يوجد:\n`;
+      if (has.length > 0) report += has.map(n => `${n}. ${findSkillTextByNumber(+n)}`).join("\n") + "\n";
+      else report += "لا يوجد بيانات\n";
+
+      report += `\nلا يوجد:\n`;
+      if (notHas.length > 0) report += notHas.map(n => `${n}. ${findSkillTextByNumber(+n)}`).join("\n") + "\n";
+      else report += "لا يوجد بيانات\n";
+
+      report += `\nغير محدد:\n`;
+      if (undefinedHas.length > 0) report += undefinedHas.map(n => `${n}. ${findSkillTextByNumber(+n)}`).join("\n") + "\n";
+      else report += "لا يوجد بيانات\n";
+
+      // عرض التقرير
+      const reportSection = document.getElementById("report-section");
+      const reportOutput = document.getElementById("report-output");
+      reportOutput.textContent = report;
+      reportSection.style.display = "block";
+      reportSection.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // دالة مساعدة لإيجاد نص البند بناءً على رقمه
+    function findSkillTextByNumber(num) {
+      for (const group of skillGroups) {
+        for (const item of group.items) {
+          if (item.number === num) return item.text;
+        }
+      }
+      return "";
+    }
+
+    // ربط زر التصدير بالحدث
+    document.getElementById("export-btn").addEventListener("click", exportReport);
+
+    // عرض المهارات عند تحميل الصفحة
+    renderSkills();
+  </script>
+</body>
+</html>

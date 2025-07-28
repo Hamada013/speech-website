@@ -1,0 +1,99 @@
+{
+    "formTitle": "Adult Case History",
+    "language": {
+        "english": "English",
+        "arabic": "Arabic"
+    },
+    "exportButton": "Download as Text",
+    "sections": {
+        "generalInfo": {
+            "title": "General Information",
+            "fields": {
+                "name": "Name",
+                "dob": "Date of Birth",
+                "address": "Address",
+                "email": "Email Address",
+                "homePhone": "Home Phone",
+                "mobilePhone": "Mobile Phone",
+                "occupation": "Occupation",
+                "referredBy": "Referred by",
+                "physician": {
+                    "name": "Physician Name",
+                    "phone": "Physician Phone",
+                    "address": "Physician Address"
+                },
+                "maritalStatus": {
+                    "label": "Marital Status",
+                    "options": ["Single", "Widowed", "Divorced", "Married"]
+                },
+                "children": {
+                    "label": "Children (include names, gender, and ages)",
+                    "addButton": "Add Child"
+                },
+                "homeResidents": "Who lives in the home?",
+                "languagesSpoken": "Languages Spoken",
+                "education": "What was the highest grade, diploma, or degree you earned?"
+            }
+        },
+        "currentConcern": {
+            "title": "Current Concern",
+            "fields": {
+                "problemDescription": {
+                    "label": "Describe your speech-language problem",
+                    "placeholder": "I sometimes struggle with pronouncing certain consonants and my speech becomes unintelligible when I'm nervous."
+                },
+                "problemCause": {
+                    "label": "What do you think may have caused the problem?",
+                    "placeholder": "I believe it could be related to a past injury or my natural speech pattern."
+                },
+                "problemChanged": {
+                    "label": "Has the problem changed since it was first noticed?",
+                    "yesPlaceholder": "Yes, it started as a minor issue and has gradually become more noticeable over time."
+                },
+                "seenSpecialists": {
+                    "label": "Have you seen any other speech-language specialists? Who and when? What were their conclusions or recommendations?",
+                    "yesPlaceholder": "I visited Dr. Smith in January 2024. She recommended speech therapy sessions twice a week."
+                },
+                "seenOtherSpecialists": {
+                    "label": "Have you seen any other specialists (physicians, audiologists, psychologists, neurologists, etc.)?",
+                    "yesPlaceholder": "I consulted an audiologist in March 2023 who confirmed that my hearing is normal, ruling out auditory causes."
+                }
+            }
+        },
+        "medicalHistory": {
+            "title": "Medical History",
+            "fields": {
+                "conditions": {
+                    "label": "Have you experienced any of the following illnesses or conditions?",
+                    "options": ["Fainting", "Headaches", "Memory loss", "Unilateral weakness", "Dizziness", "Hearing loss", "Disorientation", "Pneumonia", "Tinnitus", "Stroke", "TIA", "Other"],
+                    "otherPlaceholder": "Please specify other conditions..."
+                },
+                "chewingSwallowing": {
+                    "label": "Do you have any chewing or swallowing difficulties?",
+                    "yesPlaceholder": "I sometimes experience difficulty swallowing solid foods."
+                },
+                "medications": {
+                    "label": "List all medications you are taking",
+                    "placeholder": "e.g., Aspirin 81mg daily, Metformin 500mg twice a day",
+                    "options": ["I have medications", "I don't take any medications", "I don't know"],
+                    "reactions": {
+                        "label": "Are you having any negative reactions to these medications?",
+                        "yesPlaceholder": "I have experienced dizziness and nausea after taking medication X."
+                    }
+                },
+                "surgeries": {
+                    "label": "Describe any major surgeries, operations, or hospitalizations (include dates)",
+                    "placeholder": "I underwent appendectomy in June 2018 and was hospitalized for pneumonia in December 2020."
+                },
+                "accidents": {
+                    "label": "Describe any major accidents",
+                    "placeholder": "I was involved in a car accident in March 2019 which resulted in minor injuries."
+                },
+                "additionalInfo": {
+                    "label": "Provide any additional information that might be helpful",
+                    "placeholder": "I have been experiencing recurrent symptoms that might be connected to previous surgeries, and I would like further evaluation."
+                }
+            }
+        }
+    }
+}

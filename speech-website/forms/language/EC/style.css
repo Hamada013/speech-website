@@ -1,0 +1,308 @@
+/* عام */
+body {
+  font-family: 'Noto Sans Arabic', sans-serif;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 20px;
+  color: #333;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+main {
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* عنوان النموذج */
+#form-title {
+  text-align: center;
+  color: #43a6f8;
+  margin-bottom: 25px;
+}
+
+/* قسم المعلومات الأساسية */
+.basic-info-section h2 {
+  color: #43a6f8;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #43a6f8;
+  padding-bottom: 5px;
+  font-weight: 700;
+}
+
+.basic-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  row-gap: 15px;
+  column-gap: 15px;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.basic-info-grid label {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.basic-info-grid input[type="text"],
+.basic-info-grid input[type="date"] {
+  padding: 8px 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: border-color 0.3s;
+}
+
+.basic-info-grid input[type="text"]:focus,
+.basic-info-grid input[type="date"]:focus {
+  border-color: #43a6f8;
+  outline: none;
+}
+
+/* بطاقة المجموعة */
+.group-card {
+  border: 1px solid #43a6f8;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  padding: 15px 20px;
+  background: #f0f8ff;
+}
+
+.group-header {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #0d47a1;
+  border-bottom: 2px solid #43a6f8;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+}
+
+/* بند المهارة */
+.skill-item {
+  background: white;
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.skill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+/* تصغير حجم أزرار الإجابة */
+.answer-button {
+  background: white;
+  border: 2px solid #43a6f8;
+  color: #43a6f8;
+  font-weight: 700;
+  min-width: 60px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  margin-right: 6px;
+  text-align: center;
+  border-radius: 15px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.answer-button.selected,
+.answer-button:hover {
+  background-color: #43a6f8;
+  color: white;
+}
+
+/* ألوان أزرار حسب الحالة */
+.answer-button.yojod {
+  border-color: #28a745;
+  color: #28a745;
+}
+.answer-button.yojod.selected,
+.answer-button.yojod:hover {
+  background-color: #28a745;
+  color: white;
+}
+
+.answer-button.la_yojod {
+  border-color: #fd7e14;
+  color: #fd7e14;
+}
+.answer-button.la_yojod.selected,
+.answer-button.la_yojod:hover {
+  background-color: #fd7e14;
+  color: white;
+}
+
+.answer-button.ghair_muhaddad {
+  border-color: #6c757d;
+  color: #6c757d;
+}
+.answer-button.ghair_muhaddad.selected,
+.answer-button.ghair_muhaddad:hover {
+  background-color: #6c757d;
+  color: white;
+}
+
+/* قسم أزرار التحكم: تعليمات، صورة، ملاحظة - توضع على اليسار */
+.skill-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 10px;
+  flex-wrap: nowrap;
+}
+/* حاوية الأزرار التي تحتوي على زري الملاحظة وعرض الصورة */
+.control-buttons-left {
+  display: flex;
+  flex-direction: row;
+  gap: 1px;
+  align-items: flex-start;
+  margin-left: auto; /* لليمين في RTL */
+}
+
+/* تعديل شكل زر عرض الصورة ليطابق الزر الآخر */
+.image-button {
+  padding: 6px 12px;
+  font-size: 14px;
+  height: 36px;             /* نفس ارتفاع زر الملاحظة */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* أزرار التحكم الثلاثة */
+.instructions-btn,
+.skill-image-btn,
+.note-button {
+  background-color: #43a6f8;
+  color: white;
+  padding: 5px 12px;
+  font-weight: 600;
+  border-radius: 18px;
+  font-size: 0.85rem;
+  min-width: 90px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border: none;
+}
+
+.instructions-btn:hover {
+  background-color: #1a73e8;
+}
+
+.skill-image-btn {
+  background-color: #6cb1f7;
+}
+.skill-image-btn:hover {
+  background-color: #3a8dde;
+}
+
+.note-button {
+  background-color: #ffa500;
+}
+.note-button:hover {
+  background-color: #cc8400;
+}
+
+/* حاوية أزرار الإجابة على اليمين */
+.answer-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ملاحظة نص */
+.note-input {
+  width: 100%;
+  min-height: 60px;
+  margin-top: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: 'Noto Sans Arabic', sans-serif;
+  font-size: 1rem;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+/* ترتيب الحاويات في skill-item */
+.skill-item {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ترتيب زر المهارة والنص */
+.skill-main {
+  margin-bottom: 6px;
+}
+
+/* لجعل الواجهة متجاوبة */
+@media (max-width: 600px) {
+  .skill-controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .control-buttons-left {
+    flex-direction: row;
+    margin-left: 0;
+    margin-bottom: 10px;
+  }
+
+  .instructions-btn,
+  .skill-image-btn,
+  .note-button {
+    min-width: auto;
+    padding: 6px 10px;
+    font-size: 0.9rem;
+  }
+
+  .answer-buttons {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+.actions {
+  text-align: center; /* لتوسيط الزر أفقيًا */
+  margin-top: 30px;
+}
+
+.actions button#export-btn {
+  background: linear-gradient(135deg, #3a8dde, #6cb1f7);
+  color: white;
+  border: none;
+  padding: 12px 36px;
+  border-radius: 30px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(58, 141, 222, 0.4);
+  transition:
+    background 0.4s ease,
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
+  user-select: none;
+  display: inline-block;
+}
+
+.actions button#export-btn:hover {
+  background: linear-gradient(135deg, #6cb1f7, #3a8dde);
+  box-shadow: 0 6px 14px rgba(58, 141, 222, 0.7);
+  transform: translateY(-3px);
+}
+
+.actions button#export-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 3px 7px rgba(58, 141, 222, 0.5);
+}
+ 

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vocabulary Survey</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <main>
+    <h1 id="form-title">Vocabulary Survey</h1>
+
+    <!-- Language selection, basic info, instructions sections (unchanged) -->
+    <section class="card-section" id="language-selection-section" style="flex: 1 1 100%;">
+      <div class="card-header" style="cursor: default;">Select Tested Language</div>
+      <div class="card-content visible" style="display: flex; align-items: center; gap: 0.5rem;">
+        <label for="tested-language" style="font-weight: 600;">Tested Language:</label>
+        <select id="tested-language" aria-label="Select tested language">
+          <option value="en">English</option>
+          <option value="ar">Arabic</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="card-section" id="basic-info-section">
+      <div class="card-header" id="basic-info-header">Basic Information</div>
+      <div class="card-content visible">
+        <div class="form-group">
+          <label for="child-name" id="label-child-name">Child’s Name:</label>
+          <input type="text" id="child-name" name="childName" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label for="parent-name" id="label-parent-name">Parent’s Name:</label>
+          <input type="text" id="parent-name" name="parentName" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label for="child-dob" id="label-child-dob">Date of Birth (DOB):</label>
+          <input type="date" id="child-dob" name="childDob" />
+        </div>
+        <div class="form-group">
+          <label for="survey-date" id="label-survey-date">Date of Survey Completion:</label>
+          <input type="date" id="survey-date" name="surveyDate" />
+        </div>
+      </div>
+    </section>
+
+    <section class="card-section" id="instructions-section">
+      <div class="card-header" id="instructions-header">Instructions</div>
+      <div class="card-content visible">
+        <p id="instructions-text-short">
+          Please check each word that your child says spontaneously (without imitation). Do not include words that your child only understands. Count words even if they are mispronounced, as long as they are recognizable.
+        </p>
+        <div id="instructions-text-full" class="hidden">
+          <p>This survey helps track your child's language development. Your honest responses are crucial.</p>
+          <p>Spontaneous means the child says the word on their own, not just repeating what they heard.</p>
+          <p>If the child uses a word in a different context (e.g., 'moo' for cow), it still counts.</p>
+        </div>
+        <button type="button" class="add-row" id="toggle-instructions-btn">Show More Instructions</button>
+      </div>
+    </section>
+
+    <!-- Word checklist sections inserted dynamically here -->
+
+    <section class="card-section" id="findings-summary-section">
+      <div class="card-header" id="findings-summary-header">Findings Summary & Automatic Scoring</div>
+      <div class="card-content visible">
+        <p id="findings-summary-text"></p>
+        <ul id="suggestions-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- Actions container: Export button + Normative buttons side by side -->
+  <div class="actions" style="display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap;">
+    <button type="button" id="export-btn">Export as .txt</button>
+    <button type="button" class="add-row" id="show-norms-en-btn">Show Norms (English)</button>
+    <button type="button" class="add-row" id="show-norms-ar-btn">Show Norms (Arabic)</button>
+  </div>
+
+  <!-- Modal for normative data -->
+  <div id="norms-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content" tabindex="-1">
+      <span class="close-button" role="button" aria-label="Close modal">&times;</span>
+      <h2 id="modal-title"></h2>
+      <table id="norms-table" aria-describedby="norm-note">
+        <thead>
+          <tr id="norms-table-header"></tr>
+        </thead>
+        <tbody id="norms-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

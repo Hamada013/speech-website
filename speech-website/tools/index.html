@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tools | Ahmad Ghanem SLP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, 'Noto Sans Arabic', sans-serif;
+      background: #f8fafd;
+      margin: 0;
+      color: #233;
+    }
+    .site-nav-bar {
+      margin-bottom: 1.7em;
+      text-align: center;
+      width: 100%;
+      background: #fcfdff;
+      border-bottom: 1px solid #e3f1ff;
+      padding: 0.45em 0;
+      position: relative;
+      z-index: 2;
+    }
+    .site-nav-bar a {
+      color: #43a6f8;
+      text-decoration: none;
+      padding: 10px 22px;
+      border-radius: 18px;
+      font-weight: bold;
+      font-size: 1em;
+      margin: 0 0.5em;
+      transition: background 0.13s;
+    }
+    .site-nav-bar a.active, .site-nav-bar a:hover {
+      background: #e0f2ff;
+      color: #2693d9;
+    }
+    .tools-section-header {
+      margin-top: 2em;
+      margin-bottom: 2.1em;
+      text-align: center;
+    }
+    .tools-title {
+      font-size: 2em;
+      color: #2567aa;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      margin-bottom: 0.3em;
+    }
+    .tools-subtitle {
+      color: #3496d8;
+      font-weight: bold;
+      font-size: 1.07em;
+      margin-bottom: 0.3em;
+    }
+    .tools-area {
+      max-width: 1080px;
+      margin: 0 auto 10vh auto;
+      min-height: 75vh;
+      height: 75vh;         /* For demo: force height so scrollbar demo visible */
+      background: #fafdff;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px #43a6f810;
+      overflow-y: auto;
+      padding-bottom: 1.5em;
+    }
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 2em 2.2em;
+      padding: 2.2em 2.2em 1.5em 2.2em;
+      justify-items: center;
+    }
+    .tool-card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 2px 16px #47a5ff11;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 182px;
+      width: 182px;
+      min-width: 132px;
+      min-height: 132px;
+      cursor: pointer;
+      transition: box-shadow 0.18s, transform 0.19s;
+      border: 2px solid #e3f1ff;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      aspect-ratio: 1/1;
+    }
+    .tool-card:hover, .tool-card:focus-within {
+      box-shadow: 0 8px 32px #43a6f829;
+      transform: translateY(-2px) scale(1.04);
+      border-color: #81c7fc;
+      z-index: 2;
+    }
+    .tool-card-icon {
+      display: block;
+      width: 80px;
+      height: 80px;
+      margin: 28px auto 12px auto;
+      object-fit: contain;
+      filter: drop-shadow(0 1.5px 7px #43a6f81e);
+      transition: filter 0.18s;
+    }
+    .tool-card-label {
+      font-size: 1.02em;
+      font-weight: 600;
+      color: #2561ae;
+      margin-bottom: 6px;
+      margin-top: 0;
+      text-align: center;
+      letter-spacing: 0.02em;
+      padding: 0 3px;
+      line-height: 1.13;
+    }
+    .tool-card-subtext {
+      font-size: 0.89em;
+      color: #8890a5;
+      font-weight: 400;
+      text-align: center;
+      padding: 0 0.4em;
+      margin-top: 2px;
+      margin-bottom: 0;
+    }
+    .tool-card-link {
+      position: absolute;
+      inset: 0;
+      text-indent: -9999px; /* let whole card be clickable if a <a> wrapper is not used */
+      outline: none;
+    }
+    @media (max-width: 840px) {
+      .tools-grid { grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 1.3em; padding: 1.1em 1vw; }
+      .tool-card { width: 128px; height: 128px;}
+      .tool-card-icon { width: 48px; height: 48px; margin:17px auto 6px auto;}
+    }
+    @media (max-width:540px) {
+      .tools-area { padding:0 0; }
+      .tools-grid { gap: 0.8em; padding: 0.7em 1vw;}
+      .tool-card { width: 90px; height: 90px;}
+      .tool-card-icon { width: 28px; height: 28px; margin:7px auto 2px auto;}
+      .tool-card-label { font-size: 0.94em;}
+    }
+    /* Custom slim & colored scrollbar for area */
+    .tools-area { scrollbar-width: thin; scrollbar-color: #96cdff #e6f5ff; }
+    .tools-area::-webkit-scrollbar { width: 10px; background: #e6f5ff;}
+    .tools-area::-webkit-scrollbar-thumb { background: #96cdff; border-radius: 8px;}
+  </style>
+</head>
+<body>
+  <nav class="site-nav-bar">
+    <a href="index.html">Home</a>
+    <a href="forms.html">Forms</a>
+    <a href="resources.html">Resources</a>
+  </nav>
+  <main>
+    <section class="tools-section-header">
+      <div class="tools-title">Tools</div>
+      <div class="tools-subtitle">Digital assistants and calculators for SLP practice</div>
+    </section>
+    <section class="tools-area">
+      <div class="tools-grid">
+        <!-- Example tool cards, update src and labels as needed -->
+        <a href="tools/age-calculator.html" class="tool-card" tabindex="0">
+          <img src="images/tools-age.png" alt="Age Calculator" class="tool-card-icon">
+          <div class="tool-card-label">Age Calculator</div>
+          <div class="tool-card-subtext">Chronological age tool</div>
+        </a>
+        <a href="tools/words-per-minute.html" class="tool-card" tabindex="0">
+          <img src="images/tools-words.png" alt="Words per minute" class="tool-card-icon">
+          <div class="tool-card-label">Words-per-Minute</div>
+          <div class="tool-card-subtext">Calculate speech/reading rate</div>
+        </a>
+        <a href="tools/syllable-counter.html" class="tool-card" tabindex="0">
+          <img src="images/tools-syllable.png" alt="Syllable Counter" class="tool-card-icon">
+          <div class="tool-card-label">Syllable Counter</div>
+          <div class="tool-card-subtext">Count from text</div>
+        </a>
+        <a href="tools/hearing-screening.html" class="tool-card" tabindex="0">
+          <img src="images/tools-hearing.png" alt="Hearing Screening" class="tool-card-icon">
+          <div class="tool-card-label">Hearing Screening</div>
+          <div class="tool-card-subtext">Quick 6Q screener</div>
+        </a>
+        <!-- Add more tool cards below. Just copy-paste as you want -->
+        <!-- Demo of overflow -->
+        <a href="#" class="tool-card"><img src="images/tools-placeholder.png" alt="" class="tool-card-icon"><div class="tool-card-label">Tool Demo</div><div class="tool-card-subtext">Information</div></a>
+        <a href="#" class="tool-card"><img src="images/tools-placeholder.png" alt="" class="tool-card-icon"><div class="tool-card-label">Tool Demo</div><div class="tool-card-subtext">Information</div></a>
+        <a href="#" class="tool-card"><img src="images/tools-placeholder.png" alt="" class="tool-card-icon"><div class="tool-card-label">Tool Demo</div><div class="tool-card-subtext">Information</div></a>
+        <a href="#" class="tool-card"><img src="images/tools-placeholder.png" alt="" class="tool-card-icon"><div class="tool-card-label">Tool Demo</div><div class="tool-card-subtext">Information</div></a>
+        <a href="#" class="tool-card"><img src="images/tools-placeholder.png" alt="" class="tool-card-icon"><div class="tool-card-label">Tool Demo</div><div class="tool-card-subtext">Information</div></a>
+        <a href="#" class="tool-card"><img src="images/tools-placeholder.png" alt="" class="tool-card-icon"><div class="tool-card-label">Tool Demo</div><div class="tool-card-subtext">Information</div></a>
+        <!-- ...and so on. The right scrollbar will appear when needed! -->
+      </div>
+    </section>
+  </main>
+</body>
+</html>

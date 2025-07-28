@@ -1,0 +1,711 @@
+{
+  "form-title": "Vocabulary Survey",
+  "lang-en": "English",
+  "lang-ar": "Arabic",
+  "export-text": "Export as .txt",
+  "basic-info-header": "Basic Information",
+  "label-child-name": "Child’s Name:",
+  "label-parent-name": "Parent’s Name:",
+  "label-child-dob": "Date of Birth (DOB):",
+  "label-survey-date": "Date of Survey Completion:",
+  "instructions-header": "Instructions",
+  "instructions-text-short": "Please check each word that your child says spontaneously (without imitation). Do not include words that your child only understands. Count words even if they are mispronounced, as long as they are recognizable.",
+  "instructions-text-full": [
+    "This survey helps track your child's language development. Your honest responses are crucial.",
+    "Spontaneous means the child says the word on their own, not just repeating what they heard.",
+    "If the child uses a word in a different context (e.g., 'moo' for cow), it still counts."
+  ],
+  "show-more-instructions-button": "Show More Instructions",
+  "hide-more-instructions-button": "Hide Instructions",
+  "findings-summary-header": "Findings Summary & Automatic Scoring",
+  "findings-summary-text": "Based on your selections, your child’s vocabulary size is approximately [total-words-checked] words, and the mean phrase length is about [mean-phrase-length]. Normative data for 24 months indicates a vocabulary mean of approximately [vocab-mean] ± [vocab-sd] words (English) or ~[vocab-mean-ar] ± [vocab-sd-ar] words (Arabic), and a mean phrase length of around [mpl-mean] ± [mpl-sd] (English) or [mpl-mean-ar] ± [mpl-sd-ar] (Arabic).",
+  "suggestion-low-vocab": "Consider consulting a speech and language therapist if concerns persist.",
+  "suggestion-average-vocab": "Your child's vocabulary appears to be within the expected range.",
+  "suggestion-high-vocab": "Your child shows strong vocabulary development. Keep encouraging language use!",
+  "suggestion-mpl-generic": "Mean phrase length assessment typically requires more detailed language samples.",
+  "normative-resources-header": "Normative Resources",
+  "show-norms-en-button": "Show Norms (English)",
+  "show-norms-ar-button": "Show Norms (Arabic)",
+  "norm-note": "Note that Arabic vocabulary scores tend to be slightly lower due to different word frequencies and parental reporting styles.",
+  "norms-table-header-measure": "Measure",
+  "norms-table-header-value-sd": "Value ± SD",
+  "norms-table-header-vocab": "Vocabulary Mean (words)",
+  "norms-table-header-mpl": "Mean Phrase Length (words)",
+  "checked-words-header": "Words Checked",
+  "total-words-checked-label": "Total Words Checked",
+  "no-words-checked-in-category": "No words checked in this category.",
+  "search-placeholder": "Search for a word...",
+  "hide-category-button": "Hide Category",
+  "norms": {
+    "english": {
+      "vocabulary-mean": "323",
+      "vocabulary-sd": "177.9",
+      "mpl-mean": "4.46",
+      "mpl-sd": "2.25"
+    },
+    "arabic": {
+      "vocabulary-mean": "~290",
+      "vocabulary-sd": "160",
+      "mpl-mean": "4.20",
+      "mpl-sd": "2.10"
+    }
+  },
+  "word-checklist": {
+    "animals-animal-sounds": {
+      "title": "Animals & Animal Sounds",
+      "groups": [
+        {
+          "id": "A1",
+          "revealButtonText": "Show Animals & Animal Sounds",
+          "words": [
+            { "en": "Dog", "ar": "كلب" },
+            { "en": "Cat", "ar": "قط" },
+            { "en": "Duck", "ar": "بطة" },
+            { "en": "Cow", "ar": "بقرة" },
+            { "en": "Meow", "ar": "مياو" },
+            { "en": "Moo", "ar": "موو" },
+            { "en": "Bear", "ar": "دب" },
+            { "en": "Bee", "ar": "نحلة" },
+            { "en": "Bird", "ar": "طائر" },
+            { "en": "Bunny/Rabbit", "ar": "أرنب" },
+            { "en": "Butterfly", "ar": "فراشة" },
+            { "en": "Chicken", "ar": "دجاجة" },
+            { "en": "Lamb", "ar": "خروف" },
+            { "en": "Lion", "ar": "أسد" },
+            { "en": "Monkey", "ar": "قرد" },
+            { "en": "Mouse", "ar": "فأر" },
+            { "en": "Owl", "ar": "بومة" },
+            { "en": "Penguin", "ar": "بطريق" },
+            { "en": "Pig", "ar": "خنزير" },
+            { "en": "Horse", "ar": "حصان" },
+            { "en": "Kitten", "ar": "هريرة" },
+            { "en": "Deer", "ar": "غزال" },
+            { "en": "Donkey", "ar": "حمار" },
+            { "en": "Elephant", "ar": "فيل" },
+            { "en": "Fish", "ar": "سمك" },
+            { "en": "Frog", "ar": "ضفدع" },
+            { "en": "Giraffe", "ar": "زرافة" },
+            { "en": "Goose", "ar": "إوزة" },
+            { "en": "Squirrel", "ar": "سنجاب" },
+            { "en": "Tiger", "ar": "نمر" },
+            { "en": "Turkey", "ar": "ديك رومي" },
+            { "en": "Turtle", "ar": "سلحفاة" }
+          ]
+        }
+      ]
+    },
+    "vehicles": {
+      "title": "Vehicles",
+      "groups": [
+        {
+          "id": "B1",
+          "revealButtonText": "Show Vehicles",
+          "words": [
+            { "en": "Aeroplane / Plane", "ar": "طائرة" },
+            { "en": "Bicycle / Bike", "ar": "دراجة" },
+            { "en": "Boat", "ar": "قارب" },
+            { "en": "Truck / Lorry", "ar": "شاحنة" },
+            { "en": "Motorbike", "ar": "دراجة نارية" },
+            { "en": "Bus", "ar": "حافلة" },
+            { "en": "Car", "ar": "سيارة" },
+            { "en": "Fire Engine", "ar": "سيارة إطفاء" },
+            { "en": "Train", "ar": "قطار" }
+          ]
+        }
+      ]
+    },
+    "toys": {
+      "title": "Toys",
+      "groups": [
+        {
+          "id": "C1",
+          "revealButtonText": "Show Toys",
+          "words": [
+            { "en": "Ball", "ar": "كرة" },
+            { "en": "Balloon", "ar": "بالون" },
+            { "en": "Block / Brick", "ar": "مكعب / طوبة" },
+            { "en": "Doll", "ar": "عروسة" },
+            { "en": "Teddy Bear", "ar": "دبدوبة" },
+            { "en": "Toy", "ar": "لعبة" },
+            { "en": "Book", "ar": "كتاب" },
+            { "en": "Bubble", "ar": "فقاعة" }
+          ]
+        }
+      ]
+    },
+    "food-drink": {
+      "title": "Food & Drink",
+      "groups": [
+        {
+          "id": "D1",
+          "revealButtonText": "Show Food & Drink",
+          "words": [
+            { "en": "Apple", "ar": "تفاحة" },
+            { "en": "Banana", "ar": "موز" },
+            { "en": "Biscuit", "ar": "بسكويت" },
+            { "en": "Bread", "ar": "خبز" },
+            { "en": "Butter", "ar": "زبدة" },
+            { "en": "Cake", "ar": "كعكة" },
+            { "en": "Cereal", "ar": "حبوب" },
+            { "en": "Cheese", "ar": "جبن" },
+            { "en": "Chicken", "ar": "دجاج" },
+            { "en": "Chips", "ar": "رقائق البطاطا" },
+            { "en": "Coffee", "ar": "قهوة" },
+            { "en": "Drink", "ar": "مشروب" },
+            { "en": "Egg", "ar": "بيضة" },
+            { "en": "Fish", "ar": "سمك" },
+            { "en": "Lemon", "ar": "ليمون" },
+            { "en": "Lollipop", "ar": "مصاصة" },
+            { "en": "Marshmallow", "ar": "مارشميلو" },
+            { "en": "Melon", "ar": "شمام" },
+            { "en": "Pear", "ar": "كمثرى" },
+            { "en": "Porridge", "ar": "عصيدة" },
+            { "en": "Raisins", "ar": "زبيب" },
+            { "en": "Sandwich", "ar": "ساندويتش" },
+            { "en": "Strawberry", "ar": "فراولة" },
+            { "en": "Tomato", "ar": "طماطم" }
+          ]
+        }
+      ]
+    },
+    "body-parts": {
+      "title": "Body Parts",
+      "groups": [
+        {
+          "id": "E1",
+          "revealButtonText": "Show Body Parts",
+          "words": [
+            { "en": "Arm", "ar": "ذراع" },
+            { "en": "Belly Button", "ar": "سُرّة" },
+            { "en": "Ear", "ar": "أذن" },
+            { "en": "Eye", "ar": "عين" },
+            { "en": "Face", "ar": "وجه" },
+            { "en": "Finger", "ar": "إصبع" },
+            { "en": "Foot", "ar": "قدم" },
+            { "en": "Tongue", "ar": "لسان" },
+            { "en": "Tooth", "ar": "سن" }
+          ]
+        }
+      ]
+    },
+    "clothes": {
+      "title": "Clothes",
+      "groups": [
+        {
+          "id": "F1",
+          "revealButtonText": "Show Clothes – Group 1",
+          "words": [
+            { "en": "Bib", "ar": "مريلة" },
+            { "en": "Boots", "ar": "حذاء" },
+            { "en": "Button", "ar": "زر" },
+            { "en": "Coat", "ar": "معطف" }
+          ]
+        },
+        {
+          "id": "F2",
+          "revealButtonText": "Show Clothes – Group 2",
+          "words": [
+            { "en": "Dress", "ar": "فستان" },
+            { "en": "Glasses / Specs", "ar": "نظارة" },
+            { "en": "Hat", "ar": "قبعة" },
+            { "en": "Jacket", "ar": "سترة" },
+            { "en": "Jeans", "ar": "جينز" },
+            { "en": "Jumper / Sweater", "ar": "كنزة" },
+            { "en": "Nappy", "ar": "حفاضة" },
+            { "en": "Necklace", "ar": "قلادة" },
+            { "en": "Pyjamas", "ar": "بيجاما" },
+            { "en": "Shirt", "ar": "قميص" }
+          ]
+        }
+      ]
+    },
+    "furniture-household-items": {
+      "title": "Furniture & Household Items",
+      "groups": [
+        {
+          "id": "G1",
+          "revealButtonText": "Show Furniture – Group 1",
+          "words": [
+            { "en": "Bath / Bathtub", "ar": "حوض استحمام" },
+            { "en": "Bathroom", "ar": "حمام" },
+            { "en": "Bed", "ar": "سرير" },
+            { "en": "Bedroom", "ar": "غرفة نوم" },
+            { "en": "Chair", "ar": "كرسي" },
+            { "en": "Cooker / Stove / Oven", "ar": "موقد / فرن" },
+            { "en": "Shoe", "ar": "حذاء" },
+            { "en": "Shorts", "ar": "شورت" },
+            { "en": "Sock", "ar": "جورب" },
+            { "en": "Trousers", "ar": "بنطلون" },
+            { "en": "Zip", "ar": "سحاب" },
+            { "en": "Living Room", "ar": "غرفة المعيشة" },
+            { "en": "Play Pen", "ar": "مهد لعب" },
+            { "en": "Potty", "ar": "مرحاض صغير" },
+            { "en": "Refrigerator / Fridge", "ar": "ثلاجة" },
+            { "en": "Rocking Chair", "ar": "كرسي هزاز" },
+            { "en": "Settee / Sofa", "ar": "أريكة" },
+            { "en": "Cot", "ar": "سرير أطفال" },
+            { "en": "Sink", "ar": "حوض" },
+            { "en": "Door", "ar": "باب" },
+            { "en": "Drawer", "ar": "درج" },
+            { "en": "Garage", "ar": "مرآب" },
+            { "en": "High Chair", "ar": "كرسي عالي للأطفال" },
+            { "en": "Kitchen", "ar": "مطبخ" }
+          ]
+        },
+        {
+          "id": "G2",
+          "revealButtonText": "Show Household Items – Group 2",
+          "words": [
+            { "en": "Bin", "ar": "سلة مهملات" },
+            { "en": "Blanket", "ar": "بطانية" },
+            { "en": "Bottle", "ar": "زجاجة" },
+            { "en": "Box", "ar": "صندوق" },
+            { "en": "Broom", "ar": "مكنسة" },
+            { "en": "Brush", "ar": "فرشاة" },
+            { "en": "Clock", "ar": "ساعة" },
+            { "en": "Comb", "ar": "مشط" },
+            { "en": "Cup", "ar": "كوب" },
+            { "en": "Dish", "ar": "طبق" },
+            { "en": "Dummy", "ar": "لهاية" },
+            { "en": "Fork", "ar": "شوكة" },
+            { "en": "Glass", "ar": "كأس" },
+            { "en": "Hammer", "ar": "مطرقة" },
+            { "en": "Hoover / Vacuum", "ar": "مكنسة كهربائية" },
+            { "en": "Paper", "ar": "ورق" },
+            { "en": "Penny", "ar": "قرش" },
+            { "en": "Picture", "ar": "صورة" },
+            { "en": "Pillow", "ar": "وسادة" },
+            { "en": "Plant", "ar": "نبتة" },
+            { "en": "Plate", "ar": "صحن" },
+            { "en": "Purse", "ar": "حقيبة يد" },
+            { "en": "Radio", "ar": "راديو" },
+            { "en": "Rubbish", "ar": "قمامة" },
+            { "en": "Scissors", "ar": "مقص" }
+          ]
+        },
+        {
+          "id": "G3",
+          "revealButtonText": "Show Household Items – Group 3",
+          "words": [
+            { "en": "Jug", "ar": "إبريق" },
+            { "en": "Key", "ar": "مفتاح" },
+            { "en": "Lamp", "ar": "مصباح" },
+            { "en": "Light", "ar": "ضوء" },
+            { "en": "Medicine", "ar": "دواء" },
+            { "en": "Money", "ar": "مال" },
+            { "en": "Mug", "ar": "فنجان" }
+          ]
+        }
+      ]
+    },
+    "people": {
+      "title": "People",
+      "groups": [
+        {
+          "id": "H1",
+          "revealButtonText": "Show People",
+          "words": [
+            { "en": "Aunt", "ar": "عمة" },
+            { "en": "Baby", "ar": "طفل" },
+            { "en": "Boy", "ar": "ولد" },
+            { "en": "Brother", "ar": "أخ" },
+            { "en": "Child", "ar": "طفل" },
+            { "en": "Daddy", "ar": "أبي" },
+            { "en": "Doctor", "ar": "طبيب" },
+            { "en": "Friend", "ar": "صديق" },
+            { "en": "Person", "ar": "شخص" },
+            { "en": "Policeman", "ar": "شرطي" },
+            { "en": "Sister", "ar": "أخت" },
+            { "en": "Girl", "ar": "فتاة" },
+            { "en": "Grandma", "ar": "جدة" },
+            { "en": "Grandpa", "ar": "جد" },
+            { "en": "Lady", "ar": "سيدة" },
+            { "en": "Man", "ar": "رجل" },
+            { "en": "Mummy", "ar": "أم" },
+            { "en": "Nanny", "ar": "مربية" },
+            { "en": "People", "ar": "أناس" },
+            { "en": "Teacher", "ar": "معلم" },
+            { "en": "Uncle", "ar": "عم" }
+          ]
+        }
+      ]
+    },
+    "games-routines": {
+      "title": "Games & Routines",
+      "groups": [
+        {
+          "id": "I1",
+          "revealButtonText": "Show Games & Routines",
+          "words": [
+            { "en": "Bath", "ar": "حمام / استحمام" },
+            { "en": "Breakfast", "ar": "فطور" },
+            { "en": "Bye bye", "ar": "وداعاً" },
+            { "en": "Dinner", "ar": "عشاء" },
+            { "en": "Don't", "ar": "لا" },
+            { "en": "Hello", "ar": "مرحباً" },
+            { "en": "Hi", "ar": "أهلاً" },
+            { "en": "Soap", "ar": "صابون" },
+            { "en": "Spoon", "ar": "ملعقة" },
+            { "en": "Telephone", "ar": "هاتف" },
+            { "en": "Toothbrush", "ar": "فرشاة أسنان" },
+            { "en": "Towel", "ar": "منشفة" },
+            { "en": "Watch", "ar": "ساعة" },
+            { "en": "No", "ar": "لا" },
+            { "en": "Pat-a-cake", "ar": "لعبة التصفيق" },
+            { "en": "Peekaboo", "ar": "بيكابو" },
+            { "en": "Please", "ar": "من فضلك" },
+            { "en": "Shh / Hush", "ar": "اسكت / هادئ" },
+            { "en": "Tea", "ar": "شاي" },
+            { "en": "Thank you", "ar": "شكراً" },
+            { "en": "Lunch", "ar": "غداء" },
+            { "en": "Nap", "ar": "قيلولة" },
+            { "en": "Night night", "ar": "تصبح على خير / ليلة سعيدة" },
+            { "en": "Wait", "ar": "انتظر" },
+            { "en": "Want to", "ar": "أريد أن" },
+            { "en": "Yes", "ar": "نعم" }
+          ]
+        }
+      ]
+    },
+    "action-words": {
+      "title": "Action Words",
+      "groups": [
+        {
+          "id": "J1",
+          "revealButtonText": "Show Action Words",
+          "words": [
+            { "en": "Bite", "ar": "يعض" },
+            { "en": "Blow", "ar": "ينفخ" },
+            { "en": "Break", "ar": "يكسر" },
+            { "en": "Bring", "ar": "يجلب" },
+            { "en": "Bump", "ar": "يصطدم" },
+            { "en": "Call", "ar": "ينادي" },
+            { "en": "Carry", "ar": "يحمل" },
+            { "en": "Catch", "ar": "يمسك" },
+            { "en": "Clean", "ar": "ينظف" },
+            { "en": "Cry", "ar": "يبكي" },
+            { "en": "Cuddle", "ar": "يعانق" },
+            { "en": "Cut", "ar": "يقطع" },
+            { "en": "Dance", "ar": "يرقص" },
+            { "en": "Eat", "ar": "يأكل" },
+            { "en": "Fall", "ar": "يسقط" },
+            { "en": "Find", "ar": "يجد" },
+            { "en": "Finish", "ar": "ينهي" },
+            { "en": "Get", "ar": "يحصل" },
+            { "en": "Give", "ar": "يعطي" },
+            { "en": "Go", "ar": "يذهب" },
+            { "en": "Have", "ar": "يملك" },
+            { "en": "Hear", "ar": "يسمع" },
+            { "en": "Help", "ar": "يساعد" },
+            { "en": "Hit", "ar": "يضرب" },
+            { "en": "Hug", "ar": "يعانق" },
+            { "en": "Hurry", "ar": "يستعجل" },
+            { "en": "Jump", "ar": "يقفز" },
+            { "en": "Kick", "ar": "يركل" },
+            { "en": "Kiss", "ar": "يقبّل" },
+            { "en": "Look", "ar": "ينظر" },
+            { "en": "Love", "ar": "يحب" },
+            { "en": "Make", "ar": "يصنع" },
+            { "en": "Open", "ar": "يفتح" },
+            { "en": "Play", "ar": "يلعب" },
+            { "en": "Pull", "ar": "يشد" },
+            { "en": "Push", "ar": "يدفع" },
+            { "en": "Put", "ar": "يضع" },
+            { "en": "Read", "ar": "يقرأ" },
+            { "en": "Ride", "ar": "يركب" },
+            { "en": "Run", "ar": "يجري" },
+            { "en": "Say", "ar": "يقول" },
+            { "en": "Scratch", "ar": "يخدش" },
+            { "en": "See", "ar": "يري" },
+            { "en": "Show", "ar": "يظهر" },
+            { "en": "Shut/Close", "ar": "يغلق" },
+            { "en": "Sing", "ar": "يغني" },
+            { "en": "Sleep", "ar": "ينام" },
+            { "en": "Smile", "ar": "يبتسم" },
+            { "en": "Splash", "ar": "يرش" },
+            { "en": "Stop", "ar": "يتوقف" },
+            { "en": "Swim", "ar": "يسبح" },
+            { "en": "Swing", "ar": "يتأرجح" },
+            { "en": "Take", "ar": "يأخذ" },
+            { "en": "Tell", "ar": "يخبر" },
+            { "en": "Throw", "ar": "يرمي" },
+            { "en": "Tickle", "ar": "يدغدغ" },
+            { "en": "Walk", "ar": "يمشي" },
+            { "en": "Draw", "ar": "يرسم" },
+            { "en": "Drink", "ar": "يشرب" },
+            { "en": "Drive", "ar": "يقود" },
+            { "en": "Drop", "ar": "يسقط" },
+            { "en": "Wash", "ar": "يغسل" },
+            { "en": "Watch", "ar": "يشاهد" },
+            { "en": "Wipe", "ar": "يمسح" },
+            { "en": "Write", "ar": "يكتب" }
+          ]
+        }
+      ]
+    },
+    "descriptive-words": {
+      "title": "Descriptive Words",
+      "groups": [
+        {
+          "id": "K1",
+          "revealButtonText": "Show Descriptive Words – Group 1",
+          "words": [
+            { "en": "All gone", "ar": "اختفى" },
+            { "en": "Asleep", "ar": "نائم" },
+            { "en": "Bad", "ar": "سيئ" },
+            { "en": "Big", "ar": "كبير" },
+            { "en": "Blue", "ar": "أزرق" },
+            { "en": "Broken", "ar": "مكسور" },
+            { "en": "Careful", "ar": "حذر" },
+            { "en": "Dark", "ar": "مظلم" },
+            { "en": "Dirty", "ar": "متسخ" },
+            { "en": "Dry", "ar": "جاف" },
+            { "en": "Empty", "ar": "فارغ" },
+            { "en": "Fast", "ar": "سريع" },
+            { "en": "Clean", "ar": "نظيف" },
+            { "en": "Cold", "ar": "بارد" }
+          ]
+        },
+        {
+          "id": "K2",
+          "revealButtonText": "Show Descriptive Words – Group 2",
+          "words": [
+            { "en": "Fine", "ar": "جيد" },
+            { "en": "Gentle", "ar": "لطيف" },
+            { "en": "Good", "ar": "جيد" },
+            { "en": "Green", "ar": "أخضر" },
+            { "en": "Happy", "ar": "سعيد" },
+            { "en": "Hard", "ar": "قاسي" },
+            { "en": "Hot", "ar": "حار" },
+            { "en": "Hungry", "ar": "جائع" },
+            { "en": "Hurt", "ar": "مجروح" },
+            { "en": "Little", "ar": "صغير" },
+            { "en": "Nasty", "ar": "مقرف" },
+            { "en": "Naughty", "ar": "شقي" },
+            { "en": "Nice", "ar": "لطيف" },
+            { "en": "Old", "ar": "قديم" },
+            { "en": "Pretty", "ar": "جميل" },
+            { "en": "Red", "ar": "أحمر" },
+            { "en": "Sad", "ar": "حزين" },
+            { "en": "Scared", "ar": "خائف" },
+            { "en": "Sick", "ar": "مريض" },
+            { "en": "Sleepy", "ar": "نعسان" },
+            { "en": "Soft", "ar": "ناعم" },
+            { "en": "Thirsty", "ar": "عطشان" },
+            { "en": "Tired", "ar": "متعب" },
+            { "en": "Wet", "ar": "مبلل" },
+            { "en": "Yellow", "ar": "أصفر" }
+          ]
+        }
+      ]
+    },
+    "question-words": {
+      "title": "Question Words",
+      "groups": [
+        {
+          "id": "L1",
+          "revealButtonText": "Show Question Words",
+          "words": [
+            { "en": "How", "ar": "كيف" },
+            { "en": "What", "ar": "ماذا" },
+            { "en": "When", "ar": "متى" },
+            { "en": "Who", "ar": "من" },
+            { "en": "Why", "ar": "لماذا" },
+            { "en": "Where", "ar": "أين" }
+          ]
+        }
+      ]
+    },
+    "time": {
+      "title": "Time",
+      "groups": [
+        {
+          "id": "M1",
+          "revealButtonText": "Show Time Words",
+          "words": [
+            { "en": "Day", "ar": "يوم" },
+            { "en": "Later", "ar": "لاحقاً" },
+            { "en": "Morning", "ar": "صباح" },
+            { "en": "Night", "ar": "ليلة" },
+            { "en": "Now", "ar": "الآن" },
+            { "en": "Today", "ar": "اليوم" },
+            { "en": "Tomorrow", "ar": "غدًا" },
+            { "en": "Tonight", "ar": "الليلة" }
+          ]
+        }
+      ]
+    },
+    "pronouns": {
+      "title": "Pronouns",
+      "groups": [
+        {
+          "id": "N1",
+          "revealButtonText": "Show Pronouns",
+          "words": [
+            { "en": "Her", "ar": "لها" },
+            { "en": "His", "ar": "له" },
+            { "en": "I", "ar": "أنا" },
+            { "en": "It", "ar": "هو/هي" },
+            { "en": "Me", "ar": "إياي" },
+            { "en": "Mine", "ar": "ملكي" },
+            { "en": "My", "ar": "لي" },
+            { "en": "That", "ar": "ذالك" },
+            { "en": "This", "ar": "هذا" },
+            { "en": "You", "ar": "أنت" },
+            { "en": "Your", "ar": "لك" }
+          ]
+        }
+      ]
+    },
+    "prepositions": {
+      "title": "Prepositions",
+      "groups": [
+        {
+          "id": "O1",
+          "revealButtonText": "Show Prepositions",
+          "words": [
+            { "en": "Away", "ar": "بعيد" },
+            { "en": "Back", "ar": "خلف" },
+            { "en": "Down", "ar": "أسفل" },
+            { "en": "In", "ar": "في" },
+            { "en": "Inside", "ar": "داخل" },
+            { "en": "Off", "ar": "عن" },
+            { "en": "On", "ar": "على" },
+            { "en": "Out", "ar": "خارج" },
+            { "en": "There", "ar": "هناك" },
+            { "en": "Under", "ar": "تحت" },
+            { "en": "Up", "ar": "فوق" }
+          ]
+        }
+      ]
+    },
+    "quantifiers": {
+      "title": "Quantifiers",
+      "groups": [
+        {
+          "id": "P1",
+          "revealButtonText": "Show Quantifiers",
+          "words": [
+            { "en": "All", "ar": "كل" },
+            { "en": "Again", "ar": "مرة أخرى" },
+            { "en": "Another", "ar": "آخر" },
+            { "en": "More", "ar": "أكثر" },
+            { "en": "None", "ar": "لا شيء" },
+            { "en": "Other", "ar": "آخر" },
+            { "en": "Same", "ar": "نفسه" },
+            { "en": "Some", "ar": "بعض" }
+          ]
+        }
+      ]
+    },
+    "extra-words": {
+      "title": "Extra Words",
+      "groups": [
+        {
+          "id": "Q1",
+          "revealButtonText": "Show Extra Words",
+          "words": [
+            { "en": "Chase", "ar": "يطارد" },
+            { "en": "Smell", "ar": "يشم" },
+            { "en": "Ant", "ar": "نملة" },
+            { "en": "Camel", "ar": "جمل" },
+            { "en": "Caterpillar", "ar": "يرقة" },
+            { "en": "Crab", "ar": "سلطعون" },
+            { "en": "Dolphin", "ar": "دولفين" },
+            { "en": "Koala", "ar": "كوالا" },
+            { "en": "Lizard", "ar": "سحلية" },
+            { "en": "Octopus", "ar": "أخطبوط" },
+            { "en": "Ambulance", "ar": "سيارة إسعاف" },
+            { "en": "Crane", "ar": "رافعة" },
+            { "en": "Digger", "ar": "حفارة" },
+            { "en": "Beans", "ar": "فول" },
+            { "en": "Blackberry", "ar": "توت أسود" },
+            { "en": "Blueberry", "ar": "توت أزرق" },
+            { "en": "Cherry", "ar": "كرز" },
+            { "en": "Chocolate", "ar": "شوكولاتة" },
+            { "en": "Cookie", "ar": "بسكويت" },
+            { "en": "Cracker", "ar": "مقرمشات" },
+            { "en": "Cucumber", "ar": "خيار" },
+            { "en": "Grape", "ar": "عنب" },
+            { "en": "Green Beans", "ar": "فاصوليا خضراء" },
+            { "en": "Haribo", "ar": "اهاريبو" },
+            { "en": "Panda", "ar": "باندا" },
+            { "en": "Rabbit", "ar": "أرنب" },
+            { "en": "Seal", "ar": "فقمة" },
+            { "en": "Snail", "ar": "حلزون" },
+            { "en": "Swan", "ar": "بجعة" },
+            { "en": "Worm", "ar": "دودة" },
+            { "en": "Zebra", "ar": "حمار الوحش" },
+            { "en": "Helicopter", "ar": "مروحية" },
+            { "en": "Rocket", "ar": "صاروخ" },
+            { "en": "Tractor", "ar": "جرار" },
+            { "en": "Belt", "ar": "حزام" },
+            { "en": "Ribbon", "ar": "شريط" },
+            { "en": "Curtains", "ar": "ستائر" },
+            { "en": "Dryer", "ar": "مجفف" },
+            { "en": "Microwave", "ar": "ميكروويف" },
+            { "en": "Backpack", "ar": "حقيبة ظهر" },
+            { "en": "Bag", "ar": "حقيبة" },
+            { "en": "Camera", "ar": "كاميرا" },
+            { "en": "CD", "ar": "سي دي" },
+            { "en": "Computer", "ar": "كمبيوتر" },
+            { "en": "Cushion", "ar": "مخدة" },
+            { "en": "DVD", "ar": "دي في دي" },
+            { "en": "Handbag", "ar": "حقيبة يد" },
+            { "en": "Hanger", "ar": "علاقة" },
+            { "en": "Headphones", "ar": "سماعات" },
+            { "en": "Iron", "ar": "مكواة" },
+            { "en": "Keyboard", "ar": "لوحة مفاتيح" },
+            { "en": "Laptop", "ar": "لابتوب" },
+            { "en": "Mouse", "ar": "فأرة" },
+            { "en": "Acorn", "ar": "بلوط" },
+            { "en": "Dirt", "ar": "تراب" },
+            { "en": "Grass", "ar": "عشب" },
+            { "en": "Farm", "ar": "مزرعة" },
+            { "en": "Flag", "ar": "علم" },
+            { "en": "Footpath", "ar": "ممشى" },
+            { "en": "Leaf", "ar": "ورقة شجرة" },
+            { "en": "Mud", "ar": "طين" },
+            { "en": "Pebble", "ar": "حصاة" },
+            { "en": "Puddle", "ar": "بركة ماء" },
+            { "en": "Alien", "ar": "كائن فضائي" },
+            { "en": "Astronaut", "ar": "رائد فضاء" },
+            { "en": "Clown", "ar": "مهرج" },
+            { "en": "Tie", "ar": "ربطة" },
+            { "en": "Ghost", "ar": "شبح" },
+            { "en": "Monster", "ar": "وحش" },
+            { "en": "Antler", "ar": "قرن" },
+            { "en": "Feather", "ar": "ريشة" },
+            { "en": "Feet", "ar": "أقدام" },
+            { "en": "Fin", "ar": "زعفة" },
+            { "en": "Flipper", "ar": "زعفة" },
+            { "en": "Fur", "ar": "فرو" },
+            { "en": "Horn", "ar": "قرن" },
+            { "en": "Paw", "ar": "مخلب" },
+            { "en": "Bonnet", "ar": "غطاء السيارة" },
+            { "en": "Boot", "ar": "صندوق السيارة" },
+            { "en": "Handle", "ar": "مقبض" },
+            { "en": "E-mail", "ar": "البريد الإلكتروني" },
+            { "en": "Facebook", "ar": "فيسبوك" },
+            { "en": "Google", "ar": "جوجل" },
+            { "en": "Internet", "ar": "الإنترنت" },
+            { "en": "Online", "ar": "عبر الإنترنت" },
+            { "en": "Skype", "ar": "سكايب" },
+            { "en": "Youtube", "ar": "يوتيوب" },
+            { "en": "Scales", "ar": "قشور" },
+            { "en": "Shell", "ar": "صدف" },
+            { "en": "Snout", "ar": "خشم" },
+            { "en": "Skin", "ar": "جلد" },
+            { "en": "Spots", "ar": "بقع" },
+            { "en": "Stripes", "ar": "خطوط" },
+            { "en": "Wings", "ar": "أجنحة" },
+            { "en": "Switch", "ar": "مفتاح التشغيل" },
+            { "en": "Wheel", "ar": "عجلة" },
+            { "en": "Pirate", "ar": "قرصان" },
+            { "en": "Robot", "ar": "روبوت" }
+          ]
+        }
+      ]
+    }
+  }
+}

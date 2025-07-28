@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adult Case History Form</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="form-header">
+            <h1 id="form-title">Adult Case History</h1>
+            <div class="language-toggle">
+                <span id="lang-en" class="lang-option active">English</span>
+                <label class="switch">
+                    <input type="checkbox" id="language-switch">
+                    <span class="slider round"></span>
+                </label>
+                <span id="lang-ar" class="lang-option">العربية</span>
+            </div>
+        </header>
+
+        <main id="form-container">
+            <!-- Form sections will be dynamically inserted here -->
+        </main>
+
+        <div class="form-actions">
+            <button id="export-btn" class="btn-primary">Download as Text</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

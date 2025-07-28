@@ -1,0 +1,31 @@
+{
+  "formTitle": "استمارة تقييم الفهم السمعي - المهارات النمائية",
+  "basicInfo": {
+    "childName": "اسم الطفل",
+    "parentName": "اسم ولي الأمر",
+    "dob": "تاريخ الميلاد",
+    "surveyDate": "تاريخ تعبئة الاستبيان"
+  },
+  "skills": {
+    "instructionsBtn": "تعليمات",
+    "answers": {
+      "present": "يوجد",
+      "absent": "لا يوجد",
+      "unknown": "غير محدد"
+    }
+  },
+  "report": {
+    "presentSkills": "المهارات الموجودة",
+    "absentSkills": "المهارات غير الموجودة",
+    "unknownSkills": "المهارات غير المحددة",
+    "noData": "لم يتم اختيار أي إجابات بعد."
+  },
+  "alerts": {
+    "noDataExport": "لا توجد بيانات لتصدير التقرير.",
+    "copySuccess": "تم نسخ التقرير إلى الحافظة.",
+    "copyFailure": "فشل نسخ التقرير. الرجاء المحاولة مرة أخرى."
+  },
+  "buttons": {
+    "exportReport": "تصدير التقرير (نسخ إلى الحافظة)"
+  }
+}

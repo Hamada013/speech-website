@@ -1,0 +1,15 @@
+{
+  "formTitle": "نموذج التقييم الشامل لأخصائي النطق واللغة",
+  "exportButton": "تصدير التقرير",
+  "sections": {
+    "basicInfo": "البيانات الأساسية",
+    "healthBehavior": "الحالة الصحية والسلوكية",
+    "languageAssessment": "تقييم اللغة",
+    "speechAssessment": "تقييم النطق",
+    "voiceAssessment": "تقييم الصوت",
+    "swallowingAssessment": "تقييم البلع",
+    "literacyAssessment": "تقييم القراءة والكتابة",
+    "summary": "الخلاصة والتشخيص",
+    "additionalInfo": "معلومات إضافية"
+  }
+}

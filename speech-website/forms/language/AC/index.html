@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>استبيان مهارات الفهم السمعي</title>
+  <link rel="stylesheet" href="style.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body>
+  <main>
+    <h1 id="form-title">استبيان مهارات الفهم السمعي</h1>
+
+    <section class="basic-info-section">
+      <h2>المعلومات الأساسية</h2>
+      <div class="basic-info-grid">
+        <label for="childName">اسم الطفل:</label>
+        <input type="text" id="childName" placeholder="أدخل اسم الطفل" />
+
+        <label for="parentName">اسم ولي الأمر:</label>
+        <input type="text" id="parentName" placeholder="أدخل اسم ولي الأمر" />
+
+        <label for="dob">تاريخ الميلاد:</label>
+        <input type="date" id="dob" />
+
+        <label for="surveyDate">تاريخ تعبئة الاستبيان:</label>
+        <input type="date" id="surveyDate" />
+      </div>
+    </section>
+
+    <section id="skills-container"></section>
+
+    <div class="actions">
+      <button type="button" id="export-btn">التقرير</button>
+      <button type="button" id="download-txt-btn">تحميل تقرير</button>
+    </div>
+
+    <section id="report-section" style="display:none;">
+      <h2>تقرير النتائج</h2>
+      <pre id="report-output"></pre>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

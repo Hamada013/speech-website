@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ahmad Ghanem, Speech-Language Pathologist</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Google Fonts -->
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&display=swap"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Audio elements for cat sounds -->
+  <audio id="meow1-sound" preload="auto">
+    <source src="sounds/meow1.mp3" type="audio/mpeg" />
+  </audio>
+  <audio id="meow2-sound" preload="auto">
+    <source src="sounds/meow2.mp3" type="audio/mpeg" />
+  </audio>
+  <audio id="meow3-sound" preload="auto">
+    <source src="sounds/meow3.mp3" type="audio/mpeg" />
+  </audio>
+
+  <!-- Audio elements for dog sounds -->
+  <audio id="dog1-sound" preload="auto">
+    <source src="sounds/dog1.mp3" type="audio/mpeg" />
+  </audio>
+  <audio id="dog2-sound" preload="auto">
+    <source src="sounds/dog2.mp3" type="audio/mpeg" />
+  </audio>
+  <audio id="dog3-sound" preload="auto">
+    <source src="sounds/dog3.mp3" type="audio/mpeg" />
+  </audio>
+
+  <!-- Cat GIF Display (right side) -->
+  <div
+    id="cat-gif-display"
+    class="gif-display gif-right"
+    aria-live="polite"
+    aria-atomic="true"
+    role="region"
+    aria-label="Cat animation"
+  >
+    <img id="cat-random-gif" src="" alt="Cat GIF" />
+  </div>
+
+  <!-- Dog GIF Display (left side) -->
+  <div
+    id="dog-gif-display"
+    class="gif-display gif-left"
+    aria-live="polite"
+    aria-atomic="true"
+    role="region"
+    aria-label="Dog animation"
+  >
+    <img id="dog-random-gif" src="" alt="Dog GIF" />
+  </div>
+
+  <!-- Animated background elements -->
+  <ul class="bg-bubbles">
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+  </ul>
+
+  <main class="homepage-main">
+    <!-- Logo -->
+    <div class="logo-container">
+      <img src="images/logo.png" alt="Ahmad Ghanem SLP Logo" class="logo" />
+    </div>
+
+    <!-- Main title and subtitle -->
+    <h1 class="home-title">Ahmad Ghanem</h1>
+    <div class="subtitle">Speech-Language Pathologist</div>
+    <div class="mission">"A voice is a voice no matter how small"</div>
+
+    <!-- Floating About Me Button -->
+    <button id="open-about-btn" class="about-float-btn" aria-label="About Me">?</button>
+
+    <!-- Main navigation buttons -->
+    <nav class="main-nav">
+      <button id="open-forms-btn" class="main-btn">Forms</button>
+      <a href="tools.html" class="main-btn">Tools</a>
+      <a href="resources.html" class="main-btn">Resources</a>
+    </nav>
+
+    <!-- Contact and about block -->
+    <div class="about-contact">
+      <div>
+        <strong>Contact:</strong>
+        <a href="mailto:slp.ahmadghanem@gmail.com">slp.ahmadghanem@gmail.com</a>
+        &bull;
+        <a href="tel:+963988451245">+963 988 451 245</a>
+      </div>
+      <div><strong>Clinic:</strong> Happy Llama</div>
+      <div style="margin-top: 0.7em; color: #789; font-size: 0.9em;">
+        &copy; <span id="year"></span> Ahmad Ghanem &ndash; All rights reserved.
+      </div>
+    </div>
+  </main>
+
+  <!-- Forms Password Modal -->
+  <div
+    id="password-modal"
+    class="modal-bg"
+    aria-hidden="true"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="password-modal-title"
+  >
+    <div class="modal-box">
+      <h2 id="password-modal-title" style="margin-top: 0;">Protected Forms</h2>
+      <div style="margin-bottom: 10px;">Enter password to access client forms</div>
+      <form id="pw-modal-form" autocomplete="off">
+        <input
+          type="password"
+          id="pw-modal-input"
+          placeholder="Password"
+          autofocus
+          aria-describedby="pw-modal-error"
+        />
+        <button type="submit" style="margin-top: 12px;">Unlock</button>
+      </form>
+      <div
+        id="pw-modal-error"
+        style="color: #d33; margin-top: 7px; display: none; font-size: 0.9em;"
+      >
+        Incorrect password. Please try again.
+      </div>
+      <button
+        id="pw-close-btn"
+        type="button"
+        class="modal-close"
+        title="Close"
+        aria-label="Close Password Modal"
+      >
+        &times;
+      </button>
+    </div>
+  </div>
+
+  <!-- About Me Modal -->
+  <div
+    id="about-modal"
+    class="modal-bg"
+    aria-hidden="true"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="about-modal-title"
+  >
+    <div class="modal-box">
+      <h2 id="about-modal-title" style="margin-top: 0;">About Me</h2>
+      <div style="margin-bottom: 15px; text-align: left;">
+        <p>
+          I'm a passionate Speech-Language Pathologist (SLP) dedicated to helping
+          children and adults discover the power of communication.
+        </p>
+
+        <p>
+          With a focus on empathy, evidence-based practice, and personalized care,
+          I empower my clients to overcome challenges—unlocking confidence and
+          connection in their daily lives.
+        </p>
+
+        <p>
+          Specializing in speech and language disorders, I bring extensive
+          experience helping clients achieve their communication goals.
+        </p>
+      </div>
+      <button
+        id="about-close-btn"
+        type="button"
+        class="modal-close"
+        title="Close"
+        aria-label="Close About Modal"
+      >
+        &times;
+      </button>
+    </div>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>

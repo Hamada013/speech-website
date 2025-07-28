@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Forms | Ahmad Ghanem SLP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&display=swap">
+  <!-- Tab Icon -->
+  <link rel="icon" href="images/logo.png" type="image/png">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, 'Noto Sans Arabic', sans-serif;
+      background: #f8fafd;
+      margin: 0;
+      color: #233;
+    }
+    .site-nav-bar {
+      margin-bottom: 1.7em;
+      text-align: center;
+      width: 100%;
+      background: #fcfdff;
+      border-bottom: 1px solid #e3f1ff;
+      padding: 0.45em 0;
+      position: relative;
+      z-index: 2;
+    }
+    .site-nav-bar a {
+      color: #43a6f8;
+      text-decoration: none;
+      padding: 10px 22px;
+      border-radius: 18px;
+      font-weight: bold;
+      font-size: 1em;
+      margin: 0 0.5em;
+      transition: background 0.13s;
+    }
+    .site-nav-bar a.active, .site-nav-bar a:hover {
+      background: #e0f2ff;
+      color: #2693d9;
+    }
+    .forms-header {
+      margin-top: 2em;
+      margin-bottom: 2.5em;
+      text-align: center;
+    }
+    .subtitle {
+      font-size: 1.11em;
+      color: #3496d8;
+      margin-bottom: 0.5em;
+      font-weight: bold;
+    }
+    .forms-list {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 1.5em;
+      max-width: 1200px;
+      margin: 3em auto;
+      align-items: stretch;
+    }
+    /* Style for cards */
+    .form-card {
+      background: #fcfdff;
+      border-radius: 16px;
+      box-shadow: 0 3px 14px #a4d4ff16;
+      border: 1.8px solid #e3f1ff;
+      padding: 30px 24px 22px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: box-shadow 0.17s, border-color 0.17s;
+      min-height: 330px;
+      box-sizing: border-box;
+      aspect-ratio: 1/1;
+      min-width: 0;
+    }
+    .form-card img {
+      width: 74px;
+      height: 74px;
+      margin-bottom: 0.9em;
+      object-fit: contain;
+      color: #43a6f8;
+      filter: drop-shadow(0 2px 12px #43a6f814);
+      font-size: 2.6em;
+    }
+    .form-card-title {
+      font-size: 1.16em;
+      font-weight: bold;
+      color: #233;
+      margin-bottom: 0.7em;
+      margin-top: 0;
+    }
+    .form-card-desc {
+      color: #6b7689;
+      font-size: 0.98em;
+      margin-bottom: 1.2em;
+      flex-grow: 1;
+      margin-top: 0;
+    }
+    .form-card-link {
+      margin-top: auto;
+      background: #43a6f8;
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 24px;
+      font-size: 1.06em;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 3px 12px #43a6f81a;
+      transition: background 0.17s;
+      display: inline-block;
+    }
+    .form-card-link:hover {
+      background: #3496d8;
+    }
+    /* First 3 cards: centered in first row, columns 2-4 */
+    .form-card.card1 { grid-column: 2 / 3; grid-row: 1 / 2; }
+    .form-card.card2 { grid-column: 3 / 4; grid-row: 1 / 2; }
+    .form-card.card3 { grid-column: 4 / 5; grid-row: 1 / 2; }
+    /* Next row: fill full width */
+    .form-card.card4 { grid-column: 1 / 2; grid-row: 2 / 3; }
+    .form-card.card5 { grid-column: 2 / 3; grid-row: 2 / 3; }
+    .form-card.card6 { grid-column: 3 / 4; grid-row: 2 / 3; }
+    .form-card.card7 { grid-column: 4 / 5; grid-row: 2 / 3; }
+    .form-card.card8 { grid-column: 5 / 6; grid-row: 2 / 3; }
+
+    @media (max-width: 900px) {
+      .forms-list {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: none;
+      }
+      .form-card { grid-column: auto !important; grid-row: auto !important; }
+    }
+    @media (max-width: 540px) {
+      .forms-list { gap: 1em; }
+      .form-card { min-height: 220px; padding: 20px 7px 14px 7px; }
+      .form-card img { width: 50px; height:50px;}
+    }
+    .about-contact {
+      margin-top: 2.5em;
+      font-size: 1.09em;
+      line-height: 1.7;
+      color: #3e4666;
+      text-align: center;
+    }
+    .about-contact a {
+      color: #3496d8;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Simple Nav Bar -->
+  <nav class="site-nav-bar">
+    <a href="index.html">Home</a>
+    <a href="tools.html">Tools</a>
+    <a href="resources.html">Resources</a>
+  </nav>
+
+  <main>
+    <div class="forms-header">
+      <h1>Forms</h1>
+      <div class="subtitle">All digital assessment and intake forms</div>
+    </div>
+    <div class="forms-list">
+      <!-- Row 1: centered 3 -->
+      <div class="form-card card1">
+        <img src="images/language.gif" alt="Language forms icon">
+        <div class="form-card-title">Language</div>
+        <div class="form-card-desc">Explore language-related assessment.</div>
+        <a class="form-card-link" href="forms/language/index.html" target="_blank" rel="noopener">Language</a>
+      </div>
+      <div class="form-card card2">
+        <img src="images/speech.gif" alt="Speech forms icon">
+        <div class="form-card-title">Speech</div>
+        <div class="form-card-desc">Explore speech-related assessment.</div>
+        <a class="form-card-link" href="forms/speech/index.html" target="_blank" rel="noopener">Speech</a>
+      </div>
+      <div class="form-card card3">
+        <img src="images/ASD.gif" alt="ASD/Autism forms icon">
+        <div class="form-card-title">ASD</div>
+        <div class="form-card-desc">Assessment for autism spectrum.</div>
+        <a class="form-card-link" href="forms/asd/index.html" target="_blank" rel="noopener">ASD</a>
+      </div>
+      <!-- Row 2: 5 cards full width -->
+      <div class="form-card card4">
+        <img src="images/baby-smile.gif" alt="Child icon">
+        <div class="form-card-title">Child Case History</div>
+        <div class="form-card-desc">Basic developmental and family intake.</div>
+        <a class="form-card-link" href="forms/child-case-history/index.html" target="_blank" rel="noopener">Open</a>
+      </div>
+      <div class="form-card card5">
+        <img src="images/adult.gif" alt="Adult icon">
+        <div class="form-card-title">Adult Case History</div>
+        <div class="form-card-desc">Basic intake for adults.</div>
+        <a class="form-card-link" href="forms/adult-case-history/index.html" target="_blank" rel="noopener">Open</a>
+      </div>
+      <div class="form-card card6">
+        <img src="images/oral.gif" alt="Oral Motor Exam icon">
+        <div class="form-card-title">Oral Motor Exam</div>
+        <div class="form-card-desc">Comprehensive oral motor evaluation.</div>
+        <a class="form-card-link" href="forms/oral-motor-exam/index.html" target="_blank" rel="noopener">Open</a>
+      </div>
+      <div class="form-card card7">
+        <img src="images/voice.gif" alt="Voice icon">
+        <div class="form-card-title">Voice Evaluation</div>
+        <div class="form-card-desc">Assessment for voice issues.</div>
+        <a class="form-card-link" href="forms/voice/index.html" target="_blank" rel="noopener">Open</a>
+      </div>
+      <div class="form-card card8">
+        <img src="images/aphasia.gif" alt="Resources icon">
+        <div class="form-card-title">Aphasia</div>
+        <div class="form-card-desc">Assessment for neurodevelopmental issues.</div>
+        <a class="form-card-link" href="resources.html" target="_blank" rel="noopener">Open</a>
+      </div>
+    </div>
+
+    <div class="about-contact" style="margin-top:4em;">
+      <strong>Questions?</strong>
+      <a href="mailto:slp.ahmadghanem@gmail.com">slp.ahmadghanem@gmail.com</a> &bull;
+      <a href="tel:+963988451245">+963 988 451 245</a>
+    </div>
+  </main>
+</body>
+</html>

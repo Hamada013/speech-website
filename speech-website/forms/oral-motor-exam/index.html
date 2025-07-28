@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orofacial Examination Form</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="form-header">
+            <h1 id="form-title">Orofacial Examination</h1>
+            <div class="language-toggle">
+                <span id="lang-en">English</span>
+                <label class="switch">
+                    <input type="checkbox" id="language-switch">
+                    <span class="slider round"></span>
+                </label>
+                <span id="lang-ar">العربية</span>
+            </div>
+        </header>
+
+        <form id="orofacial-form">
+            <!-- Patient Info Section -->
+            <section class="form-section">
+                <h2 class="section-head" data-key="patientInfo">Patient Information</h2>
+                <div class="two-column">
+                    <div class="form-group">
+                        <label for="patient-name" data-key="name">Name</label>
+                        <input type="text" id="patient-name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="patient-age" data-key="age">Age</label>
+                        <input type="text" id="patient-age" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="exam-date" data-key="date">Date</label>
+                        <input type="date" id="exam-date" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="examiner-name" data-key="examiner">Examiner's Name</label>
+                        <input type="text" id="examiner-name" class="form-control">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Face Evaluation Section -->
+            <section class="form-section">
+                <h2 class="section-head" data-key="faceEval">Evaluation of Face</h2>
+                
+                <div class="form-group">
+                    <label data-key="symmetry">Symmetry</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="symmetry" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="symmetry" value="droops-right" data-key="droopsRight">
+                            <span class="radio-label" data-key="droopsRight">Droops on right</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="symmetry" value="droops-left" data-key="droopsLeft">
+                            <span class="radio-label" data-key="droopsLeft">Droops on left</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="abnormalMovements">Abnormal Movements</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="abnormal-movements" value="none" data-key="none">
+                            <span class="radio-label" data-key="none">None</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="abnormal-movements" value="grimaces" data-key="grimaces">
+                            <span class="radio-label" data-key="grimaces">Grimaces</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="abnormal-movements" value="spasms" data-key="spasms">
+                            <span class="radio-label" data-key="spasms">Spasms</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="mouthBreathing">Mouth Breathing</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="mouth-breathing" class="toggle">
+                        <label for="mouth-breathing" class="toggle-label">
+                            <span class="toggle-no" data-key="no">No</span>
+                            <span class="toggle-yes" data-key="yes">Yes</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional observations..." data-placeholder-key="enterObservations"></textarea>
+                </div>
+            </section>
+
+            <!-- Jaw and Teeth Evaluation Section -->
+            <section class="form-section">
+                <h2 class="section-head" data-key="jawTeethEval">Evaluation of Jaw and Teeth</h2>
+                <p class="instruction" data-key="jawInstruction">Tell client to open and close mouth.</p>
+                
+                <div class="form-group">
+                    <label data-key="rangeOfMotion">Range of Motion</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="jaw-range" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="jaw-range" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="symmetry">Symmetry</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="jaw-symmetry" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="jaw-symmetry" value="deviates-right" data-key="deviatesRight">
+                            <span class="radio-label" data-key="deviatesRight">Deviates to right</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="jaw-symmetry" value="deviates-left" data-key="deviatesLeft">
+                            <span class="radio-label" data-key="deviatesLeft">Deviates to left</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="movement">Movement</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="jaw-movement" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="jaw-movement" value="jerky" data-key="jerky">
+                            <span class="radio-label" data-key="jerky">Jerky</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="jaw-movement" value="groping" data-key="groping">
+                            <span class="radio-label" data-key="groping">Groping</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="jaw-movement" value="slow" data-key="slow">
+                            <span class="radio-label" data-key="slow">Slow</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="jaw-movement" value="asymmetrical" data-key="asymmetrical">
+                            <span class="radio-label" data-key="asymmetrical">Asymmetrical</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="temporomandibularJoint">TMJ Noises</label>
+                    <p class="instruction" data-key="tmjNote">Jaw popping, clicking, or grating sounds can be a sign of Temporomandibular Joint (TMJ) disorders, but they're not always a cause for concern.</p>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tmj-noises" value="absent" data-key="absent">
+                            <span class="radio-label" data-key="absent">Absent</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tmj-noises" value="grinding" data-key="grinding">
+                            <span class="radio-label" data-key="grinding">Grinding</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tmj-noises" value="popping" data-key="popping">
+                            <span class="radio-label" data-key="popping">Popping</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional details here" data-placeholder-key="enterDetails"></textarea>
+                </div>
+            </section>
+
+            <!-- Dentition Observation Section -->
+            <section class="form-section">
+                <h2 class="section-head" data-key="dentition">Observe Dentition</h2>
+                
+                <div class="form-group">
+                    <label data-key="teeth">Teeth</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="teeth" value="all-present" data-key="allPresent">
+                            <span class="radio-label" data-key="allPresent">All present</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="teeth" value="dentures" data-key="dentures">
+                            <span class="radio-label" data-key="dentures">Dentures</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="teeth" value="teeth-missing" data-key="teethMissing">
+                            <span class="radio-label" data-key="teethMissing">Teeth missing</span>
+                        </label>
+                    </div>
+                    <div class="form-group missing-teeth-group" style="display: none; margin-top: 10px;">
+                        <label data-key="specifyMissing">Specify which teeth are missing</label>
+                        <input type="text" class="form-control" id="missing-teeth">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="arrangement">Arrangement of Teeth</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="arrangement" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="arrangement" value="jumbled" data-key="jumbled">
+                            <span class="radio-label" data-key="jumbled">Jumbled</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="arrangement" value="spaces" data-key="spaces">
+                            <span class="radio-label" data-key="spaces">Spaces</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="arrangement" value="misaligned" data-key="misaligned">
+                            <span class="radio-label" data-key="misaligned">Misaligned</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="hygiene">Hygiene</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="hygiene" value="excellent" data-key="excellent">
+                            <span class="checkbox-label" data-key="excellent">Excellent</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="hygiene" value="good" data-key="good">
+                            <span class="checkbox-label" data-key="good">Good</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="hygiene" value="fair" data-key="fair">
+                            <span class="checkbox-label" data-key="fair">Fair</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="hygiene" value="poor" data-key="poor">
+                            <span class="checkbox-label" data-key="poor">Poor</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="hygiene" value="other" data-key="other">
+                            <span class="checkbox-label" data-key="other">Other</span>
+                        </label>
+                    </div>
+                    <div class="form-group hygiene-other-group" style="display: none; margin-top: 10px;">
+                        <textarea class="form-control" placeholder="Enter additional comments" data-placeholder-key="enterComments"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional observations..." data-placeholder-key="enterObservations"></textarea>
+                </div>
+            </section>
+
+            <!-- Lips Evaluation Section -->
+            <section class="form-section">
+                <h2 class="section-head" data-key="lipsEval">Evaluation of Lips</h2>
+                <p class="instruction" data-key="puckerInstruction">Tell client to pucker.</p>
+                
+                <div class="form-group">
+                    <label data-key="rangeOfMotion">Range of Motion</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="lips-range" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="lips-range" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="symmetry">Symmetry</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="lips-symmetry" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="lips-symmetry" value="droops-bilaterally" data-key="droopsBilaterally">
+                            <span class="radio-label" data-key="droopsBilaterally">Droops bilaterally</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="lips-symmetry" value="droops-right" data-key="droopsRight">
+                            <span class="radio-label" data-key="droopsRight">Droops right</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="lips-symmetry" value="droops-left" data-key="droopsLeft">
+                            <span class="radio-label" data-key="droopsLeft">Droops left</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="strength">Strength (press tongue blade against lips)</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="lips-strength" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="lips-strength" value="weak" data-key="weak">
+                            <span class="radio-label" data-key="weak">Weak</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional observations..." data-placeholder-key="enterObservations"></textarea>
+                </div>
+
+                <!-- Smile Evaluation -->
+                <h3 class="sub-section-head" data-key="smileEval">1. Tell client to smile.</h3>
+                
+                <div class="form-group">
+                    <label data-key="rangeOfMotion">Range of motion</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="smile-range" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="smile-range" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="symmetry">Symmetry</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="smile-symmetry" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="smile-symmetry" value="droops-bilaterally" data-key="droopsBilaterally">
+                            <span class="radio-label" data-key="droopsBilaterally">Droops bilaterally</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="smile-symmetry" value="droops-right" data-key="droopsRight">
+                            <span class="radio-label" data-key="droopsRight">Droops right</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="smile-symmetry" value="droops-left" data-key="droopsLeft">
+                            <span class="radio-label" data-key="droopsLeft">Droops left</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional observations..." data-placeholder-key="enterObservations"></textarea>
+                </div>
+
+                <!-- Cheeks Evaluation -->
+                <h3 class="sub-section-head" data-key="cheeksEval">2. Tell client to puff cheeks and hold air.</h3>
+                
+                <div class="form-group">
+                    <label data-key="lipStrength">Lip strength</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="cheeks-strength" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="cheeks-strength" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="nasalEmission">Nasal emission</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="nasal-emission" value="absent" data-key="absent">
+                            <span class="radio-label" data-key="absent">Absent</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="nasal-emission" value="present" data-key="present">
+                            <span class="radio-label" data-key="present">Present</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional observations..." data-placeholder-key="enterObservations"></textarea>
+                </div>
+            </section>
+
+            <!-- Tongue Evaluation Section -->
+            <section class="form-section">
+                <h2 class="section-head" data-key="tongueEval">Evaluation of Tongue</h2>
+                
+                <h3 class="sub-section-head" data-key="tongueGeneral">1. General Tongue Examination</h3>
+                
+                <div class="form-group">
+                    <label data-key="surfaceColor">Surface color</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-color" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-color" value="abnormal" data-key="abnormalColor">
+                            <span class="radio-label" data-key="abnormalColor">Abnormal</span>
+                        </label>
+                    </div>
+                    <div class="form-group color-specify-group" style="display: none; margin-top: 10px;">
+                        <label data-key="specify">Specify</label>
+                        <input type="text" class="form-control" id="tongue-color-specify">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="tongueMovements">Abnormal movements</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-movements" value="absent" data-key="absent">
+                            <span class="radio-label" data-key="absent">Absent</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-movements" value="jerky" data-key="jerky">
+                            <span class="radio-label" data-key="jerky">Jerky</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-movements" value="spasms" data-key="spasms">
+                            <span class="radio-label" data-key="spasms">Spasms</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-movements" value="writhing" data-key="writhing">
+                            <span class="radio-label" data-key="writhing">Writhing</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-movements" value="fasciculations" data-key="fasciculations">
+                            <span class="radio-label" data-key="fasciculations">Fasciculations</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="size">Size</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-size" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-size" value="small" data-key="small">
+                            <span class="radio-label" data-key="small">Small</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-size" value="large" data-key="large">
+                            <span class="radio-label" data-key="large">Large</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="frenum">Frenum</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-frenum" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-frenum" value="short" data-key="short">
+                            <span class="radio-label" data-key="short">Short</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional observations..." data-placeholder-key="enterObservations"></textarea>
+                </div>
+
+                <!-- Tongue Protraction -->
+                <h3 class="sub-section-head" data-key="protrudeInstruction">2. Tell client to protrude the tongue.</h3>
+                
+                <div class="form-group">
+                    <label data-key="excursion">Excursion</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-excursion" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-excursion" value="deviates-right" data-key="deviatesRight">
+                            <span class="radio-label" data-key="deviatesRight">Deviates to right</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-excursion" value="deviates-left" data-key="deviatesLeft">
+                            <span class="radio-label" data-key="deviatesLeft">Deviates to left</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="rangeOfMotion">Range of motion</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-range" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-range" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="speed">Speed of motion</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-speed" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-speed" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="strength">Strength (apply opposing pressure with tongue blade)</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-strength" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-strength" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional observations..." data-placeholder-key="enterObservations"></textarea>
+                </div>
+
+                <!-- Tongue Retraction -->
+                <h3 class="sub-section-head" data-key="retractInstruction">3. Tell client to retract the tongue.</h3>
+                
+                <div class="form-group">
+                    <label data-key="excursion">Excursion</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-retract-excursion" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-retract-excursion" value="deviates-right" data-key="deviatesRight">
+                            <span class="radio-label" data-key="deviatesRight">Deviates to right</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-retract-excursion" value="deviates-left" data-key="deviatesLeft">
+                            <span class="radio-label" data-key="deviatesLeft">Deviates to left</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="rangeOfMotion">Range of motion</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-retract-range" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-retract-range" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="speed">Speed of motion</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-retract-speed" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-retract-speed" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional observations..." data-placeholder-key="enterObservations"></textarea>
+                </div>
+
+                <!-- Tongue Lateral Movements -->
+                <h3 class="sub-section-head" data-key="moveTongueRight">4. Tell client to move the tongue tip to the right.</h3>
+                
+                <div class="form-group">
+                    <label data-key="excursion">Excursion</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-right-excursion" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-right-excursion" value="incomplete" data-key="incomplete">
+                            <span class="radio-label" data-key="incomplete">Incomplete</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-right-excursion" value="groping" data-key="groping">
+                            <span class="radio-label" data-key="groping">Groping</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="rangeOfMotion">Range of motion</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-right-range" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-right-range" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="strength">Strength (apply opposing pressure with tongue blade)</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-right-strength" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-right-strength" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional observations..." data-placeholder-key="enterObservations"></textarea>
+                </div>
+
+                <!-- Left Movement -->
+                <h3 class="sub-section-head" data-key="moveTongueLeft">5. Tell client to move the tongue tip to the left.</h3>
+                
+                <div class="form-group">
+                    <label data-key="excursion">Excursion</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-left-excursion" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-left-excursion" value="incomplete" data-key="incomplete">
+                            <span class="radio-label" data-key="incomplete">Incomplete</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-left-excursion" value="groping" data-key="groping">
+                            <span class="radio-label" data-key="groping">Groping</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="rangeOfMotion">Range of motion</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-left-range" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-left-range" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="strength">Strength (apply opposing pressure with tongue blade)</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-left-strength" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-left-strength" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional observations..." data-placeholder-key="enterObservations"></textarea>
+                </div>
+
+                <!-- Up/Down Movements -->
+                <h3 class="sub-section-head" data-key="moveTongueUp">6. Tell client to move the tongue tip up.</h3>
+                
+                <div class="form-group">
+                    <label data-key="movement">Movement</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-up-movement" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-up-movement" value="groping" data-key="groping">
+                            <span class="radio-label" data-key="groping">Groping</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="rangeOfMotion">Range of motion</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-up-range" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-up-range" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional observations..." data-placeholder-key="enterObservations"></textarea>
+                </div>
+
+                <h3 class="sub-section-head" data-key="moveTongueDown">7. Tell client to move the tongue tip down.</h3>
+                
+                <div class="form-group">
+                    <label data-key="movement">Movement</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-down-movement" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-down-movement" value="groping" data-key="groping">
+                            <span class="radio-label" data-key="groping">Groping</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="rangeOfMotion">Range of motion</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-down-range" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-down-range" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional observations..." data-placeholder-key="enterObservations"></textarea>
+                </div>
+
+                <!-- Side-to-side movements -->
+                <h3 class="sub-section-head" data-key="observeSideToSide">8. Observe rapid side-to-side movements.</h3>
+                
+                <div class="form-group">
+                    <label data-key="rate">Rate</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-rate" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-rate" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-rate" value="slows-down" data-key="slowsDown">
+                            <span class="radio-label" data-key="slowsDown">Slows down progressively</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="rangeOfMotion">Range of motion</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-side-range" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-side-range" value="reduced-left" data-key="reducedLeft">
+                            <span class="radio-label" data-key="reducedLeft">Reduced on left</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tongue-side-range" value="reduced-right" data-key="reducedRight">
+                            <span class="radio-label" data-key="reducedRight">Reduced on right</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional observations..." data-placeholder-key="enterObservations"></textarea>
+                </div>
+            </section>
+
+            <!-- Pharynx Evaluation Section -->
+            <section class="form-section">
+                <h2 class="section-head" data-key="pharynxEval">Evaluation of Pharynx</h2>
+                
+                <div class="form-group">
+                    <label data-key="color">Color</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="pharynx-color" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="pharynx-color" value="abnormal" data-key="abnormalColor">
+                            <span class="radio-label" data-key="abnormalColor">Abnormal</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="tonsils">Tonsils</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tonsils" value="absent" data-key="absent">
+                            <span class="radio-label" data-key="absent">Absent</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tonsils" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tonsils" value="enlarged" data-key="enlarged">
+                            <span class="radio-label" data-key="enlarged">Enlarged</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional observations..." data-placeholder-key="enterObservations"></textarea>
+                </div>
+            </section>
+
+            <!-- Palate Evaluation Section -->
+            <section class="form-section">
+                <h2 class="section-head" data-key="palateEval">Evaluation of Hard and Soft Palates</h2>
+                
+                <div class="form-group">
+                    <label data-key="color">Color</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="palate-color" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="palate-color" value="abnormal" data-key="abnormalColor">
+                            <span class="radio-label" data-key="abnormalColor">Abnormal</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="rugae">Rugae</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="rugae" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="rugae" value="very-prominent" data-key="veryProminent">
+                            <span class="radio-label" data-key="veryProminent">Very prominent</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="archHeight">Arch height</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="arch-height" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="arch-height" value="high" data-key="high">
+                            <span class="radio-label" data-key="high">High</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="arch-height" value="low" data-key="low">
+                            <span class="radio-label" data-key="low">Low</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="archWidth">Arch width</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="arch-width" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="arch-width" value="narrow" data-key="narrow">
+                            <span class="radio-label" data-key="narrow">Narrow</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="arch-width" value="wide" data-key="wide">
+                            <span class="radio-label" data-key="wide">Wide</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="growths">Growths</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="growths" value="absent" data-key="absent">
+                            <span class="radio-label" data-key="absent">Absent</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="growths" value="present" data-key="present">
+                            <span class="radio-label" data-key="present">Present</span>
+                        </label>
+                    </div>
+                    <div class="form-group growths-describe-group" style="display: none; margin-top: 10px;">
+                        <label data-key="describe">Describe</label>
+                        <textarea class="form-control" data-placeholder-key="describeGrowths"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="fistula">Fistula</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="fistula" value="absent" data-key="absent">
+                            <span class="radio-label" data-key="absent">Absent</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="fistula" value="present" data-key="present">
+                            <span class="radio-label" data-key="present">Present</span>
+                        </label>
+                    </div>
+                    <div class="form-group fistula-describe-group" style="display: none; margin-top: 10px;">
+                        <label data-key="describe">Describe</label>
+                        <textarea class="form-control" data-placeholder-key="describeFistula"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="clefting">Clefting</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="clefting" value="absent" data-key="absent">
+                            <span class="radio-label" data-key="absent">Absent</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="clefting" value="present" data-key="present">
+                            <span class="radio-label" data-key="present">Present</span>
+                        </label>
+                    </div>
+                    <div class="form-group clefting-describe-group" style="display: none; margin-top: 10px;">
+                        <label data-key="describe">Describe</label>
+                        <textarea class="form-control" data-placeholder-key="describeClefting"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="symmetryAtRest">Symmetry at rest</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="palate-symmetry" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="palate-symmetry" value="lower-right" data-key="lowerRight">
+                            <span class="radio-label" data-key="lowerRight">Lower on right</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="palate-symmetry" value="lower-left" data-key="lowerLeft">
+                            <span class="radio-label" data-key="lowerLeft">Lower on left</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="gagReflex">Gag reflex</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="gag-reflex" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="gag-reflex" value="absent" data-key="absent">
+                            <span class="radio-label" data-key="absent">Absent</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="gag-reflex" value="hyperactive" data-key="hyperactive">
+                            <span class="radio-label" data-key="hyperactive">Hyperactive</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="gag-reflex" value="hypoactive" data-key="hypoactive">
+                            <span class="radio-label" data-key="hypoactive">Hypoactive</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional observations..." data-placeholder-key="enterObservations"></textarea>
+                </div>
+
+                <!-- Phonation Evaluation -->
+                <p class="instruction" data-key="phonateInstruction">Tell client to phonate using /ɑ/.</p>
+                
+                <div class="form-group">
+                    <label data-key="symmetryOfMovement">Symmetry of movement</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="phonation-symmetry" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="phonation-symmetry" value="deviates-right" data-key="deviatesRight">
+                            <span class="radio-label" data-key="deviatesRight">Deviates right</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="phonation-symmetry" value="deviates-left" data-key="deviatesLeft">
+                            <span class="radio-label" data-key="deviatesLeft">Deviates left</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="posteriorMovement">Posterior movement</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="posterior-movement" value="present" data-key="present">
+                            <span class="radio-label" data-key="present">Present</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="posterior-movement" value="absent" data-key="absent">
+                            <span class="radio-label" data-key="absent">Absent</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="posterior-movement" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="lateralMovement">Lateral movement</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="lateral-movement" value="present" data-key="present">
+                            <span class="radio-label" data-key="present">Present</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="lateral-movement" value="absent" data-key="absent">
+                            <span class="radio-label" data-key="absent">Absent</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="lateral-movement" value="reduced" data-key="reduced">
+                            <span class="radio-label" data-key="reduced">Reduced</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="uvula">Uvula</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="uvula" value="normal" data-key="normal">
+                            <span class="radio-label" data-key="normal">Normal</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="uvula" value="bifid" data-key="bifid">
+                            <span class="radio-label" data-key="bifid">Bifid</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="uvula" value="deviates-right" data-key="deviatesRight">
+                            <span class="radio-label" data-key="deviatesRight">Deviates right</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="uvula" value="deviates-left" data-key="deviatesLeft">
+                            <span class="radio-label" data-key="deviatesLeft">Deviates left</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="nasality">Nasality</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="nasality" value="absent" data-key="absent">
+                            <span class="radio-label" data-key="absent">Absent</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="nasality" value="hypernasal" data-key="hypernasal">
+                            <span class="radio-label" data-key="hypernasal">Hypernasal</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group other-group">
+                    <label data-key="other">Other</label>
+                    <textarea class="form-control other-text" placeholder="Enter additional observations..." data-placeholder-key="enterObservations"></textarea>
+                </div>
+            </section>
+
+            <!-- Summary of Findings Section -->
+            <section class="form-section">
+                <h2 class="section-head" data-key="findingsSummary">Summary of Findings</h2>
+                <textarea id="summary" class="form-control large-textarea" 
+                    placeholder="Enter overall summary of findings..." data-placeholder-key="summaryPlaceholder"></textarea>
+                <p class="instruction" data-key="summaryNote">This area is provided for the examiner's overall summary of observations.</p>
+            </section>
+
+            <!-- Download Button -->
+            <div class="form-actions">
+                <button type="button" id="download-btn" class="btn-download" data-key="downloadText">
+                    Download as Text
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

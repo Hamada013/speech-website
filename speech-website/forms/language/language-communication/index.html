@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>نموذج التقييم اللغوي والتواصلي الشامل للأطفال الناطقين بالعربية</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<main>
+  <h1 id="form-title">نموذج التقييم اللغوي والتواصلي الشامل للأطفال الناطقين بالعربية</h1>
+  <form id="main-form" novalidate>
+
+    <!-- القسم الأول: المعلومات العامة -->
+    <div class="card">
+      <div class="card-header">القسم الأول: المعلومات العامة</div>
+      <div class="form-grid">
+        <label>اسم الطفل: <input type="text" name="child_name" /></label>
+        <div>الجنس:
+          <label><input type="checkbox" name="gender_m" /> ذكر</label>
+          <label><input type="checkbox" name="gender_f" /> أنثى</label>
+        </div>
+        <label>تاريخ الميلاد: <input type="text" placeholder="____ / ____ / ______" /></label>
+        <label>تاريخ التقييم: <input type="text" placeholder="____ / ____ / ______" /></label>
+        <label>العمر وقت التقييم: <input type="text" placeholder="_____ سنة _____ شهر" /></label>
+        <label>الجهة المُحيلة: <input type="text" /></label>
+        <label>اسم الأخصائي/ة: <input type="text" /></label>
+      </div>
+    </div>
+
+    <!-- القسم الثاني: المفردات -->
+    <div class="card">
+      <div class="card-header">القسم الثاني: المفردات (تحديد الكلمات المعروفة ضمن كل فئة)</div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>الفئة</th>
+              <th>كلمات تم التعرف عليها</th>
+              <th>استقبال</th>
+              <th>تعبير</th>
+              <th>ملاحظات</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr>
+              <td>الأسرة</td>
+              <td>أب، أم، أخ، أخت، جد، جدة</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>أعضاء الجسم</td>
+              <td>رأس، شعر، يد، اصبع، وجه، فم، عين، أذن، رجل، أنف، بطن، ظهر، صدر، أسنان، لسان</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>الملابس</td>
+              <td>قميص، فستان، بلوزة، تنورة، بنطلون، جاكيت، طاقية، جزمة، صندل، بيجامة، جرابات، كندرة، بوط، شحاطة، لحشة</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>الفواكه</td>
+              <td>تفاح، موز، برتقال، عنب، فريز، بطيخ، ليمون، مشمش، خوخ، تين، اجاص، دراق</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>الخضروات</td>
+              <td>بندورة، خيار، جزر، بصل، فليفلة، بطاطا، خس، زيتون، توم، كوسا، باذنجان</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>المأكولات</td>
+              <td>لحم، دجاج، سمك، بيض، خبز، معكرونة، عصير، حليب، شاي، كولا، ماء، ساندويش، جبنة، فول، فلافل، حمص، بيزا، بوظة</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>المنزل</td>
+              <td>بيت، كاسة، ملعقة، شوكة، سكين، صحن، كرسي، طاولة، تلفون، براد، تخت، حمام، مغسلة، مراية، مشط، طنجرة، طابة، مفتاح، خزانة، صندوق، تلفزيون، ساعة، غسالة، مطبخ، غرفة، كنباية، كمبيوتر، درج، غاز، سلة</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>الحيوانات</td>
+              <td>جاجة، خروف، حصان، كلب، بقرة، قطة، أسد، جمل، بطة، أرنب، سمكة، سلحفاة، فراشة، نحلة، ديك، عصفور، دب</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>المواصلات</td>
+              <td>سيارة، باص، طيارة، سفينة، قطار، بسكليت، موتور، شاحنة</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>الألوان</td>
+              <td>أحمر، أصفر، أزرق، أخضر، بني، أسود، أبيض، زهري، برتقالي، بنفسجي</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>الأشكال</td>
+              <td>مثلث، مربع، دائرة، مستطيل، بيضوي</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>الأحجام والمسافات والكميات</td>
+              <td>طويل/قصير، كبير/صغير، كثير/قليل، قريب/بعيد، مليان/فاضي، جديد/قديم، بارد/سخن، ليل/نهار، نظيف/وسخ</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>الكلمات المكانية</td>
+              <td>أمام/خلف، تحت/فوق، داخل/خارج، يمين/يسار</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>المثنى</td>
+              <td>قلمين، ولدين، بنتين</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>الجمع</td>
+              <td>ولد-أولاد، بنت-بنات، طاولة-طاولات، كرسي-كراسي، مفتاح-مفاتيح، كتاب-كتب، بيت-بيوت، وجه-وجوه، صورة-صور</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>التذكير والتأنيث</td>
+              <td>معلم-معلمة، يأكل-تأكل، ولد كبير-بنت كبيرة، كتب-كتبت</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>أسماء الإشارة</td>
+              <td>هذا، هذه، هديك، هاداك، هدول، هادوليك</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>الضمائر المنفصلة</td>
+              <td>أنا، نحن، أنت، أنتو، هي، هو، هم</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>الضمائر المتصلة</td>
+              <td>ني، كاف، ي، نا، ه، ها، هم، كم</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+            <tr>
+              <td>ضمائر الملكية</td>
+              <td>إلي، إلو، إلها، إلكم، إلهم</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+
+          <tr>
+  <td>الأفعال</td>
+  <td>يأكل، يشرب، ينام، يلعب، يجلس، يركض، يفتح، يغلق، يسمع، يرى، يعرف، يكتب، يقرأ، يرفع، ينزل، يلبس، يبكي، يضحك، يمشي، يتحدث</td>
+  <td><input type="checkbox" /></td>
+  <td><input type="checkbox" /></td>
+  <td><input type="text" /></td>
+</tr>
+
+<tr>
+  <td>الصفات</td>
+  <td>كبير، صغير، طويل، قصير، جميل، سريع، بطيء، ذكي، نظيف، وسخ، سعيد، حزين، بارد، دافئ، ثقيل، خفيف، جديد، قديم</td>
+  <td><input type="checkbox" /></td>
+  <td><input type="checkbox" /></td>
+  <td><input type="text" /></td>
+</tr>
+
+<tr>
+  <td>أفعال في صيغة الماضي</td>
+  <td>أكل، شرب، لعب، كتب، قرأ، نام، مشى، ذهب، عاد، رسم، قال، سمع، نظر، ضحك، بكى</td>
+  <td><input type="checkbox" /></td>
+  <td><input type="checkbox" /></td>
+  <td><input type="text" /></td>
+</tr>
+
+<tr>
+  <td>أفعال في صيغة المضارع</td>
+  <td>يأكل، يشرب، يكتب، يقرأ، يلعب، يجري، يركب، ينام، يعمل، يرى، يسمع، يقول، يحب، يفتح</td>
+  <td><input type="checkbox" /></td>
+  <td><input type="checkbox" /></td>
+  <td><input type="text" /></td>
+</tr>
+
+<tr>
+  <td>أدوات الاستفهام</td>
+  <td>من؟ ماذا؟ أين؟ متى؟ لماذا؟ كيف؟ كم؟ هل؟</td>
+  <td><input type="checkbox" /></td>
+  <td><input type="checkbox" /></td>
+  <td><input type="text" /></td>
+</tr>
+
+<tr>
+  <td>مفردات الزمن</td>
+  <td>اليوم، غدًا، أمس، الآن، صباح، مساء، ليل، نهار، أول، آخر، بعد، قبل، حين، منذ، زمن</td>
+  <td><input type="checkbox" /></td>
+  <td><input type="checkbox" /></td>
+  <td><input type="text" /></td>
+</tr>
+
+<tr>
+  <td>مفردات المكان</td>
+  <td>هنا، هناك، فوق، تحت، أمام، خلف، يمين، يسار، داخل، خارج، قريب، بعيد، مكان، جهة، موقع</td>
+  <td><input type="checkbox" /></td>
+  <td><input type="checkbox" /></td>
+  <td><input type="text" /></td>
+</tr>
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- القسم الثالث: الجمل والعبارات -->
+    <div class="card">
+      <div class="card-header">القسم الثالث: الجمل والعبارات</div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>نوع الجملة</th><th>مثال</th><th>استقبال</th><th>تعبير</th><th>ملاحظات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>جمل فعلية بسيطة</td>
+              <td>أكل الولد، راحت البنت</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+            <tr>
+              <td>جمل اسمية</td>
+              <td>البنت حلوة، الجو حار</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+            <tr>
+              <td>جمل مركبة</td>
+              <td>رحت عالمدرسة وبعدين رجعت</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+            <tr>
+              <td>استخدام أدوات الربط</td>
+              <td>و، بعدين، بس، لأن، إذا</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+            <tr>
+              <td>ترتيب الجمل في حوار</td>
+              <td>حوار بسيط من 2–3 جمل</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- القسم الرابع: سرد القصة أو الأحداث -->
+    <div class="card">
+      <div class="card-header">القسم الرابع: سرد القصة أو الأحداث</div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>المهارة</th><th>تقييم</th><th>ملاحظات</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>سرد أحداث متسلسلة (بداية، وسط، نهاية)</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+            <tr>
+              <td>استخدام المفردات الزمنية (بعدين، أول، آخر)</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+            <tr>
+              <td>الحفاظ على تسلسل منطقي</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+            <tr>
+              <td>القدرة على وصف شخصيات أو أماكن</td>
+              <td><input type="checkbox" /></td>
+              <td><input type="text" /></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- القسم الخامس: الأصوات والكلام -->
+    <div class="card">
+      <div class="card-header">القسم الخامس: الأصوات والكلام</div>
+      <label>الفحص الفموي (التقليدي):<textarea placeholder="________________________________________________"></textarea></label>
+      <label>وضوح الكلام (مدى الفهم من قبل الآخرين):</label>
+      <label><input type="checkbox" /> واضح دائمًا</label>
+      <label><input type="checkbox" /> أحيانًا</label>
+      <label><input type="checkbox" /> غير واضح</label>
+      <label>النمط الصوتي (جودة الصوت، الطبقة، الرنين):</label>
+      <label><input type="checkbox" /> طبيعي</label>
+      <label><input type="checkbox" /> به خلل: <input type="text" /></label>
+      <label>العمليات الفونولوجية (الإبدال، الحذف، الإضافة، التحريف):</label>
+      <label><input type="checkbox" /> لا</label>
+      <label><input type="checkbox" /> نعم: <input type="text" /></label>
+    </div>
+
+    <!-- القسم السادس: التواصل الاجتماعي والسلوك -->
+<div class="card">
+  <div class="card-header">القسم السادس: التواصل الاجتماعي والسلوك</div>
+  <div class="table-scroll">
+    <!-- جدول السلوك الاجتماعي -->
+    <table>
+      <thead>
+        <tr>
+          <th>السلوك الاجتماعي</th>
+          <th>ملاحَظ؟</th>
+          <th>ملاحظات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>يبدأ التفاعل مع الآخرين</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>يستجيب عند مناداته بالاسم</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>يشارك الآخرين اللعب أو الاهتمام</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>يستخدم الإيماءات لدعم التواصل</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>يُظهر تعبيرات وجه مناسبة</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>يُجري تبادل دوري في الحوار</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>يُبادر بالحوار</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>يتبع قواعد الحوار</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>يُعدل تواصله حسب الموقف</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>يُظهر تعاطفًا مع الآخرين</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- جدول السلوكيات غير النمطية -->
+    <table>
+      <thead>
+        <tr>
+          <th>سلوكيات غير نمطية</th>
+          <th>ملاحَظ؟</th>
+          <th>تكرار</th>
+          <th>ملاحظات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ترديد الكلمات (Echolalia)</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td>
+            <label style="margin-left:0.8rem;"><input type="checkbox" /> نادر</label>
+            <label style="margin-left:0.8rem;"><input type="checkbox" /> متكرر</label>
+            <label style="margin-left:0.8rem;"><input type="checkbox" /> دائم</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>انسحاب اجتماعي</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td></td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>سلوك نمطي</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td></td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>مقاومة التغيير</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td></td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>ضعف تعبير عن الحاجات</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td></td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>نوبات غضب</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td></td>
+          <td><input type="text" /></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- جدول الوسائل البديلة (AAC) -->
+    <table>
+      <thead>
+        <tr>
+          <th>الوسائل البديلة (AAC)</th>
+          <th>فعّالة؟</th>
+          <th>ملاحظات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>صور أو رموز</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>جهاز ناطق</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>إشارات أو لغة إشارة</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>تطبيقات تواصل</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> نعم</label>
+            <label><input type="checkbox" /> لا</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- جدول التفاعل مع -->
+    <table>
+      <thead>
+        <tr>
+          <th>التفاعل مع...</th>
+          <th>طبيعة التفاعل</th>
+          <th>ملاحظات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>الوالدين</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> طبيعي</label>
+            <label style="margin-left:1rem;"><input type="checkbox" /> ضعيف</label>
+            <label><input type="checkbox" /> مفرط</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>الأطفال الآخرين</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> طبيعي</label>
+            <label style="margin-left:1rem;"><input type="checkbox" /> تجنبي</label>
+            <label style="margin-left:1rem;"><input type="checkbox" /> عدواني</label>
+            <label><input type="checkbox" /> غير مهتم</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+        <tr>
+          <td>البالغين</td>
+          <td>
+            <label style="margin-left:1rem;"><input type="checkbox" /> طبيعي</label>
+            <label style="margin-left:1rem;"><input type="checkbox" /> خجول</label>
+            <label><input type="checkbox" /> مفرط</label>
+          </td>
+          <td><input type="text" /></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+    <!-- القسم السابع: التشخيص والتوصيات -->
+    <div class="card">
+      <div class="card-header">القسم السابع: التشخيص والتوصيات</div>
+      <label>التشخيص الأولي (غير رسمي): <textarea></textarea></label>
+      <label>نقاط القوة: <textarea></textarea></label>
+      <label>نقاط تحتاج إلى دعم: <textarea></textarea></label>
+
+      <label>التوصيات المبدئية:</label>
+      <label><input type="checkbox" /> بدء جلسات علاج نطقي ولغوي</label>
+      <label><input type="checkbox" /> متابعة تقييم نفسي/تربوي</label>
+      <label><input type="checkbox" /> تدريب الوالدين على دعم اللغة في المنزل</label>
+      <label><input type="checkbox" /> استخدام وسيلة AAC</label>
+      <label>إعادة التقييم بعد: <input type="text" placeholder="___ شهر" /></label>
+
+  </form>
+  <div class="actions">
+    <button type="button" id="export-btn" class="pill">تصدير النموذج</button>
+  </div>
+</main>
+<script src="script.js"></script>
+</body>
+</html>

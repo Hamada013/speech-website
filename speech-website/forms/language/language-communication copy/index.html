@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>نموذج تقييم النطق واللغة</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="container">
+
+    <h1 class="form-title">نموذج تقييم النطق واللغة</h1>
+
+    <!-- القسم 1: البيانات الأساسية -->
+    <section class="section">
+      <h2>القسم الأول: البيانات الأساسية</h2>
+      <div class="field-grid">
+        <label>✦ الاسم: <input type="text" /></label>
+        <label>✦ تاريخ الميلاد: <input type="date" /></label>
+        <label>✦ العمر: <input type="text" /></label>
+        <label>✦ الجهة المُحيلة: <input type="text" /></label>
+        <label>✦ الطبيب المختص: <input type="text" /></label>
+        <label>✦ العنوان: <input type="text" /></label>
+        <label>✦ الهاتف: <input type="text" /></label>
+        <label>✦ المستوى التعليمي: <input type="text" /></label>
+        <label>✦ الوظيفة: <input type="text" /></label>
+        <label>✦ اللغات التي يتكلمها: <input type="text" /></label>
+        <label>✦ الحالة الاجتماعية: <input type="text" /></label>
+        <label>✦ عدد الأولاد: <input type="number" /></label>
+        <label>✦ من يسكن مع المريض: <input type="text" /></label>
+      </div>
+    </section>
+
+    <!-- القسم 2: الحالة الصحية والسلوكية -->
+    <section class="section">
+      <h2>القسم الثاني: الحالة الصحية والسلوكية</h2>
+      <textarea placeholder="ـ هل يعاني الشخص من أي آثار جانبية لدواء معين؟"></textarea>
+      <textarea placeholder="ـ وصف شخصية المريض (متعاون - غير متعاون):"></textarea>
+      <textarea placeholder="ـ أي معلومات مهمة يجب ذكرها:"></textarea>
+    </section>
+
+    <!-- القسم 3: تقييم اللغة -->
+    <section class="section">
+      <h2>القسم الثالث: تقييم اللغة</h2>
+      <label>✦ وسيلة التواصل: <input type="text" /></label>
+
+      <h3>✦ اللغة الاستيعابية</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>المجال المقيم</th>
+            <th>مناسب ✅</th>
+            <th>غير مناسب ❌</th>
+            <th>الملاحظات والوصف</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>الاستجابة للتعليمات والأوامر</td><td></td><td></td><td></td></tr>
+          <tr><td>الدلالة على الأشياء</td><td></td><td></td><td></td></tr>
+          <tr><td>فهم كلام الآخرين</td><td></td><td></td><td></td></tr>
+          <tr><td>الانتباه والتواصل البصري</td><td></td><td></td><td></td></tr>
+          <tr><td>العلاقات المكانية والزمانية</td><td></td><td></td><td></td></tr>
+          <tr><td>فهم وظائف واستعمالات الأشياء</td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+
+      <h3>✦ اللغة الإنتاجية</h3>
+      <label>ـ هل يتكلم المريض؟ <input type="text" placeholder="نعم / لا" /></label>
+      <table>
+        <thead>
+          <tr>
+            <th>المجال المقيم</th>
+            <th>مناسب ✅</th>
+            <th>غير مناسب ❌</th>
+            <th>الملاحظات والوصف</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>التسمية</td><td></td><td></td><td></td></tr>
+          <tr><td>طول الجمل</td><td></td><td></td><td></td></tr>
+          <tr><td>المستوى النحوي</td><td></td><td></td><td></td></tr>
+          <tr><td>المستوى الصرفي</td><td></td><td></td><td></td></tr>
+          <tr><td>الاستخدام الاجتماعي للغة</td><td></td><td></td><td></td></tr>
+          <tr><td>التقليد والتكرار</td><td></td><td></td><td></td></tr>
+          <tr><td>الطلاقة</td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- القسم 4: تقييم النطق -->
+    <section class="section">
+      <h2>القسم الرابع: تقييم النطق</h2>
+      <textarea placeholder="هل يوجد مشاكل وظيفية في النطق؟ (نعم / لا)"></textarea>
+      <textarea placeholder="حدد نوع الاضطراب: فونولوجي، نطقي، أبراكسيا"></textarea>
+
+      <h3>✦ التقييم التشريحي</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>العضو المقيم</th>
+            <th>التماثل</th>
+            <th>القوة</th>
+            <th>الحركة</th>
+            <th>الملاحظات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>الخدين</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>خطوط الضحك</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>الشفتين</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>الفك والأسنان</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>اللسان</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>سقف الحلق الصلب</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>سقف الحلق اللين</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>اللهاة</td><td></td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- القسم 5: تقييم الصوت -->
+    <section class="section">
+      <h2>القسم الخامس: تقييم الصوت</h2>
+      <textarea placeholder="هل يوجد مشاكل في الصوت؟ (نعم / لا)"></textarea>
+      <table>
+        <thead>
+          <tr>
+            <th>الجانب المقيم</th>
+            <th>مناسب ✅</th>
+            <th>غير مناسب ❌</th>
+            <th>الملاحظات والوصف</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>علو الصوت</td><td></td><td></td><td></td></tr>
+          <tr><td>طبقة الصوت</td><td></td><td></td><td></td></tr>
+          <tr><td>نوعية الصوت</td><td></td><td></td><td></td></tr>
+          <tr><td>الرنين</td><td></td><td></td><td></td></tr>
+          <tr><td>مدة التصويت القصوى</td><td></td><td></td><td></td></tr>
+          <tr><td>التنغيم</td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- القسم 6: تقييم البلع -->
+    <section class="section">
+      <h2>القسم السادس: تقييم البلع</h2>
+      <textarea placeholder="هل يوجد مشاكل في البلع؟ (نعم / لا)"></textarea>
+      <table>
+        <thead>
+          <tr>
+            <th>الجانب المقيم</th>
+            <th>موجود ✅</th>
+            <th>غير موجود ❌</th>
+            <th>الملاحظات والوصف</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>تأخر تحضير اللقمة</td><td></td><td></td><td></td></tr>
+          <tr><td>خروج الطعام عبر الشفتين</td><td></td><td></td><td></td></tr>
+          <tr><td>بقايا طعام بعد البلع</td><td></td><td></td><td></td></tr>
+          <tr><td>شرب الماء بكثرة</td><td></td><td></td><td></td></tr>
+          <tr><td>سعال أثناء البلع</td><td></td><td></td><td></td></tr>
+          <tr><td>نقص وزن مفاجئ</td><td></td><td></td><td></td></tr>
+          <tr><td>ارتفاع حرارة مجهول</td><td></td><td></td><td></td></tr>
+          <tr><td>استبعاد أطعمة</td><td></td><td></td><td></td></tr>
+          <tr><td>وضعية غير طبيعية</td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- القسم 7: تقييم القراءة والكتابة -->
+    <section class="section">
+      <h2>القسم السابع: تقييم القراءة والكتابة</h2>
+      <textarea placeholder="هل يوجد مشاكل في القراءة والكتابة؟ (نعم / لا)"></textarea>
+      <textarea placeholder="• القدرة على القراءة: "></textarea>
+      <textarea placeholder="• القدرة على الكتابة: "></textarea>
+      <textarea placeholder="• اليد المستخدمة: "></textarea>
+      <textarea placeholder="• النسخ: "></textarea>
+      <textarea placeholder="• إهمال إحدى الباحات البصرية: "></textarea>
+    </section>
+
+    <!-- القسم 8: الخلاصة والتشخيص -->
+    <section class="section">
+      <h2>القسم الثامن: الخلاصة والتشخيص</h2>
+      <textarea placeholder="• ملخص النتائج: "></textarea>
+      <textarea placeholder="• التشخيص: "></textarea>
+      <textarea placeholder="• إمكانية التحسن: (جيدة / ضعيفة) "></textarea>
+      <textarea placeholder="• التوصيات: "></textarea>
+    </section>
+
+    <!-- القسم 9: معلومات إضافية -->
+    <section class="section">
+      <h2>القسم التاسع: معلومات إضافية</h2>
+      <label>✦ تاريخ التقييم: <input type="date" /></label>
+      <label>✦ الشخص الذي قام بتعبئة الاستمارة: <input type="text" /></label>
+      <label>✦ صلة القرابة بالمريض: <input type="text" /></label>
+    </section>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

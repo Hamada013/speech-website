@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Resources | Ahmad Ghanem SLP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap">
+  <style>
+    /* Nav and soon-banner styles already in tools.html */
+    .soon-container {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 67vh;
+      margin-top: 2em;
+      text-align:center;
+    }
+    .soon-gif {
+      width: 180px; height: auto;
+      margin-bottom:23px;
+      filter: drop-shadow(0 2px 15px #43a6f830);
+    }
+    .soon-title {
+      font-size: 2em; color: #43a6f8; margin-bottom: 0.3em;
+    }
+    .soon-desc {
+      font-size: 1.12em; color: #6b7689;
+    }
+    .site-nav-bar {
+      margin-bottom: 1.7em;
+      text-align: center;
+      width: 100%;
+      background: #fcfdff;
+      border-bottom: 1px solid #e3f1ff;
+      padding: 0.45em 0;
+      position: relative;
+      z-index: 2;
+    }
+    .site-nav-bar a {
+      color: #43a6f8;
+      text-decoration: none;
+      padding: 10px 22px;
+      border-radius: 18px;
+      font-weight: bold;
+      font-size: 1em;
+      margin: 0 0.5em;
+      transition: background 0.13s;
+    }
+    .site-nav-bar a.active, .site-nav-bar a:hover {
+      background: #e0f2ff;
+      color: #2693d9;
+    }
+  </style>
+</head>
+<body>
+  <nav class="site-nav-bar">
+    <a href="index.html">Home</a>
+    <a href="tools.html">Tools</a>
+    <a href="resources.html" class="active">Resources</a>
+  </nav>
+  <main>
+    <div class="soon-container">
+      <!-- Use same or different GIF! Change src if needed -->
+      <img src="soon.gif" class="soon-gif" alt="Coming soon...">
+      <div class="soon-title">Coming Soon!</div>
+      <div class="soon-desc">
+        A library of clinical resources, downloads, and links is on the way.
+      </div>
+    </div>
+  </main>
+</body>
+</html>

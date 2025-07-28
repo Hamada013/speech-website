@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Language Forms | Ahmad Ghanem SLP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&display=swap">
+  <!-- Tab Icon -->
+  <link rel="icon" href="../images/logo.png" type="image/png">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, 'Noto Sans Arabic', sans-serif;
+      background: #f8fafd;
+      margin: 0;
+      color: #233;
+    }
+    .site-nav-bar {
+      margin-bottom: 1.7em;
+      text-align: center;
+      width: 100%;
+      background: #fcfdff;
+      border-bottom: 1px solid #e3f1ff;
+      padding: 0.45em 0;
+      position: relative;
+      z-index: 2;
+    }
+    .site-nav-bar a {
+      color: #43a6f8;
+      text-decoration: none;
+      padding: 10px 22px;
+      border-radius: 18px;
+      font-weight: bold;
+      font-size: 1em;
+      margin: 0 0.5em;
+      transition: background 0.13s;
+    }
+    .site-nav-bar a.active, .site-nav-bar a:hover {
+      background: #e0f2ff;
+      color: #2693d9;
+    }
+    .forms-header {
+      margin-top: 2em;
+      margin-bottom: 2.5em;
+      text-align: center;
+    }
+    .subtitle {
+      font-size: 1.11em;
+      color: #3496d8;
+      margin-bottom: 0.5em;
+      font-weight: bold;
+    }
+    .forms-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5em;
+      margin-bottom: 3em;
+      align-items: stretch;
+    }
+    .form-card {
+      background: #fcfdff;
+      border-radius: 16px;
+      box-shadow: 0 3px 14px #a4d4ff16;
+      border: 1.8px solid #e3f1ff;
+      padding: 30px 24px 22px 24px;
+      min-width: 0;
+      max-width: 282px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: box-shadow 0.17s, border-color 0.17s;
+      position: relative;
+      min-height: 330px;
+      box-sizing: border-box;
+      aspect-ratio: 1/1;
+    }
+    .form-card:hover {
+      box-shadow: 0 8px 32px #43a6f830;
+      border-color: #43a6f8;
+      z-index: 1;
+    }
+    .form-card img {
+      width: 74px;
+      height: 74px;
+      margin-bottom: 0.9em;
+      object-fit: contain;
+      display: block;
+      color: #43a6f8;
+      filter: drop-shadow(0 2px 12px #43a6f814);
+      font-size: 2.6em;
+    }
+    .form-card-title {
+      font-size: 1.16em;
+      font-weight: bold;
+      color: #233;
+      margin-bottom: 0.7em;
+      margin-top: 0;
+    }
+    .form-card-desc {
+      color: #6b7689;
+      font-size: 0.97em;
+      margin-bottom: 1.2em;
+      flex-grow: 1;
+      margin-top: 0;
+    }
+    .form-card-link {
+      margin-top: auto;
+      background: #43a6f8;
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 24px;
+      font-size: 1.06em;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 3px 12px #43a6f81a;
+      transition: background 0.17s;
+      display: inline-block;
+    }
+    .form-card-link:hover {
+      background: #3496d8;
+    }
+    @media (max-width: 700px) {
+      .forms-list {
+        grid-template-columns: 1fr;
+        gap: 2em;
+      }
+      .form-card {
+        width: 95vw;
+        max-width: 440px;
+        min-width: unset;
+        aspect-ratio: unset;
+      }
+    }
+    .about-contact {
+      margin-top: 2.5em;
+      font-size: 1.09em;
+      line-height: 1.7;
+      color: #3e4666;
+      text-align: center;
+    }
+    .about-contact a {
+      color: #3496d8;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Simple Nav Bar -->
+  <nav class="site-nav-bar">
+    <a href="../index.html">Home</a>
+    <a href="../tools.html">Tools</a>
+    <a href="../resources.html">Resources</a>
+  </nav>
+
+  <main>
+    <div class="forms-header">
+      <h1>Language Forms</h1>
+      <div class="subtitle">All digital assessment and intake forms</div>
+    </div>
+    <div class="forms-list">
+
+      <!-- Language Development Survey Card (in forms/language/Language-Development-Survey/index.html) -->
+      <div class="form-card">
+        <img src="../../images/speed.gif" alt="Child icon">
+        <div class="form-card-title">DDK</div>
+        <div class="form-card-desc">
+          Pa Ta Ka
+        </div>
+        <a class="form-card-link" href="../speech/DDK/index.html" target="_blank" rel="noopener">Open Form</a>
+      </div>
+
+      <!-- Example: Another Language Assessment Card -->
+      <div class="form-card">
+        <img src="../images/language.png" alt="Language Form icon">
+        <div class="form-card-title">Vocabulary Screening (Demo)</div>
+        <div class="form-card-desc">
+          Screen expressive and receptive vocabulary.
+        </div>
+        <a class="form-card-link" href="Vocabulary-Screening/index.html" target="_blank" rel="noopener">Open Form</a>
+      </div>
+
+      <!-- Link to Adult Case History (forms/adult-case-history/index.html) -->
+      <div class="form-card">
+        <img src="../images/adult-icon.png" alt="Adult icon">
+        <div class="form-card-title">Adult Case History</div>
+        <div class="form-card-desc">
+          In-depth intake for adults and neurogenic cases.
+        </div>
+        <a class="form-card-link" href="../adult-case-history/index.html" target="_blank" rel="noopener">Open Form</a>
+      </div>
+
+      <!-- Oral Motor Exam Card -->
+      <div class="form-card">
+        <img src="../images/Orofacial.png" alt="Oral Motor Exam icon">
+        <div class="form-card-title">Oral Motor Exam</div>
+        <div class="form-card-desc">
+          Comprehensive oral motor evaluation form.
+        </div>
+        <a class="form-card-link" href="../oral-motor-exam/index.html" target="_blank" rel="noopener">Open Form</a>
+      </div>
+
+      <!-- Speech Forms Card (example, you can create forms/speech/index.html) -->
+      <div class="form-card">
+        <img src="../images/speech.gif" alt="Speech forms icon">
+        <div class="form-card-title">Speech Forms</div>
+        <div class="form-card-desc">
+          Explore speech-related assessment forms.
+        </div>
+        <a class="form-card-link" href="../speech/index.html" target="_blank" rel="noopener">Go to Speech Forms</a>
+      </div>
+
+      <!-- Add more cards by copying the above pattern -->
+      
+    </div>
+
+    <div class="about-contact" style="margin-top:4em;">
+      <strong>Questions?</strong>
+      <a href="mailto:slp.ahmadghanem@gmail.com">slp.ahmadghanem@gmail.com</a> &bull;
+      <a href="tel:+963988451245">+963 988 451 245</a>
+    </div>
+  </main>
+</body>
+</html>

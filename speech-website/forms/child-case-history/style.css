@@ -1,0 +1,88 @@
+:root {
+  --baby-blue: #43a6f8;
+  --baby-blue-light: #d6eaff;
+  --text: #1f2937;
+  --text-fade: #6b7689;
+  --white: #fff;
+}
+body {
+  font-family: 'Segoe UI', Arial, 'Noto Sans Arabic', sans-serif;
+  background: #f8fafd;
+  color: var(--text);
+  margin: 0;
+}
+main {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem 1rem 3rem 1rem;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 3px 18px #a4d4ff28;
+}
+h1 {
+  text-align: center; color: var(--baby-blue); margin-bottom: 0.9em; font-size: 2.2em;
+}
+section {
+  margin: 2em 0 2.3em 0;
+  border: 1px solid var(--baby-blue-light);
+  border-radius: 12px;
+  background: #fcfdff;
+  padding: 0 0 1em 0;
+  box-shadow: 0 0.5px 8px #c0eaff17;
+}
+.section-head {
+  border-radius: 12px 12px 0 0;
+  margin-bottom: 1.1em;
+  padding: 0.9em 1em 0.7em 1em;
+  font-size: 1.12em;
+  font-weight: 600;
+  background: var(--baby-blue);
+  color: var(--white);
+  border-bottom: 1px solid var(--baby-blue-light);
+}
+.section-content { padding: 0 1.2em; }
+label { font-weight: bold; color: var(--text); margin-bottom: 0.12em; margin-top: 0.9em; display: block;}
+.note { color: var(--text-fade); font-size: .94em; margin-bottom: 0.5em;}
+input, select, textarea {
+  width: 100%; padding: 9px 11px; border-radius: 5px;
+  border: 1.5px solid var(--baby-blue-light); background: #f9fbff; color: var(--text);
+  font-size: 1.04em; margin-bottom: 8px; box-sizing: border-box; font-family: inherit;
+}
+textarea { min-height: 66px; }
+input:focus, textarea:focus, select:focus { border-color: var(--baby-blue); outline: 0; }
+button, .btn {
+  background: var(--baby-blue);
+  color: #fff;
+  font-weight: 600;
+  border: none; border-radius: 16px;
+  padding: 10px 28px; font-size: 1.04em;
+  cursor: pointer; margin-top: 17px;
+  box-shadow: 0 4px 12px #a4d4ff20;
+}
+button:hover, .btn:hover { background: #329cf7;}
+.dynamic-list .row .btn-remove {
+  background: #e33d54; color: #fff; font-size: 1.12em; min-width: 28px; border-radius: 7px;
+  margin-left: 7px;}
+.dynamic-list .btn-remove:hover { background: #c81a33;}
+.toggle-wrapper { display: flex; align-items: center; gap: 0.7em; justify-content: flex-end; margin: 1.2em 0;}
+.toggle-switch { position: relative; width: 48px; height: 25px;}
+.toggle-switch input { display: none;}
+.slider { cursor:pointer; position: absolute; inset: 0; background: #e0f2ff; border-radius: 24px; transition: background .25s;}
+.slider:before { content: ""; position: absolute; top: 4.5px; left: 5px; width: 15.2px; height: 15.2px; border-radius: 50%; background: #fff; transition: transform .23s;}
+input:checked + .slider { background: var(--baby-blue);}
+input:checked + .slider:before { transform: translateX(22px);}
+select { appearance: none; background-color: #f9fbff; border: 1.5px solid var(--baby-blue-light); background-image: url("data:image/svg+xml;utf8,<svg fill='blue' height='20' width='20' viewBox='0 0 24 24'><path d='M7 10l5 5 5-5'/></svg>"); background-repeat: no-repeat; background-position: right 10px center; min-width: 50px; box-shadow: none;}
+select:focus, select:hover { border-color: var(--baby-blue);}
+.pills-box { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 6px; margin-top: 7px;}
+.pill { background: #e0f2ff; border: 1.5px solid #43a6f8; color: #1f2937; border-radius: 32px; padding: 7px 20px; font-size: 1em; cursor: pointer; font-weight: 500; margin-bottom: 4px;}
+.pill.selected { background: #43a6f8; color: #fff; border-color: #329cf7;}
+.dynamic-list { margin-top: 5px;}
+.dynamic-list .row { display: flex; gap: 10px; margin-bottom: 6px; align-items: center;}
+.dynamic-list .row input[type="text"],.dynamic-list .row input[type="number"],.dynamic-list .row input[type="date"], .dynamic-list .row select { flex: 1;}
+.readonly-box { background: #e6f1ff; min-height: 32px; padding: 8px 10px;}
+.row-flex { display: flex; gap: 16px; margin-bottom: 0.7em; flex-wrap: wrap;}
+.row-flex .col2 { flex: 1 1 46%; min-width: 240px;}
+@media (max-width:800px) { main { padding: 2vw; } section { padding: 0;} .section-content { padding: 0 1vw; } .row-flex { flex-direction: column; gap: 6px;} .row-flex .col2 { width:100%; } .pills-box { flex-direction: column; gap: 5px;}}
+html[dir="rtl"] { direction: rtl; font-family: 'Noto Sans Arabic', Arial, sans-serif;}
+.actions { text-align: center; margin-top: 21px;}
+.pills-box input[type='text'] { max-width: 160px; border-radius: 22px; padding: 7px 15px;}

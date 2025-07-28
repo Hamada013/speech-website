@@ -1,0 +1,142 @@
+{
+  "form-title": "Informal School-Age Language Assessment",
+  "lang-en": "EN",
+  "lang-ar": "AR",
+  "export-text": "Export Data",
+  "print-text": "Print Report",
+  "instructions-title": "Instructions",
+  "instructions-text": "Fill out the form while assessing the child. Use the language toggle to switch between English/Arabic.",
+  "close-text": "Close",
+  "validation-error": "Please complete all required fields",
+  
+  "childInfo-header": "Child Information",
+  "fullName-label": "Child's Full Name",
+  "fullName-placeholder": "e.g., John Smith",
+  "dateOfBirth-label": "Date of Birth",
+  "dateOfBirth-placeholder": "YYYY-MM-DD",
+  "dateOfBirth-tooltip": "Enter child's birth date to auto-calculate age",
+  "age-label": "Age (years)",
+  "age-tooltip": "This field auto-calculates based on date of birth",
+  "gender-label": "Gender",
+  "gender-male": "Male",
+  "gender-female": "Female",
+  "gender-other": "Other",
+
+  "administration-header": "Administration Details",
+  "assessmentDate-label": "Assessment Date",
+  "assessmentDate-placeholder": "YYYY-MM-DD",
+  "evaluatorName-label": "Evaluator/Clinician",
+  "evaluatorName-placeholder": "Full name",
+  "warmUpNotes-label": "Rapport & Warm-Up Observations",
+  "warmUpNotes-placeholder": "Notes from initial play/conversation",
+  "recordingUsed-label": "Recording Device Used?",
+  "recordingUsed-tooltip": "Toggle if audio/video recording was used",
+  "recorderDetails-label": "Recorder Type & Permissions",
+  "recorderDetails-placeholder": "e.g., Audio recorder (parent consent)",
+  "recorderDetails-tooltip": "Describe recording device and permissions",
+
+  "tasks-header": "Task Trials",
+  "tasks-description": "Add one entry per domain/trial set. Select or customize prompts.",
+
+  "domain-label": "Language Domain",
+  "domain-options": [
+    "Receptive Language",
+    "Expressive Language",
+    "Vocabulary & Semantics",
+    "Morphology & Syntax",
+    "Pragmatics & Social Use",
+    "Narrative & Discourse",
+    "Metalinguistic Awareness",
+    "Memory & Attention",
+    "Problem-Solving & Inference"
+  ],
+  "domain-tooltip": "Select the language domain for this task",
+
+  "prompt-label": "Prompt Given",
+  "prompt-placeholder": "Choose predefined or write custom...",
+  "prompt-tooltip": "Select from examples or enter your own prompt",
+
+  "response-label": "Child's Verbatim Response",
+  "response-placeholder": "Enter exactly what child said",
+  "response-tooltip": "Record child's exact words",
+
+  "promptLevel-label": "Prompt Level",
+  "promptLevel-options": [
+    {"value": 0, "label": "None"},
+    {"value": 1, "label": "Simplified cue"}
+  ],
+  "promptLevel-tooltip": "Indicate if cues were needed",
+
+  "score-label": "Score (0-3)",
+  "score-tooltip": "0=No response, 1=Partial, 2=Functional, 3=Excellent",
+
+  "errorTypes-label": "Error Types (if score < 3)",
+  "errorTypes-options": [
+    {"value": "S", "label": "Semantic"},
+    {"value": "M", "label": "Morphological"},
+    {"value": "SY", "label": "Syntactic"},
+    {"value": "P", "label": "Pragmatic"},
+    {"value": "PR", "label": "Pronoun/Reference"}
+  ],
+  "errorTypes-tooltip": "Check all observed error types",
+
+  "notes-label": "Clinician Notes",
+  "notes-placeholder": "Observations and strategies",
+
+  "observations-header": "Behavioral Observations",
+  "observation-fields": [
+    "Task Initiation",
+    "Attention Focus",
+    "Frustration Tolerance",
+    "Use of Gestures",
+    "Self Correction",
+    "Social Reciprocity"
+  ],
+  "observation-ratings": [
+    {"value": 0, "label": "Absent"},
+    {"value": 1, "label": "Emerging"},
+    {"value": 2, "label": "Functional"},
+    {"value": 3, "label": "Age-Expected"}
+  ],
+
+  "narrative-header": "Narrative Story Elements",
+  "narrative-element-label": "Story Element",
+  "narrative-element-options": [
+    "Setting",
+    "Characters",
+    "Initiating Event",
+    "Attempts",
+    "Outcome",
+    "Resolution"
+  ],
+  "narrative-present-label": "Present?",
+  "narrative-example-label": "Example Utterance",
+  "narrative-example-placeholder": "Child's exact words",
+
+  "interpretation-header": "Interpretation",
+  "suspectedDisorders-header": "Suspected Disorders",
+  
+  "strengths-label": "Strengths",
+  "strengths-placeholder": "Domains scoring ≥2",
+  "needs-label": "Needs",
+  "needs-placeholder": "Domains scoring ≤1.5",
+  "accommodations-label": "Accommodations",
+  "accommodations-placeholder": "Classroom supports needed",
+  "goals-label": "SMART Goals",
+  "goals-placeholder": "Specific, measurable goals",
+
+  "suspectedDisorders-options": [
+    "Receptive Language Disorder",
+    "Expressive Language Disorder",
+    "Mixed Receptive-Expressive Disorder",
+    "Semantic Disorder",
+    "Morphosyntactic Disorder",
+    "Social (Pragmatic) Communication Disorder",
+    "Narrative Discourse Disorder",
+    "Phonological Awareness Deficit",
+    "Working Memory Deficit",
+    "Inferential Language Disorder"
+  ],
+
+  "summary-template": "Assessment of {{childName}} (age {{childAge}}) revealed strengths in {{strengths}} and needs in {{needs}}. Concerns include {{disorders}}. Recommendations: {{goals}} with {{accommodations}}."
+}
