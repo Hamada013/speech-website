@@ -1,10 +1,11 @@
 {
-  "formTitle": "استمارة تقييم الفهم السمعي - المهارات النمائية",
+  "formTitle": "مهارات الفهم السمعي",
   "basicInfo": {
     "childName": "اسم الطفل",
-    "parentName": "اسم ولي الأمر",
+    "parentName": "اسم مقدم الرعاية",
     "dob": "تاريخ الميلاد",
-    "surveyDate": "تاريخ تعبئة الاستبيان"
+    "surveyDate": "تاريخ التقرير", 
+    "therapistName": "اسم الاختصاصي"
   },
   "skills": {
     "instructionsBtn": "تعليمات",

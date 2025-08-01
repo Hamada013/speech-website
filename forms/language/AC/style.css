@@ -1,74 +1,167 @@
-/* عام */
-body {
-  font-family: 'Noto Sans Arabic', sans-serif;
-  background-color: #f9f9f9;
+:root {
+  --gap: 1rem;
+  --radius: 8px;
+  --max-width: 1000px;
+  --bg: #f7f8fa;
+  --card-bg: #ffffff;
+  --shadow: 0 4px 12px rgba(0,0,0,0.04);
+  font-family: 'Noto Sans Arabic', system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body, html {
   margin: 0;
-  padding: 20px;
-  color: #333;
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
+  padding: 0;
+  background: var(--bg);
+  color: #1f2937;
+  line-height: 1.4;
+  direction: rtl;
+  overflow-x: hidden;
 }
 
 main {
-  background: #fff;
-  padding: 20px 30px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: calc(var(--gap) * 1.5) var(--gap);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
 }
 
-/* عنوان النموذج */
-#form-title {
-  text-align: center;
-  color: #43a6f8;
-  margin-bottom: 25px;
-}
-
-/* قسم المعلومات الأساسية */
-.basic-info-section h2 {
-  color: #43a6f8;
-  margin-bottom: 10px;
-  border-bottom: 2px solid #43a6f8;
-  padding-bottom: 5px;
+h1 {
+  font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+  margin: 0 0 0.25rem 0;
   font-weight: 700;
+  text-align: center;
+  color: #2563eb;
+}
+
+h2 {
+  font-size: 1.25rem;
+  margin: 0 0 0.75rem 0;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.basic-info-section,
+.age-nav-wrapper,
+#report-section {
+  background: var(--card-bg);
+  padding: 1rem 1rem 1.25rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .basic-info-grid {
   display: grid;
-  grid-template-columns: 1fr 2fr;
-  row-gap: 15px;
-  column-gap: 15px;
-  align-items: center;
-  margin-bottom: 30px;
+  gap: 15px;
+  grid-template-columns: 1fr;
+  align-items: start;
+  margin-bottom: 10px;
 }
 
-.basic-info-grid label {
+@media (min-width: 768px) {
+  .basic-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+label {
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
-.basic-info-grid input[type="text"],
-.basic-info-grid input[type="date"] {
-  padding: 8px 12px;
+input, button, textarea {
   font-size: 1rem;
-  border: 1px solid #ccc;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
-  transition: border-color 0.3s;
-}
-
-.basic-info-grid input[type="text"]:focus,
-.basic-info-grid input[type="date"]:focus {
-  border-color: #43a6f8;
   outline: none;
+  background: #fff;
+  font-family: inherit;
 }
 
-/* بطاقة المجموعة */
+input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+}
+
+button {
+  cursor: pointer;
+  font-weight: 600;
+  transition: filter .15s ease;
+}
+
+button:hover {
+  filter: brightness(1.05);
+}
+
+.actions {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.actions button#export-btn {
+  background: linear-gradient(135deg, #3a8dde, #6cb1f7);
+  color: white;
+  border: none;
+  padding: 12px 36px;
+  border-radius: 30px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(58, 141, 222, 0.4);
+  transition: background 0.4s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  user-select: none;
+  display: inline-block;
+}
+
+.actions button#export-btn:hover {
+  background: linear-gradient(135deg, #6cb1f7, #3a8dde);
+  box-shadow: 0 6px 14px rgba(58, 141, 222, 0.7);
+  transform: translateY(-1px);
+}
+
+.actions button#export-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 3px 7px rgba(58, 141, 222, 0.5);
+}
+
+pre {
+  background: #f0f4f8;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 0;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* skill groups */
 .group-card {
   border: 1px solid #43a6f8;
   border-radius: 10px;
   margin-bottom: 25px;
   padding: 15px 20px;
   background: #f0f8ff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .group-header {
@@ -80,212 +173,176 @@ main {
   margin-bottom: 15px;
 }
 
-/* بند المهارة */
 .skill-item {
   background: white;
   border-radius: 8px;
   padding: 15px 20px;
   margin-bottom: 15px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.skill-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-  font-size: 1rem;
-  margin-bottom: 10px;
-}
-
-/* زر التعليمات */
-.instructions-btn {
-  background-color: #43a6f8;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 5px 14px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.3s;
-}
-
-.instructions-btn:hover {
-  background-color: #1a73e8;
-}
-
-/* صندوق النص الخاص بالتعليمات */
-.instructions-text {
-  background: #dbeeff;
-  padding: 10px 15px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  font-size: 0.9rem;
-  color: #0a3c7c;
-  line-height: 1.4;
-}
-
-/* أزرار الاختيار */
-.control-buttons-left {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
+}
+
+.skill-text {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.skill-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
   align-items: flex-start;
-  margin-left: auto; /* يجعلها على الجهة اليمنى في RTL */
+  margin-top: 10px;
+}
+
+.control-buttons-left {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  order: 1;
 }
 
 .answer-buttons {
   display: flex;
   gap: 8px;
-  margin-right: auto; /* تبقى على اليسار */
+  flex-wrap: wrap;
+  order: 2;
 }
 
-.instructions-btn {
-  background-color: #2196F3;
+.instructions-btn,
+.skill-image-btn,
+.note-button {
+  background-color: #43a6f8;
   color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 12px;
+  padding: 5px 12px;
+  font-weight: 600;
+  border-radius: 18px;
+  font-size: 0.85rem;
+  white-space: nowrap;
   cursor: pointer;
   transition: background-color 0.3s;
+  border: none;
 }
 
-.instructions-btn:hover {
-  background-color: #1976D2;
+.skill-image-btn {
+  background-color: #6cb1f7;
+}
+.skill-image-btn:hover {
+  background-color: #3a8dde;
 }
 
-/* لون عند التحديد */
-.answer-button.selected {
+.note-button {
+  background-color: #ffa500;
+}
+.note-button:hover {
+  background-color: #cc8400;
+}
+
+.answer-button {
+  background: white;
+  border: 2px solid #43a6f8;
+  color: #43a6f8;
+  font-weight: 700;
+  min-width: 60px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  border-radius: 15px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.answer-button.selected,
+.answer-button:hover {
   background-color: #43a6f8;
   color: white;
 }
 
-/* ألوان أزرار حسب الحالة */
-
 .answer-button.yojod {
-  border-color: #28a745;  /* أخضر */
+  border-color: #28a745;
   color: #28a745;
 }
-
-.answer-button.yojod:hover,
-.answer-button.yojod.selected {
+.answer-button.yojod.selected,
+.answer-button.yojod:hover {
   background-color: #28a745;
   color: white;
 }
 
 .answer-button.la_yojod {
-  border-color: #fd7e14;  /* برتقالي */
+  border-color: #fd7e14;
   color: #fd7e14;
 }
-
-.answer-button.la_yojod:hover,
-.answer-button.la_yojod.selected {
+.answer-button.la_yojod.selected,
+.answer-button.la_yojod:hover {
   background-color: #fd7e14;
   color: white;
 }
 
 .answer-button.ghair_muhaddad {
-  border-color: #d3d3d3; /* رمادي فاتح */
+  border-color: #6c757d;
   color: #6c757d;
 }
-
-.answer-button.ghair_muhaddad:hover,
-.answer-button.ghair_muhaddad.selected {
-  background-color: #d3d3d3;
+.answer-button.ghair_muhaddad.selected,
+.answer-button.ghair_muhaddad:hover {
+  background-color: #6c757d;
   color: white;
 }
 
-/* أزرار التصدير (عرض التقرير وتحميله) */
-.actions {
-  text-align: center;
-  margin-top: 30px;
-}
-
-.actions button {
-  background: linear-gradient(135deg, #3a8dde, #6cb1f7);
-  color: white;
-  border: none;
-  padding: 12px 32px;
-  border-radius: 30px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(58, 141, 222, 0.4);
-  transition: 
-    background 0.4s ease,
-    box-shadow 0.3s ease,
-    transform 0.2s ease;
-  user-select: none;
-  margin-left: 10px; /* يمكن تغييره حسب الاتجاه */
-}
-
-.actions button:hover {
-  background: linear-gradient(135deg, #6cb1f7, #3a8dde);
-  box-shadow: 0 6px 14px rgba(58, 141, 222, 0.7);
-  transform: translateY(-3px);
-}
-
-.actions button:active {
-  transform: translateY(1px);
-  box-shadow: 0 3px 7px rgba(58, 141, 222, 0.5);
-}
-
-/* قسم عرض التقرير */
-#report-output {
-  white-space: pre-wrap;
-  font-family: 'Noto Sans Arabic', monospace;
-  color: #0d47a1;
-  margin-top: 25px;
-  padding: 15px;
-  background: #f0f8ff;
+.note-input {
+  width: 100%;
+  min-height: 60px;
+  margin-top: 8px;
+  border: 1px solid #ccc;
   border-radius: 8px;
-  border: 1px solid #43a6f8;
-  min-height: 120px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  resize: vertical;
+  font-family: inherit;
+  box-sizing: border-box;
 }
 
-/* استجابة تصميم الهواتف */
-@media (max-width: 600px) {
-  .basic-info-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .actions button {
-    margin-left: 0;
-    margin-bottom: 10px;
-    width: 100%;
-  }
-  
-  .answer-buttons {
-    flex-direction: column;
-  }
+/* age-nav buttons section */
+.age-nav-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
 }
 
-/* صورة المهارة */
-.skill-image {
-  max-width: 100%;
-  margin-top: 10px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-/* زر عرض الصورة (يشبه زر التعليمات) */
-.instructions-btn {
+.age-jump-button {
   background-color: #43a6f8;
   color: white;
   border: none;
-  border-radius: 20px;
-  padding: 5px 14px;
-  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: 18px;
   font-size: 0.9rem;
-  transition: background-color 0.3s;
-  user-select: none;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter .15s ease, transform .15s ease;
+  margin: 2px;
+}
+.age-jump-button:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
 }
 
-.instructions-btn:hover {
-  background-color: #1a73e8;
+/* tested state: orange like note */
+.age-jump-button.tested {
+  background-color: #ffa500 !important;
+  color: white !important;
 }
 
-/* مسافة صغيرة بين أزرار التعليمات وصورة */
-.skill-header button {
-  margin-left: 6px;
+/* responsive tweaks */
+@media (max-width: 600px) {
+  .skill-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .control-buttons-left, .answer-buttons {
+    width: 100%;
+    justify-content: flex-start;
+  }
 }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>استبيان مهارات الفهم السمعي</title>
+  <title>مهارات الفهم السمعي</title>
   <link rel="stylesheet" href="style.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap"
@@ -12,22 +12,42 @@
 </head>
 <body>
   <main>
-    <h1 id="form-title">استبيان مهارات الفهم السمعي</h1>
+    <h1 id="form-title">مهارات الفهم السمعي</h1>
 
     <section class="basic-info-section">
       <h2>المعلومات الأساسية</h2>
       <div class="basic-info-grid">
-        <label for="childName">اسم الطفل:</label>
-        <input type="text" id="childName" placeholder="أدخل اسم الطفل" />
+        <div class="field">
+          <label for="childName">اسم الطفل:</label>
+          <input type="text" id="childName" placeholder="أدخل اسم الطفل" />
+        </div>
 
-        <label for="parentName">اسم ولي الأمر:</label>
-        <input type="text" id="parentName" placeholder="أدخل اسم ولي الأمر" />
+        <div class="field">
+          <label for="parentName">اسم ولي الأمر:</label>
+          <input type="text" id="parentName" placeholder="أدخل اسم ولي الأمر" />
+        </div>
 
-        <label for="dob">تاريخ الميلاد:</label>
-        <input type="date" id="dob" />
+        <div class="field">
+          <label for="dob">تاريخ الميلاد:</label>
+          <input type="date" id="dob" />
+        </div>
 
-        <label for="surveyDate">تاريخ تعبئة الاستبيان:</label>
-        <input type="date" id="surveyDate" />
+        <div class="field">
+          <label for="surveyDate">تاريخ التقرير:</label>
+          <input type="date" id="surveyDate" />
+        </div>
+
+        <div class="field">
+          <label for="therapistName">اسم الاختصاصي:</label>
+          <input type="text" id="therapistName" placeholder="أدخل اسم الاختصاصي" />
+        </div>
+      </div>
+    </section>
+
+    <section class="age-nav-wrapper">
+      <h2>انتقل إلى مجموعة العمر</h2>
+      <div id="age-nav-buttons" class="age-nav-buttons">
+        <!-- dynamically generated age-group buttons -->
       </div>
     </section>
 
@@ -35,10 +55,9 @@
 
     <div class="actions">
       <button type="button" id="export-btn">التقرير</button>
-      <button type="button" id="download-txt-btn">تحميل تقرير</button>
     </div>
 
-    <section id="report-section" style="display:none;">
+    <section id="report-section" class="hidden">
       <h2>تقرير النتائج</h2>
       <pre id="report-output"></pre>
     </section>

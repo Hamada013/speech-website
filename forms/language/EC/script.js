@@ -66,7 +66,7 @@ const skillGroups = [
     ]
   },
   {
-    label: "0:11-0:9 العمر",
+    label: "العمر 0:9-0:11",
     items: [
       {
         number: 11,
@@ -101,7 +101,7 @@ const skillGroups = [
       {
         number: 16,
         text: "يتبادل الأدوار الصوتية عدة مرات",
-        instruction: "عندما تقلد صوتًا يصدره طفلك، هل يعيد الطفل الصوت الذي قمت به؟\nهل يتبادل معك الأدوار صوتيًا مرتين أو ثلاث مرات؟\n\nالتقييم:\nيأخذ الطفل على الأقل دورتين للتواصل الصوتي ردًا على تقليد الوصي لأصوات الطفل."
+        instruction: "عندما تقلد صوتًا يصدره طفلك، هل يعيد الطفل الصوت الذي قمت به؟\nهل يتبادل معك الأدوار صوتيًا مرتين أو ثلاث مرات؟\n\nالتقييم:\nأخذ الطفل على الأقل دورتين للتواصل الصوتي ردًا على تقليد الوصي لأصوات الطفل."
       },
       {
         number: 17,
@@ -161,7 +161,7 @@ const skillGroups = [
     ]
   },
   {
-  label: "العمر 2:6-2:11",
+    label: "العمر 2:6-2:11",
     items: [
       {
         number: 26,
@@ -176,7 +176,7 @@ const skillGroups = [
     ]
   },
   {
-  label: "العمر 3:0 - 3:5",
+    label: "العمر 3:0 - 3:5",
     items: [
       {
         number: 28,
@@ -195,7 +195,6 @@ const skillGroups = [
       }
     ]
   },
-  
   {
     label: "العمر 3:6 - 3:11",
     items: [
@@ -212,7 +211,7 @@ const skillGroups = [
       {
         number: 33,
         text: "يستخدم أدوات الملكية",
-        instruction: "التدريب:\n هي موزة الولد → هي موزتو\n هي موزة البنت → هي موزتها\n• طابتها / طابتو\n• طعامها / طعامو\n• كلبو / كلبها\n• قطتها \\n\nالتقييم:\nثلاث إجابات صحيحة"
+        instruction: "التعليمات:\n هي موزة الولد → هي موزتو\n هي موزة البنت → هي موزتها\n• طابتها / طابتو\n• طعامها / طعامو\n• كلبو / كلبها\n• قطتها \\n\nالتقييم:\nثلاث إجابات صحيحة"
       },
       {
         number: 34,
@@ -227,7 +226,7 @@ const skillGroups = [
       {
         number: 35,
         text: "ينتج صيغة المثنى",
-        instruction: "التعليمات:\nتمرين: ساعد الطفل على التمييز بين المفرد والمثنى.  قلم – قلمين:\n\n• سيارتين\n• تفاحتين\n• بابين\n\nالتقييم:\nإجابتين صحيحة"
+        instruction: "التعليمات:\nتمرين: ساعد الطفل على التمييز بين المفرد والمثنى.  قلم – قلمين:\n\n• سيارتين\n• تفاحتين\n• بابين\n\nالتقييم:\nإجابتين صحيحتان"
       },
       {
         number: 36,
@@ -246,7 +245,7 @@ const skillGroups = [
       }
     ]
   },
-    {
+  {
     label: "العمر 4:6-4:11",
     items: [
       {
@@ -286,7 +285,7 @@ const skillGroups = [
       }
     ]
   },
-   {
+  {
     label: "العمر 5:6-5:11",
     items: [
       {
@@ -297,7 +296,7 @@ const skillGroups = [
       {
         number: 46,
         text: "تكرار الجمل",
-        instruction: "التعليمات:\nتمرين: أنا أحب الشوكولاتة.\n- \هل تعطيني شيئًا لأشرب؟\n- الطفلة التي تغني هي أختي.\n- هل يمكن لأصدقائي القدوم لمشاهدة التلفاز؟\n- عندما عاد من المدرسة، أكل سامي تفاحة.\n\nالتقييم: إجابتان صحيحتان"
+        instruction: "التعليمات:\nتمرين: أنا أحب الشوكولاتة.\n- \\هل تعطيني شيئًا لأشرب؟\n- الطفلة التي تغني هي أختي.\n- هل يمكن لأصدقائي القدوم لمشاهدة التلفاز؟\n- عندما عاد من المدرسة، أكل سامي تفاحة.\n\nالتقييم: إجابتان صحيحتان"
       }
     ]
   },
@@ -388,12 +387,67 @@ const skillGroups = [
   },
 ];
 
+
 const responses = {};
 const showInstructions = {};
 const showImages = {};
-const hideImageButtonFor = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,41,42,43,44,45,46,49,53,54,55,56,59,60];
+const hideImageButtonFor = [
+  1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,41,42,43,44,45,46,49,53,54,55,56,59,60,
+];
 
 const container = document.getElementById("skills-container");
+
+// helper to generate id from label
+function sanitizeLabelToId(label) {
+  let cleaned = label.replace(/العمر\s*/i, "").trim();
+  cleaned = cleaned.replace(/[:\s.]+/g, "-").replace(/[^\w\-]/g, "");
+  return `age-${cleaned}`;
+}
+
+function createButton(text, className = "", onClick) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = text;
+  btn.className = className;
+  if (onClick) btn.addEventListener("click", onClick);
+  return btn;
+}
+
+// render age navigation; uses skillGroups directly so tested detection reliable
+function createAgeNavButtons() {
+  const containerBtn = document.getElementById("age-nav-buttons");
+  if (!containerBtn) return;
+  containerBtn.innerHTML = "";
+
+  skillGroups.forEach((group) => {
+    const rawLabel = group.label || "";
+    const displayLabel = rawLabel.replace(/العمر\s*/i, "").trim();
+    const safeId = sanitizeLabelToId(rawLabel);
+    // ensure group card has that id (used for scroll)
+    const existingCard = document.getElementById(safeId);
+    if (!existingCard) {
+      // will be created later in renderSkills (but assign anyway if exists)
+    }
+
+    const btn = createButton(displayLabel, "age-jump-button", (e) => {
+      e.preventDefault();
+      const targetEl = document.getElementById(safeId);
+      if (!targetEl) return;
+      targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      targetEl.classList.add("highlight-temp");
+      setTimeout(() => targetEl.classList.remove("highlight-temp"), 1200);
+    });
+    btn.setAttribute("data-target", safeId);
+
+    // tested if any response exists in that group
+    const tested = group.items.some(item => Boolean(responses[item.number]));
+    if (tested) {
+      btn.classList.add("tested");
+    }
+
+    containerBtn.appendChild(btn);
+  });
+}
 
 function renderSkills() {
   container.innerHTML = "";
@@ -401,6 +455,9 @@ function renderSkills() {
   skillGroups.forEach((group) => {
     const groupCard = document.createElement("div");
     groupCard.className = "group-card";
+    groupCard.setAttribute("data-age", group.label);
+    const generatedId = sanitizeLabelToId(group.label);
+    groupCard.id = generatedId;
 
     const groupHeader = document.createElement("h3");
     groupHeader.className = "group-header";
@@ -414,16 +471,11 @@ function renderSkills() {
       const skillMain = document.createElement("div");
       skillMain.className = "skill-main";
 
-      const skillControls = document.createElement("div");
-      skillControls.className = "skill-controls";
+      const skillText = document.createElement("p");
+      skillText.className = "skill-text";
+      skillText.textContent = `${item.number}. ${item.text}`;
+      skillMain.appendChild(skillText);
 
-      // نص المهارة
-      const skillHeader = document.createElement("p");
-      skillHeader.textContent = `${item.number}. ${item.text}`;
-      skillHeader.className = "skill-text";
-      skillMain.appendChild(skillHeader);
-
-      // عرض التعليمات
       if (showInstructions[item.number]) {
         const instrText = document.createElement("pre");
         instrText.className = "instructions-text";
@@ -431,87 +483,76 @@ function renderSkills() {
         skillMain.appendChild(instrText);
       }
 
-      // زر تعليمات
-      const instrBtn = document.createElement("button");
-      instrBtn.className = "instructions-btn";
-      instrBtn.textContent = showInstructions[item.number] ? "إخفاء التعليمات" : "تعليمات";
-      instrBtn.addEventListener("click", () => {
-        showInstructions[item.number] = !showInstructions[item.number];
-        renderSkills();
+      const skillControls = document.createElement("div");
+      skillControls.className = "skill-controls";
+
+      const controlButtonsLeft = document.createElement("div");
+      controlButtonsLeft.className = "control-buttons-left";
+
+      const instrBtn = createButton(
+        showInstructions[item.number] ? "إخفاء التعليمات" : "تعليمات",
+        "instructions-btn",
+        () => {
+          showInstructions[item.number] = !showInstructions[item.number];
+          renderSkills();
+          createAgeNavButtons();
+        }
+      );
+      controlButtonsLeft.appendChild(instrBtn);
+
+      if (!hideImageButtonFor.includes(item.number)) {
+        const imageBtn = createButton(
+          showImages[item.number] ? "إخفاء الصورة" : "عرض صورة",
+          "skill-image-btn",
+          () => {
+            showImages[item.number] = !showImages[item.number];
+            renderSkills();
+            createAgeNavButtons();
+          }
+        );
+        controlButtonsLeft.appendChild(imageBtn);
+      }
+
+      const noteBtn = createButton("ملاحظة", "note-button");
+      controlButtonsLeft.appendChild(noteBtn);
+
+      const noteInput = document.createElement("textarea");
+      noteInput.className = "note-input hidden";
+      noteInput.placeholder = "أدخل ملاحظة...";
+
+      noteBtn.addEventListener("click", () => {
+        noteInput.classList.toggle("hidden");
       });
 
-      // أزرار الاختيار (يوجد، لايوجد، غير محدد)
       const answerButtonsDiv = document.createElement("div");
       answerButtonsDiv.className = "answer-buttons";
 
       ["يوجد", "لايوجد", "غير محدد"].forEach((option) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "answer-button";
+        const btn = createButton(option, "answer-button", () => {
+          if (responses[item.number] === option) {
+            delete responses[item.number];
+          } else {
+            responses[item.number] = option;
+          }
+          renderSkills();
+          createAgeNavButtons();
+        });
         if (responses[item.number] === option) {
           btn.classList.add("selected");
         }
-        btn.textContent = option;
-        btn.addEventListener("click", () => {
-          responses[item.number] = option;
-          renderSkills();
-        });
         answerButtonsDiv.appendChild(btn);
       });
 
-       // زر عرض/إخفاء الصورة (إذا لم يكن ضمن المهارات المخفية)
-       let imageBtn = null;
-       if (!hideImageButtonFor.includes(item.number)) {
-         imageBtn = document.createElement("button");
-         imageBtn.type = "button";
-         imageBtn.className = "instructions-btn";
-         imageBtn.style.marginTop = "5px";
-         imageBtn.textContent = showImages[item.number] ? "إخفاء الصورة" : "عرض صورة";
-         imageBtn.addEventListener("click", () => {
-           showImages[item.number] = !showImages[item.number];
-           renderSkills();
-         });
-       }
-      // زر الملاحظة
-      const noteBtn = document.createElement("button");
-      noteBtn.type = "button";
-      noteBtn.textContent = "ملاحظة";
-      noteBtn.className = "note-button";
-
-          // إنشاء حاوية الأزرار اليسارية
-       const controlButtonsLeft = document.createElement("div");
-       controlButtonsLeft.className = "control-buttons-left";
-
-       // إضافة الأزرار إلى الحاوية بالترتيب: تعليمات، عرض صورة، ملاحظة
-       controlButtonsLeft.appendChild(instrBtn);
-       if (imageBtn) controlButtonsLeft.appendChild(imageBtn); // الصورة فوق
-       controlButtonsLeft.appendChild(noteBtn);                // الملاحظة تحت
-
-
-      // مربع النص الخاص بالملاحظة (مخفي افتراضياً)
-      const noteInput = document.createElement("textarea");
-      noteInput.className = "note-input";
-      noteInput.placeholder = "أدخل ملاحظة...";
-      noteInput.style.display = "none";
-
-      noteBtn.addEventListener("click", () => {
-        noteInput.style.display = noteInput.style.display === "none" ? "block" : "none";
-      });
-
-      // تجميع الأزرار في القسم الخاص بها
-      skillControls.appendChild(instrBtn);
+      skillControls.appendChild(controlButtonsLeft);
       skillControls.appendChild(answerButtonsDiv);
-      if (imageBtn) skillControls.appendChild(imageBtn);
-      skillControls.appendChild(noteBtn);
 
       skillItem.appendChild(skillMain);
       skillItem.appendChild(skillControls);
       skillItem.appendChild(noteInput);
 
-      // عرض الصورة إن تم تفعيلها
       if (showImages[item.number]) {
         const img = document.createElement("img");
-        img.src = `images/skill${item.number}.png`; // تأكد من وجود الصور في هذا المسار
+        img.src = `images/skill${item.number}.png`;
         img.alt = `صورة مهارة رقم ${item.number}`;
         img.className = "skill-image";
         skillItem.appendChild(img);
@@ -522,6 +563,8 @@ function renderSkills() {
 
     container.appendChild(groupCard);
   });
+
+  createAgeNavButtons();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -529,12 +572,11 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.getElementById("export-btn").addEventListener("click", () => {
-  const childName = document.getElementById("childName").value.trim();
-  const parentName = document.getElementById("parentName").value.trim();
-  const dob = document.getElementById("dob").value;
-  const surveyDate = document.getElementById("surveyDate").value;
-  const therapistInput = document.getElementById("therapistName");
-  const therapistName = therapistInput ? therapistInput.value.trim() : "";
+  const childName = document.getElementById("childName").value.trim() || "[غير مُدخل]";
+  const parentName = document.getElementById("parentName").value.trim() || "[غير مُدخل]";
+  const dob = document.getElementById("dob").value || "[غير مُدخل]";
+  const surveyDate = document.getElementById("surveyDate").value || "[غير مُدخل]";
+  const therapistName = (document.getElementById("therapistName")?.value.trim() || "[غير مُدخل]");
 
   const groupedAnswers = {
     يوجد: [],
@@ -542,26 +584,27 @@ document.getElementById("export-btn").addEventListener("click", () => {
     "غير محدد": [],
   };
 
-  skillGroups.forEach(group => {
-    group.items.forEach(item => {
-      const answer = responses[item.number];
-      const skillElements = [...document.querySelectorAll(".skill-item")];
-      const skillElement = skillElements.find(el => el.querySelector(".skill-text").textContent.startsWith(item.number + "."));
-      const noteInput = skillElement ? skillElement.querySelector(".note-input") : null;
-      const noteText = noteInput ? noteInput.value.trim() : "";
+  const testedGroups = new Set();
 
-      if (answer) {
-        if (noteText) {
-          groupedAnswers[answer].push(`${item.number}. ${item.text}\nملاحظة: ${noteText}`);
-        } else {
-          groupedAnswers[answer].push(`${item.number}. ${item.text}`);
-        }
-      }
+  skillGroups.forEach((group) => {
+    group.items.forEach((item) => {
+      const answer = responses[item.number];
+      if (!answer) return;
+      testedGroups.add(group.label);
+      const skillElement = Array.from(document.querySelectorAll(".skill-item")).find((el) =>
+        el.querySelector(".skill-text")?.textContent.startsWith(item.number + ".")
+      );
+      const noteText = skillElement
+        ? skillElement.querySelector(".note-input")?.value.trim()
+        : "";
+      let entry = `${item.number}. ${item.text}`;
+      if (noteText) entry += `\nملاحظة: ${noteText}`;
+      groupedAnswers[answer].push(entry);
     });
   });
 
   let reportText = `===============================\n`;
-  reportText += `مهارات التواصل \n`;
+  reportText += `مهارات الفهم السمعي \n`;
   reportText += `===============================\n\n`;
   reportText += `اسم الطفل: ${childName}\n`;
   reportText += `اسم ولي الأمر: ${parentName}\n`;
@@ -569,28 +612,37 @@ document.getElementById("export-btn").addEventListener("click", () => {
   reportText += `تاريخ التقرير: ${surveyDate}\n\n`;
   reportText += `اسم الاختصاصي: ${therapistName}\n\n`;
 
+  if (testedGroups.size) {
+    reportText += `المجموعات التي تم اختبارها:\n`;
+    Array.from(testedGroups).forEach((label) => {
+      const display = label.replace(/العمر\s*/i, "").trim();
+      reportText += `- ${display}\n`;
+    });
+    reportText += `\n`;
+  }
+
   Object.entries(groupedAnswers).forEach(([key, items]) => {
-    if (items.length > 0) {
+    if (items.length) {
       reportText += `${key}:\n`;
-      items.forEach(text => {
+      items.forEach((text) => {
         reportText += `${text}\n`;
       });
       reportText += `\n`;
     }
   });
 
-  const reportWindow = window.open("", "_blank", "width=700,height=700,scrollbars=yes,resizable=yes");
+  const reportWindow = window.open("", "_blank", "width=800,height=700,scrollbars=yes,resizable=yes");
   if (!reportWindow) {
     alert("يرجى السماح للنوافذ المنبثقة في المتصفح لعرض التقرير.");
     return;
   }
-
   const escapedReport = reportText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
+  const safeChildName = childName.replace(/["'<>]/g, "");
   reportWindow.document.write(`
     <html lang="ar" dir="rtl">
       <head>
-        <title>مهارات التواصل التعبيري - تقرير</title>
+        <title>مهارات الفهم السمعي - تقرير</title>
+        <meta charset="utf-8" />
         <style>
           body { font-family: "Noto Sans Arabic", sans-serif; margin: 20px; background: #f9f9f9; }
           pre { white-space: pre-wrap; word-wrap: break-word; background: #fff; border: 1px solid #ccc; padding: 15px; font-size: 16px; }
@@ -598,7 +650,7 @@ document.getElementById("export-btn").addEventListener("click", () => {
         </style>
       </head>
       <body>
-        <h1>مهارات التعبير التعبيري  - تقرير</h1>
+        <h1>مهارات الفهم السمعي - تقرير</h1>
         <pre id="report-text">${escapedReport}</pre>
         <button id="download-btn">تحميل التقرير</button>
         <script>
@@ -607,15 +659,14 @@ document.getElementById("export-btn").addEventListener("click", () => {
             const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "تقرير_مهارات_التعبير_${childName || "child"}.txt";
+            link.download = "تقرير_مهارات_الفهم السمعي_${safeChildName || 'child'}.txt";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
           });
-        <\/script>
+        </script>
       </body>
     </html>
   `);
-
   reportWindow.document.close();
 });
