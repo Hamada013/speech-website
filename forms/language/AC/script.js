@@ -392,7 +392,7 @@ const responses = {};
 const showInstructions = {};
 const showImages = {};
 const hideImageButtonFor = [
-  1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,41,42,43,44,45,46,49,53,54,55,56,59,60,
+  1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,
 ];
 
 const container = document.getElementById("skills-container");
