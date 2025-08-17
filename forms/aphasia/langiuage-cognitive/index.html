@@ -1,0 +1,2397 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التقييم السريري</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+
+    <!-- Title and Subtitle -->
+    <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+        
+        <!-- Titles -->
+        <div style="flex: 1; text-align: center;">
+            <h1 style="margin: 0; font-size: 2em;">تقييم معرفي - لغوي</h1>
+            <h2 style="margin: 5px 0 0; font-size: 1.2em; font-weight: normal;">
+                أداة تقييم الأداء لمرضى الإصابات العصبية
+            </h2>
+        </div>
+
+<!-- Info button on far right, fixed size -->
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo(`
+         أداة تقييم الأداء لمرضى الإصابات العصبية<p> وتشمل الجوانب التالية: </p>
+        <ol style='margin-top:10px; padding-left:25px; line-height:2;'>
+            <li>التوجه والوعي</li>
+            <li>الفهم السمعي</li>
+            <li>الأسئلة الفكرية المعقدة</li>
+            <li>حل المشكلات</li>
+            <li>التسمية</li>
+            <li>تكرار الجمل</li>
+            <li>المنطق والاستدلال والفهم</li>
+            <li>تنظيم الأفكار</li>
+            <li>القراءة والكتابة</li>
+            <li>الحساب</li>
+            <li>البراغماتية</li>
+            <li>الذاكرة</li>
+            <li>خصائص الكلام</li>
+        </ol>
+    `)">
+    ؟
+</button>
+
+    </header>
+
+<!-- القسم 0 – البيانات الشخصية والطبية -->
+<section id="section0">
+  <h2> البيانات الشخصية والطبية <button class="btn-note" onclick="addNote(0)">!</button></h2>
+  <div class="card-row">
+    <div class="card"><label>الاسم</label><input type="text" id="name"></div>
+    <div class="card"><label>الطبيب المعالج</label><input type="text" id="treatingDoctor"></div>
+    <div class="card"><label>التشخيص الطبي</label><input type="text" id="medicalDiagnosis"></div>
+    <div class="card"><label>الحالة قبل الحادث</label><input type="text" id="preIncidentCondition"></div>
+    <div class="card"><label>العمر</label><input type="text" id="age"></div>
+    <div class="card"><label>النتائج</label><input type="text" id="results"></div>
+    <div class="card"><label>الأدوية</label><input type="text" id="medications"></div>
+    <div class="card"><label>اسم الفاحص</label><input type="text" id="examinerName"></div>
+    <div class="card">
+    <label for="incidentDate">تاريخ الحادث</label>
+    <input type="date" id="incidentDate" class="date-input">
+</div>
+
+<div class="card">
+    <label for="currentDate">تاريخ اليوم</label>
+    <input type="date" id="currentDate" class="date-input">
+</div>
+
+  </div>
+</section>
+<!-- القسم 1 -->
+<section id="section1">
+  <h2>
+    التوجه والوعي <span id="percent1">0%</span>
+    <button class="btn-note" onclick="addNote(3)">!</button>
+<!-- Info button for التوجه والوعي -->
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p>القسم: التوجه والوعي</p>\
+        <table cellpadding=&quot;6&quot; cellspacing=&quot;0&quot; style=&quot;width:100%; min-width:500px; text-align:center; border-collapse:collapse;&quot;>\
+            <thead style=&quot;background:#f0f0f0;&quot;>\
+                <tr>\
+                    <th>قسم</th>\
+                    <th>الأخطاء المتوقعة</th>\
+                    <th>ملاحظات سريرية</th>\
+                </tr>\
+            </thead>\
+            <tbody>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>الوعي الزمني</td>\
+                    <td>صعوبة تحديد اليوم، التاريخ، أو الوقت</td>\
+                    <td>يقيم إدراك المريض للزمن والتسلسل الزمني</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>الوعي المكاني</td>\
+                    <td>صعوبة التعرف على المكان أو البيئة المحيطة</td>\
+                    <td>يقيس قدرة المريض على تحديد موقعه والتكيف مع المكان</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>الوعي الشخصي</td>\
+                    <td>صعوبة التعرف على الذات أو التغيرات البدنية</td>\
+                    <td>يقيم إدراك المريض لذاته وحالته البدنية</td>\
+                </tr>\
+                <tr>\
+                    <td>الوعي الاجتماعي</td>\
+                    <td>صعوبة فهم السياق الاجتماعي أو توقع ردود الفعل</td>\
+                    <td>يقيم إدراك المريض للقواعد الاجتماعية والتفاعل مع الآخرين</td>\
+                </tr>\
+            </tbody>\
+        </table>\
+    </div>')">
+    ؟
+</button>
+  </h2>
+
+  <div class="card-row">
+    <div class="card">
+      <label>ما هو اليوم؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(1,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(1,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>ما هو الشهر؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(1,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(1,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>ما هي السنة؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(1,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(1,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>ما هو الفصل من السنة؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(1,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(1,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>كم تظن أن الوقت الآن تقريبًا؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(1,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(1,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>في أي مدينة نحن؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(1,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(1,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>في أي محافظة نحن؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(1,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(1,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>أين تسكن؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(1,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(1,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>منذ متى وأنت تسكن هنا؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(1,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(1,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>متى تعرضت للحادث؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(1,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(1,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>ما نوع المشاكل التي تعاني منها بسبب الحادث؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(1,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(1,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>ما اسمي؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(1,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(1,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>من هو طبيبك؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(1,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(1,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>كم من الوقت تقريبًا مضى منذ بدأنا الحديث</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(1,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(1,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- القسم 2 -->
+<section id="section2">
+  <h2> القسم: الفهم السمعي <span id="percent2">0%</span>
+    <button class="btn-note" onclick="addNote(2)">!</button>
+<!-- Info button with full table -->
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p>الفهم السمعي</p>\
+        <table cellpadding=&quot;6&quot; cellspacing=&quot;0&quot; style=&quot;width:100%; min-width:400px; text-align:center; border-collapse:collapse;&quot;>\
+            <thead style=&quot;background:#f0f0f0;&quot;>\
+                <tr>\
+                    <th>قسم</th>\
+                    <th>الأخطاء المتوقعة</th>\
+                    <th>ملاحظات سريرية</th>\
+                </tr>\
+            </thead>\
+            <tbody>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>أوامر بسيطة</td>\
+                    <td>عدم تنفيذ عند Wernicke، بطء أو تردد عند Broca</td>\
+                    <td>يوضح الفرق بين ضعف الفهم وضعف التنفيذ الحركي</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>أسئلة شخصية بسيطة</td>\
+                    <td>إجابات غير دقيقة عند Global، فشل استدعاء عند Anomic</td>\
+                    <td>يميز بين ضعف الفهم وصعوبة الاستدعاء</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>أسئلة نعم/لا</td>\
+                    <td>إجابات عشوائية أو yes-bias عند Wernicke، رد بالإشارة عند Broca</td>\
+                    <td>اختبار حساس لدقة الفهم</td>\
+                </tr>\
+                <tr>\
+                    <td>أوامر متتابعة</td>\
+                    <td>صعوبة عند Wernicke وConduction، نجاح نسبي عند Broca إذا قصيرة</td>\
+                    <td>يكشف عن مشاكل بالمعالجة السمعية أو الذاكرة اللغوية</td>\
+                </tr>\
+            </tbody>\
+        </table>\
+    </div>')">
+    ؟
+</button>
+
+
+  <!-- Subsection 2: الأسئلة الشخصية البسيطة -->
+  <h3>الأسئلة الشخصية البسيطة</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>ما اسمك؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subB','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>كم عمرك؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subB','dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subsection 3: أسئلة نعم/لا -->
+  <h3>أسئلة نعم/لا</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>هل انت جالس على كرسي؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subC','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>هل آنا ارتدي قبعة؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subC','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>هل السيارة نوع من الحيوانات؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subC','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subC','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>هل السماء زرقاء؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subC','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>هل الفيل أصغر من القطة؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subC','dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+
+    <!-- Subsection 1: تقديم الاوامر البسيطة -->
+  <h3>تقديم الاوامر البسيطة</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>ارفع يدك</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>المس أنفك</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>انظر إلى الباب</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>المس القلم</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subA','dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subsection 4: تقديم أوامر متتابعة -->
+  <h3>تقديم أوامر متتابعة</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>المس انفك ، ثم المس فمك</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subD','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subD','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>المس القلم ، ثم المس شعرك</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subD','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subD','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>المس شعرك ، ثم انفك ، ثم انظر إلى الباب</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subD','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subD','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>اذكر اسمك ثم عدد أطفالك</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subD','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subD','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>قل اسم فاكهتين ثم اسم حيوانين</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subD','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subD','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>صف لونين ثم صف طعامك المفضل</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subD','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subD','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>اذكر ثلاث أدوات في المطبخ ثم ثلاث حيوانات</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subD','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subD','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>أخبرني ما فعلت صباح اليوم ثم ما ستفعله بعد الظهر</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('2subD','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('2subD','dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- القسم 3 -->
+<section id="section3">
+  <h2>
+     الأسئلة الفكرية المعقدة <span id="percent3">0%</span>
+    <button class="btn-note" onclick="addNote(3)">!</button>
+<!-- Info button for الأسئلة الفكرية المعقدة -->
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p>القسم: الأسئلة الفكرية المعقدة</p>\
+        <table cellpadding=&quot;6&quot; cellspacing=&quot;0&quot; style=&quot;width:100%; min-width:500px; text-align:center; border-collapse:collapse;&quot;>\
+            <thead style=&quot;background:#f0f0f0;&quot;>\
+                <tr>\
+                    <th>قسم</th>\
+                    <th>الأخطاء المتوقعة</th>\
+                    <th>ملاحظات سريرية</th>\
+                </tr>\
+            </thead>\
+            <tbody>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>تفكير</td>\
+                    <td>صعوبة صياغة أفكار معقدة عند Broca، إجابات غير مترابطة عند Wernicke وGlobal</td>\
+                    <td>يقيس القدرة على الاستدلال، التنظيم العقلي، واستخدام اللغة المعقدة</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>قصة ١: إجابة عن أسئلة قصة</td>\
+                    <td>حذف تفاصيل، أخطاء تسلسل، صعوبة استرجاع أحداث عند Conduction وAnomic</td>\
+                    <td>يقيس فهم القصة، استدعاء المعلومات، والربط بين الأفكار</td>\
+                </tr>\
+                <tr>\
+                    <td>قصة ٢: إجابة عن أسئلة قصة</td>\
+                    <td>نفس الأخطاء السابقة مع احتمال زيادة الأخطاء عند مرضى Global</td>\
+                    <td>يكرر التقييم لتأكيد أن صعوبات الفهم أو الاسترجاع ثابتة وليس مؤقتة</td>\
+                </tr>\
+            </tbody>\
+        </table>\
+    </div>')">
+    ؟
+</button>
+  </h2>
+
+  <!-- Subsection 1: تفكير -->
+  <h3>تفكير</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>هل يطفو الخشب على الماء؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('3subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('3subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>هل تستخدم المقص لقطع الورق؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('3subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('3subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>هل يغرق الحديد في الماء؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('3subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('3subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>هل تستخدم المقص لصنع الشاي؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('3subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('3subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>لماذا نضع الثلج في الثلاجة؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('3subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('3subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>لماذا لاتسبح معظم البشر في الشتاء؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('3subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('3subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ماذا سوف تفعل إذا سيارتك لم يعد بها من البنزين؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('3subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('3subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>كيف سوف تتنقل وتذهب إلى المدينة في حال ليس لديك سيارة؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('3subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('3subA','dontknow',this)">/</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Subsection 2: قصة ١ -->
+  <h3>قصة ١   : <button class="btn-show" onclick="showImage('images/23.png')">S</button> </h3>
+  <p><em>Note: ذهب سامر إلى السوق لشراء الخضروات. اشترى طماطم وخياراً وجزرًا. ثم عاد إلى المنزل ليطهو الغداء.</em></p>
+  <div class="card-row">
+    <div class="card">
+      <label>هل ذهب سامر إلى السوق؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('3subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('3subB','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>هل اشترى سامر الحلوى؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('3subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('3subB','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>هل اشترى سامر خضروات؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('3subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('3subB','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>هل بقي سامر في المنزل طوال اليوم؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('3subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('3subB','dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subsection 3: قصة ٢ -->
+  <h3>قصة ٢: <button class="btn-show" onclick="showImage('images/24.png')">S</button> </h3>
+  <p><em>Note: دخلت ليلى المكتبة وقرأت كتابًا عن الطيور. كانت مهتمة بتعلم المزيد عن الأنواع المختلفة من الطيور.</em></p>
+  <div class="card-row">
+    <div class="card">
+      <label>هل دخلت ليلى المكتبة؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('3subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('3subC','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>هل كانت ليلى مهتمة بالطيور؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('3subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('3subC','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>هل قرأت ليلى كتابًا عن الأسماك؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('3subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('3subC','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>هل كانت ليلى مهتمة بالرياضة؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('3subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('3subC','dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- القسم 4 -->
+<section id="section4">
+  <h2>
+     حل المشكلات <span id="percent4">0%</span>
+    <button class="btn-note" onclick="addNote(4)">!</button>
+<!-- Info button for حل المشكلات -->
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p>القسم: حل المشكلات</p>\
+        <table cellpadding=&quot;6&quot; cellspacing=&quot;0&quot; style=&quot;width:100%; min-width:500px; text-align:center; border-collapse:collapse;&quot;>\
+            <thead style=&quot;background:#f0f0f0;&quot;>\
+                <tr>\
+                    <th>قسم</th>\
+                    <th>الأخطاء المتوقعة</th>\
+                    <th>ملاحظات سريرية</th>\
+                </tr>\
+            </thead>\
+            <tbody>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>مسائل بسيطة</td>\
+                    <td>صعوبة في اختيار الحل عند Broca، إجابات غير منطقية أو عشوائية عند Wernicke وGlobal</td>\
+                    <td>يقيس القدرة على التفكير المنطقي وحل المشكلات البسيطة باستخدام اللغة</td>\
+                </tr>\
+                <tr>\
+                    <td>مسائل مركبة/متسلسلة</td>\
+                    <td>حذف خطوات، أخطاء ترتيب، صعوبة بالاستنتاج عند Conduction وAnomic</td>\
+                    <td>يقيم قدرة التخطيط والتنظيم وحل المشكلات متعددة الخطوات</td>\
+                </tr>\
+            </tbody>\
+        </table>\
+    </div>')">
+    ؟
+</button>
+  </h2>
+
+  <div class="card-row">
+    <div class="card">
+      <label>ماذا تفعل إذا أغلقت مفاتيحك داخل المنزل؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(4,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(4,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>ماذا تفعل إذا لايوجد شحن بالموبايل؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(4,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(4,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>ماذا تفعل إذا لم تجد رقم تلفون أحدهم؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(4,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(4,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>ماذا تفعل إذا توقف التلفاز عن العمل؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(4,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(4,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>اذا اسايقظت صباحا ولم تجد هاتفك؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(4,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(4,'dontknow',this)">/</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>ماذا تفعل إذا لم تجد بون بون في سوبرماركت ؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(4,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(4,'dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- القسم 5 -->
+<section id="section5">
+  <h2>
+     التسمية <span id="percent5">0%</span>
+    <button class="btn-note" onclick="addNote(5)">!</button>
+    <!-- Info button for التسمية -->
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p>القسم: التسمية</p>\
+        <table cellpadding=&quot;6&quot; cellspacing=&quot;0&quot; style=&quot;width:100%; min-width:500px; text-align:center; border-collapse:collapse;&quot;>\
+            <thead style=&quot;background:#f0f0f0;&quot;>\
+                <tr>\
+                    <th>قسم</th>\
+                    <th>الأخطاء المتوقعة</th>\
+                    <th>ملاحظات سريرية</th>\
+                </tr>\
+            </thead>\
+            <tbody>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>كلمات شائعة</td>\
+                    <td>صعوبة إيجاد الكلمة عند Anomic، أخطاء لفظية عند Broca، إنتاج كلمات غير صحيحة عند Wernicke</td>\
+                    <td>يقيس القدرة على استدعاء الكلمات الشائعة والمعروفة</td>\
+                </tr>\
+                <tr>\
+                    <td>كلمات أقل شيوعًا</td>\
+                    <td>أخطاء تسمية، استخدام تعبيرات عامة (مثل &quot;هذا&quot;)، استبدال كلمات عند Conduction وAnomic</td>\
+                    <td>يقيم القدرة على التسمية الدقيقة واستخدام المفردات المناسبة</td>\
+                </tr>\
+            </tbody>\
+        </table>\
+    </div>')">
+    ؟
+</button>
+  </h2>
+
+  <div class="card-row">
+    <div class="card">
+      <label>كوب</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/01.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ملعقة</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/02.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ساعة</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/03.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>مفتاح</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/04.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>كتاب</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/05.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>كرسي</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/06.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>قلم</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/08.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>موبايل</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/09.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>سيارة</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/011.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>حذاء</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/012.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>فيل</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/010.png')">S</button>
+      </div>
+    </div>   
+    <div class="card">
+      <label>وردة</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/07.png')">S</button>
+      </div>
+    </div>    
+    <div class="card">
+      <label>يأكل</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/013.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>يكتب</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/014.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ينام</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/015.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>يركض</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/016.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>يشرب</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/017.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>يغسل</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(5,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(5,'dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/018.png')">S</button>
+      </div>
+    </div>   
+  </div>
+</section>
+
+<!-- القسم 6 -->
+<section id="section6">
+  <h2>
+     تكرار الجمل <span id="percent6">0%</span>
+    <button class="btn-note" onclick="addNote(6)">!</button>
+<!-- Info button for تكرار الجمل -->
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p>القسم: تكرار الجمل</p>\
+        <table cellpadding=&quot;6&quot; cellspacing=&quot;0&quot; style=&quot;width:100%; min-width:500px; text-align:center; border-collapse:collapse;&quot;>\
+            <thead style=&quot;background:#f0f0f0;&quot;>\
+                <tr>\
+                    <th>قسم</th>\
+                    <th>الأخطاء المتوقعة</th>\
+                    <th>ملاحظات سريرية</th>\
+                </tr>\
+            </thead>\
+            <tbody>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>حرف</td>\
+                    <td>صعوبة نطق الحروف عند Broca، احتمال تحريف صوتي عند Wernicke</td>\
+                    <td>يقيس القدرة على تكرار الأصوات البسيطة</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>رقم</td>\
+                    <td>حذف أو تبديل الأرقام عند Conduction وAnomic، بطء عند Broca</td>\
+                    <td>يقيم التكرار الرقمي والذاكرة القصيرة المدى</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>جمل قصيرة</td>\
+                    <td>حذف كلمات، إعادة ترتيب، أخطاء نحوية بسيطة عند Broca وConduction</td>\
+                    <td>يقيس القدرة على تكرار جمل بسيطة والحفاظ على التسلسل</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>جمل متوسطة</td>\
+                    <td>حذف أو إضافة كلمات، أخطاء نحو أكبر، صعوبة عند Broca وWernicke</td>\
+                    <td>يختبر قدرة الذاكرة العاملة والنحو</td>\
+                </tr>\
+                <tr>\
+                    <td>جمل طويلة</td>\
+                    <td>صعوبة كبيرة في التكرار، أخطاء نحوية ووصفية، حذف مقاطع عند Broca وGlobal</td>\
+                    <td>يقيم حدود السعة اللفظية والمعالجة النحوية الطويلة</td>\
+                </tr>\
+            </tbody>\
+        </table>\
+    </div>')">
+    ؟
+</button>
+  </h2>
+
+  <!-- Subsection 1 – حرف -->
+     <div id="sub6subA">
+  <h3>حرف</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>ألف</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('6subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('6subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>باء</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('6subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('6subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>جيم</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('6subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('6subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>شين</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('6subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('6subA','dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subsection 2 – رقم -->
+     <div id="sub6subB">
+  <h3>رقم</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>2</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('6subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('6subB','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>13</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('6subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('6subB','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>165</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('6subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('6subB','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>1312</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('6subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('6subB','dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subsection 3 – جمل قصيرة -->
+        <div id="sub6subC">
+  <h3>جمل قصيرة</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>الجو جميل اليوم</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('6subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('6subC','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>أريد كوب ماء</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('6subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('6subC','dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subsection 4 – جمل متوسطة -->
+        <div id="sub6subD">
+  <h3>جمل متوسطة</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>ذهبتُ إلى السوق صباح اليوم</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('6subD','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('6subD','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>يلعب الأطفال في الحديقة القريبة</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('6subD','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('6subD','dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subsection 5 – جمل طويلة -->
+        <div id="sub6subE">
+  <h3>جمل طويلة</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>عندما وصلت إلى المحطة، كان القطار قد غادر بالفعل</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('6subE','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('6subE','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>الطبيب نصحني بأن أتناول الدواء قبل وجبة الفطور</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('6subE','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('6subE','dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- القسم 7 -->
+<section id="section7">
+  <h2>
+     المنطق والاستدلال والفهم <span id="percent7">0%</span>
+    <button class="btn-note" onclick="addNote(7)">!</button>
+    <!-- Info button for المنطق والاستدلال والفهم -->
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p>القسم: المنطق والاستدلال والفهم</p>\
+        <table cellpadding=&quot;6&quot; cellspacing=&quot;0&quot; style=&quot;width:100%; min-width:500px; text-align:center; border-collapse:collapse;&quot;>\
+            <thead style=&quot;background:#f0f0f0;&quot;>\
+                <tr>\
+                    <th>قسم</th>\
+                    <th>الأخطاء المتوقعة</th>\
+                    <th>ملاحظات سريرية</th>\
+                </tr>\
+            </thead>\
+            <tbody>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>تصحيح جمل منطق</td>\
+                    <td>صعوبة تصحيح الأخطاء عند Broca وGlobal، أخطاء تسلسل أو استنتاج عند Wernicke</td>\
+                    <td>يقيس القدرة على التفكير المنطقي واكتشاف التناقضات</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>تفسير معنى</td>\
+                    <td>إجابات عامة أو خاطئة عند Wernicke وAnomic، صعوبة صياغة تفسير متماسك عند Broca</td>\
+                    <td>يختبر الفهم الدلالي والقدرة على التعبير عن المعنى</td>\
+                </tr>\
+                <tr>\
+                    <td>اللغة الدلالية</td>\
+                    <td>صعوبة ربط الكلمات بالمعنى الصحيح، استخدام مرادفات عامة، أخطاء اختيار كلمات عند Conduction وAnomic</td>\
+                    <td>يقيم معالجة المفاهيم والارتباطات الدلالية</td>\
+                </tr>\
+            </tbody>\
+        </table>\
+    </div>')">
+    ؟
+</button>
+
+  </h2>
+
+  <h3>تصحيح جمل منطق</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>وضع الملح في قهوته</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ستة زائد واحد تساوي ثمانية</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ارتديت جواربي فوق حذائي</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>أغلق الهاتف عندما رن</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>الكلب يصدر صوت مواء</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subA','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>في الصيف ارتدي جاكيت</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subA','dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+
+  <h3>تفسير معنى</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>التفاحة في اليوم تبعد الطبيب</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subB','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>راح عل البحر ورجع عطشان</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subB','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>هو نسخة طبق الأصل عن والده</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subB','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>القرد بعين امه غزال</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subB','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>الحياة صعبة اول 100 سنة</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subB','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>الجمال جمال الروح</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subB','dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+
+  <h3>اللغة الدلالية</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>ما الذي يُلبس على القدمين، يُحاك ويُستخدم للتدفئة؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subC','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ما الذي له ذيل كثيف، يتسلق الأشجار، ويخزن المكسرات؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subC','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ما الشيء الرقيق والخفيف، يُستخدم لمسح الدموع، ويُستخدم عند الإصابة بالزكام؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subC','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ما الشيء الذي لديه اربع ارجل ، ويستخدم للجلوس ؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subC','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ما أوجه التشابه بين السترة، البنطال، والبلوزة؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subC','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ما أوجه التشابه بين عصير البرتقال، الصودا، والحليب؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('7subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('7subC','dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- القسم 8 -->
+<section id="section8">
+  <h2>
+     تنظيم الأفكار <span id="percent8">0%</span>
+    <button class="btn-note" onclick="addNote(8)">!</button>
+<!-- Info button for تنظيم الأفكار -->
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p>القسم: تنظيم الأفكار</p>\
+        <table cellpadding=&quot;6&quot; cellspacing=&quot;0&quot; style=&quot;width:100%; min-width:500px; text-align:center; border-collapse:collapse;&quot;>\
+            <thead style=&quot;background:#f0f0f0;&quot;>\
+                <tr>\
+                    <th>قسم</th>\
+                    <th>الأخطاء المتوقعة</th>\
+                    <th>ملاحظات سريرية</th>\
+                </tr>\
+            </thead>\
+            <tbody>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>تنظيم مهام يومية أو خطوات متتابعة</td>\
+                    <td>حذف خطوات، ترتيب غير منطقي، صعوبة بالتسلسل عند Broca وGlobal</td>\
+                    <td>يقيس القدرة على التخطيط اللفظي والتنظيم العقلي</td>\
+                </tr>\
+                <tr>\
+                    <td>تخطيط مهام معقدة متعددة الخطوات</td>\
+                    <td>صعوبة ترتيب المهام، حذف عناصر، صعوبة التعبير المفصل عند Broca وWernicke</td>\
+                    <td>يقيم التنظيم المعقد، التخطيط متعدد الخطوات، واستدعاء المعلومات</td>\
+                </tr>\
+            </tbody>\
+        </table>\
+    </div>')">
+    ؟
+</button>
+  </h2>
+
+  <div class="card-row">
+    <div class="card">
+      <label>ما معنى كلمة "حنون"؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(8,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(8,'dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ما معنى كلمة "يُسلّم"؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(8,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(8,'dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ما الخطوات التي تتبعها لغسل شعرك؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(8,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(8,'dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ما الخطوات التي تتبعها لترتيب سريرك؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(8,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(8,'dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ما الخطوات التي تتبعها لشرب عصير برتقال؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(8,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(8,'dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>كيف تخطط لوجبة عشاء لضيوفين؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(8,'correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score(8,'dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- القسم 9: القراءة والمعالجة البصرية -->
+<section id="section9">
+  <h2>
+    القراءة والمعالجة البصرية <span id="percent9">0%</span>
+    <button class="btn-note" onclick="addNote(9)">!</button>
+    <!-- Info button for القراءة والمعالجة البصرية والكتابة -->
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p>القسم: القراءة والمعالجة البصرية والكتابة</p>\
+        <table cellpadding=&quot;6&quot; cellspacing=&quot;0&quot; style=&quot;width:100%; min-width:500px; text-align:center; border-collapse:collapse;&quot;>\
+            <thead style=&quot;background:#f0f0f0;&quot;>\
+                <tr>\
+                    <th>قسم</th>\
+                    <th>الأخطاء المتوقعة</th>\
+                    <th>ملاحظات سريرية</th>\
+                </tr>\
+            </thead>\
+            <tbody>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>استبعاد كلمة لا تنتمي</td>\
+                    <td>اختيار خاطئ أو بطء عند Wernicke وConduction، صعوبة تمييز المفاهيم</td>\
+                    <td>يقيس الفهم البصري والمعالجة الدلالية</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>اتباع أوامر مكتوبة</td>\
+                    <td>حذف أوامر، ترتيب خاطئ، صعوبة التنفيذ عند Broca وGlobal</td>\
+                    <td>يقيم القدرة على معالجة التعليمات البصرية وتنفيذها</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>فهم القرائي</td>\
+                    <td>صعوبة استخراج المعلومات الصحيحة، تخمين الكلمات، استجابات غير دقيقة عند Wernicke وAnomic</td>\
+                    <td>يختبر الفهم القرائي والفهم الدلالي</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>رسم ساعة</td>\
+                    <td>أخطاء في الترتيب الزمني أو مكان العقارب، نقص الدقة عند Broca وGlobal</td>\
+                    <td>يقيس التنظيم البصري والمهارات التخطيطية</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>إهمال بصري</td>\
+                    <td>تجاهل جانب من الرسم أو الكلمات، عدم الانتباه للجانب الأيسر عند Right Hemisphere Lesion</td>\
+                    <td>يقيّم الانتباه البصري والإهمال الجانبي</td>\
+                </tr>\
+                <tr>\
+                    <td>كتابة</td>\
+                    <td>أخطاء هجائية، حذف حروف أو كلمات، صعوبة تشكيل جمل عند Broca وGlobal</td>\
+                    <td>يقيس القدرة على التعبير الكتابي، التهجئة، وتنظيم الأفكار المكتوبة</td>\
+                </tr>\
+            </tbody>\
+        </table>\
+    </div>')">
+    ؟
+</button>
+  </h2>
+
+  <!-- Subsection 1 – استبعاد كلمة (4 بطاقات) -->
+  <h3> استبعاد كلمة <button class="btn-info" onclick="showInfo('التعليمات للمُقيّم: اطلب من الشخص قراءة الكلمات وستُعرض عليه، كل صف يحتوي على ٣ كلمات. اطلب منه أن يشطب الكلمة التي لا تنتمي إلى باقي الكلمات في كل صف. 
+')">?</button></h3>
+  <div class="card-row">
+    <div class="card">
+      <label>بقرة، تفاحة، جزر</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subA','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/1.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>مكتب، كرسي، أزرق</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subA','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/2.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>جبن، سرير، موز</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subA','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/3.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>بسكوتة، أريكة، طاولة</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subA','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subA','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/4.png')">S</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subsection 2 – اتباع أوامر (3 بطاقات) -->
+  <h3> اتباع أوامر <button class="btn-info" onclick="showInfo('اطلب من المريض قراءة الجمل التالية وتنفيذ ما تطلبه الجملة')">?</button></h3>
+  <div class="card-row">
+    <div class="card">
+      <label>انظر إلى السقف</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subB','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/5.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>أشر إلى الباب، ثم اغمض بعينيك</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subB','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/6.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ضع القلم على الورقة ،ثم انقر على الطاولة مرتين</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subB','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/22.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>غنِ أغنية "عيد ميلاد سعيد"</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subB','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subB','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/7.png')">S</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subsection 3 – فهم القرائي (4 بطاقات) -->
+  <h3> فهم القرائي <button class="btn-info" onclick="showInfo('سمير وسامر أخوان. كلاهما شارك في بطولة كرة القدم على أمل الفوز بجائزة قدرها 1,000 دولار. فاز سمير بمباراته الأولى والثانية، لكنه خرج من البطولة بعد خسارته في المباراة الثالثة. سامر وصل حتى نصف النهائي. خسر هناك، لكن حصل على لباس رياضة كجائزة تعزية.
+')">?</button></h3>
+  <div class="card-row">
+    <div class="card">
+      <label>هل سامر وسمير أولاد عم؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subC','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/8.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>ما الرياضة التي لعباها؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subC','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/9.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>كم كانت قيمة الجائزة الكبرى؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subC','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/11.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>هل فاز أحدهما بالجائزة الكبرى؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subC','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subC','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/12.png')">S</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subsection 4 – رسم ساعة (2 بطاقات) -->
+<h3>
+    رسم ساعة 
+    <button class="btn-info" 
+        onclick="showInfo('اعرض على الشخص الساعة واطلب منه أن يذكر الوقت الذي تشير إليه كل ساعة. بعد ذلك، اطلب من الشخص نسخ شكل الساعة مع ملاحظة دقة الرسم والتفاصيل.')">
+        ؟
+    </button>
+</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>انتاج الوقت</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subD','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subD','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/clock.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>رسم الساعة</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subD','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subD','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/clock.png')">S</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subsection 5 – إهمال بصري (1 بطاقة) -->
+  <h3> إهمال البصري     <button class="btn-info" 
+    
+        onclick="showInfo('اطلب من الشخص وضع علامة (×) على جميع الدوائر الموجودة في هذه الصفحة. لاحظ مدى انتباهه للنصف الأيسر من الصفحة.')">
+        ؟
+    </button>  
+    <button class="btn-show" onclick="showImage('images/v.jpeg')">S</button>
+</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>مدى انتباهه للنصف الأيسر من الصفحة.</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subE','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subE','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/21.png')">S</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subsection 6 – كتابة (2 بطاقات) -->
+  <h3> كتابة </h3>
+  <div class="card-row">
+    <div class="card">
+      <label>اكتب اسمك</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subF','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subF','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/13.png')">S</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>اكتب تاريخ اليوم</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('9subF','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('9subF','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/14.png')">S</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- القسم 10 -->
+<section id="section10">
+  <h2>
+     الحساب <span id="percent10">0%</span>
+    <button class="btn-note" onclick="addNote(10)">!</button>
+<!-- Info button for الحساب -->
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p>القسم: الحساب</p>\
+        <table cellpadding=&quot;6&quot; cellspacing=&quot;0&quot; style=&quot;width:100%; min-width:500px; text-align:center; border-collapse:collapse;&quot;>\
+            <thead style=&quot;background:#f0f0f0;&quot;>\
+                <tr>\
+                    <th>قسم</th>\
+                    <th>الأخطاء المتوقعة</th>\
+                    <th>ملاحظات سريرية</th>\
+                </tr>\
+            </thead>\
+            <tbody>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>عمليات بسيطة (جمع وطرح)</td>\
+                    <td>أخطاء حسابية، تأخر في الإجابة عند Broca وGlobal</td>\
+                    <td>يقيس القدرة على الحساب الأساسي والذاكرة العددية القصيرة</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>عمليات مركبة (ضرب وقسمة)</td>\
+                    <td>صعوبة في التسلسل والخطوات، أخطاء ترتيب عند Conduction وAnomic</td>\
+                    <td>يقيم القدرة على حل مسائل متعددة الخطوات</td>\
+                </tr>\
+                <tr>\
+                    <td>مسائل لفظية/تطبيقية</td>\
+                    <td>صعوبة استخراج المعلومات العددية، حذف خطوات، استجابات غير دقيقة عند Broca وWernicke</td>\
+                    <td>يختبر القدرة على استخدام الحساب في سياق مفهومي وتطبيقي</td>\
+                </tr>\
+            </tbody>\
+        </table>\
+    </div>')">
+    ؟
+</button>
+  </h2>
+
+  <div class="card-row">
+    <div class="card">
+      <label>إذا ذهبت إلى السوق وأنفقت 1500 في متجر و 1200 في متجر آخر، كم أنفقت بالمجموع؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('10','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('10','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/15.png')">S</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>إذا كان سعر الطماطم 150 للكيلو واشتريت 2 كيلو، كم أنفقت على الطماطم؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('10','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('10','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/16.png')">S</button>
+
+      </div>
+    </div>
+
+    <div class="card">
+      <label>إذا ذهبت إلى المتجر ومعك 3000 وعدت ومعك 1000، كم أنفقت؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('10','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('10','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/17.png')">S</button>
+
+      </div>
+    </div>
+
+    <div class="card">
+      <label>إذا معك تفاحة واعطيتك 12 تفاحة كم تفاحة معك الآن؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('10','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('10','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/20.png')">S</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>إذا كان سعر فرشاة الأسنان 5000 ولديك 1000، كم فرشاة أسنان يمكنك شراؤها؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('10','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('10','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/18.png')">S</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>إذا كان لديك موعد مع الطبيب الساعة 10:30 ويستغرق الوصول 30 دقيقة، متى يجب أن تغادر؟</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('10','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('10','dontknow',this)">/</button>
+        <button class="btn-show" onclick="showImage('images/19.png')">S</button>
+      </div>
+    </div>
+  </div>
+
+  
+</section>
+
+
+<!-- القسم 11 -->
+<section id="section11">
+  <h2> البراغماتية والتأثير الانفعالي
+    <button class="btn-note" onclick="addNote(11)">!</button>
+    <!-- Info button for البراغماتية والتأثير الانفعالي -->
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p>القسم: البراغماتية والتأثير الانفعالي</p>\
+        <table cellpadding=&quot;6&quot; cellspacing=&quot;0&quot; style=&quot;width:100%; min-width:600px; text-align:center; border-collapse:collapse;&quot;>\
+            <thead style=&quot;background:#f0f0f0;&quot;>\
+                <tr>\
+                    <th>قسم</th>\
+                    <th>الأخطاء المتوقعة</th>\
+                    <th>ملاحظات سريرية</th>\
+                </tr>\
+            </thead>\
+            <tbody>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>قرب جسدي/تلامس جسدي غير مناسب</td>\
+                    <td>تجاوز المسافة الاجتماعية، لمس غير ملائم</td>\
+                    <td>يقيس الوعي الاجتماعي والتحكم الحركي في التفاعل</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>إهمال النصف الأيسر من المجال البصري</td>\
+                    <td>تجاهل الأشياء أو الأشخاص على الجانب الأيسر</td>\
+                    <td>يشير إلى إهمال بصري غالبًا بعد إصابة نصفي الكرة المخية اليمنى</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>ضعف التواصل البصري</td>\
+                    <td>تجنب النظر للمتحدث، صعوبة متابعة الموقف</td>\
+                    <td>يعكس ضعف الانتباه الاجتماعي أو تأثير Broca/Wernicke على التفاعل</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>غياب تعابير الوجه</td>\
+                    <td>تعابير ثابتة أو غير مناسبة</td>\
+                    <td>يقيم التعبير الانفعالي والتواصل غير اللفظي</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>إيماءات غير مناسبة أو غائبة</td>\
+                    <td>استخدام إيماءات خاطئة أو عدم استخدام الإيماءات</td>\
+                    <td>يقيس التعبير الحركي الدلالي</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>غياب الخصائص النبرية في الكلام</td>\
+                    <td>نبرة، شدة، إيقاع غير مناسبة</td>\
+                    <td>يقيم الطابع الانفعالي والنغمة في الكلام</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>ضعف الحفاظ على موضوع الحديث</td>\
+                    <td>التحول العشوائي للموضوع، فقدان التسلسل</td>\
+                    <td>يعكس ضعف التنظيم اللغوي والانتباه</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>غياب التبادل المناسب في الحوار</td>\
+                    <td>عدم انتظار دور الآخر، مقاطعات متكررة</td>\
+                    <td>يقيم المهارات الاجتماعية والتبادلية</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>التكرار اللفظي أو السلوكي (Perseveration)</td>\
+                    <td>تكرار كلمات أو أفعال بلا داعٍ</td>\
+                    <td>يظهر ضعف التحكم التنفيذي أو اضطراب Broca</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>الافتراض المسبق الزائد أو الناقص للمعلومات (Presupposition)</td>\
+                    <td>إعطاء معلومات خاطئة أو نقصها عند التواصل</td>\
+                    <td>يقيس القدرة على ملاءمة المعلومات للسياق</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>الإسهاب غير المناسب</td>\
+                    <td>كلام زائد، تفاصيل غير ضرورية</td>\
+                    <td>يعكس ضعف التنظيم أو التحكم في التعبير</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>غياب المبادرة في بدء التفاعل</td>\
+                    <td>عدم بدء محادثة أو تفاعل</td>\
+                    <td>يقيس الدافعية الاجتماعية والانتباه</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>سهولة التشتت</td>\
+                    <td>فقدان التركيز بسرعة</td>\
+                    <td>يظهر ضعف الانتباه التنفيذي</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>مقاطعات متكررة</td>\
+                    <td>قطع كلام الآخرين</td>\
+                    <td>يعكس ضعف ضبط النفس والتحكم في الحوار</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>الاندفاعية</td>\
+                    <td>ردود سريعة وغير مدروسة</td>\
+                    <td>يقيم ضبط النفس والتخطيط</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>ضعف التنظيم</td>\
+                    <td>صعوبة ترتيب الأفكار أو المهام</td>\
+                    <td>يعكس قصور الوظائف التنفيذية</td>\
+                </tr>\
+                <tr>\
+                    <td>عدم إكمال المهام</td>\
+                    <td>ترك المهام دون إنهاء</td>\
+                    <td>يقيم الانتباه، التحفيز، والقدرة على التخطيط</td>\
+                </tr>\
+            </tbody>\
+        </table>\
+    </div>')">
+    ؟
+</button>
+
+  </h2>
+
+  <div class="card-row">
+
+    <div class="card"><label>قرب جسدي غير مناسب</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('يقترب جدًا من الممتحن أثناء الحديث أو يلمسه دون سبب')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>تلامس جسدي غير مناسب</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('يقترب جدًا من الممتحن أثناء الحديث أو يلمسه دون سبب')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>إهمال النصف الأيسر من المجال البصري</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('يتجاهل الطعام أو الأشياء الموضوعة على الطاولة في الجانب الأيسر')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>ضعف التواصل البصري</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('ينظر إلى الأرض أو بعيدًا أثناء الحديث بدلاً من النظر إلى المتحدث')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>غياب تعابير الوجه</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('يتحدث بصوت عادي دون تعبير عن المفاجأة أو الفرح أثناء سرد قصة')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>إيماءات (غير مناسبة أو غائبة)</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('عند الحديث عن شيء كبير، لا يرفع يديه أو يشير بطريقة صحيحة')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>غياب الخصائص النبرية في الكلام (الشدة، النغمة، الإيقاع)</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('يقرأ جملة استفهامية بصوت ثابت بدون ارتفاع النبرة في السؤال')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>ضعف الحفاظ على موضوع الحديث</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('يبدأ بالحديث عن الطعام، ثم فجأة ينتقل إلى التلفاز دون سبب')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>غياب التبادل المناسب في الأدوار أثناء الحوار</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('يقطع الممتحن أثناء طرح السؤال ليجيب مباشرة')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>التكرار اللفظي أو السلوكي (Perseveration)</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('يكرر كلمة (الكرة) عدة مرات رغم أن السؤال انتهى')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>يسأل عن لون شيء لم يُذكر أو يعطي تفاصيل غير موجودة مسبقًا</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('الافتراض المسبق الزائد أو الناقص للمعلومات')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>الإسهاب غير المناسب</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('عند وصف صورة، يسرد تفاصيل غير مهمة مثل لون الحائط أو عدد النوافذ')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>غياب المبادرة في بدء التفاعل</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('لا يبدأ التحية أو السؤال عن حالة الآخرين رغم وجود فرصة')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>سهولة التشتت</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('يبدأ حل مهمة، ثم يتوقف فجأة ليتفقد شيء آخر في الغرفة')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>مقاطعات متكررة</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('يقاطع الممتحن عدة مرات أثناء قراءة سؤال أو إعطاء تعليمات')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>الاندفاعية</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('يجيب على سؤال قبل أن يُكمل الممتحن السؤال بالكامل')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>ضعف التنظيم</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('عند وصف عملية، يذكر الخطوات بشكل عشوائي وغير متسلسل')">?</button>
+      </div>
+    </div>
+
+    <div class="card"><label>عدم إكمال المهام</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score(11,'correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('يبدأ بكتابة قائمة، لكنه يتركها نصف مكتوبة دون إنهاء')">?</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- القسم 12 -->
+<section id="section12">
+  <h2>
+     الذاكرة <span id="percent12">0%</span>
+    <button class="btn-note" onclick="addNote(12)">!</button>
+    <!-- Info button for الذاكرة -->
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p>القسم: الذاكرة</p>\
+        <table cellpadding=&quot;6&quot; cellspacing=&quot;0&quot; style=&quot;width:100%; min-width:500px; text-align:center; border-collapse:collapse;&quot;>\
+            <thead style=&quot;background:#f0f0f0;&quot;>\
+                <tr>\
+                    <th>قسم</th>\
+                    <th>الأخطاء المتوقعة</th>\
+                    <th>ملاحظات سريرية</th>\
+                </tr>\
+            </thead>\
+            <tbody>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>الذاكرة الفورية</td>\
+                    <td>صعوبة تذكر معلومات قصيرة فور سماعها، حذف أرقام أو كلمات</td>\
+                    <td>يقيس القدرة على الاحتفاظ بالمعلومات لفترة قصيرة جداً</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>سرد قصة</td>\
+                    <td>حذف أحداث، تسلسل خاطئ، استبدال تفاصيل</td>\
+                    <td>يقيم القدرة على الاحتفاظ بالمعلومات وسردها بشكل متسلسل</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>الذاكرة الحديثة</td>\
+                    <td>صعوبة استرجاع أحداث أو معلومات حديثة</td>\
+                    <td>يقيس قدرة التذكر بعد مرور وقت قصير</td>\
+                </tr>\
+                <tr>\
+                    <td>الذاكرة طويلة المدى</td>\
+                    <td>صعوبة تذكر أحداث قديمة، أسماء أو معلومات مألوفة</td>\
+                    <td>يقيم القدرة على الاحتفاظ بالذكريات القديمة</td>\
+                </tr>\
+            </tbody>\
+        </table>\
+    </div>')">
+    ؟
+</button>
+
+  </h2>
+
+  <!-- Subsection 1 – الذاكرة الفورية – 7 cards -->
+  <h3>الذاكرة الفورية </h3>
+  <div class="card-row">
+    <div class="card">
+      <label>7، 4، 2</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('12sub1','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('12sub1','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>6، 1، 8, 3</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('12sub1','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('12sub1','dontknow',this)">/</button>
+      </div>
+    </div>   
+    <div class="card">
+      <label>9، 1، 4، 6، 5</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('12sub1','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('12sub1','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>سيارة، بطة، خاتم، حذاء</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('12sub1','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('12sub1','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>مطر، مكتب، سلم، حصان، كعكة</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('12sub1','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('12sub1','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>وُجدت المفاتيح تحت الطاولة</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('12sub1','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('12sub1','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>هو دائمًا يقرأ الجريدة قبل الإفطار</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('12sub1','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('12sub1','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>بعد انتصارهم، تناول فريق البيسبول البيتزا وشاهدوا فيلمًا</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('12sub1','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('12sub1','dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subsection 2 – سرد قصة – 1 card -->
+  <h3> سرد قصة </h3>
+  <div class="card-row">
+    <div class="card">
+      <label>احتفلت هيلين بعيد ميلادها في حديقة الحيوانات الأليفة. حضر عشرة من أصدقائها.ضحك جميع الأطفال عندما وجدوا ماعزًا يأكل الكعكة والآيس</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('12sub2','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('12sub2','dontknow',this)">/</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>احتفلت ليلى بعيد ميلادها في حديقة الطيور الملونة. حضر اثنا عشر صديقًا. تعجب الأطفال عندما رأوا ببغاءً يسرق قطعة البيتزا من الطاولة!</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('12sub2','correct',this)">+</button>
+        <button class="btn-dontknow" onclick="score('12sub2','dontknow',this)">/</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Subsection 3 – الذاكرة الحديثة – 8 cards -->
+  <h3>الذاكرة الحديثة </h3>
+  <div class="card-row">
+    <div class="card"><label>ماذا تناولت على الإفطار؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub3','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub3','dontknow',this)">/</button></div></div>
+    <div class="card"><label>ماذا فعلت بعد العشاء الليلة الماضية؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub3','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub3','dontknow',this)">/</button></div></div>
+    <div class="card"><label>ماذا فعلت بعد الإفطار هذا الصباح؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub3','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub3','dontknow',this)">/</button></div></div>
+    <div class="card"><label>ماذا فعلت أيضًا اليوم؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub3','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub3','dontknow',this)">/</button></div></div>
+    <div class="card"><label>هل زارك أحد اليوم أو أمس؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub3','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub3','dontknow',this)">/</button></div></div>
+    <div class="card"><label>ما العلاجات الأخرى التي تتلقاها؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub3','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub3','dontknow',this)">/</button></div></div>
+    <div class="card"><label>من هو طبيبك؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub3','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub3','dontknow',this)">/</button></div></div>
+    <div class="card"><label>منذ متى وأنت هنا؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub3','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub3','dontknow',this)">/</button></div></div>
+  </div>
+
+  <!-- Subsection 4 – الذاكرة طويلة المدى – 9 cards -->
+     <div id="sub12sub4">
+  <h3>الذاكرة طويلة المدى </h3>
+  <div class="card-row">
+    <div class="card"><label>أين وُلدت؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub4','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub4','dontknow',this)">/</button></div></div>
+    <div class="card"><label>متى تاريخ ميلادك؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub4','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub4','dontknow',this)">/</button></div></div>
+    <div class="card"><label>اسم زوجك/زوجتك؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub4','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub4','dontknow',this)">/</button></div></div>
+    <div class="card"><label>كم عدد أطفالك؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub4','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub4','dontknow',this)">/</button></div></div>
+    <div class="card"><label>كم عدد أحفادك؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub4','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub4','dontknow',this)">/</button></div></div>
+    <div class="card"><label>أين كنت تعمل سابقًا؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub4','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub4','dontknow',this)">/</button></div></div>
+    <div class="card"><label>كم سنة عملت؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub4','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub4','dontknow',this)">/</button></div></div>
+    <div class="card"><label>أين نشأت؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub4','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub4','dontknow',this)">/</button></div></div>
+    <div class="card"><label>كم عدد إخوتك وأخواتك؟</label><div class="button-row"><button class="btn-correct" onclick="score('12sub4','correct',this)">+</button><button class="btn-dontknow" onclick="score('12sub4','dontknow',this)">/</button></div></div>
+  </div>
+</section>
+
+<!-- القسم 13 -->
+<section id="section13">
+  <h2> خصائص الكلام
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <h3>أنواع الـ Paraphasia عند مرضى الحبسة الكلامية (Aphasia)</h3>\
+        <table cellpadding=&quot;6&quot; cellspacing=&quot;0&quot; style=&quot;width:100%; min-width:500px; text-align:center; border-collapse:collapse;&quot;>\
+            <thead style=&quot;background:#f0f0f0;&quot;>\
+                <tr>\
+                    <th>English Keyword</th>\
+                    <th>Arabic Keyword</th>\
+                    <th>Example in Arabic</th>\
+                    <th>Example in English</th>\
+                </tr>\
+            </thead>\
+            <tbody>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>Phonemic (Literal) Paraphasia</td>\
+                    <td>بارافازيا صوتية (حرفية)</td>\
+                    <td>المريض يقول: &quot;توب&quot; بدل &quot;كوب&quot;</td>\
+                    <td>Patient says &quot;poon&quot; instead of &quot;spoon&quot;</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>Verbal (Semantic) Paraphasia</td>\
+                    <td>بارافازيا لفظية (دلالية)</td>\
+                    <td>المريض يقول: &quot;كرسي&quot; بدل &quot;طاولة&quot;</td>\
+                    <td>Patient says &quot;chair&quot; instead of &quot;table&quot;</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>Neologistic Paraphasia</td>\
+                    <td>بارافازيا كلامية مبتكرة (نحت كلمة جديدة)</td>\
+                    <td>المريض يقول: &quot;فلمبو&quot; بدل &quot;قلم&quot;</td>\
+                    <td>Patient says &quot;flambo&quot; instead of &quot;pen&quot;</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>Mixed Paraphasia</td>\
+                    <td>بارافازيا مختلطة</td>\
+                    <td>المريض يقول: &quot;كارسو&quot; بدل &quot;كرسي&quot; (جزء صوتي خاطئ + دلالي خاطئ)</td>\
+                    <td>Patient says &quot;carso&quot; instead of &quot;chair&quot;</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td>Remote Semantic Paraphasia</td>\
+                    <td>بارافازيا دلالية بعيدة</td>\
+                    <td>المريض يقول: &quot;قطة&quot; بدل &quot;مفتاح&quot; (لا علاقة معنوية مباشرة)</td>\
+                    <td>Patient says &quot;cat&quot; instead of &quot;key&quot;</td>\
+                </tr>\
+                <tr>\
+                    <td>Formal Paraphasia</td>\
+                    <td>بارافازيا شكلية</td>\
+                    <td>المريض يقول: &quot;كتب&quot; بدل &quot;كتبّة&quot; (تشابه شكلي/صوتي مع الكلمة المستهدفة)</td>\
+                    <td>Patient says &quot;bookz&quot; instead of &quot;book&quot;</td>\
+                </tr>\
+            </tbody>\
+        </table>\
+    </div>')">
+    ؟
+</button>
+    <button class="btn-note" onclick="addNote(13)">!</button>
+  </h2>
+
+  <!-- Subsection 1 – بارافيزيا – 2 cards -->
+  <h3>بارافيزيا Paraphasia <button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; font-family:Arial, sans-serif;&quot;>\
+        <h3 style=&quot;margin-bottom:10px;&quot;>حوار عفوي مع المفحوص</h3>\
+        <p>ابدأ حوارًا عفويًا مع المفحوص لتسجيل الإجابات قدر الإمكان، ويمكن تقديم بعض المساعدة عند الحاجة. يفضل تسجيل الإجابات إن أمكن.</p>\
+        <div style=&quot;margin-top:10px;&quot;><strong>1. كيف حالك اليوم؟</strong> (الحمد لله، منيح، تمام ...)</div>\
+        <div style=&quot;margin-top:5px;&quot;><strong>2. هل سبق لك وأتيت لهذا المكان أو هل اختبرتك سابقاً؟</strong> (نعم، لا، أو أية استجابة أخرى)</div>\
+        <div style=&quot;margin-top:5px;&quot;><strong>3. هل تعتقد أنه بإمكاننا مساعدتك؟ وهل قدمنا لك مساعدة مسبقاً؟</strong> (أعتقد ذلك، ربما، ...)</div>\
+        <div style=&quot;margin-top:5px;&quot;><strong>4. هل تعتقد أنه يمكن أن تتحسن معنا أو تتطور أكثر؟</strong> (آمل ذلك، لا أظن ...)</div>\
+        <div style=&quot;margin-top:5px;&quot;><strong>5. في أي وقت ستغادر هذا المكان اليوم؟</strong> (لا أعرف، قريباً جداً، بسرعة ...)</div>\
+        <div style=&quot;margin-top:5px;&quot;><strong>6. ما هو اسمك الثلاثي الكامل؟</strong></div>\
+        <div style=&quot;margin-top:5px;&quot;><strong>7. ما هو عنوانك التفصيلي؟</strong> (رقم البناء، الشارع، المدينة ...)</div>\
+    </div>')">?</button>
+</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>Phonemic (Literal)  صوتية (حرفية)</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('13sub1','correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('المريض يقول:  توب بدل كوب')">?</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>Verbal (Semantic) لفظية (دلالية)</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('13sub1','correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('المريض يقول: كرسي بدل طاولة')">?</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>Neologistic كلامية مبتكرة</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('13sub1','correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('المريض يقول: فلمبو بدل قلم')">?</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>Mixed مختلطة</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('13sub1','correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('المريض يقول: كارسو بدل كرسي (جزء صوتي خاطئ + دلالي خاطئ)')">?</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>Remote Semantic دلالية بعيدة</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('13sub1','correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('المريض يقول: قطة بدل مفتاح (لا علاقة معنوية مباشرة)')">?</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>Formal شكلية</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('13sub1','correct',this)">+</button>
+        <button class="btn-info" onclick="showInfo('المريض يقول: كتب بدل يكتب (تشابه شكلي/صوتي مع الكلمة المستهدفة)')">?</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subsection 2 – الصوت – 2 cards -->
+  <h3>تعقيد الكلام   
+  <button class="btn-show" onclick="showImage('images/pic1.png')">S</button>
+  <button class="btn-show" onclick="showImage('images/pic2.png')">S</button>
+  <button class="btn-note" onclick="addNote(13)">!</button>
+</h3>
+  <div class="card-row">
+    <div class="card">
+      <label>الفهم العام للصورة</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('13sub2','correct',this)">+</button>
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p><strong>تقييم فهم القصة والمحتوى:</strong></p>\
+        <ul>\
+            <li>هل يفهم المريض ما يحدث في القصة؟</li>\
+            <li>هل يستطيع التعرف على الشخصيات والأفعال الأساسية؟</li>\
+        </ul>\
+    </div>')">?</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>تسلسل الأحداث</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('13sub2','correct',this)">+</button>
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p><strong>تقييم تسلسل الأحداث والسرد:</strong></p>\
+        <ul>\
+            <li>هل يذكر المريض الأحداث بالترتيب المنطقي؟</li>\
+            <li>هل يختزل الأحداث أو يضيف عناصر غير موجودة؟</li>\
+        </ul>\
+    </div>')">?</button>
+      </div>
+    </div>
+        <div class="card">
+      <label>التسمية والكلمات</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('13sub2','correct',this)">+</button>
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p><strong>تقييم اختيار الكلمات والبارافازيا:</strong></p>\
+        <ul>\
+            <li>هل يستخدم المريض الكلمات الصحيحة مثل (كرسي، كعكة، سرقة)؟</li>\
+            <li>هل يظهر بارافازيا لفظية أو صوتية؟</li>\
+            <li>هل يوجد حذف كلمات، استبدال كلمات أو نحت كلمات جديدة (Neologisms)؟</li>\
+        </ul>\
+    </div>')">?</button>
+      </div>
+    </div>
+    <div class="card">
+      <label>القواعد والنحو</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('13sub2','correct',this)">+</button>
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p><strong>تقييم تركيب الجمل والنحو:</strong></p>\
+        <ul>\
+            <li>هل يشكل المريض جملًا مفهومة وواضحة؟</li>\
+            <li>هل توجد أخطاء نحوية كبيرة عند مرضى Broca؟</li>\
+            <li>هل توجد أخطاء تركيبية عند مرضى Wernicke؟</li>\
+        </ul>\
+    </div>')">?</button>
+      </div>
+    </div>
+        <div class="card">
+      <label>التفاصيل الدلالية</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('13sub2','correct',this)">+</button>
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p><strong>ملاحظات تقييمية:</strong></p>\
+        <ul>\
+            <li>هل يصف الشخصيات والملابس والأشياء بدقة؟</li>\
+            <li>هل يربط بين الفعل والفاعل بشكل صحيح؟</li>\
+        </ul>\
+    </div>')">?</button>
+      </div>
+    </div>
+        <div class="card">
+      <label>المنطق والاستدلال</label>
+      <div class="button-row">
+        <button class="btn-correct" onclick="score('13sub2','correct',this)">+</button>
+<button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
+        <p><strong>شرح تفصيلي عن الصوت الضعيف:</strong></p>\
+        <ul>\
+            <li>هل يفهم السبب والنتيجة؟ (مثلاً: لماذا أخذ الشخص الكعكة)</li>\
+            <li>هل يلاحظ أي تناقضات أو اختلاط بالأحداث؟</li>\
+        </ul>\
+    </div>')">?</button>
+      </div>
+    </div>
+  </div>
+
+<!-- Subsection 3 – الصوت – 6 cards -->
+<h3>الصوت 
+ <button class="btn-info" 
+    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
+    onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto; font-family:Arial, sans-serif; direction:rtl;&quot;>\
+        <h3 style=&quot;margin-bottom:10px;&quot;>خصائص الصوت والنطق</h3>\
+        <table cellpadding=&quot;6&quot; cellspacing=&quot;0&quot; style=&quot;width:100%; min-width:500px; border-collapse:collapse; text-align:right;&quot;>\
+            <thead style=&quot;background:#f0f0f0;&quot;>\
+                <tr>\
+                    <th style=&quot;border:1px solid #ccc;&quot;>القسم</th>\
+                    <th style=&quot;border:1px solid #ccc;&quot;>الأخطاء أو الملاحظات المتوقعة</th>\
+                    <th style=&quot;border:1px solid #ccc;&quot;>ملاحظات سريرية</th>\
+                </tr>\
+            </thead>\
+            <tbody>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>علو الصوت: عالي</td>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>رفع الصوت بشكل مفرط عن الحاجة أو عن السياق</td>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>قد يدل على اضطراب تحكم في الشدة أو زيادة اندفاعية الكلام</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>علو الصوت: منخفض</td>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>الكلام ضعيف أو غير مسموع بسهولة</td>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>قد يشير إلى ضعف قوة الصوت أو مشاكل نطقية عند Broca</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>نوعية الصوت: مهموس</td>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>صعوبة إصدار الحروف أو الصوت غير واضح</td>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>يشير إلى ضعف التحكم الصوتي أو اضطراب في النطق الحرفي</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>نوعية الصوت: خشن</td>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>خشونة أو خشونة في النبرة</td>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>قد يظهر عند إجهاد الصوت أو ضعف العضلات النطقية</td>\
+                </tr>\
+                <tr style=&quot;border-bottom:1px solid #ccc;&quot;>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>معدل الكلام: بطيء</td>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>بطء غير طبيعي في الكلام أو توقفات مطولة</td>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>مرتبط غالبًا بـBroca أو مشاكل تنفيذية في التخطيط اللغوي</td>\
+                </tr>\
+                <tr>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>معدل الكلام: سريع</td>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>الكلام سريع وغير واضح، حذف كلمات أو مقاطع</td>\
+                    <td style=&quot;border:1px solid #ccc;&quot;>قد يظهر عند اضطرابات تحكمية أو اندفاعية كلامية</td>\
+                </tr>\
+            </tbody>\
+        </table>\
+    </div>')">?</button>
+
+</h3>
+
+<div class="card-row">
+  <div class="card">
+    <label>علو الصوت : عالي</label>
+    <div class="button-row">
+      <button class="btn-correct" onclick="score('13sub3','correct',this)">+</button>
+    </div>
+  </div>
+  <div class="card">
+    <label>علو الصوت : منخفض</label>
+    <div class="button-row">
+      <button class="btn-correct" onclick="score('13sub3','correct',this)">+</button>
+    </div>
+  </div>
+</div>
+
+<div class="card-row">
+  <div class="card">
+    <label>نوعية الصوت : مهموس</label>
+    <div class="button-row">
+      <button class="btn-correct" onclick="score('13sub3','correct',this)">+</button>
+    </div>
+  </div>
+  <div class="card">
+    <label>نوعية الصوت : خشن</label>
+    <div class="button-row">
+      <button class="btn-correct" onclick="score('13sub3','correct',this)">+</button>
+    </div>
+  </div>
+</div>
+
+<div class="card-row">
+  <div class="card">
+    <label>معدل الكلام : بطيء</label>
+    <div class="button-row">
+      <button class="btn-correct" onclick="score('13sub3','correct',this)">+</button>
+    </div>
+  </div>
+  <div class="card">
+    <label>معدل الكلام : سريع</label>
+    <div class="button-row">
+      <button class="btn-correct" onclick="score('13sub3','correct',this)">+</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- القسم 13 – تقرير نهائي -->
+<section id="section13">
+  <h2>القسم 13: التقرير النهائي</h2>
+  <textarea id="report" readonly></textarea>
+  <button class="btn-download" onclick="downloadReport()">ملف</button>
+</section>
+
+</div>
+
+<div class="floating-box" id="floatingBox"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
