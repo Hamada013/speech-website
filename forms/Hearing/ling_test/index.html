@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ling Six Sound Test</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+<section id="sectionLingTest" class="info-section">
+  <div class="section-header">
+    <div class="section-icon">
+      <img src="images/logo.png" alt="Test Icon">
+    </div>
+    <h2>Ling Six Sound Test</h2>
+    <button class="btn-info" onclick="showTestInfo('lingTest')">?</button>
+  </div>
+
+  <!-- Optional content under header -->
+  <div class="card-wrapper">
+    <!-- your cards go here -->
+  </div>
+</section>
+
+<!-- القسم 0 – البيانات الشخصية والطبية -->
+<section id="section0" class="info-section">
+  <h2>البيانات الشخصية  
+  </h2>
+  <div class="info-grid">
+    <div class="info-field">
+      <label for="currentDate">تاريخ اليوم</label>
+      <input type="date" id="currentDate" readonly>
+    </div>
+    <div class="info-field">
+      <label for="age">العمر الزمني (بالسنوات)</label>
+      <input type="text" id="age" readonly>
+    </div>
+    <div class="info-field">
+      <label for="name">الاسم</label>
+      <input type="text" id="name">
+    </div>
+    <div class="info-field">
+      <label for="birthDate">تاريخ الميلاد</label>
+      <input type="date" id="birthDate">
+    </div>
+    <div class="info-field">
+      <label for="medicalDiagnosis">التشخيص</label>
+      <input type="text" id="medicalDiagnosis">
+    </div>
+    <div class="info-field">
+      <label for="examinerName">اسم الاختصاصي</label>
+      <input type="text" id="examinerName">
+    </div>
+  </div>
+</section>
+
+  <!-- القسم 1 -->
+  <section id="section1">
+<h2>
+  القسم 1: <span id="percent1">0%</span>
+  <button class="btn-note" onclick="addNote(1)">!</button>
+  <button class="btn-add" onclick="startNextTrial()">+</button>
+  <button class="btn-expand" onclick="expandCard(1)">&lt;&gt;</button>
+  <span id="currentSoundBox" class="current-sound-box"></span> <!-- NEW BOX -->
+</h2>
+<!-- Cards -->
+<div class="card-wrapper">
+  <div class="card" id="card1">
+    <img src="images/a.png" alt="صورة 1" class="card-img">
+    <audio id="sound1"><source src="sounds/a.wav" type="audio/mpeg"></audio>
+  </div>
+  <div class="card" id="card2">
+    <img src="images/i.png" alt="صورة 2" class="card-img">
+    <audio id="sound2"><source src="sounds/i.wav" type="audio/mpeg"></audio>
+  </div>
+  <div class="card" id="card3">
+    <img src="images/u.png" alt="صورة 3" class="card-img">
+    <audio id="sound3"><source src="sounds/u.wav" type="audio/mpeg"></audio>
+  </div>
+  <div class="card" id="card4">
+    <img src="images/s.png" alt="صورة 4" class="card-img">
+    <audio id="sound4"><source src="sounds/s.wav" type="audio/mpeg"></audio>
+  </div>
+  <div class="card" id="card5">
+    <img src="images/sh.png" alt="صورة 5" class="card-img">
+    <audio id="sound5"><source src="sounds/sh.wav" type="audio/mpeg"></audio>
+  </div>
+  <div class="card" id="card6">
+    <img src="images/m.png" alt="صورة 6" class="card-img">
+    <audio id="sound6"><source src="sounds/m.wav" type="audio/mpeg"></audio>
+  </div>
+</div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+      <div class="progress-container">
+        <div class="progress-bar" id="progress1"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- القسم 2 – التقرير -->
+  <section id="section2">
+    <h2>القسم 2: التقرير النهائي</h2>
+    <textarea id="report" readonly></textarea>
+    <button class="btn-download" onclick="downloadReport()">التقرير</button>
+  </section>
+
+</div>
+
+<div class="floating-box" id="floatingBox"></div>
+<script src="script.js"></script>
+<script>
+  // =========================
+  // Auto-fill date and age
+  // =========================
+  const currentDateInput = document.getElementById("currentDate");
+  const birthDateInput = document.getElementById("birthDate");
+  const ageInput = document.getElementById("age");
+
+  const today = new Date();
+  currentDateInput.valueAsDate = today;
+
+  birthDateInput.addEventListener("change", ()=>{
+    const birth = new Date(birthDateInput.value);
+    if(!isNaN(birth.getTime())){
+      let age = today.getFullYear() - birth.getFullYear();
+      const m = today.getMonth() - birth.getMonth();
+      if(m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+      ageInput.value = age;
+    }
+  });
+</script>
+</body>
+</html>
