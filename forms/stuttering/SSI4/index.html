@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auditory Skills Checklist</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-logo">
+    <img src="images/logo.png" alt="Logo">
+  </div>
+  <h1>Auditory Skills Checklist</h1>
+  <button class="btn-info" onclick="showTestInfo('page')">?</button>
+</header>
+
+<!-- Info box for the page header -->
+<div id="info-box-page" class="info-box hidden">
+  <p>This checklist evaluates auditory skills in children and adults. Use it to record observations and measure frequency, duration, and naturalness of speech.</p>
+  <button onclick="closeInfoBox('page')">Close</button>
+</div>
+
+
+<div class="container">
+
+  <!-- Section 0: Identifying Info -->
+  <section id="section0" class="info-section">
+    <h2>Identifying Information</h2>
+    <div class="info-grid">
+      <div class="info-field"><label for="name">Name</label><input type="text" id="name" placeholder="Enter name"></div>
+      <div class="info-field"><label for="grade">Grade</label><input type="text" id="grade" placeholder="Enter grade"></div>
+      <div class="info-field"><label for="testDate">Date of Testing</label><input type="date" id="testDate"></div>
+      <div class="info-field"><label for="school">School</label><input type="text" id="school" placeholder="Enter school"></div>
+      <div class="info-field"><label for="dob">Date of Birth</label><input type="date" id="dob" onchange="calculateAge()"></div>
+      <div class="info-field"><label for="age">Age</label><input type="text" id="age" readonly></div>
+      <div class="info-field">
+        <label>Category</label>
+        <div id="categoryBtns" class="btn-group">
+          <button type="button" onclick="selectOption('category','Preschool',this)">Preschool</button>
+          <button type="button" onclick="selectOption('category','School Age',this)">School Age</button>
+          <button type="button" onclick="selectOption('category','Adult',this)">Adult</button>
+        </div>
+        <input type="hidden" id="category" name="category">
+      </div>
+      <div class="info-field">
+        <label>Gender</label>
+        <div id="genderBtns" class="btn-group">
+          <button type="button" onclick="selectOption('gender','Female',this)">Female</button>
+          <button type="button" onclick="selectOption('gender','Male',this)">Male</button>
+        </div>
+        <input type="hidden" id="gender" name="gender">
+      </div>
+      <div class="info-field"><label>Examiner</label><input type="text" id="examiner" placeholder="Enter examiner name"></div>
+      <div class="info-field">
+        <label>Reader Status</label>
+        <div id="readerBtns" class="btn-group">
+          <button type="button" onclick="selectOption('reader','Reader',this)">Reader</button>
+          <button type="button" onclick="selectOption('reader','Nonreader',this)">Nonreader</button>
+        </div>
+        <input type="hidden" id="reader" name="reader">
+      </div>
+    </div>
+  </section>
+
+
+<!-- Resources Section -->
+<section id="resources-section">
+  <h2 style="display:flex; align-items:center; gap:8px;">
+    Resources
+    <button class="btn-info" onclick="showTestInfo('resources')">?</button>
+  </h2>
+
+  <div id="info-box-resources" class="info-box hidden">
+    <p>
+      This section lists all the available resources related to the session. 
+      Click on a resource button to view or download the corresponding item.
+    </p>
+    <button onclick="closeInfoBox('resources')">Close</button>
+  </div>
+
+  <div class="resource-buttons">
+    <button data-img="images/preschool.png">Preschool</button>
+    <button data-img="images/school.png">School Age</button>
+    <button data-img="images/adult.png">Adult</button>
+    <p> </p>
+    <button data-img="images/reader1.png">📖 1</button>
+    <button data-img="images/reader2.png">📖 2</button>
+    <button data-img="images/reader3.png">📖 3</button>
+    <button data-img="images/reader4.png">📖 4</button>
+    <button data-img="images/reader5.png">📖 5</button>
+    <p> </p>
+    <button data-img="images/reader6.png">📖 6</button>
+    <button data-img="images/reader7.png">📖 7</button>
+    <button data-img="images/reader8.png">📖 8</button>
+    <button data-img="images/reader9.png">📖 9</button>
+    <button data-img="images/reader10.png">📖 10</button>
+  </div>
+</section>
+
+<!-- Floating Image Box -->
+<div id="floating-box" class="hidden">
+  <img id="resource-img" src="" alt="Resource">
+</div>
+
+<section id="section-audio" class="info-section">
+  <h2>Audio Recorder</h2>
+  <div class="card">
+
+<!-- Audio Controls -->
+<div class="controls">
+  <button id="recordBtn">🎙 Record</button>
+  <button id="stopBtn" disabled>⏹ Stop</button>
+  <span id="timer">0 ms</span>
+</div>
+
+<!-- Waveform Canvas -->
+<canvas id="waveform" width="600" height="100"></canvas>
+
+<!-- Playback Player -->
+<div class="audio-player">
+  <!-- Play/Pause Button -->
+  <button class="play-btn" id="playBtn">⏯</button>
+
+  <!-- Progress Bar (Right-to-Left) -->
+  <div class="progress-container" id="progressContainer">
+    <div class="progress" id="progress" style="position: absolute; right: 0; top: 0; height: 100%; width: 0%; border-radius: 6px;"></div>
+  </div>
+
+  <!-- Current Time -->
+  <span class="current-time" id="currentTime">0.00 s</span>
+</div>
+
+
+    <!-- Transcript -->
+      <textarea id="transcript" placeholder="Write notes or transcribe audio..." rows="5"></textarea>
+  </div>
+</section>
+<section id="section-frequency" class="info-section">
+  <h2 style="display:flex; align-items:center; gap:8px;">
+    Frequency & Duration
+    <button class="btn-info" onclick="showTestInfo('frequency')">?</button>
+  </h2>
+
+  <div id="info-box-frequency" class="info-box hidden">
+    <p>
+      In this section, you can paste speech or reading samples to calculate frequency and duration measures. 
+      Select the sample type for each text and click the calculate button to view results.
+    </p>
+    <button onclick="closeInfoBox('frequency')">Close</button>
+  </div>
+
+  <div class="card">
+    <!-- Text 1 -->
+    <label for="text1">Text 1</label>
+    <textarea id="text1" rows="5" placeholder="Paste first text sample here"></textarea>
+    <div class="btn-group">
+      <span>Sample Type:</span>
+      <button type="button" onclick="selectSampleType('text1','Reader', this)">Reader</button>
+      <button type="button" onclick="selectSampleType('text1','Nonreader', this)">Nonreader</button>
+      <button type="button" onclick="selectSampleType('text1','Speaking / Readers', this)">Speaking / Readers</button>
+    </div>
+
+    <!-- Text 2 -->
+    <label for="text2">Text 2 (optional)</label>
+    <textarea id="text2" rows="5" placeholder="Paste second text sample here"></textarea>
+    <div class="btn-group">
+      <span>Sample Type:</span>
+      <button type="button" onclick="selectSampleType('text2','Reader', this)">Reader</button>
+      <button type="button" onclick="selectSampleType('text2','Nonreader', this)">Nonreader</button>
+      <button type="button" onclick="selectSampleType('text2','Speaking / Readers', this)">Speaking / Readers</button>
+    </div>
+
+    <button type="button" onclick="calculateFrequencyDuration()">Calculate Frequency & Duration</button>
+  </div>
+
+  <div id="results" class="card" style="display:none; margin-top:15px;">
+    <h3>Results</h3>
+    <pre id="results-output"></pre>
+  </div>
+</section>
+
+
+
+
+
+<!-- Section 3: Physical Concomitants -->
+<section id="physical-concomitants" class="info-section">
+<h2 style="display:flex; align-items:center; gap:8px;">
+  Physical Concomitants
+  <button class="btn-info" onclick="showTestInfo('physical')">?</button>
+</h2>
+
+<div id="info-box-physical" class="info-box hidden">
+  <p>
+    This section allows you to record observed physical concomitants during speech. 
+    Click a button to select the observed type. Only one type per category can be selected.
+  </p>
+  <button onclick="closeInfoBox('physical')">Close</button>
+</div>
+  <div class="card">
+    <div class="physical-item" data-category="Distracting Sounds">
+      <span class="category-title">Distracting Sounds:</span>
+      <div class="type-buttons">
+        <button onclick="selectType('Distracting Sounds','Noisy breathing')">Noisy breathing</button>
+        <button onclick="selectType('Distracting Sounds','Whistling')">Whistling</button>
+        <button onclick="selectType('Distracting Sounds','Sniffing')">Sniffing</button>
+        <button onclick="selectType('Distracting Sounds','Blowing')">Blowing</button>
+        <button onclick="selectType('Distracting Sounds','Clicking sounds')">Clicking sounds</button>
+        <button onclick="promptOther('Distracting Sounds')">Other</button>
+      </div>
+      <div class="rating">
+        Score: 
+        <button onclick="setScore('Distracting Sounds',0)">0</button>
+        <button onclick="setScore('Distracting Sounds',1)">1</button>
+        <button onclick="setScore('Distracting Sounds',2)">2</button>
+        <button onclick="setScore('Distracting Sounds',3)">3</button>
+        <button onclick="setScore('Distracting Sounds',4)">4</button>
+        <button onclick="setScore('Distracting Sounds',5)">5</button>
+      </div>
+    </div>
+
+    <div class="physical-item" data-category="Facial Grimaces">
+      <span class="category-title">Facial Grimaces:</span>
+      <div class="type-buttons">
+        <button onclick="selectType('Facial Grimaces','Jaw jerking')">Jaw jerking</button>
+        <button onclick="selectType('Facial Grimaces','Tongue protruding')">Tongue protruding</button>
+        <button onclick="selectType('Facial Grimaces','Lip pressing')">Lip pressing</button>
+        <button onclick="selectType('Facial Grimaces','Jaw muscles tense')">Jaw muscles tense</button>
+        <button onclick="promptOther('Facial Grimaces')">Other</button>
+      </div>
+      <div class="rating">
+        Score: 
+        <button onclick="setScore('Facial Grimaces',0)">0</button>
+        <button onclick="setScore('Facial Grimaces',1)">1</button>
+        <button onclick="setScore('Facial Grimaces',2)">2</button>
+        <button onclick="setScore('Facial Grimaces',3)">3</button>
+        <button onclick="setScore('Facial Grimaces',4)">4</button>
+        <button onclick="setScore('Facial Grimaces',5)">5</button>
+      </div>
+    </div>
+
+    <div class="physical-item" data-category="Head Movements">
+      <span class="category-title">Head Movements:</span>
+      <div class="type-buttons">
+        <button onclick="selectType('Head Movements','Back')">Back</button>
+        <button onclick="selectType('Head Movements','Forward')">Forward</button>
+        <button onclick="selectType('Head Movements','Turning away')">Turning away</button>
+        <button onclick="selectType('Head Movements','Poor eye contact')">Poor eye contact</button>
+        <button onclick="selectType('Head Movements','Constant looking around')">Constant looking around</button>
+        <button onclick="promptOther('Head Movements')">Other</button>
+      </div>
+      <div class="rating">
+        Score: 
+        <button onclick="setScore('Head Movements',0)">0</button>
+        <button onclick="setScore('Head Movements',1)">1</button>
+        <button onclick="setScore('Head Movements',2)">2</button>
+        <button onclick="setScore('Head Movements',3)">3</button>
+        <button onclick="setScore('Head Movements',4)">4</button>
+        <button onclick="setScore('Head Movements',5)">5</button>
+      </div>
+    </div>
+
+    <div class="physical-item" data-category="Movements of the Extremities">
+      <span class="category-title">Movements of the Extremities:</span>
+      <div class="type-buttons">
+        <button onclick="selectType('Movements of the Extremities','Arm and hand movement')">Arm and hand movement</button>
+        <button onclick="selectType('Movements of the Extremities','Hands about face')">Hands about face</button>
+        <button onclick="selectType('Movements of the Extremities','Torso movement')">Torso movement</button>
+        <button onclick="selectType('Movements of the Extremities','Leg movements')">Leg movements</button>
+        <button onclick="selectType('Movements of the Extremities','Foot-tapping or swinging')">Foot-tapping or swinging</button>
+        <button onclick="promptOther('Movements of the Extremities')">Other</button>
+      </div>
+      <div class="rating">
+        Score: 
+        <button onclick="setScore('Movements of the Extremities',0)">0</button>
+        <button onclick="setScore('Movements of the Extremities',1)">1</button>
+        <button onclick="setScore('Movements of the Extremities',2)">2</button>
+        <button onclick="setScore('Movements of the Extremities',3)">3</button>
+        <button onclick="setScore('Movements of the Extremities',4)">4</button>
+        <button onclick="setScore('Movements of the Extremities',5)">5</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="physical-results" class="card" style="margin-top:15px; display:none;">
+    <h3>Results</h3>
+    <pre id="physical-output"></pre>
+  </div>
+</section>
+<!-- Section 4: Speech Naturalness -->
+<section id="section-naturalness" class="info-section">
+  <h2>
+    Speech Naturalness
+    <button class="btn-info" onclick="showTestInfo('naturalness')">?</button>
+  </h2>
+
+  <div id="info-box-naturalness" class="info-box hidden">
+    <p>
+      Immediately after scoring the speaking sample. Speech naturalness refers to the degree to which the speaker sounds like most normal speakers of the same gender, age, and dialect. You should base this judgment on the following scale: 1 = highly natural sounding speech; 9 = highly unnatural sounding speech observed type.
+    </p>
+    <button onclick="closeInfoBox('naturalness')">Close</button>
+  </div>
+
+  <div class="card">
+    <label for="naturalnessNotes">Observations / Notes</label>
+    <textarea id="naturalnessNotes" placeholder="Enter speech naturalness notes..." rows="4"></textarea>
+  </div>
+
+  <div class="card">
+    <label for="naturalnessScale">Speech Naturalness Scale</label>
+    
+    <div class="scale-container">
+      <span class="scale-label">Highly Natural</span>
+      <input type="range" id="naturalnessScale" min="1" max="9" step="1" value="5">
+      <span class="scale-label">Highly Unnatural</span>
+    </div>
+
+    <div class="scale-numbers">
+      <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+      <span>6</span><span>7</span><span>8</span><span>9</span>
+    </div>
+
+    <p>Speech Naturalness = <span id="naturalnessValue">5</span></p>
+  </div>
+</section>
+<!-- Section 5: Final Report -->
+<section id="section-report" class="info-section">
+  <h2 style="display:flex; align-items:center; gap:8px;">
+    Final Report
+    <button class="btn-info" onclick="showTestInfo('report')">?</button>
+  </h2>
+
+  <div id="info-box-report" class="info-box hidden">
+    <p>
+      This section automatically generates a final report combining results from Frequency & Duration, 
+      Physical Concomitants, and Speech Naturalness. Percentile and Severity are calculated based on 
+      the selected category: Preschool, School Age, or Adult.
+    </p>
+    <button onclick="closeInfoBox('report')">Close</button>
+  </div>
+
+  <textarea id="report" readonly rows="15" placeholder="Final report will appear here..."></textarea>
+  <button class="btn-download" onclick="downloadReport()">Download Report</button>
+</section>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

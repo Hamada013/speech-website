@@ -2,12 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Language Forms | Ahmad Ghanem SLP</title>
+  <title>Stuttering Forms | Ahmad Ghanem SLP</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <!-- Google Fonts -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&display=swap">
+
   <!-- Tab Icon -->
   <link rel="icon" href="../images/logo.png" type="image/png">
+
   <style>
     body {
       font-family: 'Segoe UI', Arial, 'Noto Sans Arabic', sans-serif;
@@ -36,8 +39,7 @@
       transition: background 0.13s;
     }
 
-    .site-nav-bar a.active,
-    .site-nav-bar a:hover {
+    .site-nav-bar a.active, .site-nav-bar a:hover {
       background: #e0f2ff;
       color: #2693d9;
     }
@@ -65,28 +67,28 @@
       padding: 0 1em;
     }
 
-    /* Make the whole card clickable */
+    /* Card */
     .form-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
       background: #fcfdff;
       border-radius: 16px;
       border: 1.8px solid #e3f1ff;
       box-shadow: 0 3px 14px #a4d4ff16;
       padding: 25px 18px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: box-shadow 0.17s, border-color 0.17s, transform 0.17s;
       min-height: 280px;
+      box-sizing: border-box;
+      cursor: pointer;
       text-decoration: none;
       color: inherit;
-      cursor: pointer;
+      transition: box-shadow 0.17s, border-color 0.17s;
     }
 
     .form-card:hover {
       box-shadow: 0 8px 32px #43a6f830;
       border-color: #43a6f8;
-      transform: translateY(-3px);
     }
 
     .form-card img {
@@ -100,13 +102,12 @@
     .form-card-title {
       font-size: 1.16em;
       font-weight: bold;
-      color: #233;
       margin: 0.5em 0;
     }
 
     .form-card-desc {
-      color: #6b7689;
       font-size: 0.95em;
+      color: #6b7689;
       margin: 0.5em 0 1.2em;
       flex-grow: 1;
     }
@@ -124,16 +125,14 @@
       text-decoration: none;
     }
 
+    /* Responsive */
     @media (max-width: 1024px) {
       .form-card img { width: 60px; height: 60px; }
       .form-card { min-height: 250px; padding: 20px 15px; }
     }
 
     @media (max-width: 768px) {
-      .forms-list {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1em;
-      }
+      .forms-list { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1em; }
       .form-card img { width: 55px; height: 55px; }
       .form-card { min-height: 220px; padding: 18px 12px; }
     }
@@ -147,6 +146,7 @@
   </style>
 </head>
 <body>
+
   <nav class="site-nav-bar">
     <a href="../../index.html">Home</a>
     <a href="../../tools.html">Tools</a>
@@ -155,45 +155,27 @@
 
   <main>
     <div class="forms-header">
-      <h1>Language Forms</h1>
+      <h1>Stuttering Forms</h1>
       <div class="subtitle">All digital assessment and intake forms</div>
     </div>
 
     <div class="forms-list">
-      <a href="language-communication/index.html" target="_blank" rel="noopener" class="form-card">
-        <img src="../../images/language-communication.gif" alt="Oral Motor Exam icon">
-        <div class="form-card-title">Language & Communication</div>
-        <div class="form-card-desc">Comprehensive language and communication form.</div>
+      <a href="SSI4/index.html" target="_blank" rel="noopener" class="form-card">
+        <img src="../../images/stutter.gif" alt="SSI-4 icon">
+        <div class="form-card-title">SSI-4</div>
+        <div class="form-card-desc">Severity of Stuttering Index</div>
       </a>
 
-      <a href="Language-Development-Survey/index.html" target="_blank" rel="noopener" class="form-card">
-        <img src="../../images/check.gif" alt="Child icon">
-        <div class="form-card-title">Language Development Survey</div>
-        <div class="form-card-desc">Basic developmental and family intake.</div>
+      <a href="Auditory Skills Checklist/index.html" target="_blank" rel="noopener" class="form-card">
+        <img src="../../images/srv.gif" alt="Auditory Skills icon">
+        <div class="form-card-title">Auditory Skills Checklist</div>
+        <div class="form-card-desc">Med-El Checklist</div>
       </a>
 
       <a href="Vocabulary-survey/index.html" target="_blank" rel="noopener" class="form-card">
-        <img src="../../images/voc.gif" alt="Language Form icon">
+        <img src="../../images/voc.gif" alt="Vocabulary icon">
         <div class="form-card-title">24 Vocabulary Survey</div>
-        <div class="form-card-desc">Screen expressive and receptive vocabulary.</div>
-      </a>
-
-      <a href="morphology/index.html" target="_blank" rel="noopener" class="form-card">
-        <img src="../../images/morphology.gif" alt="Adult icon">
-        <div class="form-card-title">Morphology</div>
-        <div class="form-card-desc">Morphology Checklist for Arabic Language.</div>
-      </a>
-
-      <a href="EC/index.html" target="_blank" rel="noopener" class="form-card">
-        <img src="../../images/EC.gif" alt="Oral Motor Exam icon">
-        <div class="form-card-title">Expressive Communication</div>
-        <div class="form-card-desc">Expressive language skills by age.</div>
-      </a>
-
-      <a href="AC/index.html" target="_blank" rel="noopener" class="form-card">
-        <img src="../../images/AC.gif" alt="Speech forms icon">
-        <div class="form-card-title">Auditory Comprehension</div>
-        <div class="form-card-desc">Receptive language skills by age.</div>
+        <div class="form-card-desc">Screen expressive and receptive vocabulary</div>
       </a>
     </div>
 

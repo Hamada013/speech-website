@@ -4,10 +4,13 @@
   <meta charset="UTF-8">
   <title>Aphasia | Ahmad Ghanem SLP</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <!-- Google Fonts -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&display=swap">
+
   <!-- Tab Icon -->
   <link rel="icon" href="images/logo.png" type="image/png">
+
   <style>
     body {
       font-family: 'Segoe UI', Arial, 'Noto Sans Arabic', sans-serif;
@@ -66,20 +69,29 @@
       padding: 0 1em;
     }
 
+    /* Card */
     .form-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
       background: #fcfdff;
       border-radius: 16px;
       box-shadow: 0 3px 14px #a4d4ff16;
       border: 1.8px solid #e3f1ff;
       padding: 25px 18px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: box-shadow 0.17s, border-color 0.17s;
       min-height: 280px;
       box-sizing: border-box;
-      width: 100%;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.17s, border-color 0.17s;
+    }
+
+    .form-card:hover {
+      box-shadow: 0 8px 32px #43a6f830;
+      border-color: #43a6f8;
+      z-index: 1;
     }
 
     .form-card img {
@@ -93,33 +105,14 @@
     .form-card-title {
       font-size: 1.16em;
       font-weight: bold;
-      color: #233;
       margin: 0.5em 0;
     }
 
     .form-card-desc {
-      color: #6b7689;
       font-size: 0.95em;
+      color: #6b7689;
       margin: 0.5em 0 1.2em;
       flex-grow: 1;
-    }
-
-    .form-card-link {
-      margin-top: auto;
-      background: #43a6f8;
-      color: #fff;
-      padding: 10px 22px;
-      border-radius: 24px;
-      font-size: 1.05em;
-      font-weight: 600;
-      text-decoration: none;
-      box-shadow: 0 3px 12px #43a6f81a;
-      transition: background 0.17s;
-      display: inline-block;
-    }
-
-    .form-card-link:hover {
-      background: #3496d8;
     }
 
     .about-contact {
@@ -135,17 +128,14 @@
       text-decoration: none;
     }
 
+    /* Responsive */
     @media (max-width: 1024px) {
       .form-card img { width: 60px; height: 60px; }
       .form-card { min-height: 250px; padding: 20px 15px; }
     }
 
     @media (max-width: 768px) {
-      .forms-list {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1em;
-        padding: 0 1em;
-      }
+      .forms-list { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1em; }
       .form-card img { width: 55px; height: 55px; }
       .form-card { min-height: 220px; padding: 18px 12px; }
     }
@@ -155,12 +145,12 @@
       .form-card img { width: 50px; height: 50px; margin-bottom: 0.7em; }
       .form-card-title { font-size: 1.05em; }
       .form-card-desc { font-size: 0.9em; }
-      .form-card-link { font-size: 0.98em; padding: 8px 18px; }
     }
   </style>
 </head>
 <body>
-  <!-- Simple Nav Bar -->
+
+  <!-- Navigation -->
   <nav class="site-nav-bar">
     <a href="index.html">Home</a>
     <a href="tools.html">Tools</a>
@@ -174,61 +164,53 @@
     </div>
 
     <div class="forms-list">
-      <div class="form-card">
+      <a href="../../forms/aphasia/langiuage-cognitive/index.html" target="_blank" rel="noopener" class="form-card">
         <img src="../../images/brain.gif" alt="Language forms icon">
-        <div class="form-card-title">Language & cognitive</div>
+        <div class="form-card-title">Language & Cognitive</div>
         <div class="form-card-desc">Assessment for neurodevelopmental issues.</div>
-        <a class="form-card-link" href="../../forms/aphasia/langiuage-cognitive/index.html" target="_blank" rel="noopener">open</a>
-      </div>
+      </a>
 
-      <div class="form-card">
+      <a href="forms/speech/index.html" target="_blank" rel="noopener" class="form-card">
         <img src="images/speech.gif" alt="Speech forms icon">
         <div class="form-card-title">Speech</div>
         <div class="form-card-desc">Explore speech-related assessment.</div>
-        <a class="form-card-link" href="forms/speech/index.html" target="_blank" rel="noopener">Speech</a>
-      </div>
+      </a>
 
-      <div class="form-card">
+      <a href="forms/asd/index.html" target="_blank" rel="noopener" class="form-card">
         <img src="images/ASD.gif" alt="ASD/Autism forms icon">
         <div class="form-card-title">ASD</div>
         <div class="form-card-desc">Assessment for autism spectrum.</div>
-        <a class="form-card-link" href="forms/asd/index.html" target="_blank" rel="noopener">ASD</a>
-      </div>
+      </a>
 
-      <div class="form-card">
+      <a href="forms/child-case-history/index.html" target="_blank" rel="noopener" class="form-card">
         <img src="images/baby-smile.gif" alt="Child icon">
         <div class="form-card-title">Child Case History</div>
         <div class="form-card-desc">Basic developmental and family intake.</div>
-        <a class="form-card-link" href="forms/child-case-history/index.html" target="_blank" rel="noopener">Open</a>
-      </div>
+      </a>
 
-      <div class="form-card">
+      <a href="forms/adult-case-history/index.html" target="_blank" rel="noopener" class="form-card">
         <img src="images/adult.gif" alt="Adult icon">
         <div class="form-card-title">Adult Case History</div>
         <div class="form-card-desc">Basic intake for adults.</div>
-        <a class="form-card-link" href="forms/adult-case-history/index.html" target="_blank" rel="noopener">Open</a>
-      </div>
+      </a>
 
-      <div class="form-card">
+      <a href="forms/oral-motor-exam/index.html" target="_blank" rel="noopener" class="form-card">
         <img src="images/oral.gif" alt="Oral Motor Exam icon">
         <div class="form-card-title">Oral Motor Exam</div>
         <div class="form-card-desc">Comprehensive oral motor evaluation.</div>
-        <a class="form-card-link" href="forms/oral-motor-exam/index.html" target="_blank" rel="noopener">Open</a>
-      </div>
+      </a>
 
-      <div class="form-card">
+      <a href="forms/voice/index.html" target="_blank" rel="noopener" class="form-card">
         <img src="images/voice.gif" alt="Voice icon">
         <div class="form-card-title">Voice Evaluation</div>
         <div class="form-card-desc">Assessment for voice issues.</div>
-        <a class="form-card-link" href="forms/voice/index.html" target="_blank" rel="noopener">Open</a>
-      </div>
+      </a>
 
-      <div class="form-card">
-        <img src="images/aphasia.gif" alt="Resources icon">
+      <a href="forms/aphasia.html" target="_blank" rel="noopener" class="form-card">
+        <img src="images/aphasia.gif" alt="Aphasia icon">
         <div class="form-card-title">Aphasia</div>
         <div class="form-card-desc">Assessment for neurodevelopmental issues.</div>
-        <a class="form-card-link" href="forms/aphasia.html" target="_blank" rel="noopener">Open</a>
-      </div>
+      </a>
     </div>
 
     <div class="about-contact">
@@ -237,5 +219,6 @@
       <a href="tel:+963988451245">+963 988 451 245</a>
     </div>
   </main>
+
 </body>
 </html>

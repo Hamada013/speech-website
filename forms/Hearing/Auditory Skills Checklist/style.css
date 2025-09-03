@@ -1,0 +1,324 @@
+/* =========================
+   Global
+========================= */
+body {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background-color: #f0f4f8;
+  margin: 0;
+  padding: 0;
+  direction: rtl;
+  text-align: right;
+  color: #1f2937;
+  font-size: 20px;
+}
+
+.container {
+  max-width: 950px;
+  margin: 40px auto;
+  padding: 25px;
+}
+
+section {
+  background: #fff;
+  border-radius: 14px;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+}
+
+h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #1e3a8a;
+  border-bottom: 2px solid #2563eb;
+  padding-bottom: 10px;
+}
+
+h3 {
+  font-size: 22px;
+  margin: 15px 0;
+  color: #2563eb;
+}
+
+/* =========================
+   Page Header
+========================= */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px 25px;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+  margin: 20px auto;
+  max-width: 950px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  color: #1e3a8a;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.header-logo img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.page-header button.btn-info {
+  background: #a0a5ac;
+  color: #fff;
+  border-radius: 8px;
+  border: none;
+  width: 50px;
+  height: 50px;
+  font-size: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* =========================
+   Info Section
+========================= */
+.info-section {
+  max-width: 950px;
+  margin: 30px auto;
+  padding: 25px 30px;
+  background: #fff;
+  border: 1px solid #dfe3e8;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  box-sizing: border-box;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px 25px;
+}
+
+.info-field {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+input {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 15px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* =========================
+   Cards
+========================= */
+.card-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.card label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* =========================
+   Buttons
+========================= */
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+button {
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #fff;
+  transition: all 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  transform: scale(1.05);
+  opacity: 0.85;
+}
+
+button:active {
+  transform: scale(0.95) rotate(-2deg);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+button.selected {
+  opacity: 0.7;
+  transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(37,99,235,0.5);
+}
+
+/* Specific button colors */
+.btn-bad, .btn-bad\/never       { background: #b74e4e; }
+.btn-not, .btn-not.bad\/once    { background: #daa344; }
+.btn-good, .btn-good\/multiple  { background: #10b981; }
+.btn-above, .btn-above.good\/multiple { background: #5c71b6; }
+.btn-excellent, .btn-excellent\/multiple { background: #8b5cf6; }
+.btn-perfect, .btn-perfect\/multiple { background: #f97316; }
+.btn-note { background: #588de1; }
+.btn-download { background: #1e40af; }
+
+/* =========================
+   Floating Box
+========================= */
+.floating-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  background: rgba(224,242,254,0.95);
+  padding: 20px;
+  border-radius: 14px;
+  display: none;
+  z-index: 1000;
+  text-align: center;
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow: auto;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+  transition: transform 0.4s ease;
+}
+
+.floating-box.show {
+  display: block;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.floating-box img {
+  max-width: 10vw;
+  max-height: 10vh;
+  margin: 10px 0 20px;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+.floating-box textarea {
+  width: 90%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 16px;
+  resize: vertical;
+}
+
+.floating-box button {
+  margin: 5px;
+  background: #0284c7;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.floating-box button:hover { background: #0369a1; }
+
+/* =========================
+   Responsive
+========================= */
+@media (max-width: 1024px) {
+  .container, .page-header { padding: 20px; }
+  button { font-size: 16px; padding: 10px 14px; }
+  textarea, input { font-size: 16px; padding: 12px; }
+}
+
+@media (max-width: 768px) {
+  .container, .page-header { padding: 15px; }
+  h2, .page-header h1 { font-size: 24px; }
+  button { font-size: 14px; padding: 8px 12px; }
+  textarea, input { font-size: 14px; padding: 10px; }
+  .floating-box { padding: 15px; max-height: 80vh; }
+}
+
+@media (max-width: 480px) {
+  .info-grid { grid-template-columns: 1fr; }
+  .page-header { flex-direction: column; gap: 10px; text-align: center; }
+}
+/* =========================
+   Report Section
+========================= */
+#section5 {
+  background: #fff;
+  border-radius: 14px;
+  padding: 25px;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+  margin-bottom: 30px;
+}
+
+#section5 h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #1e3a8a;
+  border-bottom: 2px solid #2563eb;
+  padding-bottom: 10px;
+}
+
+#report {
+  width: 100%;
+  min-height: 350px;     /* larger area for results */
+  max-height: 600px;     /* limit overflow on big screens */
+  padding: 15px;
+  font-size: 18px;
+  line-height: 1.6;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  resize: vertical;      /* user can adjust height if needed */
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* Download button styling */
+#section5 .btn-download {
+  margin-top: 15px;
+  padding: 12px 25px;
+  font-size: 18px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  #report {
+    min-height: 250px;
+    font-size: 16px;
+  }
+  #section5 .btn-download {
+    font-size: 16px;
+    padding: 10px 20px;
+  }
+}

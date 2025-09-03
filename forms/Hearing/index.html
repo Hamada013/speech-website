@@ -77,6 +77,9 @@
       align-items: center;
       transition: box-shadow 0.17s, border-color 0.17s;
       min-height: 280px;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
     }
 
     .form-card:hover {
@@ -104,24 +107,6 @@
       font-size: 0.95em;
       margin: 0.5em 0 1.2em;
       flex-grow: 1;
-    }
-
-    .form-card-link {
-      margin-top: auto;
-      background: #43a6f8;
-      color: #fff;
-      padding: 10px 22px;
-      border-radius: 24px;
-      font-size: 1.05em;
-      font-weight: 600;
-      text-decoration: none;
-      box-shadow: 0 3px 12px #43a6f81a;
-      transition: background 0.17s;
-      display: inline-block;
-    }
-
-    .form-card-link:hover {
-      background: #3496d8;
     }
 
     .about-contact {
@@ -156,7 +141,6 @@
       .form-card img { width: 50px; height: 50px; margin-bottom: 0.7em; }
       .form-card-title { font-size: 1.05em; }
       .form-card-desc { font-size: 0.9em; }
-      .form-card-link { font-size: 0.98em; padding: 8px 18px; }
     }
   </style>
 </head>
@@ -174,47 +158,17 @@
     </div>
 
     <div class="forms-list">
-      <div class="form-card">
+      <a href="ling_test/index.html" target="_blank" rel="noopener" class="form-card">
         <img src="../../images/ling.gif" alt="Oral Motor Exam icon">
-        <div class="form-card-title">ling six sounds</div>
+        <div class="form-card-title">Ling Six Sounds</div>
         <div class="form-card-desc">Hearing Speech Sound Test</div>
-        <a class="form-card-link" href="ling_test/index.html" target="_blank" rel="noopener">Open</a>
-      </div>
+      </a>
 
-      <div class="form-card">
-        <img src="../../images/check.gif" alt="Child icon">
-        <div class="form-card-title">Language Development Survey</div>
-        <div class="form-card-desc">Basic developmental and family intake.</div>
-        <a class="form-card-link" href="Language-Development-Survey/index.html" target="_blank" rel="noopener">Open Form</a>
-      </div>
-
-      <div class="form-card">
-        <img src="../../images/voc.gif" alt="Language Form icon">
-        <div class="form-card-title">24 Vocabulary Survey</div>
-        <div class="form-card-desc">Screen expressive and receptive vocabulary</div>
-        <a class="form-card-link" href="Vocabulary-survey/index.html" target="_blank" rel="noopener">Open Form</a>
-      </div>
-
-      <div class="form-card">
-        <img src="../../images/morphology.gif" alt="Adult icon">
-        <div class="form-card-title">Morphology</div>
-        <div class="form-card-desc">Morphology Checklist for Arabic Language</div>
-        <a class="form-card-link" href="morphology/index.html" target="_blank" rel="noopener">Open Form</a>
-      </div>
-
-      <div class="form-card">
-        <img src="../../images/EC.gif" alt="Oral Motor Exam icon">
-        <div class="form-card-title">Expressive Communication</div>
-        <div class="form-card-desc">Expressive language skills by age</div>
-        <a class="form-card-link" href="EC/index.html" target="_blank" rel="noopener">Open Form</a>
-      </div>
-
-      <div class="form-card">
-        <img src="../../images/AC.gif" alt="Speech forms icon">
-        <div class="form-card-title">Auditory Comprehension</div>
-        <div class="form-card-desc">Receptive language skills by age</div>
-        <a class="form-card-link" href="AC/index.html" target="_blank" rel="noopener">Open Form</a>
-      </div>
+      <a href="Auditory Skills Checklist/index.html" target="_blank" rel="noopener" class="form-card">
+        <img src="../../images/srv.gif" alt="Child icon">
+        <div class="form-card-title">Auditory Skills Checklist</div>
+        <div class="form-card-desc">Med-El Checklist</div>
+      </a>
     </div>
 
     <div class="about-contact">
