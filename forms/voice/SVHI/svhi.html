@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVHI - Singing Voice Handicap Index</title>
+  <link rel="stylesheet" href="svhi.css">
+</head>
+<body>
+  <div class="container">
+    <h1>SINGING VOICE HANDICAP INDEX (SVHI)</h1>
+
+    <!-- Patient Info -->
+    <div class="section">
+      <label for="patient-name">NAME:</label>
+      <input type="text" id="patient-name" placeholder="Enter patient name">
+      <label for="assessment-date">DATE:</label>
+      <input type="date" id="assessment-date">
+    </div>
+
+    <!-- Music Type -->
+    <div class="section">
+      <p>I sing the following kinds of music:</p>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="music" value="Country"> Country</label>
+        <label><input type="checkbox" name="music" value="Classical"> Classical</label>
+        <label><input type="checkbox" name="music" value="Choral"> Choral</label>
+        <label><input type="checkbox" name="music" value="Cantorial"> Cantorial</label>
+        <label><input type="checkbox" name="music" value="Broadway"> Broadway</label>
+        <label><input type="checkbox" name="music" value="Pop"> Pop</label>
+        <label><input type="checkbox" name="music" value="Rock"> Rock</label>
+        <label><input type="checkbox" name="music" value="Gospel"> Gospel</label>
+        <label><input type="checkbox" name="music" value="Jazz"> Jazz</label>
+      </div>
+    </div>
+
+    <!-- Singing Level -->
+    <div class="section">
+      <p>How would you categorize your singing level?</p>
+      <div class="radio-group">
+        <label><input type="radio" name="level" value="Professional entertainer"> Professional entertainer</label>
+        <label><input type="radio" name="level" value="Teacher"> Teacher</label>
+        <label><input type="radio" name="level" value="Music/singing student"> Music/singing student</label>
+        <label><input type="radio" name="level" value="Amateur choir/singing group"> Amateur choir/singing group</label>
+      </div>
+      <p>Singing is:</p>
+      <div class="radio-group">
+        <label><input type="radio" name="income" value="Primary source of income"> Primary source of income</label>
+        <label><input type="radio" name="income" value="Secondary source of income"> Secondary source of income</label>
+        <label><input type="radio" name="income" value="Not a source of income"> Not a source of income</label>
+      </div>
+    </div>
+
+    <!-- SVHI Questions -->
+    <div class="section" id="svhi-questions">
+      <h2>Instructions:</h2>
+      <p>These are statements many people have used to describe their voices and the effects of their voices on their lives. Circle the response that indicates how frequently you have the same experience:</p>
+      <p>0 = never, 1 = almost never, 2 = sometimes, 3 = almost always, 4 = always</p>
+      <!-- Questions injected here by JS -->
+    </div>
+
+    <button id="submit-svhi" class="submit-btn">Submit SVHI</button>
+
+    <!-- Results -->
+    <div class="section" id="svhi-result" style="display:none;">
+      <h2>Results</h2>
+      <p><strong>Total Score:</strong> <span id="total-score"></span></p>
+      <p><strong>Interpretation:</strong> <span id="score-interpretation"></span></p>
+      <h3>Clinical Note:</h3>
+      <textarea id="clinical-note" rows="20" readonly></textarea>
+    </div>
+  </div>
+
+  <script src="svhi.js"></script>
+</body>
+</html>

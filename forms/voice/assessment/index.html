@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Assessment</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Header -->
+<header class="page-header">
+  <div class="header-logo">
+    <img src="../../../images/logo.png" alt="Logo">
+  </div>
+  <h1>Voice Assessment</h1>
+  <button class="btn-info" onclick="showTestInfo()">?</button>
+</header>
+
+<!-- Info Box Modal for Voice Assessment -->
+<div id="info-overlay" class="info-overlay hidden" onclick="overlayClick(event)">
+  <div id="info-box-page" class="info-box-content">
+    <h2>Voice Assessment Guide</h2>
+    <p>
+      A comprehensive voice assessment evaluates multiple domains to accurately 
+      identify voice disorders, establish baseline measures, and develop 
+      evidence-based therapy plans. It integrates <strong>case history, perceptual ratings, 
+      acoustic and aerodynamic data, and stimulability testing</strong>.
+    </p>
+
+    <h3>Core Components</h3>
+    <ul>
+      <li><strong>Case History:</strong> Voice complaints, onset/duration, occupational voice use, lifestyle factors, and relevant medical or surgical history.</li>
+      <li><strong>Perceptual Assessment:</strong> GRBAS or CAPE-V scales for standardized evaluation of vocal quality.</li>
+      <li><strong>Acoustic Analysis:</strong> Fundamental frequency (F0), jitter, shimmer, noise-to-harmonic ratio.</li>
+      <li><strong>Physiological Measures:</strong> Maximum phonation time (MPT), s/z ratio, airflow, and subglottal pressure estimations.</li>
+      <li><strong>Oral-Peripheral Exam:</strong> Assessment of articulators, laryngeal elevation, and resonance patterns.</li>
+      <li><strong>Stimulability Testing:</strong> Trials of therapeutic techniques to gauge treatment potential.</li>
+    </ul>
+
+    <h3>Normative Data</h3>
+    <ul>
+      <li><strong>Maximum Phonation Time (MPT):</strong>
+        <br>• Males: 15–25 sec
+        <br>• Females: 14–20 sec
+        <br>• Children (6–10 yrs): 8–12 sec
+      </li>
+      <li><strong>Speaking Fundamental Frequency (F0):</strong>
+        <br>• Males: 85–180 Hz
+        <br>• Females: 165–255 Hz
+        <br>• Children: 250–300 Hz
+      </li>
+      <li><strong>GRBAS Ratings:</strong>
+        <br>0 = Normal, 1 = Slight, 2 = Moderate, 3 = Severe
+      </li>
+    </ul>
+
+    <h3>References</h3>
+    <ul class="references">
+      <li>Boone DR, McFarlane SC, Von Berg SL, Zraick RI. <em>The Voice and Voice Therapy</em>, 10th ed. Pearson, 2020.</li>
+      <li>American Speech-Language-Hearing Association (ASHA). Voice Assessment Guidelines, 2023.</li>
+      <li>Behrman A. <em>Speech and Voice Science</em>, 3rd ed. Plural Publishing, 2017.</li>
+      <li>Kempster GB, et al. CAPE-V: A standardized tool for perceptual voice assessment. AJSLP, 2009.</li>
+    </ul>
+
+    <button class="btn-close" onclick="closeInfoBox()">Close</button>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- Section 0: Identifying Information -->
+<section id="section0" class="info-section">
+  <h2>Identifying Information</h2>
+  <div class="info-grid">
+
+    <div class="info-field">
+      <label for="name">Name</label>
+      <input type="text" id="name" placeholder="Enter name">
+    </div>
+
+    <div class="info-field">
+      <label for="dob">Date of Birth / Age</label>
+      <div class="dob-group">
+        <input type="date" id="dob" onchange="calculateAge()">
+        <input type="text" id="age" readonly placeholder="Age">
+      </div>
+    </div>
+
+<div class="info-field">
+  <label>Gender</label>
+  <div class="button-group" id="genderButtons">
+    <button type="button" class="btn-gender" data-value="Female">Female</button>
+    <button type="button" class="btn-gender" data-value="Male">Male</button>
+    <button type="button" class="btn-gender" data-value="Other">Other</button>
+  </div>
+  <!-- Hidden field to store selected gender -->
+  <input type="hidden" id="gender" value="">
+</div>
+
+
+    <div class="info-field">
+      <label for="testDate">Date of Assessment</label>
+      <input type="date" id="testDate">
+    </div>
+
+    <div class="info-field">
+      <label for="examiner">Evaluator</label>
+      <input type="text" id="examiner" placeholder="Enter evaluator name">
+    </div>
+
+    <div class="info-field">
+      <label for="referralSource">Referral Source</label>
+      <input type="text" id="referralSource" placeholder="Enter referral source">
+    </div>
+
+    <div class="info-field">
+      <label for="occupation">Occupation</label>
+      <input type="text" id="occupation" placeholder="Enter occupation">
+    </div>
+
+    <div class="info-field">
+      <label for="languages">Language(s) Spoken</label>
+      <input type="text" id="languages" placeholder="Enter languages">
+    </div>
+  </div>
+
+  <h3 class="sub-header">Reason for Referral</h3>
+  <div class="referral-section">
+    <div class="info-field">
+      <label for="primaryComplaint">Primary Complaint</label>
+      <textarea id="primaryComplaint" placeholder="e.g., hoarseness, vocal fatigue, loss of voice, pitch changes" rows="2"></textarea>
+    </div>
+
+    <div class="info-field">
+      <label for="onsetCourse">Onset and Course</label>
+      <textarea id="onsetCourse" placeholder="Sudden, gradual, episodic, progressive" rows="2"></textarea>
+    </div>
+
+    <div class="info-field">
+      <label for="impactDailyLife">Impact on Daily Life</label>
+      <textarea id="impactDailyLife" placeholder="Work, communication, social interactions" rows="2"></textarea>
+    </div>
+  </div>
+</section>
+
+  <!-- Section 1: Medical & Voice History -->
+  <section id="section1" class="info-section">
+    <h2>Medical & Voice History</h2>
+    <div class="history-grid">
+      <div class="history-field">
+        <label for="medicalConditions">Medical Conditions</label>
+        <textarea id="medicalConditions" placeholder="e.g., GERD, thyroid issues, allergies, neurological conditions" rows="2"></textarea>
+      </div>
+
+      <div class="history-field">
+        <label for="currentMedications">Current Medications</label>
+        <textarea id="currentMedications" placeholder="List current medications" rows="2"></textarea>
+      </div>
+
+      <div class="history-field">
+        <label for="surgicalHistory">Surgical History</label>
+        <textarea id="surgicalHistory" placeholder="Especially ENT, thyroid, cardiac surgeries" rows="2"></textarea>
+      </div>
+
+      <div class="history-field">
+        <label for="previousVoice">Previous Voice Disorders / Therapy</label>
+        <textarea id="previousVoice" placeholder="Describe past diagnoses or therapy" rows="2"></textarea>
+      </div>
+
+      <div class="history-field">
+        <label for="hydrationLifestyle">Hydration & Lifestyle Habits</label>
+        <textarea id="hydrationLifestyle" placeholder="Daily water intake, caffeine use, etc." rows="2"></textarea>
+      </div>
+
+      <div class="history-field">
+        <label for="allergiesSinus">Allergies / Sinus Issues</label>
+        <textarea id="allergiesSinus" placeholder="Seasonal allergies, sinusitis, nasal congestion" rows="2"></textarea>
+      </div>
+
+      <div class="history-field">
+        <label for="smokingAlcohol">Smoking / Alcohol Use</label>
+        <textarea id="smokingAlcohol" placeholder="Frequency and duration of use" rows="2"></textarea>
+      </div>
+
+      <div class="history-field">
+        <label for="vocalMisuse">Vocal Overuse or Misuse Patterns</label>
+        <textarea id="vocalMisuse" placeholder="Yelling, excessive talking, singing without proper technique" rows="2"></textarea>
+      </div>
+    </div>
+  </section>
+
+<!-- Section 2: Oral-Peripheral Exam -->
+<section id="section2" class="oral-section">
+  <h2 class="section-title">
+    Oral-Peripheral Exam
+    <button class="btn-info">?</button>
+  </h2>
+
+  <div class="info-box">
+      <p>
+        This section evaluates the oral mechanism including lips, tongue, palate, laryngeal elevation, and resonance.
+      </p>
+      <p>
+        <strong>Assessment Instructions:</strong><br>
+        <em>Adults:</em> Ask the client to perform mouth movements, tongue elevation, smiling, puckering, and open/close jaw. Observe laryngeal elevation during swallowing and phonation. Check resonance during sustained vowels or speech.<br>
+        <em>Children:</em> Use playful tasks like blowing bubbles, making animal sounds, saying “Aah” to observe oral structures and resonance.
+      </p>
+      <button class="btn-close">Close</button>
+    </div>
+    <div class="history-grid">
+      <div class="history-field">
+        <label>Lips</label>
+        <div class="button-group">
+          <button class="btn">WNL</button>
+          <button class="btn">Impaired</button>
+        </div>
+        <input type="text" placeholder="Optional: Add notes or details">
+      </div>
+
+      <div class="history-field">
+        <label>Tongue</label>
+        <div class="button-group">
+          <button class="btn">WNL</button>
+          <button class="btn">Impaired</button>
+        </div>
+        <input type="text" placeholder="Optional: Add notes or details">
+      </div>
+
+      <div class="history-field">
+        <label>Palate</label>
+        <div class="button-group">
+          <button class="btn">WNL</button>
+          <button class="btn">Impaired</button>
+        </div>
+        <input type="text" placeholder="Optional: Add notes or details">
+      </div>
+
+      <div class="history-field">
+        <label>Laryngeal Elevation</label>
+        <div class="button-group">
+          <button class="btn">WNL</button>
+          <button class="btn">Impaired</button>
+        </div>
+        <input type="text" placeholder="Optional: Add notes or details">
+      </div>
+
+      <div class="history-field">
+        <label>Resonance (oral vs nasal)</label>
+        <div class="button-group">
+          <button class="btn">WNL</button>
+          <button class="btn">Hypernasal</button>
+          <button class="btn">Hyponasal</button>
+        </div>
+        <input type="text" placeholder="Optional: Add notes or details">
+      </div>
+    </div>
+  </section>
+
+<!-- Section 3: Breathing & Phonation Assessment -->
+<section id="section3" class="info-section">
+  <h2 class="section-title">
+    Breathing & Phonation Assessment
+    <button class="btn-info">?</button>
+  </h2>
+  <div class="info-box">
+      <p>
+        This section evaluates respiratory support and phonatory control.
+      </p>
+      <p>
+        <strong>Assessment Instructions:</strong><br>
+        <em>Adults:</em> Ask the client to take a deep breath and sustain /a/ or read a passage. Observe breath support, phrasing, loudness, and phonation onset.<br>
+        <em>Children:</em> Use fun tasks: blow bubbles, sustain /m/ or /a/ sounds, count aloud, or repeat words while observing breath and voice control.
+      </p>
+    <button class="btn-close">Close</button>
+  </div>
+
+
+  <div class="history-grid">
+    <div class="history-field">
+      <label>Breathing Type</label>
+      <div class="button-group">
+        <button class="btn">Clavicular</button>
+        <button class="btn">Thoracic</button>
+        <button class="btn">Diaphragmatic</button>
+      </div>
+      <input type="text" placeholder="Optional: Add observations">
+    </div>
+    <div class="history-field">
+      <label>Breathing Pattern Regularity</label>
+      <div class="button-group">
+        <button class="btn">Regular</button>
+        <button class="btn">Irregular</button>
+      </div>
+      <input type="text" placeholder="Optional: Add observations">
+    </div>
+    <div class="history-field">
+      <label>Coordination of Breathing with Speech</label>
+      <div class="button-group">
+        <button class="btn">Adequate</button>
+        <button class="btn">Inadequate</button>
+      </div>
+      <input type="text" placeholder="Optional: Add observations">
+    </div>
+    <div class="history-field">
+      <label>Phonation Onset Type</label>
+      <div class="button-group">
+        <button class="btn">Hard</button>
+        <button class="btn">Soft</button>
+        <button class="btn">Balanced</button>
+      </div>
+      <input type="text" placeholder="Optional: Add observations">
+    </div>
+    <div class="history-field">
+      <label>Vocal Loudness & Projection</label>
+      <div class="button-group">
+        <button class="btn">Normal</button>
+        <button class="btn">Soft</button>
+        <button class="btn">Loud</button>
+      </div>
+      <input type="text" placeholder="Optional: Add observations">
+    </div>
+    <div class="history-field">
+      <label>Vocal Fatigue / Effort</label>
+      <div class="button-group">
+        <button class="btn">None</button>
+        <button class="btn">Mild</button>
+        <button class="btn">Moderate</button>
+        <button class="btn">Severe</button>
+      </div>
+      <input type="text" placeholder="Optional: Add observations">
+    </div>
+  </div>
+</section>
+
+
+<!-- Section 4: Perceptual Voice Evaluation (GRBAS Scale) -->
+<section id="section4" class="info-section">
+  <h2 class="section-title">
+    Perceptual Voice Evaluation – GRBAS Scale
+    <button class="btn-info">?</button>
+  </h2>
+
+  <div class="info-box">
+    <p>
+      The GRBAS scale is a standardized perceptual tool used to assess voice quality across five parameters:
+    </p>
+    <ul>
+      <li>G – Grade of hoarseness</li>
+      <li>R – Roughness</li>
+      <li>B – Breathiness</li>
+      <li>A – Asthenia (weakness)</li>
+      <li>S – Strain</li>
+    </ul>
+    <p>Each parameter is rated on a 0–3 scale (0 = normal, 3 = severe).</p>
+    <button class="btn-close">Close</button>
+  </div>
+
+  <div class="grbas-grid">
+    <div class="grbas-item">
+      <label>G (Grade)</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+      </div>
+    </div>
+
+    <div class="grbas-item">
+      <label>R (Roughness)</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+      </div>
+    </div>
+
+    <div class="grbas-item">
+      <label>B (Breathiness)</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+      </div>
+    </div>
+
+    <div class="grbas-item">
+      <label>A (Asthenia)</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+      </div>
+    </div>
+
+    <div class="grbas-item">
+      <label>S (Strain)</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section 5: Acoustic & Aerodynamic Measures -->
+<section id="section5" class="info-section">
+  <h2>Acoustic & Aerodynamic Measures</h2>
+  <div class="history-grid">
+
+    <!-- Fundamental Frequency (F0) -->
+    <div class="history-field">
+      <label>Fundamental Frequency (F0)</label>
+      <button class="btn-info" data-id="f0">?</button>
+      <div id="info-box-f0" class="info-box">
+        <p>
+          <strong>Instructions:</strong> Ask patient to sustain vowel /a/ at comfortable pitch.<br>
+          <strong>Tasks per group:</strong><br>
+          - Children (7–10 yrs): Sustain /a/ for 3–5 sec<br>
+          - Teenagers (11–15 yrs): Sustain /a/ for 5–7 sec<br>
+          - Adult Female: Sustain /a/ for 7–10 sec<br>
+          - Adult Male: Sustain /a/ for 7–10 sec<br>
+          <strong>Norms (Hz):</strong><br>
+          Children: 250–400<br>
+          Teenagers: 200–350<br>
+          Adult Male: 80–150<br>
+          Adult Female: 175–250
+        </p>
+        <button class="btn-close">Close</button>
+      </div>
+      <div class="button-group">
+        <button class="btn">Normal</button>
+        <button class="btn">Low</button>
+        <button class="btn">High</button>
+      </div>
+      <input type="text" placeholder="Optional: Enter exact F0 value">
+    </div>
+
+    <!-- Pitch Range -->
+<div class="history-field">
+  <label>Pitch Range</label>
+  <button class="btn-info" data-id="pitch-range">?</button>
+  <div id="info-box-pitch-range" class="info-box">
+    <p>
+      <strong>Instructions:</strong> Have the client glide from their lowest to highest pitch on a sustained vowel (e.g., /ah/). 
+      Measure using a keyboard, app, or acoustic analysis software.<br><br>
+      
+      <strong>Norms:</strong><br>
+      - Adults: 2 to 2.5 octaves (≈ 24–30 semitones)<br>
+      - Children: Typically wider than adults due to smaller laryngeal structures
+    </p>
+    <button class="btn-close">Close</button>
+  </div>
+  <div class="button-group">
+    <button class="btn">Normal</button>
+    <button class="btn">Reduced</button>
+  </div>
+  <input type="text" placeholder="Optional: Enter Pitch Range (e.g., 2.3 octaves)">
+</div>
+
+
+    <!-- S/Z Ratio -->
+    <div class="history-field">
+      <label>S/Z Ratio</label>
+      <button class="btn-info" data-id="sz">?</button>
+      <div id="info-box-sz" class="info-box">
+        <p>
+          <strong>Instructions:</strong> Sustain /s/ and /z/ as long as possible. Divide /s/ duration by /z/ duration.<br>
+          <strong>Tasks per group:</strong><br>
+          - Children: Sustain 3–5 sec each<br>
+          - Teenagers: Sustain 5–7 sec each<br>
+          - Adults: Sustain 10 sec each<br>
+          <strong>Norms:</strong> ~1.0 for all ages/genders
+        </p>
+        <button class="btn-close">Close</button>
+      </div>
+      <div class="button-group">
+        <button class="btn">Normal (~1.0)</button>
+        <button class="btn">Abnormal</button>
+      </div>
+      <input type="text" placeholder="Optional: Enter S/Z value">
+    </div>
+
+    <!-- Jitter (%) -->
+    <div class="history-field">
+      <label>Jitter (%)</label>
+      <button class="btn-info" data-id="jitter">?</button>
+      <div id="info-box-jitter" class="info-box">
+        <p>
+          <strong>Instructions:</strong> Record sustained /a/ and measure frequency perturbation.<br>
+          <strong>Norms (%):</strong> Typically ≤1% for healthy voices.
+        </p>
+        <button class="btn-close">Close</button>
+      </div>
+      <div class="button-group">
+        <button class="btn">Normal</button>
+        <button class="btn">Elevated</button>
+      </div>
+      <input type="text" placeholder="Optional: Enter Jitter value">
+    </div>
+
+    <!-- Shimmer (%) -->
+    <div class="history-field">
+      <label>Shimmer (%)</label>
+      <button class="btn-info" data-id="shimmer">?</button>
+      <div id="info-box-shimmer" class="info-box">
+        <p>
+          <strong>Instructions:</strong> Record sustained /a/ and measure amplitude perturbation.<br>
+          <strong>Norms (%):</strong> Typically ≤3.8% for healthy voices.
+        </p>
+        <button class="btn-close">Close</button>
+      </div>
+      <div class="button-group">
+        <button class="btn">Normal</button>
+        <button class="btn">Elevated</button>
+      </div>
+      <input type="text" placeholder="Optional: Enter Shimmer value">
+    </div>
+
+    <!-- Noise-to-Harmonic Ratio (NHR) -->
+    <div class="history-field">
+      <label>Noise-to-Harmonic Ratio</label>
+      <button class="btn-info" data-id="nhr">?</button>
+      <div id="info-box-nhr" class="info-box">
+        <p>
+          <strong>Instructions:</strong> Measure ratio of noise to harmonic components from sustained vowel.<br>
+          <strong>Norms:</strong> Typically ≤0.2 for healthy voices.
+        </p>
+        <button class="btn-close">Close</button>
+      </div>
+      <div class="button-group">
+        <button class="btn">Normal</button>
+        <button class="btn">Abnormal</button>
+      </div>
+      <input type="text" placeholder="Optional: Enter NHR value">
+    </div>
+
+
+    <!-- Maximum Phonation Time (MPT) -->
+    <div class="history-field">
+      <label>Maximum Phonation Time (MPT)</label>
+      <button class="btn-info" data-id="mpt">?</button>
+      <div id="info-box-mpt" class="info-box">
+        <p>
+          <strong>Instructions:</strong> Ask patient to sustain /a/ at comfortable loudness.<br>
+          <strong>Tasks per group:</strong><br>
+          - Children: Sustain /a/ 5–8 sec<br>
+          - Teenagers: Sustain /a/ 8–15 sec<br>
+          - Adult Female: Sustain /a/ 15–20 sec<br>
+          - Adult Male: Sustain /a/ 20–25 sec<br>
+          <strong>Norms (sec):</strong><br>
+          Children: ~8<br>
+          Teenagers: ~12–15<br>
+          Adult Female: ~19<br>
+          Adult Male: ~26
+        </p>
+        <button class="btn-close">Close</button>
+      </div>
+      <div class="button-group">
+        <button class="btn">Normal</button>
+        <button class="btn">Reduced</button>
+      </div>
+      <input type="text" placeholder="Optional: Enter MPT (sec)">
+    </div>
+
+  </div>
+</section>
+
+
+<!-- Section 6: Vocal Health Assessment -->
+<section id="section6" class="info-section">
+  <h2>Vocal Health Assessment</h2>
+  <div class="history-grid">
+
+    <!-- Define each behavior as a history-field -->
+    <div class="history-field">
+      <label>Sensitivity</label>
+      <div class="button-group">
+        <button class="btn">None</button>
+        <button class="btn">Mild</button>
+        <button class="btn">Moderate</button>
+        <button class="btn">Severe</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Shouting / Loud Screaming</label>
+      <div class="button-group">
+        <button class="btn">Never</button>
+        <button class="btn">Occasionally</button>
+        <button class="btn">Often</button>
+        <button class="btn">Always</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Stimulant Intake (Alcohol, Coffee, Caffeine, Cola, etc.)</label>
+      <div class="button-group">
+        <button class="btn">None</button>
+        <button class="btn">Sometimes</button>
+        <button class="btn">Often</button>
+        <button class="btn">Daily</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Frequent Coughing</label>
+      <div class="button-group">
+        <button class="btn">Never</button>
+        <button class="btn">Occasionally</button>
+        <button class="btn">Often</button>
+        <button class="btn">Always</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Excessive Throat Clearing (Hawking)</label>
+      <div class="button-group">
+        <button class="btn">Never</button>
+        <button class="btn">Occasionally</button>
+        <button class="btn">Often</button>
+        <button class="btn">Always</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Side Effects from Continuous Medication</label>
+      <div class="button-group">
+        <button class="btn">None</button>
+        <button class="btn">Mild</button>
+        <button class="btn">Moderate</button>
+        <button class="btn">Severe</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Vocalization During Exercise</label>
+      <div class="button-group">
+        <button class="btn">Never</button>
+        <button class="btn">Occasionally</button>
+        <button class="btn">Often</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Loud Laughing</label>
+      <div class="button-group">
+        <button class="btn">Never</button>
+        <button class="btn">Occasionally</button>
+        <button class="btn">Often</button>
+        <button class="btn">Always</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Use of Voice in Work (Teaching, Singing, etc.)</label>
+      <div class="button-group">
+        <button class="btn">Low</button>
+        <button class="btn">Moderate</button>
+        <button class="btn">High</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Prolonged Speaking Without Breaks</label>
+      <div class="button-group">
+        <button class="btn">Never</button>
+        <button class="btn">Occasionally</button>
+        <button class="btn">Often</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Smoking</label>
+      <div class="button-group">
+        <button class="btn">No</button>
+        <button class="btn">Yes</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Calling Others from a Distance</label>
+      <div class="button-group">
+        <button class="btn">Never</button>
+        <button class="btn">Occasionally</button>
+        <button class="btn">Often</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Activities Requiring Loud Voice</label>
+      <div class="button-group">
+        <button class="btn">Never</button>
+        <button class="btn">Occasionally</button>
+        <button class="btn">Often</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Exposure to Environmental Pollution</label>
+      <div class="button-group">
+        <button class="btn">Low</button>
+        <button class="btn">Moderate</button>
+        <button class="btn">High</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Imitating Others’ Sounds</label>
+      <div class="button-group">
+        <button class="btn">Never</button>
+        <button class="btn">Occasionally</button>
+        <button class="btn">Often</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Speaking in Noisy Environments</label>
+      <div class="button-group">
+        <button class="btn">Never</button>
+        <button class="btn">Occasionally</button>
+        <button class="btn">Often</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Speaking While Upset</label>
+      <div class="button-group">
+        <button class="btn">Never</button>
+        <button class="btn">Occasionally</button>
+        <button class="btn">Often</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Low Water Intake</label>
+      <div class="button-group">
+        <button class="btn">Never</button>
+        <button class="btn">Occasionally</button>
+        <button class="btn">Often</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>Other</label>
+      <input type="text" placeholder="Enter any other behavior">
+    </div>
+
+  </div>
+</section>
+<!-- Section 7: Voice Handicap Index - 10 (VHI-10) -->
+<section id="section7" class="info-section">
+  <h2>Voice Handicap Index - 10 (VHI-10)</h2>
+  <p>
+    Instructions: These statements describe common experiences related to voice and its impact on daily life. Select the response that indicates how frequently you experience each statement.
+  </p>
+  <p>
+    Scale: 0-Never | 1-Almost Never | 2-Sometimes | 3-Almost Always | 4-Always
+  </p>
+
+  <div class="history-grid">
+
+    <!-- VHI items -->
+    <div class="history-field">
+      <label>My voice makes it difficult for people to hear me.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>People have difficulty understanding me in a noisy room.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>My voice difficulties restrict personal and social life.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>I feel left out of conversations because of my voice.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>My voice problem causes me to lose income.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>I feel as though I have to strain to produce voice.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>The clarity of my voice is unpredictable.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>My voice problem upsets me.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>My voice makes me feel handicapped.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>People ask, “What’s wrong with your voice?”</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="vhi-score">Total VHI-10 Score: <span id="vhiTotal">0</span> / 40</p>
+  <p>Interpretation (Rosen et al., 2004):</p>
+  <ul>
+    <li>0–11: Normal / Minimal handicap</li>
+    <li>12–22: Mild handicap</li>
+    <li>23–34: Moderate handicap</li>
+    <li>35–40: Severe handicap</li>
+  </ul>
+</section>
+
+<!-- Section 8: Voice Therapy Stimulability & Strategy Testing -->
+<section id="section8" class="info-section">
+  <h2>Voice Therapy Stimulability & Strategy Testing</h2>
+  <p>
+    Instructions: Try the strategies below with the patient. Record if improvement is observed for each. Click the info button "?" to see instructions on how to perform each strategy. Use notes to document observations.
+  </p>
+
+  <div class="history-grid">
+
+    <!-- Relaxation Exercises -->
+    <div class="history-field">
+      <label>Relaxation Exercises</label>
+      <button class="btn-info">?</button>
+      <div class="info-box">
+        <p>
+          <strong>Instructions:</strong> Teach the patient gentle neck, jaw, and shoulder relaxation exercises to reduce muscular tension. Encourage diaphragmatic breathing and gentle exhalation.
+        </p>
+        <button class="btn-close">Close</button>
+      </div>
+      <div class="button-group">
+        <button class="btn" data-value="yes">Improvement Observed: Yes</button>
+        <button class="btn" data-value="no">Improvement Observed: No</button>
+      </div>
+      <textarea placeholder="Notes / observations"></textarea>
+    </div>
+
+    <!-- Resonant Voice Tasks -->
+    <div class="history-field">
+      <label>Resonant Voice Tasks</label>
+      <button class="btn-info">?</button>
+      <div class="info-box">
+        <p>
+          <strong>Instructions:</strong> Guide the patient to produce a forward-focused, buzzing voice using /m/, /n/, /ng/ sounds. Maintain a comfortable pitch and loudness. Focus on oral resonance and relaxed phonation.
+        </p>
+        <button class="btn-close">Close</button>
+      </div>
+      <div class="button-group">
+        <button class="btn" data-value="yes">Improvement Observed: Yes</button>
+        <button class="btn" data-value="no">Improvement Observed: No</button>
+      </div>
+      <textarea placeholder="Notes / observations"></textarea>
+    </div>
+
+    <!-- Pitch Glides -->
+    <div class="history-field">
+      <label>Pitch Glides</label>
+      <button class="btn-info">?</button>
+      <div class="info-box">
+        <p>
+          <strong>Instructions:</strong> Ask the patient to glide smoothly from low to high pitch on vowels, keeping airflow steady and tension minimal. Repeat several times and observe vocal stability.
+        </p>
+        <button class="btn-close">Close</button>
+      </div>
+      <div class="button-group">
+        <button class="btn" data-value="yes">Improvement Observed: Yes</button>
+        <button class="btn" data-value="no">Improvement Observed: No</button>
+      </div>
+      <textarea placeholder="Notes / observations"></textarea>
+    </div>
+
+    <!-- Semi-Occluded Vocal Tract Exercises (SOVT) -->
+    <div class="history-field">
+      <label>Semi-Occluded Vocal Tract Exercises (SOVT)</label>
+      <button class="btn-info">?</button>
+      <div class="info-box">
+        <p>
+          <strong>Instructions:</strong> Use straw phonation, lip trills, or tongue trills to reduce vocal fold collision and improve resonance. Encourage sustained, smooth phonation.
+        </p>
+        <button class="btn-close">Close</button>
+      </div>
+      <div class="button-group">
+        <button class="btn" data-value="yes">Improvement Observed: Yes</button>
+        <button class="btn" data-value="no">Improvement Observed: No</button>
+      </div>
+      <textarea placeholder="Notes / observations"></textarea>
+    </div>
+
+    <!-- Additional Strategies -->
+    <div class="history-field">
+      <label>Additional Voice Therapy Strategy</label>
+      <button class="btn-info">?</button>
+      <div class="info-box">
+        <p>
+          <strong>Instructions:</strong> Specify any other voice exercises or techniques attempted (e.g., breath support, loudness control, pacing). Document method and response.
+        </p>
+        <button class="btn-close">Close</button>
+      </div>
+      <div class="button-group">
+        <button class="btn" data-value="yes">Improvement Observed: Yes</button>
+        <button class="btn" data-value="no">Improvement Observed: No</button>
+      </div>
+      <textarea placeholder="Notes / observations"></textarea>
+    </div>
+
+  </div>
+
+  <!-- Overall Result & Recommendations -->
+  <div class="history-field">
+    <label>Overall Result / Clinical Recommendations</label>
+    <div class="button-group">
+      <button class="btn" data-value="improved">Overall Improvement Observed</button>
+      <button class="btn" data-value="noImprovement">No Significant Improvement</button>
+    </div>
+    <textarea placeholder="Professional recommendations, follow-up plan, or additional strategies"></textarea>
+  </div>
+</section>
+
+
+  <!-- Section reprot : Final Report -->
+  <section id="section-report" class="info-section">
+    <h2 style="display:flex; align-items:center; gap:8px;">
+      Final Report
+      <button class="btn-info" onclick="showTestInfo('report')">?</button>
+    </h2>
+
+    <div id="info-box-report" class="info-box hidden">
+      <p>
+        This section automatically generates a final report combining results from the assessment.
+      </p>
+      <button onclick="closeInfoBox('report')">Close</button>
+    </div>
+
+    <textarea id="report" readonly rows="15" placeholder="Final report will appear here..."></textarea>
+    <button class="btn-download" onclick="downloadReport()">Download Report</button>
+  </section>
+
+</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
+

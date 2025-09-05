@@ -1,0 +1,1180 @@
+/* =========================
+   Global
+========================= */
+body {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background-color: #f0f4f8;
+  margin: 0;
+  padding: 0;
+  direction: ltr;
+  text-align: left;
+  color: #1f2937;
+  font-size: 18px;
+}
+
+.container {
+  max-width: 950px;
+  margin: 40px auto;
+  padding: 25px;
+}
+
+section {
+  background: #fff;
+  border-radius: 14px;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+}
+
+h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #1e3a8a;
+  border-bottom: 2px solid #43a6f8;
+  padding-bottom: 10px;
+}
+
+h3 {
+  font-size: 22px;
+  margin: 15px 0;
+  color: #43a6f8;
+}
+
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+}
+
+/* =========================
+   Page Header
+========================= */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px 25px;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+  margin: 20px auto;
+  max-width: 950px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  color: #1e3a8a;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.header-logo img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.page-header button.btn-info {
+  background: #a0a5ac;
+  color: #fff;
+  border-radius: 8px;
+  border: none;
+  width: 50px;
+  height: 50px;
+  font-size: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+/* =========================
+   Info Grid / Inputs
+========================= */
+.info-section {
+  padding: 24px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  margin-bottom: 35px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.info-section h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 18px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 22px;
+  margin-top: 10px;
+}
+
+.info-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-field label {
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #374151;
+}
+
+.info-field input,
+.info-field select,
+.info-field textarea {
+  padding: 14px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 16px;
+  background: #ffffff;
+  box-sizing: border-box;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+.info-field input:focus,
+.info-field select:focus,
+.info-field textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.35);
+  outline: none;
+  background-color: #f0f9ff;
+}
+
+.info-field select {
+  cursor: pointer;
+}
+
+.info-field textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* =========================
+   Gender Button Group
+========================= */
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.btn-gender {
+  flex: 1;
+  padding: 12px 0;
+  background-color: #f3f4f6;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 15px;
+  color: #374151;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-gender:hover {
+  background-color: #e5e7eb;
+}
+
+.btn-gender.active {
+  background-color: #2563eb;
+  color: white;
+  border-color: #2563eb;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.4);
+}
+
+/* =========================
+   Referral Section
+========================= */
+.referral-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.referral-section textarea {
+  min-height: 100px;
+}
+
+/* =========================
+   Buttons
+========================= */
+.btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.btn-group button {
+  flex: 1;
+  min-width: 100px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #f3f4f6;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-group button:hover {
+  background: #e5e7eb;
+}
+
+.btn-group button.active-btn {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.35);
+}
+
+button {
+  padding: 14px 22px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  background: #2563eb;
+  transition: all 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  transform: scale(1.03);
+  opacity: 0.9;
+}
+
+button:active {
+  transform: scale(0.97) rotate(-1deg);
+}
+
+button.selected {
+  opacity: 0.85;
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.5);
+}
+
+.btn-download {
+  background: #1e40af;
+  margin-top: 18px;
+  padding: 14px 28px;
+}
+
+
+/* =========================
+   Medical & Voice History
+========================= */
+.history-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.history-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-field label {
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #334155;
+}
+
+.history-field textarea {
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 15px;
+  min-height: 90px;
+  resize: vertical;
+  box-sizing: border-box;
+  background-color: #f8fafc;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.history-field textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  background-color: #ffffff;
+}
+
+/* =========================
+   Oral-Peripheral Buttons
+========================= */
+#section2 .section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* title left, info button right */
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 15px;
+  padding: 12px 16px;
+}
+
+#section2 .section-title .btn-info {
+  flex: 0; /* prevent button from stretching */
+  margin-left: 20px; /* optional spacing from title */
+}
+
+.button-group .btn {
+  padding: 10px 16px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  color: #1e293b;
+}
+
+.button-group .btn:hover {
+  background: #f0f9ff;
+}
+
+.button-group .btn.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.35);
+}
+
+
+/* Info box (sliding glass effect) */
+.info-box {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.info-box .info-content {
+  max-height: 0;
+  opacity: 0;
+  padding: 0 20px;
+  background: #f8fafc;
+  transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
+}
+
+.info-box.open .info-content {
+  max-height: 500px; /* enough for content */
+  opacity: 1;
+  padding: 15px 20px 20px 20px;
+}
+/* Card container */
+.history-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Label and buttons */
+.history-field label {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 5px;
+}
+
+/* Button group stays aligned */
+.history-field .button-group {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+/* Textarea for notes */
+.history-field textarea,
+.history-field input[type="text"] {
+  width: 100%;
+  min-height: 60px;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  resize: vertical;
+  box-sizing: border-box;
+  margin-top: 5px;
+}
+
+/* Ensure it's visually centered */
+.history-field textarea:focus,
+.history-field input[type="text"]:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+}
+
+/* =========================
+   Breathing & Phonation Section
+========================= */
+#section3 .section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 15px;
+}
+
+#section3 .history-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+#section3 .history-field {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#section3 .history-field:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+#section3 .history-field label {
+  display: block;
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 1rem;
+  margin-bottom: 12px;
+}
+
+/* Button group styling */
+#section3 .button-group {
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#section3 .button-group .btn {
+  flex: 1;
+  padding: 10px 0;
+  font-size: 14px;
+  border: 1px solid #ebf1fb;
+  border-radius: 8px;
+  background: #ebf1fb;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+#section3 .button-group .btn:hover {
+  background: #e5e7eb;
+}
+
+#section3 .button-group .btn.active {
+  background-color: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.35);
+}
+
+/* Text input styling */
+#section3 input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ebf1fb;
+  font-size: 0.95rem;
+  margin-top: 10px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+#section3 input[type="text"]:focus {
+  border-color: #3b82f6;
+  outline: none;
+  background-color: #fff;
+}
+
+/* Info box styling like GRBAS sliding glass */
+#section3 .info-box {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+
+/* hidden content area */
+#section3 .info-box .info-content {
+  max-height: 0;
+  opacity: 0;
+  padding: 0 20px;
+  background: #f8fafc;
+  transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
+}
+
+/* open state */
+#section3 .info-box.open .info-content {
+  max-height: 500px; /* enough to show content */
+  opacity: 1;
+  padding: 15px 20px 20px 20px;
+}
+
+
+/* =========================
+   GRBAS Section
+========================= */
+#section4 .section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 15px;
+}
+
+#section4 .grbas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.grbas-item {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.grbas-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.grbas-item label {
+  display: block;
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 1rem;
+  margin-bottom: 12px;
+}
+
+/* Button-based selection for GRBAS */
+.grbas-item .button-group {
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.grbas-item .button-group .btn {
+  flex: 1;
+  padding: 10px 0;
+  font-size: 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #f3f4f6;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.grbas-item .button-group .btn:hover {
+  background: #e5e7eb;
+}
+
+.grbas-item .button-group .btn.selected,
+.grbas-item .button-group .btn.active {
+  background-color: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.35);
+}
+
+.scale-numbers {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #475569;
+  margin-top: 5px;
+}
+
+.scale-value {
+  display: inline-block;
+  margin-top: 8px;
+  background: #3b82f6;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+#section4 textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  resize: vertical;
+  font-size: 0.95rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+#section4 textarea:focus {
+  border-color: #3b82f6;
+  outline: none;
+  background-color: #fff;
+}
+
+/* =========================
+   Section 5: Acoustic & Aerodynamic Measures
+========================= */
+#section5 {
+  padding: 25px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  margin-bottom: 30px;
+}
+
+#section5 h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 15px;
+}
+
+#section5 .history-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.history-field {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.history-field:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.history-field label {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 1rem;
+  margin-bottom: 12px;
+}
+
+/* Buttons group */
+.history-field .button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.history-field .button-group .btn {
+  flex: 1;
+  padding: 10px 0;
+  font-size: 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #f3f4f6;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.25s ease;
+}
+
+.history-field .button-group .btn:hover {
+  background: #e5e7eb;
+}
+
+.history-field .button-group .btn.active {
+  background-color: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.35);
+}
+
+/* Info box */
+.info-box {
+  max-height: 0;
+  overflow: hidden;
+  background: #f1f5f9;
+  padding: 0 15px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  transition: max-height 0.5s ease, padding 0.5s ease;
+}
+
+.info-box.open {
+  max-height: 500px; /* adjust as needed */
+  padding: 12px 15px;
+}
+
+.info-box p strong {
+  color: #1e3a8a;
+}
+
+/* Info box close button */
+.btn-close {
+  margin-top: 8px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  background-color: #ef4444;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.25s ease;
+}
+
+.btn-close:hover {
+  background-color: #dc2626;
+}
+
+/* Input fields */
+.history-field input,
+.history-field textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+  margin-top: 8px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.history-field input:focus,
+.history-field textarea:focus {
+  border-color: #3b82f6;
+  outline: none;
+  background-color: #fff;
+}
+
+/* Optional scale styling */
+.scale-numbers {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #475569;
+  margin-top: 5px;
+}
+
+.scale-value {
+  display: inline-block;
+  margin-top: 8px;
+  background: #3b82f6;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+
+/* =========================
+   section 5 Oral-Peripheral Exam 
+========================= */
+#section5 h2 {
+  font-size: 22px;
+  color: #1e3a8a;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #43a6f8;
+  padding-bottom: 10px;
+}
+
+.oral-peripheral-grid {
+  display: grid;
+  grid-template-columns: 2fr 0.7fr 0.7fr 3fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.oral-peripheral-header {
+  font-weight: 700;
+  background: #e2e8f0;
+  padding: 10px;
+  border-radius: 8px;
+  display: contents; /* Keeps header aligned with grid */
+}
+
+.oral-peripheral-header span {
+  padding: 8px;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.oral-peripheral-row {
+  display: contents;
+}
+
+.oral-peripheral-row span {
+  padding: 10px 8px;
+  font-size: 0.95rem;
+}
+
+.oral-peripheral-row input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin: auto;
+}
+
+.oral-peripheral-row input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+  background: #f8fafc;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.oral-peripheral-row input[type="text"]:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 6px rgba(37,99,235,0.35);
+  outline: none;
+  background: #fff;
+}
+
+/* Responsive for small screens */
+@media (max-width: 600px) {
+  .oral-peripheral-grid {
+    grid-template-columns: 1fr 0.6fr 0.6fr 2fr;
+    gap: 10px;
+  }
+
+  .oral-peripheral-row input[type="text"] {
+    font-size: 0.9rem;
+    padding: 6px;
+  }
+
+  .oral-peripheral-row span {
+    font-size: 0.9rem;
+  }
+}
+
+/* =========================
+   Section 6 – Breathing & Phonation Assessment 
+========================= */
+.assessment-section {
+  margin-bottom: 20px;
+}
+
+.assessment-section h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.button-group .btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button-group .btn:hover {
+  background-color: #e0e0e0;
+}
+
+.button-group .btn.selected {
+  background-color: #007bff;
+  color: white;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================
+   Mobile Adjustments
+========================= */
+@media (max-width: 600px) {
+  .info-section, .history-grid, .grbas-grid {
+    grid-template-columns: 1fr;
+  }
+  .info-section h2, .history-field label, .grbas-item label {
+    text-align: left;
+    font-size: 16px;
+  }
+  button, .btn-group button {
+    font-size: 16px;
+    padding: 12px 16px;
+  }
+}
+
+
+/* =========================
+   Final Report Section 
+========================= */
+#section-report {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+#section-report h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* Info button inside the header */
+#section-report .btn-info {
+  background: #007bff;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#section-report .btn-info:hover {
+  background: #0056b3;
+}
+
+/* Info Box Styling */
+.info-box {
+  background: #e9f5ff;
+  border: 1px solid #b3d9ff;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.info-box.hidden {
+  display: none;
+}
+
+.info-box button {
+  background: #007bff;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  transition: background 0.3s ease;
+}
+
+.info-box button:hover {
+  background: #0056b3;
+}
+
+/* Report Textarea */
+#report {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  resize: vertical;
+  min-height: 200px;
+  background: #fff;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+#report:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.3);
+}
+
+/* Download Button */
+.btn-download {
+  background: #28a745;
+  border: none;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-download:hover {
+  background: #218838;
+}
+/* ==============================
+   Info Modal Overlay
+============================== */
+.info-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: opacity 0.3s ease;
+}
+
+.info-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ==============================
+   Info Box Content
+============================== */
+.info-box-content {
+  background: #ffffff;
+  max-width: 700px;
+  width: 90%;
+  border-radius: 16px;
+  padding: 25px 30px;
+  position: relative;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  text-align: left;
+  animation: slideDown 0.3s ease;
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+.info-box-content h2 {
+  margin-top: 0;
+  font-size: 1.8rem;
+  color: #1e293b;
+}
+
+.info-box-content h3 {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  color: #334155;
+}
+
+.info-box-content p,
+.info-box-content li {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.info-box-content ul {
+  padding-left: 20px;
+  margin: 10px 0;
+}
+
+.info-box-content ul.references {
+  padding-left: 18px;
+  margin-top: 15px;
+}
+
+.info-box-content ul.references li {
+  font-size: 0.9rem;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+/* Close button inside the modal */
+.info-box-content .btn-close {
+  display: block;
+  margin: 25px auto 0;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.info-box-content .btn-close:hover {
+  background: #1e40af;
+}
+
+/* ==============================
+   Animation for modal appearance
+============================== */
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Scroll styling for overflow */
+.info-box-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.info-box-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+}
+
+.info-box-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
