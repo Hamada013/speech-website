@@ -1,18 +1,18 @@
 // =============================
-// Section 0: Identifying Info
+// القسم 0: المعلومات الشخصية
 // =============================
 
-// Auto-set today's date for the assessment date
+// تعيين تاريخ اليوم تلقائياً لتاريخ التقييم
 document.addEventListener("DOMContentLoaded", () => {
   const testDateField = document.getElementById("testDate");
   const today = new Date().toISOString().split("T")[0];
   testDateField.value = today;
 
-  // Generate initial empty report
+  // إنشاء تقرير أولي فارغ
   generateReport();
 });
 
-// Calculate chronological age when DOB is selected
+// حساب العمر الزمني عند اختيار تاريخ الميلاد
 function calculateAge() {
   const dobField = document.getElementById("dob");
   const ageField = document.getElementById("age");
@@ -38,22 +38,22 @@ function calculateAge() {
     months += 12;
   }
 
-  ageField.value = `${years}y ${months}m ${days}d`;
+  ageField.value = `${years}س ${months}ش ${days}ي`;
   generateReport();
 }
 
 // =============================
-// Gender Button Toggle
+// أزرار اختيار الجنس
 // =============================
 const genderButtons = document.querySelectorAll(".btn-gender");
 let selectedGender = "";
 
 genderButtons.forEach(button => {
   button.addEventListener("click", () => {
-    // Remove active class from all
+    // إزالة الصف النشط من جميع الأزرار
     genderButtons.forEach(btn => btn.classList.remove("active"));
 
-    // Mark this one active
+    // وضع علامة على الزر النشط
     button.classList.add("active");
     selectedGender = button.getAttribute("data-value");
 
@@ -62,17 +62,17 @@ genderButtons.forEach(button => {
 });
 
 // =============================
-// Section 1: Medical & Voice History
+// القسم 1: التاريخ الطبي والصوتي
 // =============================
 const medicalHistoryFields = [
-  { id: "medicalConditions", label: "Medical Conditions" },
-  { id: "currentMedications", label: "Current Medications" },
-  { id: "surgicalHistory", label: "Surgical History" },
-  { id: "previousVoice", label: "Previous Voice Disorders / Therapy" },
-  { id: "hydrationLifestyle", label: "Hydration & Lifestyle Habits" },
-  { id: "allergiesSinus", label: "Allergies / Sinus Issues" },
-  { id: "smokingAlcohol", label: "Smoking / Alcohol Use" },
-  { id: "vocalMisuse", label: "Vocal Overuse or Misuse Patterns" }
+  { id: "medicalConditions", label: "الحالات الطبية" },
+  { id: "currentMedications", label: "الأدوية الحالية" },
+  { id: "surgicalHistory", label: "التاريخ الجراحي" },
+  { id: "previousVoice", label: "اضطرابات صوتية سابقة / علاج" },
+  { id: "hydrationLifestyle", label: "العادات الغذائية ونمط الحياة" },
+  { id: "allergiesSinus", label: "الحساسية / مشاكل الجيوب الأنفية" },
+  { id: "smokingAlcohol", label: "التدخين / تعاطي الكحول" },
+  { id: "vocalMisuse", label: "أنماط الإفراط في استخدام الصوت أو سوء الاستخدام" }
 ];
 
 function getSection1MedicalHistory() {
@@ -85,39 +85,25 @@ function getSection1MedicalHistory() {
     }
   });
 
-  return sectionText ? `Medical & Voice History:\n${sectionText}\n` : "";
+  return sectionText ? `التاريخ الطبي والصوتي:\n${sectionText}\n` : "";
 }
 
 // =============================
-// Section 2: Generate Oral-Peripheral Text
+// القسم 2: فحص الفم والجهاز النطقي
 // =============================
-function getSection2OralPeripheral() {
-  let sectionText = "";
-
-  Object.entries(oralPeripheralData).forEach(([area, data]) => {
-    if (data.status || data.notes) {
-      sectionText += `- ${area}: ${data.status || "N/A"}`;
-      if (data.notes) sectionText += ` (Notes: ${data.notes})`;
-      sectionText += "\n";
-    }
-  });
-
-  return sectionText ? `Oral-Peripheral Exam:\n${sectionText}\n` : "";
-}
-
 const oralPeripheralFields = [
-  "Lips",
-  "Tongue",
-  "Palate",
-  "Laryngeal Elevation",
-  "Resonance"
+  "الشفاه",
+  "اللسان",
+  "الحنك",
+  "ارتفاع الحنجرة",
+  "الرنين (فموي vs أنفي)"
 ];
 
 const oralPeripheralData = {};
 
-// Attach listeners
+// إرفاق المستمعين
 oralPeripheralFields.forEach(labelText => {
-  // Find the container by matching the label text
+  // البحث عن الحاوية بمطابقة نص التسمية
   const containers = document.querySelectorAll("#section2 .history-field");
   let container = null;
 
@@ -132,7 +118,7 @@ oralPeripheralFields.forEach(labelText => {
     const buttons = container.querySelectorAll(".button-group .btn");
     const noteInput = container.querySelector("input[type='text']");
 
-    // Button clicks
+    // النقر على الأزرار
     buttons.forEach(btn => {
       btn.addEventListener("click", () => {
         buttons.forEach(b => b.classList.remove("active"));
@@ -146,7 +132,7 @@ oralPeripheralFields.forEach(labelText => {
       });
     });
 
-    // Note input changes
+    // تغييرات ملاحظات الإدخال
     noteInput.addEventListener("input", () => {
       if (!oralPeripheralData[labelText]) oralPeripheralData[labelText] = {};
       oralPeripheralData[labelText].notes = noteInput.value.trim();
@@ -155,6 +141,7 @@ oralPeripheralFields.forEach(labelText => {
   }
 });
 
+// مربع المعلومات للقسم 2
 const section2 = document.querySelector("#section2");
 const infoButton2 = section2.querySelector(".btn-info");
 const infoBox2 = section2.querySelector(".info-box");
@@ -168,22 +155,36 @@ closeButton2.addEventListener("click", () => {
   infoBox2.classList.remove("open");
 });
 
+// إنشاء نص القسم 2 للتقرير
+function getSection2OralPeripheral() {
+  let sectionText = "";
+
+  Object.entries(oralPeripheralData).forEach(([area, data]) => {
+    if (data.status || data.notes) {
+      sectionText += `- ${area}: ${data.status || "غير محدد"}`;
+      if (data.notes) sectionText += ` (ملاحظات: ${data.notes})`;
+      sectionText += "\n";
+    }
+  });
+
+  return sectionText ? `فحص الفم وال الجهاز النطقي:\n${sectionText}\n` : "";
+}
+
 // =============================
-// Section 3: Breathing & Phonation Assessment
+// القسم 3: تقييم التنفس وإصدار الصوت
 // =============================
 const breathingPhonationFields = [
-  "Breathing Type",
-  "Breathing Pattern Regularity",
-  "Coordination of Breathing with Speech",
-  "Phonation Onset Type",
-  "Vocal Loudness & Projection",
-  "Vocal Fatigue / Effort"
+  "نوع التنفس",
+  "انتظام نمط التنفس",
+  "تنسيق التنفس مع الكلام",
+  "نوع بدء إصدار الصوت",
+  "مستوى الصوت والإسقاط",
+  "إجهاد الصوت / الجهد"
 ];
 
 const breathingPhonationData = {};
 
-// -----------------------------
-// Info box toggle & close (like GRBAS)
+// تبديل وإغلاق مربع المعلومات (مثل GRBAS)
 const section3 = document.querySelector("#section3");
 const infoButton3 = section3.querySelector(".btn-info");
 const infoBox3 = section3.querySelector(".info-box");
@@ -197,8 +198,7 @@ closeButton3.addEventListener("click", () => {
   infoBox3.classList.remove("open");
 });
 
-// -----------------------------
-// Handle button selection & note input (like GRBAS)
+// التعامل مع اختيار الأزرار وإدخال الملاحظات (مثل GRBAS)
 breathingPhonationFields.forEach(labelText => {
   const containers = section3.querySelectorAll(".history-field");
   let container = null;
@@ -235,33 +235,28 @@ breathingPhonationFields.forEach(labelText => {
   }
 });
 
-// -----------------------------
-// Generate Section 3 report text
-// -----------------------------
+// إنشاء نص تقرير القسم 3
 function getSection3BreathingPhonation() {
   let sectionText = "";
 
   Object.entries(breathingPhonationData).forEach(([param, data]) => {
-    sectionText += `- ${param}: ${data.status || "N/A"}`;
-    if (data.notes) sectionText += ` (Notes: ${data.notes})`;
+    sectionText += `- ${param}: ${data.status || "غير محدد"}`;
+    if (data.notes) sectionText += ` (ملاحظات: ${data.notes})`;
     sectionText += "\n";
   });
 
   return sectionText
-    ? `Breathing & Phonation Assessment:\n${sectionText}\n`
+    ? `تقييم التنفس وإصدار الصوت:\n${sectionText}\n`
     : "";
 }
 
-
 // =============================
-// Section 4: Perceptual Voice Evaluation (GRBAS Scale)
+// القسم 4: التقييم الإدراكي للصوت (مقياس GRBAS)
 // =============================
-const grbasFields = ["G (Grade)", "R (Roughness)", "B (Breathiness)", "A (Asthenia)", "S (Strain)"];
+const grbasFields = ["G (الدرجة)", "R (الخشونة)", "B (النفاخية)", "A (الوهن)", "S (الإجهاد)"];
 const grbasData = {};
 
-// -----------------------------
-// Info box toggle and close
-// -----------------------------
+// تبديل وإغلاق مربع المعلومات
 const section4 = document.querySelector("#section4");
 const infoButton = section4.querySelector(".btn-info");
 const infoBox = section4.querySelector(".info-box");
@@ -275,9 +270,7 @@ closeButton.addEventListener("click", () => {
   infoBox.classList.remove("open");
 });
 
-// -----------------------------
-// Handle button selections
-// -----------------------------
+// التعامل مع اختيارات الأزرار
 grbasFields.forEach(labelText => {
   const containers = section4.querySelectorAll(".grbas-item");
   let container = null;
@@ -293,11 +286,11 @@ grbasFields.forEach(labelText => {
 
   buttons.forEach(btn => {
     btn.addEventListener("click", () => {
-      // Remove active class from all buttons in the group
+      // إزالة الصف النشط من جميع الأزرار في المجموعة
       buttons.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
 
-      // Save the selected number
+      // حفظ الرقم المحدد
       grbasData[labelText] = btn.textContent.trim();
 
       generateReport();
@@ -305,9 +298,7 @@ grbasFields.forEach(labelText => {
   });
 });
 
-// -----------------------------
-// Generate Section 4 text for report
-// -----------------------------
+// إنشاء نص القسم 4 للتقرير
 function getSection4GRBAS() {
   let sectionText = "";
 
@@ -315,27 +306,24 @@ function getSection4GRBAS() {
     sectionText += `- ${param}: ${score}\n`;
   });
 
-  return sectionText ? `Perceptual Voice Evaluation (GRBAS Scale):\n${sectionText}\n` : "";
+  return sectionText ? `التقييم الإدراكي للصوت (مقياس GRBAS):\n${sectionText}\n` : "";
 }
+
 // =============================
-// Section 5: Acoustic & Aerodynamic Measures
+// القسم 5: القياسات الصوتية والديناميكية الهوائية
 // =============================
 const section5Fields = [
-  "Fundamental Frequency (F0)",
-  "Maximum Phonation Time (MPT)",
-  "Pitch Range",
-  "S/Z Ratio",
-  "Jitter (%)",
-  "Shimmer (%)",
-  "Noise-to-Harmonic Ratio",
-  "Voice Range Profile (VRP)"
+  "التردد الأساسي (F0)",
+  "زمن الصوت الأقصى (MPT)",
+  "نسبة S/Z",
+  "التذبذب (Jitter) (%)",
+  "الاهتزاز (Shimmer) (%)",
+  "نسبة الضوضاء إلى النغمات"
 ];
 
 const acousticData = {};
 
-// -----------------------------
-// Info box toggle and close
-// -----------------------------
+// تبديل وإغلاق مربع المعلومات
 document.querySelectorAll("#section5 .btn-info").forEach(btn => {
   btn.addEventListener("click", () => {
     const container = btn.closest(".history-field");
@@ -351,9 +339,7 @@ document.querySelectorAll("#section5 .btn-close").forEach(btn => {
   });
 });
 
-// -----------------------------
-// Handle button selections & input
-// -----------------------------
+// التعامل مع اختيارات الأزرار والإدخال
 section5Fields.forEach(labelText => {
   const containers = document.querySelectorAll("#section5 .history-field");
   
@@ -364,14 +350,14 @@ section5Fields.forEach(labelText => {
     const buttons = container.querySelectorAll(".button-group .btn");
     const noteInput = container.querySelector("input[type='text']");
 
-    // Button selection
+    // اختيار الزر
     buttons.forEach(btn => {
       btn.addEventListener("click", () => {
-        // Toggle active
+        // تبديل النشط
         buttons.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
 
-        // Save to data object
+        // حفظ في كائن البيانات
         if (!acousticData[labelText]) acousticData[labelText] = {};
         acousticData[labelText].status = btn.textContent.trim();
         acousticData[labelText].notes = noteInput ? noteInput.value.trim() : "";
@@ -380,7 +366,7 @@ section5Fields.forEach(labelText => {
       });
     });
 
-    // Input changes
+    // تغييرات الإدخال
     if (noteInput) {
       noteInput.addEventListener("input", () => {
         if (!acousticData[labelText]) acousticData[labelText] = {};
@@ -391,52 +377,49 @@ section5Fields.forEach(labelText => {
   });
 });
 
-// -----------------------------
-// Generate Section 5 text for report
-// -----------------------------
+// إنشاء نص القسم 5 للتقرير
 function getSection5AcousticAerodynamic() {
   let sectionText = "";
 
   Object.entries(acousticData).forEach(([area, data]) => {
     if (data.status || data.notes) {
-      sectionText += `- ${area}: ${data.status || "N/A"}`;
-      if (data.notes) sectionText += ` (Notes: ${data.notes})`;
+      sectionText += `- ${area}: ${data.status || "غير محدد"}`;
+      if (data.notes) sectionText += ` (ملاحظات: ${data.notes})`;
       sectionText += "\n";
     }
   });
 
-  return sectionText ? `Acoustic & Aerodynamic Measures:\n${sectionText}\n` : "";
+  return sectionText ? `القياسات الصوتية والديناميكية الهوائية:\n${sectionText}\n` : "";
 }
 
-
 // =============================
-// Section 6: Vocal Health Assessment
+// القسم 6: تقييم صحة الصوت
 // =============================
 const section6Fields = [
-  "Sensitivity",
-  "Shouting / Loud Screaming",
-  "Stimulant Intake (Alcohol, Coffee, Caffeine, Cola, etc.)",
-  "Frequent Coughing",
-  "Excessive Throat Clearing (Hawking)",
-  "Side Effects from Continuous Medication",
-  "Vocalization During Exercise",
-  "Loud Laughing",
-  "Use of Voice in Work (Teaching, Singing, etc.)",
-  "Prolonged Speaking Without Breaks",
-  "Smoking",
-  "Calling Others from a Distance",
-  "Activities Requiring Loud Voice",
-  "Exposure to Environmental Pollution",
-  "Imitating Others’ Sounds",
-  "Speaking in Noisy Environments",
-  "Speaking While Upset",
-  "Low Water Intake",
-  "Other"
+  "الحساسية",
+  "الصراخ / الصياح بصوت عالٍ",
+  "تناول المنبهات (الكحول، القهوة، الكافيين، الكولا، إلخ)",
+  "السعال المتكرر",
+  "النباح المفرط (تنظيف الحلق)",
+  "الآثار الجانبية من الأدوية المستمرة",
+  "التصويت أثناء التمرين",
+  "الضحك بصوت عالٍ",
+  "استخدام الصوت في العمل (التدريس، الغناء، إلخ)",
+  "التحدث المطول دون استراحات",
+  "التدخين",
+  "مناداة الآخرين من بعيد",
+  "الأنشطة التي تتطلب صوتاً عالياً",
+  "التعرض للتلوث البيئي",
+  "تقليد أصوات الآخرين",
+  "التحدث في بيئات صاخبة",
+  "التحدث أثناء الانزعاج",
+  "قلة شرب الماء",
+  "أخرى"
 ];
 
 const vocalHealthData = {};
 
-// Attach listeners
+// إرفاق المستمعين
 section6Fields.forEach(labelText => {
   const containers = document.querySelectorAll("#section6 .history-field");
   let container = null;
@@ -450,7 +433,7 @@ section6Fields.forEach(labelText => {
     const buttons = container.querySelectorAll(".button-group .btn");
     const noteInput = container.querySelector("input[type='text']");
 
-    // Button clicks
+    // النقر على الأزرار
     buttons.forEach(btn => {
       btn.addEventListener("click", () => {
         buttons.forEach(b => b.classList.remove("active"));
@@ -464,7 +447,7 @@ section6Fields.forEach(labelText => {
       });
     });
 
-    // Input changes
+    // تغييرات الإدخال
     if (noteInput) {
       noteInput.addEventListener("input", () => {
         if (!vocalHealthData[labelText]) vocalHealthData[labelText] = {};
@@ -475,40 +458,40 @@ section6Fields.forEach(labelText => {
   }
 });
 
-// Generate Section 6 text for report
+// إنشاء نص القسم 6 للتقرير
 function getSection6VocalHealth() {
   let sectionText = "";
 
   Object.entries(vocalHealthData).forEach(([behavior, data]) => {
     if (data.status || data.notes) {
-      sectionText += `- ${behavior}: ${data.status || "N/A"}`;
-      if (data.notes) sectionText += ` (Notes: ${data.notes})`;
+      sectionText += `- ${behavior}: ${data.status || "غير محدد"}`;
+      if (data.notes) sectionText += ` (ملاحظات: ${data.notes})`;
       sectionText += "\n";
     }
   });
 
-  return sectionText ? `Vocal Health Assessment:\n${sectionText}\n` : "";
+  return sectionText ? `تقييم صحة الصوت:\n${sectionText}\n` : "";
 }
 
 // =============================
-// Section 7: Voice Handicap Index - 10 (VHI-10) with Interpretation
+// القسم 7: مؤشر إعاقة الصوت - 10 (VHI-10) مع التفسير
 // =============================
 const vhiFields = [
-  "My voice makes it difficult for people to hear me.",
-  "People have difficulty understanding me in a noisy room.",
-  "My voice difficulties restrict personal and social life.",
-  "I feel left out of conversations because of my voice.",
-  "My voice problem causes me to lose income.",
-  "I feel as though I have to strain to produce voice.",
-  "The clarity of my voice is unpredictable.",
-  "My voice problem upsets me.",
-  "My voice makes me feel handicapped.",
-  "People ask, “What’s wrong with your voice?”"
+  "صوتي يجعل من الصعب على الآخرين سماعي.",
+  "يواجه الآخرون صعوبة في فهمي في غرفة صاخبة.",
+  "صعوبات صوتي تقيد حياتي الشخصية والاجتماعية.",
+  "أشعر بأنني مستبعد من المحادثات بسبب صوتي.",
+  "مشكلة صوتي تتسبب في فقداني الدخل.",
+  "أشعر كما لو أنني يجب أن أجهد لإنتاج الصوت.",
+  "وضوح صوتي غير متوقع.",
+  "مشكلة صوتي تزعجني.",
+  "صوتي يجعلني أشعر بأنني معاق.",
+  "يسأل الناس: \"ما الخطأ في صوتك؟\""
 ];
 
 const vhiData = {};
 
-// Attach event listeners for VHI-10 buttons
+// إرفاق مستمعي الأحداث لأزرار VHI-10
 vhiFields.forEach(labelText => {
   const containers = document.querySelectorAll("#section7 .history-field");
   let container = null;
@@ -535,22 +518,22 @@ vhiFields.forEach(labelText => {
   }
 });
 
-// Calculate total VHI-10 score and update display
+// حساب مجموع درجة VHI-10 وتحديث العرض
 function updateVHITotal() {
   const total = Object.values(vhiData).reduce((sum, val) => sum + val, 0);
   document.getElementById("vhiTotal").textContent = total;
 }
 
-// Determine VHI-10 interpretation
+// تحديد تفسير VHI-10
 function getVHIInterpretation(score) {
-  if (score >= 0 && score <= 11) return "Normal / Minimal handicap";
-  if (score >= 12 && score <= 22) return "Mild handicap";
-  if (score >= 23 && score <= 34) return "Moderate handicap";
-  if (score >= 35 && score <= 40) return "Severe handicap";
-  return "N/A";
+  if (score >= 0 && score <= 11) return "طبيعي / إعاقة طفيفة";
+  if (score >= 12 && score <= 22) return "إعاقة خفيفة";
+  if (score >= 23 && score <= 34) return "إعاقة متوسطة";
+  if (score >= 35 && score <= 40) return "إعاقة شديدة";
+  return "غير محدد";
 }
 
-// Generate Section 7 text for report with interpretation
+// إنشاء نص القسم 7 للتقرير مع التفسير
 function getSection7VHI() {
   if (Object.keys(vhiData).length === 0) return "";
 
@@ -562,29 +545,27 @@ function getSection7VHI() {
   const totalScore = Object.values(vhiData).reduce((sum, val) => sum + val, 0);
   const interpretation = getVHIInterpretation(totalScore);
 
-  sectionText += `\nTotal VHI-10 Score: ${totalScore} / 40\n`;
-  sectionText += `Interpretation: ${interpretation}\n`;
+  sectionText += `\nإجمالي درجة VHI-10: ${totalScore} / 40\n`;
+  sectionText += `التفسير: ${interpretation}\n`;
 
-  return `Voice Handicap Index - 10 (VHI-10):\n${sectionText}`;
+  return `مؤشر إعاقة الصوت - 10 (VHI-10):\n${sectionText}`;
 }
 
 // =============================
-// Section 8: Voice Therapy Stimulability & Strategy Testing
+// القسم 8: اختبار القابلية للاستثارة واستراتيجيات علاج الصوت
 // =============================
 const section8Fields = [
-  "Relaxation Exercises",
-  "Resonant Voice Tasks",
-  "Pitch Glides",
-  "Semi-Occluded Vocal Tract Exercises (SOVT)",
-  "Additional Voice Therapy Strategy",
-  "Overall Result / Clinical Recommendations"
+  "تمارين الاسترخاء",
+  "مهام الصوت الرنان",
+  "الانزلاقات النغمية",
+  "تمارين المسالك الصوتية شبه المغلقة (SOVT)",
+  "استراتيجية علاج صوت إضافية",
+  "النتيجة العامة / التوصيات السريرية"
 ];
 
 const therapyData = {};
 
-// -----------------------------
-// Info box toggle and close
-// -----------------------------
+// تبديل وإغلاق مربع المعلومات
 document.querySelectorAll("#section8 .btn-info").forEach(btn => {
   btn.addEventListener("click", () => {
     const container = btn.closest(".history-field");
@@ -600,9 +581,7 @@ document.querySelectorAll("#section8 .btn-close").forEach(btn => {
   });
 });
 
-// -----------------------------
-// Handle button selections & textarea
-// -----------------------------
+// التعامل مع اختيارات الأزرار ومنطقة النص
 section8Fields.forEach(labelText => {
   const containers = document.querySelectorAll("#section8 .history-field");
 
@@ -613,7 +592,7 @@ section8Fields.forEach(labelText => {
     const buttons = container.querySelectorAll(".button-group .btn");
     const noteInput = container.querySelector("textarea");
 
-    // Button click
+    // النقر على الزر
     buttons.forEach(btn => {
       btn.addEventListener("click", () => {
         buttons.forEach(b => b.classList.remove("active"));
@@ -627,7 +606,7 @@ section8Fields.forEach(labelText => {
       });
     });
 
-    // Note input
+    // إدخال الملاحظات
     if (noteInput) {
       noteInput.addEventListener("input", () => {
         if (!therapyData[labelText]) therapyData[labelText] = {};
@@ -638,34 +617,31 @@ section8Fields.forEach(labelText => {
   });
 });
 
-// -----------------------------
-// Generate Section 8 report
-// -----------------------------
+// إنشاء تقرير القسم 8
 function getSection8Therapy() {
   if (!Object.keys(therapyData).length) return "";
 
   let sectionText = "";
   Object.entries(therapyData).forEach(([strategy, data]) => {
-    const statusText = data.status ? `Status: ${data.status}` : "";
-    const notesText = data.notes ? `Notes: ${data.notes}` : "";
+    const statusText = data.status ? `الحالة: ${data.status}` : "";
+    const notesText = data.notes ? `ملاحظات: ${data.notes}` : "";
     sectionText += `- ${strategy}: ${statusText}${notesText ? ` | ${notesText}` : ""}\n`;
   });
 
-  return `Voice Therapy Stimulability & Strategy Testing:\n${sectionText}\n`;
+  return `اختبار القابلية للاستثارة واستراتيجيات علاج الصوت:\n${sectionText}\n`;
 }
 
-// Update report textarea if exists
+// تحديث منطقة النص للتقرير إذا كانت موجودة
 function updateSection8Report() {
   const reportTextarea = document.getElementById("report");
   if (reportTextarea) reportTextarea.value = getSection8Therapy();
 }
 
-
 // =============================
-// Extend Unified Report Generator
+// منشئ التقرير الموحد الموسع
 // =============================
 function generateReport() {
-  // ----- Section 0 -----
+  // ----- القسم 0 -----
   const name = document.getElementById("name").value.trim();
   const dob = document.getElementById("dob").value;
   const age = document.getElementById("age").value.trim();
@@ -679,71 +655,71 @@ function generateReport() {
   const impactDailyLife = document.getElementById("impactDailyLife").value.trim();
 
 let report = `
-VOICE ASSESSMENT REPORT
-=======================
+تقرير تقييم الصوت
+=================
 
-Patient Information:
-- Name: ${name || "N/A"}
-- Date of Birth: ${dob || "N/A"}
-- Chronological Age: ${age || "N/A"}
-- Gender: ${selectedGender || "N/A"}
-- Occupation: ${occupation || "N/A"}
-- Languages Spoken: ${languages || "N/A"}
+المعلومات الشخصية:
+- الاسم: ${name || "غير محدد"}
+- تاريخ الميلاد: ${dob || "غير محدد"}
+- العمر الزمني: ${age || "غير محدد"}
+- الجنس: ${selectedGender || "غير محدد"}
+- المهنة: ${occupation || "غير محدد"}
+- اللغة/اللغات المتحدث بها: ${languages || "غير محدد"}
 
-Assessment Details:
-- Date of Assessment: ${testDate || "N/A"}
-- Evaluator: ${examiner || "N/A"}
-- Referral Source: ${referralSource || "N/A"}
+تفاصيل التقييم:
+- تاريخ التقييم: ${testDate || "غير محدد"}
+- المقيّم: ${examiner || "غير محدد"}
+- مصدر الإحالة: ${referralSource || "غير محدد"}
 
-Reason for Referral:
-- Primary Complaint: ${primaryComplaint || "N/A"}
-- Onset & Course: ${onsetCourse || "N/A"}
-- Impact on Daily Life: ${impactDailyLife || "N/A"}
+سبب الإحالة:
+- الشكوى الرئيسية: ${primaryComplaint || "غير محدد"}
+- البداية والتطور: ${onsetCourse || "غير محدد"}
+- التأثير على الحياة اليومية: ${impactDailyLife || "غير محدد"}
 `;
 
-// Section 1 – Medical History
+// القسم 1 – التاريخ الطبي
 const section1History = getSection1MedicalHistory();
 if (section1History) {
   report += `\n-----------------------------------------\n${section1History}`;
 }
 
-// Section 2 – Oral-Peripheral
+// القسم 2 – الفحص النطقي
 const section2Oral = getSection2OralPeripheral();
 if (section2Oral) {
   report += `\n-----------------------------------------\n${section2Oral}`;
 }
 
-// Section 3 – Breathing & Phonation
+// القسم 3 – التنفس وإصدار الصوت
 const section3Breathing = getSection3BreathingPhonation();
 if (section3Breathing) {
   report += `\n-----------------------------------------\n${section3Breathing}`;
 }
 
-// Section 4 – GRBAS
+// القسم 4 – GRBAS
 const section4GRBAS = getSection4GRBAS();
 if (section4GRBAS) {
   report += `\n-----------------------------------------\n${section4GRBAS}`;
 }
 
-// Section 5 – Acoustic & Aerodynamic
+// القسم 5 – القياسات الصوتية
 const section5Acoustic = getSection5AcousticAerodynamic();
 if (section5Acoustic) {
   report += `\n-----------------------------------------\n${section5Acoustic}`;
 }
 
-// Section 6 – Vocal Health
+// القسم 6 – صحة الصوت
 const section6VocalHealth = getSection6VocalHealth();
 if (section6VocalHealth) {
   report += `\n-----------------------------------------\n${section6VocalHealth}`;
 }
 
-// Section 7 – Voice Handicap Index
+// القسم 7 – مؤشر إعاقة الصوت
 const section7VHI = getSection7VHI();
 if (section7VHI) {
   report += `\n-----------------------------------------\n${section7VHI}`;
 }
 
-// Section 8 – Therapy Recommendations
+// القسم 8 – التوصيات العلاجية
 const section8Therapy = getSection8Therapy();
 if (section8Therapy) {
   report += `\n-----------------------------------------\n${section8Therapy}`;
@@ -751,31 +727,30 @@ if (section8Therapy) {
 
 report += `
 -----------------------------------------
-Note: This report will automatically update as additional sections are completed.
-Prepared by: SLP Ahmad Ghanem
+ملاحظة: سيتم تحديث هذا التقرير تلقائياً عند إكمال أقسام إضافية.
+أعدّه: أخصائي النطق واللغة أحمد غانم
 `;
 
 document.getElementById("report").value = report.trim();
-
 }
 
 // =============================
-// Event Listeners for Live Updates
+// مستمعي الأحداث للتحديثات المباشرة
 // =============================
 
-// Section 0 inputs
+// مدخلات القسم 0
 const section0Fields = document.querySelectorAll("#section0 input, #section0 textarea");
 section0Fields.forEach(field => {
   field.addEventListener("input", generateReport);
 });
 
-// Section 1 inputs (Medical & Voice History)
+// مدخلات القسم 1 (التاريخ الطبي والصوتي)
 const section1Fields = document.querySelectorAll("#section1 textarea");
 section1Fields.forEach(field => {
   field.addEventListener("input", generateReport);
 });
 
-// Section 2: Attach listeners to buttons and note inputs
+// القسم 2: إرفاق المستمعين بالأزرار ومدخلات الملاحظات
 oralPeripheralFields.forEach(labelText => {
   const containers = document.querySelectorAll("#section2 .history-field");
   let container = null;
@@ -810,31 +785,6 @@ oralPeripheralFields.forEach(labelText => {
   }
 });
 
-// Generate Section 3 text for report
-function getSection3BreathingPhonation() {
-  let sectionText = "";
-
-  Object.entries(breathingPhonationData).forEach(([area, data]) => {
-    if (data.status || data.notes) {
-      sectionText += `- ${area}: ${data.status || "N/A"}`;
-      if (data.notes) sectionText += ` (Notes: ${data.notes})`;
-      sectionText += "\n";
-    }
-  });
-
-  return sectionText ? `Breathing & Phonation Assessment:\n${sectionText}\n` : "";
-}
-
-// Generate Section 4 text for report
-function getSection4GRBAS() {
-  let sectionText = "";
-  Object.entries(grbasData).forEach(([parameter, value]) => {
-    sectionText += `- ${parameter}: ${value || "N/A"}\n`;
-  });
-
-  return sectionText ? `Perceptual Voice Evaluation (GRBAS):\n${sectionText}\n` : "";
-}
-
 section5Fields.forEach(labelText => {
   const containers = document.querySelectorAll("#section5 .history-field");
   let container = null;
@@ -848,7 +798,7 @@ section5Fields.forEach(labelText => {
     const buttons = container.querySelectorAll(".button-group .btn");
     const noteInput = container.querySelector("input[type='text']");
 
-    // Buttons
+    // الأزرار
     buttons.forEach(btn => {
       btn.addEventListener("click", () => {
         buttons.forEach(b => b.classList.remove("active"));
@@ -862,7 +812,7 @@ section5Fields.forEach(labelText => {
       });
     });
 
-    // Input field
+    // حقل الإدخال
     noteInput.addEventListener("input", () => {
       if (!acousticData[labelText]) acousticData[labelText] = {};
       acousticData[labelText].notes = noteInput.value.trim();
@@ -870,28 +820,14 @@ section5Fields.forEach(labelText => {
     });
   }
 });
-// Generate Section 5 text for report
-function getSection5AcousticAerodynamic() {
-  let sectionText = "";
-
-  Object.entries(acousticData).forEach(([area, data]) => {
-    if (data.status || data.notes) {
-      sectionText += `- ${area}: ${data.status || "N/A"}`;
-      if (data.notes) sectionText += ` (Notes: ${data.notes})`;
-      sectionText += "\n";
-    }
-  });
-
-  return sectionText ? `Acoustic & Aerodynamic Measures:\n${sectionText}\n` : "";
-}
 
 // =============================
-// Download Report as TXT
+// تحميل التقرير كملف TXT
 // =============================
 function downloadReport() {
   const reportText = document.getElementById("report").value.trim();
   if (!reportText) {
-    alert("The report is empty. Please complete some fields first.");
+    alert("التقرير فارغ. يرجى إكمال بعض الحقول أولاً.");
     return;
   }
 
@@ -900,22 +836,23 @@ function downloadReport() {
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = "voice_assessment_report.txt";
+  a.download = "تقرير_تقييم_الصوت.txt";
   a.click();
 
   URL.revokeObjectURL(url);
 }
-// Show the popup
+
+// إظهار النافذة المنبثقة
 function showTestInfo() {
   document.getElementById('info-overlay').classList.remove('hidden');
 }
 
-// Close popup when clicking close button
+// إغلاق النافذة المنبثقة عند النقر على زر الإغلاق
 function closeInfoBox() {
   document.getElementById('info-overlay').classList.add('hidden');
 }
 
-// Close popup when clicking outside the modal content
+// إغلاق النافذة المنبثقة عند النقر خارج محتوى النافذة
 function overlayClick(event) {
   const contentBox = document.getElementById('info-box-page');
   if (!contentBox.contains(event.target)) {

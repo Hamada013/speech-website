@@ -393,7 +393,6 @@ function getFrequencyScore(frequencyPercent, type) {
   return 0; // fallback if no match
 }
 
-
 // Duration scoring table
 const durationTable = [
   { max: 0.5, score: 2 },
@@ -619,17 +618,19 @@ function updatePhysicalResults() {
   naturalnessScale.addEventListener('input', updateNaturalnessValue);
   // Initialize display
   updateNaturalnessValue();
-
+  
 // ---------------------------
 // Info Button Pop-up Logic
 // ---------------------------
 const infoMessages = {
-  page: "This tool assesses stuttering severity in children and adults. It is used to record observations and measure frequency, duration, physical concomitants, and speech naturalness.",
-  resources: "This section lists all available resources. Click a resource button to view or download the corresponding item.",
-  frequency: "Paste speech or reading samples here to calculate frequency and duration measures. Select the sample type for each text and click calculate.",
-  physical: "Only observable phenomena associated with stuttering should be recorded. General behaviors such as restlessness or fidgeting are not rated here.",
-  naturalness: "Evaluation is done immediately after the speech sample is recorded. Speech naturalness refers to how similar the speaker sounds compared to most typical speakers of the same gender, age, and dialect. Use the following scale: 1 = highly natural; 9 = highly unnatural."
+  page: "تقوم هذه الأداة بتقييم شدة التلعثم لدى الأطفال والكبار. يُستخدم هذا التقييم لتسجيل الملاحظات وقياس التكرار، والمدة، والظواهر الجسدية المصاحبة، وطبيعية الكلام.",
+  resources: "يعرض هذا القسم جميع الموارد المتاحة. اضغط على زر المورد لمشاهدة أو تنزيل العنصر المقابل.",
+  frequency: "ألصق هنا عينات الكلام أو القراءة لحساب مقاييس التكرار والمدة. اختر نوع العينة لكل نص واضغط زر الحساب.",
+  physical: "يجب تسجيل فقط الظواهر القابلة للملاحظة المرتبطة بالتلعثم. السلوك العام مثل القلق أو الحركة المستمرة لا يتم تقييمه هنا.",
+  naturalness: "يتم التقييم فور الانتهاء من تسجيل عينة الكلام. طبيعية الكلام تشير إلى مدى تشابه كلام المتحدث مع معظم المتحدثين الطبيعيين من نفس الجنس والعمر واللهجة. استخدم المقياس التالي: 1 = كلام طبيعي جداً؛ 9 = كلام غير طبيعي بشكل كبير."
 };
+
+
 // Show info box
 function showTestInfo(key) {
   const boxId = `info-box-${key}`;
@@ -724,13 +725,13 @@ function selectOption(field, value, btn) {
   updateFinalReport();
 }
 
-// ======= Update Final Report Automatically =======
+// ======= تحديث التقرير النهائي تلقائياً =======
 function updateFinalReport() {
-  const category = currentCategory; // use selected button
+  const category = currentCategory; // استخدم الفئة المختارة
   const frequency = window.combinedFrequencyScore || 0;
   const duration = window.combinedDurationScore || 0;
 
-  // Physical concomitants
+  // المظاهر الجسدية المصاحبة
   let physicalScore = 0;
   let physicalText = "";
   for (const [cat, data] of Object.entries(physicalData || {})) {
@@ -740,8 +741,8 @@ function updateFinalReport() {
 
   const totalScore = frequency + duration + physicalScore;
 
-  // Determine percentile & severity
-  let percentile = "N/A", severity = "N/A";
+  // تحديد النسبة المئوية وشدة التلعثم
+  let percentile = "غير محدد", severity = "غير محدد";
   const table = severityTables[category];
   if(table) {
     for (let row of table) {
@@ -754,57 +755,53 @@ function updateFinalReport() {
   }
 
   const reportContent = `
-Identifying Information
-Name: ${document.getElementById("name")?.value || ""}
-Grade: ${document.getElementById("grade")?.value || ""}
-School: ${document.getElementById("school")?.value || ""}
-DOB: ${document.getElementById("dob")?.value || ""}
-Age: ${document.getElementById("age")?.value || ""}
-Category: ${category}
-Gender: ${document.getElementById("gender")?.value || ""}
-Examiner: ${document.getElementById("examiner")?.value || ""}
-Reader: ${document.getElementById("reader")?.value || ""}
+المعلومات التعريفية
+الاسم: ${document.getElementById("name")?.value || ""}
+الصف: ${document.getElementById("grade")?.value || ""}
+المدرسة: ${document.getElementById("school")?.value || ""}
+تاريخ الميلاد: ${document.getElementById("dob")?.value || ""}
+العمر: ${document.getElementById("age")?.value || ""}
+الفئة: ${category}
+الجنس: ${document.getElementById("gender")?.value || ""}
+المختبر: ${document.getElementById("examiner")?.value || ""}
+القارئ: ${document.getElementById("reader")?.value || ""}
 
-Frequency & Duration Results
-Frequency Score = ${frequency}
-Duration Score = ${duration}
+نتائج التكرار والمدة
+درجة التكرار = ${frequency}
+درجة المدة = ${duration}
 
-Physical Concomitants
-${physicalText || "None selected"}
-Physical Score = ${physicalScore}
+المظاهر الجسدية المصاحبة
+${physicalText || "لا توجد اختيارات"}
+درجة المظاهر الجسدية = ${physicalScore}
 
-Speech Naturalness
-Scale Value = ${document.getElementById("naturalnessScale")?.value || ""}
-Notes = ${document.getElementById("naturalnessNotes")?.value || ""}
+طبيعية الكلام
+قيمة المقياس = ${document.getElementById("naturalnessScale")?.value || ""}
+ملاحظات = ${document.getElementById("naturalnessNotes")?.value || ""}
 
-Total Score = ${totalScore}
-Percentile = ${percentile}
-Severity = ${severity}
+المجموع الكلي = ${totalScore}
+النسبة المئوية = ${percentile}
+شدة التلعثم = ${severity}
+
 SLP. Ahmad Ghanem
 `;
-
   document.getElementById("report").value = reportContent;
 }
 
-// ======= Auto-update triggers =======
-
-// Frequency/duration recalculation triggers report update
+// ======= تحديث تلقائي عند التغيير =======
 document.getElementById("text1")?.addEventListener("input", calculateFrequencyDuration);
 document.getElementById("text2")?.addEventListener("input", calculateFrequencyDuration);
 
-// Physical concomitants buttons
 document.querySelectorAll(`#physical-concomitants button`).forEach(btn => btn.addEventListener("click", updateFinalReport));
 
-// Naturalness slider
 document.getElementById("naturalnessScale")?.addEventListener("input", updateFinalReport);
 
-// ======= Download Report =======
+// ======= تحميل التقرير =======
 function downloadReport() {
   const content = document.getElementById("report")?.value || "";
-  if (!content) return alert("Report is empty!");
+  if (!content) return alert("التقرير فارغ!");
   const blob = new Blob([content], {type:"text/plain"});
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = "report.txt";
+  link.download = "التقرير.txt";
   link.click();
 }

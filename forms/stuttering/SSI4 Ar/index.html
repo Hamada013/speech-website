@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مؤشر شدة التأتأة SSI-4</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-logo">
+    <img src="images/logo.png" alt="الشعار">
+  </div>
+  <h1>مؤشر شدة التأتأة SSI-4</h1>
+  <button class="btn-info" onclick="showTestInfo('page')">i</button>
+    <button class="btn-arabic" onclick="window.location.href='../SSI4/index.html'">En</button>
+
+</header>
+
+<div id="info-box-page" class="info-box hidden">
+  <p>تُستخدم هذه القائمة لتقييم المهارات السمعية لدى الأطفال والبالغين. يمكن تسجيل الملاحظات وقياس التكرار، المدة، وطبيعية الكلام.</p>
+  <button onclick="closeInfoBox('page')">إغلاق</button>
+</div>
+
+<div class="container">
+
+  <!-- القسم 0: المعلومات التعريفية -->
+  <section id="section0" class="info-section">
+    <h2>المعلومات التعريفية</h2>
+    <div class="info-grid">
+      <div class="info-field"><label for="name">الاسم</label><input type="text" id="name" placeholder="أدخل الاسم"></div>
+      <div class="info-field"><label for="grade">الصف الدراسي</label><input type="text" id="grade" placeholder="أدخل الصف الدراسي"></div>
+      <div class="info-field"><label for="testDate">تاريخ الاختبار</label><input type="date" id="testDate"></div>
+      <div class="info-field"><label for="school">المدرسة</label><input type="text" id="school" placeholder="أدخل اسم المدرسة"></div>
+      <div class="info-field"><label for="dob">تاريخ الميلاد</label><input type="date" id="dob" onchange="calculateAge()"></div>
+      <div class="info-field"><label for="age">العمر</label><input type="text" id="age" readonly></div>
+      <div class="info-field">
+        <label>الفئة</label>
+        <div id="categoryBtns" class="btn-group">
+          <button type="button" onclick="selectOption('category','Preschool',this)">مرحلة ما قبل المدرسة</button>
+          <button type="button" onclick="selectOption('category','School Age',this)">السن المدرسي</button>
+          <button type="button" onclick="selectOption('category','Adult',this)">بالغ</button>
+        </div>
+        <input type="hidden" id="category" name="category">
+      </div>
+      <div class="info-field">
+        <label>الجنس</label>
+        <div id="genderBtns" class="btn-group">
+          <button type="button" onclick="selectOption('gender','Female',this)">أنثى</button>
+          <button type="button" onclick="selectOption('gender','Male',this)">ذكر</button>
+        </div>
+        <input type="hidden" id="gender" name="gender">
+      </div>
+      <div class="info-field"><label>المقيّم</label><input type="text" id="examiner" placeholder="أدخل اسم المقيّم"></div>
+      <div class="info-field">
+        <label>حالة القراءة</label>
+        <div id="readerBtns" class="btn-group">
+          <button type="button" onclick="selectOption('reader','Reader',this)">قارئ</button>
+          <button type="button" onclick="selectOption('reader','Nonreader',this)">غير قارئ</button>
+        </div>
+        <input type="hidden" id="reader" name="reader">
+      </div>
+    </div>
+  </section>
+
+  <!-- قسم الموارد -->
+  <section id="resources-section">
+    <h2 style="display:flex; align-items:center; gap:8px;">
+      الموارد
+      <button class="btn-info" onclick="showTestInfo('resources')">i</button>
+    </h2>
+
+    <div id="info-box-resources" class="info-box hidden">
+      <p>يعرض هذا القسم جميع الموارد المتاحة المتعلقة بالجلسة. اضغط على أي زر لعرض أو تنزيل المورد المقابل.</p>
+      <button onclick="closeInfoBox('resources')">إغلاق</button>
+    </div>
+
+    <div class="resource-buttons">
+      <button data-img="images/preschool.png">مرحلة ما قبل المدرسة</button>
+      <button data-img="images/school.png">السن المدرسي</button>
+      <button data-img="images/adult.png">بالغ</button>
+      <p> </p>
+      <button data-img="images/reader1.png">📖 1</button>
+      <button data-img="images/reader2.png">📖 2</button>
+      <button data-img="images/reader3.png">📖 3</button>
+      <button data-img="images/reader4.png">📖 4</button>
+      <button data-img="images/reader5.png">📖 5</button>
+      <p> </p>
+      <button data-img="images/reader6.png">📖 6</button>
+      <button data-img="images/reader7.png">📖 7</button>
+      <button data-img="images/reader8.png">📖 8</button>
+      <button data-img="images/reader9.png">📖 9</button>
+      <button data-img="images/reader10.png">📖 10</button>
+    </div>
+  </section>
+
+  <!-- صندوق الصور العائم -->
+  <div id="floating-box" class="hidden">
+    <img id="resource-img" src="" alt="المورد">
+  </div>
+
+  <!-- قسم مسجل الصوت -->
+  <section id="section-audio" class="info-section">
+    <h2>مسجل الصوت</h2>
+    <div class="card">
+      <div class="controls">
+        <button id="recordBtn">🎙 تسجيل</button>
+        <button id="stopBtn" disabled>⏹ إيقاف</button>
+        <span id="timer">0 مللي ثانية</span>
+      </div>
+
+      <canvas id="waveform" width="600" height="100"></canvas>
+
+      <div class="audio-player">
+        <button class="play-btn" id="playBtn">⏯</button>
+        <div class="progress-container" id="progressContainer">
+          <div class="progress" id="progress" style="position: absolute; right: 0; top: 0; height: 100%; width: 0%; border-radius: 6px;"></div>
+        </div>
+        <span class="current-time" id="currentTime">0.00 ث</span>
+      </div>
+
+      <textarea id="transcript" placeholder="اكتب الملاحظات أو انقل النص الصوتي..." rows="5"></textarea>
+    </div>
+  </section>
+
+  <!-- قسم التكرار والمدة -->
+  <section id="section-frequency" class="info-section">
+    <h2 style="display:flex; align-items:center; gap:8px;">
+      التكرار والمدة
+      <button class="btn-info" onclick="showTestInfo('frequency')">i</button>
+    </h2>
+
+    <div id="info-box-frequency" class="info-box hidden">
+      <p>في هذا القسم، يمكنك لصق عينات الكلام أو القراءة لحساب مقاييس التكرار والمدة. اختر نوع العينة لكل نص واضغط زر الحساب لعرض النتائج.</p>
+      <button onclick="closeInfoBox('frequency')">إغلاق</button>
+    </div>
+
+    <div class="card">
+      <label for="text1">النص 1</label>
+      <textarea id="text1" rows="5" placeholder="ألصق هنا عينة النص الأولى"></textarea>
+      <div class="btn-group">
+        <span>نوع العينة:</span>
+        <button type="button" onclick="selectSampleType('text1','Reader', this)">قارئ</button>
+        <button type="button" onclick="selectSampleType('text1','Nonreader', this)">غير قارئ</button>
+        <button type="button" onclick="selectSampleType('text1','Speaking / Readers', this)">متحدث / قارئ</button>
+      </div>
+
+      <label for="text2">النص 2 (اختياري)</label>
+      <textarea id="text2" rows="5" placeholder="ألصق هنا عينة النص الثانية"></textarea>
+      <div class="btn-group">
+        <span>نوع العينة:</span>
+        <button type="button" onclick="selectSampleType('text2','Reader', this)">قارئ</button>
+        <button type="button" onclick="selectSampleType('text2','Nonreader', this)">غير قارئ</button>
+        <button type="button" onclick="selectSampleType('text2','Speaking / Readers', this)">متحدث / قارئ</button>
+      </div>
+
+      <button type="button" onclick="calculateFrequencyDuration()">احسب التكرار والمدة</button>
+    </div>
+
+    <div id="results" class="card" style="display:none; margin-top:15px;">
+      <h3>النتائج</h3>
+      <pre id="results-output"></pre>
+    </div>
+  </section>
+
+  <!-- القسم 3: المظاهر الجسدية المصاحبة -->
+  <section id="physical-concomitants" class="info-section">
+    <h2 style="display:flex; align-items:center; gap:8px;">
+      المظاهر الجسدية المصاحبة
+      <button class="btn-info" onclick="showTestInfo('physical')">i</button>
+    </h2>
+
+    <div id="info-box-physical" class="info-box hidden">
+      <p>يمكنك تسجيل المظاهر الجسدية المصاحبة التي لوحظت أثناء الكلام. اختر نوع الملاحظة لكل فئة. يمكن اختيار نوع واحد فقط لكل فئة.</p>
+      <button onclick="closeInfoBox('physical')">إغلاق</button>
+    </div>
+
+    <div class="card">
+      <div class="physical-item" data-category="Distracting Sounds">
+        <span class="category-title">الأصوات المشتتة:</span>
+        <div class="type-buttons">
+          <button onclick="selectType('Distracting Sounds','تنفس صاخب')">تنفس صاخب</button>
+          <button onclick="selectType('Distracting Sounds','صفير')">صفير</button>
+          <button onclick="selectType('Distracting Sounds','شم')">شم</button>
+          <button onclick="selectType('Distracting Sounds','نفخ')">نفخ</button>
+          <button onclick="selectType('Distracting Sounds','أصوات طقطقة')">أصوات طقطقة</button>
+          <button onclick="promptOther('Distracting Sounds')">أخرى</button>
+        </div>
+        <div class="rating">
+          الدرجة: 
+          <button onclick="setScore('Distracting Sounds',0)">0</button>
+          <button onclick="setScore('Distracting Sounds',1)">1</button>
+          <button onclick="setScore('Distracting Sounds',2)">2</button>
+          <button onclick="setScore('Distracting Sounds',3)">3</button>
+          <button onclick="setScore('Distracting Sounds',4)">4</button>
+          <button onclick="setScore('Distracting Sounds',5)">5</button>
+        </div>
+      </div>
+
+      <div class="physical-item" data-category="Facial Grimaces">
+        <span class="category-title">تجهمات الوجه:</span>
+        <div class="type-buttons">
+          <button onclick="selectType('Facial Grimaces','رعشة الفك')">رعشة الفك</button>
+          <button onclick="selectType('Facial Grimaces','بروز اللسان')">بروز اللسان</button>
+          <button onclick="selectType('Facial Grimaces','ضغط الشفاه')">ضغط الشفاه</button>
+          <button onclick="selectType('Facial Grimaces','توتر عضلات الفك')">توتر عضلات الفك</button>
+          <button onclick="promptOther('Facial Grimaces')">أخرى</button>
+        </div>
+        <div class="rating">
+          الدرجة: 
+          <button onclick="setScore('Facial Grimaces',0)">0</button>
+          <button onclick="setScore('Facial Grimaces',1)">1</button>
+          <button onclick="setScore('Facial Grimaces',2)">2</button>
+          <button onclick="setScore('Facial Grimaces',3)">3</button>
+          <button onclick="setScore('Facial Grimaces',4)">4</button>
+          <button onclick="setScore('Facial Grimaces',5)">5</button>
+        </div>
+      </div>
+
+      <div class="physical-item" data-category="Head Movements">
+        <span class="category-title">حركات الرأس:</span>
+        <div class="type-buttons">
+          <button onclick="selectType('Head Movements','خلفي')">خلفي</button>
+          <button onclick="selectType('Head Movements','أمامي')">أمامي</button>
+          <button onclick="selectType('Head Movements','الالتفاف بعيداً')">الالتفاف بعيداً</button>
+          <button onclick="selectType('Head Movements','ضعف التواصل البصري')">ضعف التواصل البصري</button>
+          <button onclick="selectType('Head Movements','النظر المستمر حوله')">النظر المستمر حوله</button>
+          <button onclick="promptOther('Head Movements')">أخرى</button>
+        </div>
+        <div class="rating">
+          الدرجة: 
+          <button onclick="setScore('Head Movements',0)">0</button>
+          <button onclick="setScore('Head Movements',1)">1</button>
+          <button onclick="setScore('Head Movements',2)">2</button>
+          <button onclick="setScore('Head Movements',3)">3</button>
+          <button onclick="setScore('Head Movements',4)">4</button>
+          <button onclick="setScore('Head Movements',5)">5</button>
+        </div>
+      </div>
+
+      <div class="physical-item" data-category="Movements of the Extremities">
+        <span class="category-title">حركات الأطراف:</span>
+        <div class="type-buttons">
+          <button onclick="selectType('Movements of the Extremities','حركة الذراع واليد')">حركة الذراع واليد</button>
+          <button onclick="selectType('Movements of the Extremities','اليدين قرب الوجه')">اليدين قرب الوجه</button>
+          <button onclick="selectType('Movements of the Extremities','حركة الجذع')">حركة الجذع</button>
+          <button onclick="selectType('Movements of the Extremities','حركات الساق')">حركات الساق</button>
+          <button onclick="selectType('Movements of the Extremities','نقر أو تأرجح القدم')">نقر أو تأرجح القدم</button>
+          <button onclick="promptOther('Movements of the Extremities')">أخرى</button>
+        </div>
+        <div class="rating">
+          الدرجة: 
+          <button onclick="setScore('Movements of the Extremities',0)">0</button>
+          <button onclick="setScore('Movements of the Extremities',1)">1</button>
+          <button onclick="setScore('Movements of the Extremities',2)">2</button>
+          <button onclick="setScore('Movements of the Extremities',3)">3</button>
+          <button onclick="setScore('Movements of the Extremities',4)">4</button>
+          <button onclick="setScore('Movements of the Extremities',5)">5</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="physical-results" class="card" style="margin-top:15px; display:none;">
+      <h3>النتائج</h3>
+      <pre id="physical-output"></pre>
+    </div>
+  </section>
+
+  <!-- القسم 4: طبيعية الكلام -->
+  <section id="section-naturalness" class="info-section">
+    <h2>
+      طبيعية الكلام
+      <button class="btn-info" onclick="showTestInfo('naturalness')">i</button>
+    </h2>
+
+    <div id="info-box-naturalness" class="info-box hidden">
+      <p>بعد تقييم عينة الكلام مباشرةً، تشير طبيعية الكلام إلى مدى اقتراب كلام المتحدث من المتحدثين الطبيعيين من نفس الجنس والعمر واللهجة. استخدم المقياس التالي: 1 = طبيعي للغاية؛ 9 = غير طبيعي للغاية.</p>
+      <button onclick="closeInfoBox('naturalness')">إغلاق</button>
+    </div>
+
+    <div class="card">
+      <label for="naturalnessNotes">الملاحظات / الملاحظات</label>
+      <textarea id="naturalnessNotes" placeholder="أدخل ملاحظات طبيعية الكلام..." rows="4"></textarea>
+    </div>
+
+    <div class="card">
+      <label for="naturalnessScale">مقياس طبيعية الكلام</label>
+      <div class="scale-container">
+        <span class="scale-label">طبيعي للغاية</span>
+        <input type="range" id="naturalnessScale" min="1" max="9" step="1" value="5">
+        <span class="scale-label">غير طبيعي للغاية</span>
+      </div>
+
+      <div class="scale-numbers">
+        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+        <span>6</span><span>7</span><span>8</span><span>9</span>
+      </div>
+
+      <p>طبيعية الكلام = <span id="naturalnessValue">5</span></p>
+    </div>
+  </section>
+
+<!-- Section 5: Final Report -->
+<section id="section-report" class="info-section">
+  <h2 style="display:flex; align-items:center; gap:8px;">
+    التقرير النهائي
+    <button class="btn-info" onclick="showTestInfo('report')">i</button>
+  </h2>
+
+  <div id="info-box-report" class="info-box hidden">
+   <p>
+    يقوم هذا القسم بتوليد التقرير النهائي تلقائياً، حيث يجمع النتائج من قسم التكرار والمدة، 
+    الظواهر الجسدية المصاحبة، وطبيعية الكلام. يتم حساب النسبة المئوية وشدة التلعثم بناءً على 
+    الفئة المحددة: مرحلة ما قبل المدرسة، سن المدرسة، أو البالغين.
+  </p>
+    <button onclick="closeInfoBox('report')">Close</button>
+  </div>
+
+  <textarea id="report" readonly rows="15" placeholder="Final report will appear here..."></textarea>
+  <button class="btn-download" onclick="downloadReport()">تحميل التقرير</button>
+</section>
+
+</div>
+
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -6,8 +6,8 @@ body {
   background-color: #f0f4f8;
   margin: 0;
   padding: 0;
-  direction: ltr;
-  text-align: left;
+  direction: rtl; /* Corrected typo: was rlt */
+  text-align: right;
   color: #1f2937;
   font-size: 18px;
 }
@@ -60,20 +60,32 @@ h3 {
   box-shadow: 0 6px 25px rgba(0,0,0,0.08);
   margin: 20px auto;
   max-width: 950px;
+  direction: ltr; /* Keeps header layout left-to-right */
 }
 
-.page-header h1 {
-  font-size: 28px;
-  color: #1e3a8a;
-  margin: 0;
-  flex: 1;
-  text-align: center;
+.header-logo {
+  display: flex;
+  align-items: center;
 }
 
 .header-logo img {
   width: 50px;
   height: 50px;
   object-fit: contain;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  color: #1e3a8a;
+  margin: 0 auto;
+  text-align: center;
+  flex: 1;
+}
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .page-header .btn-info {
@@ -85,8 +97,6 @@ h3 {
   height: 50px;
   font-size: 20px;
   cursor: pointer;
-  flex-shrink: 0;
-   margin-right: 12px;
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
@@ -96,7 +106,7 @@ h3 {
 }
 
 .page-header .btn-arabic {
-  background: #81D8D0 ; /* Baby blue */
+  background: #81D8D0; /* Soft teal */
   color: #fff;
   border-radius: 8px;
   border: none;
@@ -104,10 +114,9 @@ h3 {
   height: 50px;
   font-size: 18px;
   cursor: pointer;
-  flex-shrink: 0;
-  display: flex;                /* Flexbox for alignment */
-  align-items: center;          /* Vertical centering */
-  justify-content: center;      /* Horizontal centering */
+  display: flex;
+  align-items: center;      /* Center vertically */
+  justify-content: center;  /* Center horizontally */
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
@@ -1147,6 +1156,10 @@ button.selected,
   font-size: 0.9rem;
   color: #475569;
   margin-bottom: 8px;
+}
+.info-box-content {
+  direction: rtl;
+  text-align: right;
 }
 
 /* Close button inside the modal */

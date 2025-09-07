@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تقييم الصوت</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-logo">
+    <img src="../../../images/logo.png" alt="شعار">
+  </div>
+  <h1>تقييم الصوت</h1>
+  <div class="header-buttons">
+        <button class="btn-info" onclick="showTestInfo()">i</button>
+    <button class="btn-arabic" onclick="window.location.href='../assessment/index.html'">En</button>
+  </div>
+</header>
+
+<!-- مربع المعلومات لتقييم الصوت -->
+<div id="info-overlay" class="info-overlay hidden" onclick="overlayClick(event)">
+  <div id="info-box-page" class="info-box-content">
+    <h2>دليل تقييم الصوت</h2>
+    <p>
+      يقوم تقييم الصوت الشامل بتقييم مجالات متعددة لتحديد اضطرابات الصوت بدقة، 
+      وإنشاء مقاييس أساسية، وتطوير خطط علاجية قائمة على الأدلة. 
+      يجمع التقييم بين <strong>التاريخ المرضي، التقييمات الإدراكية، 
+      البيانات الصوتية والديناميكية الهوائية، واختبار القابلية للاستثارة</strong>.
+    </p>
+
+    <h3>المكونات الأساسية</h3>
+    <ul>
+      <li><strong>التاريخ المرضي:</strong> الشكاوى الصوتية، البداية/المدة، استخدام الصوت المهني، عوامل نمط الحياة، والتاريخ الطبي أو الجراحي ذو الصلة.</li>
+      <li><strong>التقييم الإدراكي:</strong> مقاييس GRBAS أو CAPE-V للتقييم الموحد لجودة الصوت.</li>
+      <li><strong>التحليل الصوتي:</strong> التردد الأساسي (F0)، التذبذب (jitter)، الاهتزاز (shimmer)، نسبة الضوضاء إلى النغمات.</li>
+      <li><strong>القياسات الفسيولوجية:</strong> زمن الصوت الأقصى (MPT)، نسبة s/z، تدفق الهواء، وتقديرات الضغط تحت المزمار.</li>
+      <li><strong>فحص الفم والجهاز النطقي:</strong> تقييم أعضاء النطق، ارتفاع الحنجرة، وأنماط الرنين.</li>
+      <li><strong>اختبار القابلية للاستثارة:</strong> تجارب تقنيات علاجية لقياس إمكانات العلاج.</li>
+    </ul>
+
+    <h3>البيانات المعيارية</h3>
+    <ul>
+      <li><strong>زمن الصوت الأقصى (MPT):</strong>
+        <br>• الذكور: 25–15 ثانية
+        <br>• الإناث: 20–14 ثانية
+        <br>• الأطفال (10–6 سنوات): 12–8 ثانية
+      </li>
+      <li><strong>التردد الأساسي للكلام (F0):</strong>
+        <br>• الذكور: 180–85 هرتز
+        <br>• الإناث: 255–165 هرتز
+        <br>• الأطفال: 300–250 هرتز
+      </li>
+      <li><strong>تقييمات GRBAS:</strong>
+        <br>0 = طبيعي، 1 = طفيف، 2 = متوسط، 3 = شديد
+      </li>
+    </ul>
+
+    <h3>المراجع</h3>
+    <ul class="references">
+      <li>Boone DR, McFarlane SC, Von Berg SL, Zraick RI. <em>The Voice and Voice Therapy</em>, الإصدار العاشر. Pearson, 2020.</li>
+      <li>American Speech-Language-Hearing Association (ASHA). Voice Assessment Guidelines, 2023.</li>
+      <li>Behrman A. <em>Speech and Voice Science</em>, الإصدار الثالث. Plural Publishing, 2017.</li>
+      <li>Kempster GB, et al. CAPE-V: A standardized tool for perceptual voice assessment. AJSLP, 2009.</li>
+    </ul>
+
+    <button class="btn-close" onclick="closeInfoBox()">إغلاق</button>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- القسم 0: المعلومات الشخصية -->
+<section id="section0" class="info-section">
+  <h2>المعلومات الشخصية</h2>
+  <div class="info-grid">
+
+    <div class="info-field">
+      <label for="name">الاسم</label>
+      <input type="text" id="name" placeholder="أدخل الاسم">
+    </div>
+
+    <div class="info-field">
+      <label for="dob">تاريخ الميلاد / العمر</label>
+      <div class="dob-group">
+        <input type="date" id="dob" onchange="calculateAge()">
+        <input type="text" id="age" readonly placeholder="العمر">
+      </div>
+    </div>
+
+<div class="info-field">
+  <label>الجنس</label>
+  <div class="button-group" id="genderButtons">
+    <button type="button" class="btn-gender" data-value="أنثى">أنثى</button>
+    <button type="button" class="btn-gender" data-value="ذكر">ذكر</button>
+    <button type="button" class="btn-gender" data-value="أخرى">أخرى</button>
+  </div>
+  <!-- حقل مخفي لتخزين الجنس المحدد -->
+  <input type="hidden" id="gender" value="">
+</div>
+
+
+    <div class="info-field">
+      <label for="testDate">تاريخ التقييم</label>
+      <input type="date" id="testDate">
+    </div>
+
+    <div class="info-field">
+      <label for="examiner">المقيّم</label>
+      <input type="text" id="examiner" placeholder="أدخل اسم المقيّم">
+    </div>
+
+    <div class="info-field">
+      <label for="referralSource">مصدر الإحالة</label>
+      <input type="text" id="referralSource" placeholder="أدخل مصدر الإحالة">
+    </div>
+
+    <div class="info-field">
+      <label for="occupation">المهنة</label>
+      <input type="text" id="occupation" placeholder="أدخل المهنة">
+    </div>
+
+    <div class="info-field">
+      <label for="languages">اللغة/اللغات المتحدث بها</label>
+      <input type="text" id="languages" placeholder="أدخل اللغة/اللغات">
+    </div>
+  </div>
+
+  <h3 class="sub-header">سبب الإحالة</h3>
+  <div class="referral-section">
+    <div class="info-field">
+      <label for="primaryComplaint">الشكوى الرئيسية</label>
+      <textarea id="primaryComplaint" placeholder="مثل: بحة صوت، إرهاق صوتي، فقدان الصوت، تغيرات في النغمة" rows="2"></textarea>
+    </div>
+
+    <div class="info-field">
+      <label for="onsetCourse">البداية والتطور</label>
+      <textarea id="onsetCourse" placeholder="مفاجئ، تدريجي، عرَضي، تقدمي" rows="2"></textarea>
+    </div>
+
+    <div class="info-field">
+      <label for="impactDailyLife">التأثير على الحياة اليومية</label>
+      <textarea id="impactDailyLife" placeholder="العمل، التواصل، التفاعلات الاجتماعية" rows="2"></textarea>
+    </div>
+  </div>
+</section>
+  <!-- القسم 1: التاريخ الطبي والصوتي -->
+  <section id="section1" class="info-section">
+    <h2>التاريخ الطبي والصوتي</h2>
+    <div class="history-grid">
+      <div class="history-field">
+        <label for="medicalConditions">الحالات الطبية</label>
+        <textarea id="medicalConditions" placeholder="مثل: ارتجاع المريء، مشاكل الغدة الدرقية، الحساسية، الحالات العصبية" rows="2"></textarea>
+      </div>
+
+      <div class="history-field">
+        <label for="currentMedications">الأدوية الحالية</label>
+        <textarea id="currentMedications" placeholder="قائمة الأدوية الحالية" rows="2"></textarea>
+      </div>
+
+      <div class="history-field">
+        <label for="surgicalHistory">التاريخ الجراحي</label>
+        <textarea id="surgicalHistory" placeholder="خاصة جراحات الأذن والأنف والحنجرة، الغدة الدرقية، القلب" rows="2"></textarea>
+      </div>
+
+      <div class="history-field">
+        <label for="previousVoice">اضطرابات صوتية سابقة / علاج</label>
+        <textarea id="previousVoice" placeholder="وصف التشخيصات أو العلاج السابق" rows="2"></textarea>
+      </div>
+
+      <div class="history-field">
+        <label for="hydrationLifestyle">العادات الغذائية ونمط الحياة</label>
+        <textarea id="hydrationLifestyle" placeholder="استهلاك الماء اليومي، استخدام الكافيين، إلخ." rows="2"></textarea>
+      </div>
+
+      <div class="history-field">
+        <label for="allergiesSinus">الحساسية / مشاكل الجيوب الأنفية</label>
+        <textarea id="allergiesSinus" placeholder="الحساسية الموسمية، التهاب الجيوب الأنفية، احتقان الأنف" rows="2"></textarea>
+      </div>
+
+      <div class="history-field">
+        <label for="smokingAlcohol">التدخين / تعاطي الكحول</label>
+        <textarea id="smokingAlcohol" placeholder="تكرار الاستخدام ومدة الاستخدام" rows="2"></textarea>
+      </div>
+
+      <div class="history-field">
+        <label for="vocalMisuse">أنماط الإفراط في استخدام الصوت أو سوء الاستخدام</label>
+        <textarea id="vocalMisuse" placeholder="الصراخ، التحدث المفرط، الغناء بدون تقنية مناسبة" rows="2"></textarea>
+      </div>
+    </div>
+  </section>
+<!-- القسم 2: فحص الفم والجهاز النطقي -->
+<section id="section2" class="oral-section">
+  <h2 class="section-title">
+    فحص الفم والجهاز النطقي
+    <button class="btn-info">!</button>
+  </h2>
+
+  <div class="info-box">
+      <p>
+        يُقيّم هذا القسم الجهاز النطقي بما في ذلك الشفاه، اللسان، الحنك، ارتفاع الحنجرة، والرنين.
+      </p>
+      <p>
+        <strong>تعليمات التقييم:</strong><br>
+        <em>البالغون:</em> اطلب من العميل أداء حركات الفم، رفع اللسان، الابتسام، تضمين الشفاه، وفتح/إغلاق الفك. لاحظ ارتفاع الحنجرة أثناء البلاد وإصدار الصوت. تحقق من الرنين أثناء مد أصوات العلة أو الكلام.<br>
+        <em>الأطفال:</em> استخدم مهامًا مرحة مثل نفخ الفقاعات، تقليد أصوات الحيوانات، قول "آه" لملاحظة تراكيب الفم والرنين.
+      </p>
+      <button class="btn-close">إغلاق</button>
+    </div>
+    <div class="history-grid">
+      <div class="history-field">
+        <label>الشفاه</label>
+        <div class="button-group">
+          <button class="btn">طبيعي</button>
+          <button class="btn">مُضعَف</button>
+        </div>
+        <input type="text" placeholder="اختياري: أضف ملاحظات أو تفاصيل">
+      </div>
+
+      <div class="history-field">
+        <label>اللسان</label>
+        <div class="button-group">
+          <button class="btn">طبيعي</button>
+          <button class="btn">مُضعَف</button>
+        </div>
+        <input type="text" placeholder="اختياري: أضف ملاحظات أو تفاصيل">
+      </div>
+
+      <div class="history-field">
+        <label>الحنك</label>
+        <div class="button-group">
+          <button class="btn">طبيعي</button>
+          <button class="btn">مُضعَف</button>
+        </div>
+        <input type="text" placeholder="اختياري: أضف ملاحظات أو تفاصيل">
+      </div>
+
+      <div class="history-field">
+        <label>ارتفاع الحنجرة</label>
+        <div class="button-group">
+          <button class="btn">طبيعي</button>
+          <button class="btn">مُضعَف</button>
+        </div>
+        <input type="text" placeholder="اختياري: أضف ملاحظات أو تفاصيل">
+      </div>
+
+      <div class="history-field">
+        <label>الرنين (فموي vs أنفي)</label>
+        <div class="button-group">
+          <button class="btn">طبيعي</button>
+          <button class="btn">فرط الرنين الأنفي</button>
+          <button class="btn">نقص الرنين الأنفي</button>
+        </div>
+        <input type="text" placeholder="اختياري: أضف ملاحظات أو تفاصيل">
+      </div>
+    </div>
+  </section>
+
+<!-- القسم 3: تقييم التنفس وإصدار الصوت -->
+<section id="section3" class="info-section">
+  <h2 class="section-title">
+    تقييم التنفس وإصدار الصوت
+    <button class="btn-info">!</button>
+  </h2>
+  <div class="info-box">
+      <p>
+        يُقيّم هذا القسم الدعم التنفسي والتحكم في إصدار الصوت.
+      </p>
+      <p>
+        <strong>تعليمات التقييم:</strong><br>
+        <em>البالغون:</em> اطلب من العميل أخذ نفس عميق ومد صوت /a/ أو قراءة فقرة. لاحظ دعم التنفس، التقسيم العبارات، مستوى الصوت، وبدء إصدار الصوت.<br>
+        <em>الأطفال:</em> استخدم مهامًا مرحة: نفخ الفقاعات، مد أصوات /m/ أو /a/، العد بصوت عالٍ، أو تكرار كلمات أثناء ملاحظة التحكم في التنفس والصوت.
+      </p>
+    <button class="btn-close">إغلاق</button>
+  </div>
+
+
+  <div class="history-grid">
+    <div class="history-field">
+      <label>نوع التنفس</label>
+      <div class="button-group">
+        <button class="btn">ترقوي</button>
+        <button class="btn">صدري</button>
+        <button class="btn">حجابي</button>
+      </div>
+      <input type="text" placeholder="اختياري: أضف ملاحظات">
+    </div>
+    <div class="history-field">
+      <label>انتظام نمط التنفس</label>
+      <div class="button-group">
+        <button class="btn">منتظم</button>
+        <button class="btn">غير منتظم</button>
+      </div>
+      <input type="text" placeholder="اختياري: أضف ملاحظات">
+    </div>
+    <div class="history-field">
+      <label>تنسيق التنفس مع الكلام</label>
+      <div class="button-group">
+        <button class="btn">كافي</button>
+        <button class="btn">غير كافي</button>
+      </div>
+      <input type="text" placeholder="اختياري: أضف ملاحظات">
+    </div>
+    <div class="history-field">
+      <label>نوع بدء إصدار الصوت</label>
+      <div class="button-group">
+        <button class="btn">قاسي</button>
+        <button class="btn">لين</button>
+        <button class="btn">متوازن</button>
+      </div>
+      <input type="text" placeholder="اختياري: أضف ملاحظات">
+    </div>
+    <div class="history-field">
+      <label>مستوى الصوت والإسقاط</label>
+      <div class="button-group">
+        <button class="btn">طبيعي</button>
+        <button class="btn">منخفض</button>
+        <button class="btn">مرتفع</button>
+      </div>
+      <input type="text" placeholder="اختياري: أضف ملاحظات">
+    </div>
+    <div class="history-field">
+      <label>إجهاد الصوت / الجهد</label>
+      <div class="button-group">
+        <button class="btn">لا يوجد</button>
+        <button class="btn">خفيف</button>
+        <button class="btn">متوسط</button>
+        <button class="btn">شديد</button>
+      </div>
+      <input type="text" placeholder="اختياري: أضف ملاحظات">
+    </div>
+  </div>
+</section>
+
+<!-- القسم 4: التقييم الإدراكي للصوت (مقياس GRBAS) -->
+<section id="section4" class="info-section">
+  <h2 class="section-title">
+    التقييم الإدراكي للصوت – مقياس GRBAS
+    <button class="btn-info">!</button>
+  </h2>
+
+  <div class="info-box">
+    <p>
+      مقياس GRBAS هو أداة إدراكية موحدة تُستخدم لتقييم جودة الصوت عبر خمسة معايير:
+    </p>
+    <ul>
+      <li>G – درجة البحة</li>
+      <li>R – الخشونة</li>
+      <li>B – النفاخية</li>
+      <li>A – الضعف (الوهن)</li>
+      <li>S – الإجهاد</li>
+    </ul>
+    <p>يتم تقييم كل معيار على مقياس من 0-3 (0 = طبيعي، 3 = شديد).</p>
+    <button class="btn-close">إغلاق</button>
+  </div>
+
+  <div class="grbas-grid">
+    <div class="grbas-item">
+      <label>G (الدرجة)</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+      </div>
+    </div>
+
+    <div class="grbas-item">
+      <label>R (الخشونة)</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+      </div>
+    </div>
+
+    <div class="grbas-item">
+      <label>B (النفاخية)</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+      </div>
+    </div>
+
+    <div class="grbas-item">
+      <label>A (الوهن)</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+      </div>
+    </div>
+
+    <div class="grbas-item">
+      <label>S (الإجهاد)</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- القسم 5: القياسات الصوتية والديناميكية الهوائية -->
+<section id="section5" class="info-section">
+  <h2>القياسات الصوتية والديناميكية الهوائية</h2>
+  <div class="history-grid">
+
+    <!-- التردد الأساسي (F0) -->
+    <div class="history-field">
+      <label>التردد الأساسي (F0)</label>
+      <button class="btn-info" data-id="f0">i</button>
+      <div id="info-box-f0" class="info-box">
+        <p>
+          <strong>التعليمات:</strong> اطلب من المريض مد صوت العلة /a/ بنغمة مريحة.<br>
+          <strong>المهام حسب الفئة العمرية:</strong><br>
+          - الأطفال (10-7 سنوات): مد صوت /a/ لمدة 5-3 ثوانٍ<br>
+          - المراهقون (15-11 سنة): مد صوت /a/ لمدة 7-5 ثوانٍ<br>
+          - البالغات الإناث: مد صوت /a/ لمدة 10-7 ثوانٍ<br>
+          - البالغون الذكور: مد صوت /a/ لمدة 10-7 ثوانٍ<br>
+          <strong>المعايير (هرتز):</strong><br>
+          الأطفال: 400-250<br>
+          المراهقون: 350-200<br>
+          البالغون الذكور: 150-80<br>
+          البالغات الإناث: 250-175
+        </p>
+        <button class="btn-close">إغلاق</button>
+      </div>
+      <div class="button-group">
+        <button class="btn">طبيعي</button>
+        <button class="btn">منخفض</button>
+        <button class="btn">مرتفع</button>
+      </div>
+      <input type="text" placeholder="اختياري: أدخل قيمة F0 الدقيقة">
+    </div>
+
+    <!-- المدى النغمي -->
+<div class="history-field">
+  <label>المدى النغمي</label>
+  <button class="btn-info" data-id="pitch-range">i</button>
+  <div id="info-box-pitch-range" class="info-box">
+    <p>
+      <strong>التعليمات:</strong> اطلب من العميل الانتقال من أدنى نغمة إلى أعلى نغمة على صوت علة مستمر (مثل /آه/). 
+      القياس باستخدام بيانو، تطبيق، أو برنامج تحليل صوتي.<br><br>
+      
+      <strong>المعايير:</strong><br>
+      - البالغون: 2 إلى 2.5 أوكتاف (≈ 24–30 نصف نغمة)<br>
+      - الأطفال: عادةً أوسع من البالغين بسبب صغر حجم تراكيب الحنجرة
+    </p>
+    <button class="btn-close">إغلاق</button>
+  </div>
+  <div class="button-group">
+    <button class="btn">طبيعي</button>
+    <button class="btn">محدود</button>
+  </div>
+  <input type="text" placeholder="اختياري: أدخل المدى النغمي (مثال: 2.3 أوكتاف)">
+</div>
+
+
+    <!-- نسبة S/Z -->
+    <div class="history-field">
+      <label>نسبة S/Z</label>
+      <button class="btn-info" data-id="sz">i</button>
+      <div id="info-box-sz" class="info-box">
+        <p>
+          <strong>التعليمات:</strong> مد صوتي /s/ و /z/ لأطول مدة ممكنة. قسم مدة /s/ على مدة /z/.<br>
+          <strong>المهام حسب الفئة العمرية:</strong><br>
+          - الأطفال: مد كل صوت لمدة 5-3 ثوانٍ<br>
+          - المراهقون: مد كل صوت لمدة 7-5 ثوانٍ<br>
+          - البالغون: مد كل صوت لمدة 10 ثوانٍ<br>
+          <strong>المعايير:</strong> ~1.0 لجميع الأعمار والجنسين
+        </p>
+        <button class="btn-close">إغلاق</button>
+      </div>
+      <div class="button-group">
+        <button class="btn">طبيعي (~1.0)</button>
+        <button class="btn">غير طبيعي</button>
+      </div>
+      <input type="text" placeholder="اختياري: أدخل قيمة S/Z">
+    </div>
+
+    <!-- التذبذب (Jitter) (%) -->
+    <div class="history-field">
+      <label>التذبذب (Jitter) (%)</label>
+      <button class="btn-info" data-id="jitter">i</button>
+      <div id="info-box-jitter" class="info-box">
+        <p>
+          <strong>التعليمات:</strong> سجل صوت العلة /a/ المستمر وقم بقياس التغير في التردد.<br>
+          <strong>المعايير (%):</strong> عادةً ≤1% للأصوات الصحية.
+        </p>
+        <button class="btn-close">إغلاق</button>
+      </div>
+      <div class="button-group">
+        <button class="btn">طبيعي</button>
+        <button class="btn">مرتفع</button>
+      </div>
+      <input type="text" placeholder="اختياري: أدخل قيمة التذبذب">
+    </div>
+
+    <!-- الاهتزاز (Shimmer) (%) -->
+    <div class="history-field">
+      <label>الاهتزاز (Shimmer) (%)</label>
+      <button class="btn-info" data-id="shimmer">i</button>
+      <div id="info-box-shimmer" class="info-box">
+        <p>
+          <strong>التعليمات:</strong> سجل صوت العلة /a/ المستمر وقم بقياس التغير في السعة.<br>
+          <strong>المعايير (%):</strong> عادةً ≤3.8% للأصوات الصحية.
+        </p>
+        <button class="btn-close">إغلاق</button>
+      </div>
+      <div class="button-group">
+        <button class="btn">طبيعي</button>
+        <button class="btn">مرتفع</button>
+      </div>
+      <input type="text" placeholder="اختياري: أدخل قيمة الاهتزاز">
+    </div>
+
+    <!-- نسبة الضوضاء إلى النغمات (NHR) -->
+    <div class="history-field">
+      <label>نسبة الضوضاء إلى النغمات</label>
+      <button class="btn-info" data-id="nhr">i</button>
+      <div id="info-box-nhr" class="info-box">
+        <p>
+          <strong>التعليمات:</strong> قياس نسبة مكونات الضوضاء إلى المكونات النغمية من صوت العلة المستمر.<br>
+          <strong>المعايير:</strong> عادةً ≤0.2 للأصوات الصحية.
+        </p>
+        <button class="btn-close">إغلاق</button>
+      </div>
+      <div class="button-group">
+        <button class="btn">طبيعي</button>
+        <button class="btn">غير طبيعي</button>
+      </div>
+      <input type="text" placeholder="اختياري: أدخل قيمة NHR">
+    </div>
+
+
+    <!-- زمن الصوت الأقصى (MPT) -->
+    <div class="history-field">
+      <label>زمن الصوت الأقصى (MPT)</label>
+      <button class="btn-info" data-id="mpt">i</button>
+      <div id="info-box-mpt" class="info-box">
+        <p>
+          <strong>التعليمات:</strong> اطلب من المريض مد صوت /a/ بمستوى صوت مريح.<br>
+          <strong>المهام حسب الفئة العمرية:</strong><br>
+          - الأطفال: مد صوت /a/ لمدة 8-5 ثوانٍ<br>
+          - المراهقون: مد صوت /a/ لمدة 15-8 ثوانٍ<br>
+          - البالغات الإناث: مد صوت /a/ لمدة 20-15 ثانية<br>
+          - البالغون الذكور: مد صوت /a/ لمدة 25-20 ثانية<br>
+          <strong>المعايير (ثانية):</strong><br>
+          الأطفال: ~8<br>
+          المراهقون: ~15-12<br>
+          البالغات الإناث: ~19<br>
+          البالغون الذكور: ~26
+        </p>
+        <button class="btn-close">إغلاق</button>
+      </div>
+      <div class="button-group">
+        <button class="btn">طبيعي</button>
+        <button class="btn">محدود</button>
+      </div>
+      <input type="text" placeholder="اختياري: أدخل قيمة MPT (ثانية)">
+    </div>
+
+  </div>
+</section>
+
+<!-- القسم 6: تقييم صحة الصوت -->
+<section id="section6" class="info-section">
+  <h2>تقييم صحة الصوت</h2>
+  <div class="history-grid">
+
+    <!-- الحساسية -->
+    <div class="history-field">
+      <label>الحساسية</label>
+      <div class="button-group">
+        <button class="btn">لا يوجد</button>
+        <button class="btn">خفيف</button>
+        <button class="btn">متوسط</button>
+        <button class="btn">شديد</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>الصراخ / الصياح بصوت عالٍ</label>
+      <div class="button-group">
+        <button class="btn">أبداً</button>
+        <button class="btn">أحياناً</button>
+        <button class="btn">غالباً</button>
+        <button class="btn">دائماً</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>تناول المنبهات (الكحول، القهوة، الكافيين، الكولا، إلخ)</label>
+      <div class="button-group">
+        <button class="btn">لا يوجد</button>
+        <button class="btn">أحياناً</button>
+        <button class="btn">غالباً</button>
+        <button class="btn">يومياً</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>السعال المتكرر</label>
+      <div class="button-group">
+        <button class="btn">أبداً</button>
+        <button class="btn">أحياناً</button>
+        <button class="btn">غالباً</button>
+        <button class="btn">دائماً</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>النباح المفرط (تنظيف الحلق)</label>
+      <div class="button-group">
+        <button class="btn">أبداً</button>
+        <button class="btn">أحياناً</button>
+        <button class="btn">غالباً</button>
+        <button class="btn">دائماً</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>الآثار الجانبية من الأدوية المستمرة</label>
+      <div class="button-group">
+        <button class="btn">لا يوجد</button>
+        <button class="btn">خفيف</button>
+        <button class="btn">متوسط</button>
+        <button class="btn">شديد</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>التصويت أثناء التمرين</label>
+      <div class="button-group">
+        <button class="btn">أبداً</button>
+        <button class="btn">أحياناً</button>
+        <button class="btn">غالباً</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>الضحك بصوت عالٍ</label>
+      <div class="button-group">
+        <button class="btn">أبداً</button>
+        <button class="btn">أحياناً</button>
+        <button class="btn">غالباً</button>
+        <button class="btn">دائماً</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>استخدام الصوت في العمل (التدريس، الغناء، إلخ)</label>
+      <div class="button-group">
+        <button class="btn">منخفض</button>
+        <button class="btn">متوسط</button>
+        <button class="btn">مرتفع</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>التحدث المطول دون استراحات</label>
+      <div class="button-group">
+        <button class="btn">أبداً</button>
+        <button class="btn">أحياناً</button>
+        <button class="btn">غالباً</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>التدخين</label>
+      <div class="button-group">
+        <button class="btn">لا</button>
+        <button class="btn">نعم</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>مناداة الآخرين من بعيد</label>
+      <div class="button-group">
+        <button class="btn">أبداً</button>
+        <button class="btn">أحياناً</button>
+        <button class="btn">غالباً</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>الأنشطة التي تتطلب صوتاً عالياً</label>
+      <div class="button-group">
+        <button class="btn">أبداً</button>
+        <button class="btn">أحياناً</button>
+        <button class="btn">غالباً</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>التعرض للتلوث البيئي</label>
+      <div class="button-group">
+        <button class="btn">منخفض</button>
+        <button class="btn">متوسط</button>
+        <button class="btn">مرتفع</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>تقليد أصوات الآخرين</label>
+      <div class="button-group">
+        <button class="btn">أبداً</button>
+        <button class="btn">أحياناً</button>
+        <button class="btn">غالباً</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>التحدث في بيئات صاخبة</label>
+      <div class="button-group">
+        <button class="btn">أبداً</button>
+        <button class="btn">أحياناً</button>
+        <button class="btn">غالباً</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>التحدث أثناء الانزعاج</label>
+      <div class="button-group">
+        <button class="btn">أبداً</button>
+        <button class="btn">أحياناً</button>
+        <button class="btn">غالباً</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>قلة شرب الماء</label>
+      <div class="button-group">
+        <button class="btn">أبداً</button>
+        <button class="btn">أحياناً</button>
+        <button class="btn">غالباً</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>أخرى</label>
+      <input type="text" placeholder="أدخل أي سلوك آخر">
+    </div>
+
+  </div>
+</section>
+
+<!-- القسم 7: مؤشر إعاقة الصوت - 10 (VHI-10) -->
+<section id="section7" class="info-section">
+  <h2>مؤشر إعاقة الصوت - 10 (VHI-10)</h2>
+  <p>
+    التعليمات: تصف هذه العبارات التجارب الشائعة المتعلقة بالصوت وتأثيره على الحياة اليومية. اختر الإجابة التي تشير إلى مدى تكرار تعرضك لكل عبارة.
+  </p>
+  <p>
+    المقياس: 0-أبداً | 1-تقريباً أبداً | 2-أحياناً | 3-تقريباً دائماً | 4-دائماً
+  </p>
+
+  <div class="history-grid">
+
+    <!-- بنود VHI -->
+    <div class="history-field">
+      <label>صوتي يجعل من الصعب على الآخرين سماعي.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>يواجه الآخرون صعوبة في فهمي في غرفة صاخبة.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>صعوبات صوتي تقيد حياتي الشخصية والاجتماعية.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>أشعر بأنني مستبعد من المحادثات بسبب صوتي.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>مشكلة صوتي تتسبب في فقداني الدخل.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>أشعر كما لو أنني يجب أن أجهد لإنتاج الصوت.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>وضوح صوتي غير متوقع.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>مشكلة صوتي تزعجني.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>صوتي يجعلني أشعر بأنني معاق.</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="history-field">
+      <label>يسأل الناس: "ما الخطأ في صوتك؟"</label>
+      <div class="button-group">
+        <button class="btn" data-value="0">0</button>
+        <button class="btn" data-value="1">1</button>
+        <button class="btn" data-value="2">2</button>
+        <button class="btn" data-value="3">3</button>
+        <button class="btn" data-value="4">4</button>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="vhi-score">إجمالي درجة VHI-10: <span id="vhiTotal">0</span> / 40</p>
+  <p>التفسير (Rosen et al., 2004):</p>
+  <ul>
+    <li>11-0: طبيعي / إعاقة طفيفة</li>
+    <li>22-12: إعاقة خفيفة</li>
+    <li>34-23: إعاقة متوسطة</li>
+    <li>40-35: إعاقة شديدة</li>
+  </ul>
+</section>
+
+<!-- القسم 8: اختبار القابلية للاستثارة واستراتيجيات علاج الصوت -->
+<section id="section8" class="info-section">
+  <h2>اختبار القابلية للاستثارة واستراتيجيات علاج الصوت</h2>
+  <p>
+    التعليمات: جرب الاستراتيجيات التالية مع المريض. سجل إذا تم ملاحظة تحسن لكل منها. انقر على زر المعلومات "؟" لرؤية التعليمات حول كيفية تنفيذ كل استراتيجية. استخدم الملاحظات لتوثيق المشاهدات.
+  </p>
+
+  <div class="history-grid">
+
+    <!-- تمارين الاسترخاء -->
+    <div class="history-field">
+      <label>تمارين الاسترخاء</label>
+      <button class="btn-info">i</button>
+      <div class="info-box">
+        <p>
+          <strong>التعليمات:</strong> علم المريض تمارين استرخاء لطيفة للرقبة، الفك، والكتفين لتقليل التوتر العضلي. شجع على التنفس الحجابي والزفير اللطيف.
+        </p>
+        <button class="btn-close">إغلاق</button>
+      </div>
+      <div class="button-group">
+        <button class="btn" data-value="yes">تم ملاحظة تحسن: نعم</button>
+        <button class="btn" data-value="no">تم ملاحظة تحسن: لا</button>
+      </div>
+      <textarea placeholder="ملاحظات / مشاهدات"></textarea>
+    </div>
+
+    <!-- مهام الصوت الرنان -->
+    <div class="history-field">
+      <label>مهام الصوت الرنان</label>
+      <button class="btn-info">i</button>
+      <div class="info-box">
+        <p>
+          <strong>التعليمات:</strong> وجه المريض لإنتاج صوت يركز على الأمام باستخدام أصوات /م/، /ن/، /نگ/. حافظ على نغمة ومستوى صوت مريح. ركز على الرنين الفموي وإصدار الصوت المريح.
+        </p>
+        <button class="btn-close">إغلاق</button>
+      </div>
+      <div class="button-group">
+        <button class="btn" data-value="yes">تم ملاحظة تحسن: نعم</button>
+        <button class="btn" data-value="no">تم ملاحظة تحسن: لا</button>
+      </div>
+      <textarea placeholder="ملاحظات / مشاهدات"></textarea>
+    </div>
+
+    <!-- الانزلاقات النغمية -->
+    <div class="history-field">
+      <label>الانزلاقات النغمية</label>
+      <button class="btn-info">i</button>
+      <div class="info-box">
+        <p>
+          <strong>التعليمات:</strong> اطلب من المريض الانزلاق بسلاسة من النغمة المنخفضة إلى المرتفعة على أصوات العلة، مع الحفاظ على تدفق الهواء ثابتًا والتقليل من التوتر. كرر عدة مرات ولاحظ استقرار الصوت.
+        </p>
+        <button class="btn-close">إغلاق</button>
+      </div>
+      <div class="button-group">
+        <button class="btn" data-value="yes">تم ملاحظة تحسن: نعم</button>
+        <button class="btn" data-value="no">تم ملاحظة تحسن: لا</button>
+      </div>
+      <textarea placeholder="ملاحظات / مشاهدات"></textarea>
+    </div>
+
+    <!-- تمارين المسالك الصوتية شبه المغلقة (SOVT) -->
+    <div class="history-field">
+      <label>تمارين المسالك الصوتية شبه المغلقة (SOVT)</label>
+      <button class="btn-info">i</button>
+      <div class="info-box">
+        <p>
+          <strong>التعليمات:</strong> استخدم التصويت بالقشة، الاهتزازات الشفاهية، أو الاهتزازات اللسانية لتقليل اصطدام الطيات الصوتية وتحسين الرنين. شجع على إصدار الصوت المستمر والمنتظم.
+        </p>
+        <button class="btn-close">إغلاق</button>
+      </div>
+      <div class="button-group">
+        <button class="btn" data-value="yes">تم ملاحظة تحسن: نعم</button>
+        <button class="btn" data-value="no">تم ملاحظة تحسن: لا</button>
+      </div>
+      <textarea placeholder="ملاحظات / مشاهدات"></textarea>
+    </div>
+
+    <!-- استراتيجيات إضافية -->
+    <div class="history-field">
+      <label>استراتيجية علاج صوت إضافية</label>
+      <button class="btn-info">i</button>
+      <div class="info-box">
+        <p>
+          <strong>التعليمات:</strong> حدد أي تمارين أو تقنيات صوتية أخرى تم تجربتها (مثل دعم التنفس، التحكم في مستوى الصوت، تنظيم السرعة). وثق الطريقة والاستجابة.
+        </p>
+        <button class="btn-close">إغلاق</button>
+      </div>
+      <div class="button-group">
+        <button class="btn" data-value="yes">تم ملاحظة تحسن: نعم</button>
+        <button class="btn" data-value="no">تم ملاحظة تحسن: لا</button>
+      </div>
+      <textarea placeholder="ملاحظات / مشاهدات"></textarea>
+    </div>
+
+  </div>
+
+  <!-- النتيجة العامة والتوصيات -->
+  <div class="history-field">
+    <label>النتيجة العامة / التوصيات السريرية</label>
+    <div class="button-group">
+      <button class="btn" data-value="improved">تم ملاحظة تحسن عام</button>
+      <button class="btn" data-value="noImprovement">لا يوجد تحسن ملحوظ</button>
+    </div>
+    <textarea placeholder="التوصيات المهنية، خطة المتابعة، أو استراتيجيات إضافية"></textarea>
+  </div>
+</section>
+
+
+  <!-- القسم 9: التقرير النهائي -->
+  <section id="section-report" class="info-section">
+    <h2 style="display:flex; align-items:center; gap:8px;">
+      التقرير النهائي
+    </h2>
+
+    <div id="info-box-report" class="info-box hidden">
+      <p>
+        يُنشئ هذا القسم تلقائيًا تقريرًا نهائيًا يجمع نتائج التقييم.
+      </p>
+      <button onclick="closeInfoBox('report')">إغلاق</button>
+    </div>
+
+    <textarea id="report" readonly rows="15" placeholder="سيظهر التقرير النهائي هنا..."></textarea>
+    <button class="btn-download" onclick="downloadReport()">تحميل التقرير</button>
+  </section>
+
+</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

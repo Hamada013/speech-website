@@ -7,67 +7,83 @@
   <link rel="stylesheet" href="svhi.css">
 </head>
 <body>
-  <div class="container">
-    <h1>SINGING VOICE HANDICAP INDEX (SVHI)</h1>
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-title">
+      <img src="../../../images/logo.png" alt="Clinic Logo" class="logo">
+      <h1 id="form-title">SINGING VOICE HANDICAP INDEX (SVHI)</h1>
+    </div>
+    <div class="header-controls">
+      <button id="info-btn" class="info-btn"> info </button>
+      <select id="language-switcher" class="language-switcher">
+        <option value="en" selected>English</option>
+        <option value="ar">العربية</option>
+      </select>
+    </div>
+  </div>
 
+  <!-- Info Modal -->
+  <div id="info-modal">
+    <div class="modal-content">
+      <button class="close-btn">&times;</button>
+      <div id="info-text"></div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
     <!-- Patient Info -->
     <div class="section">
-      <label for="patient-name">NAME:</label>
+      <label for="patient-name" data-i18n="name_label">NAME:</label>
       <input type="text" id="patient-name" placeholder="Enter patient name">
-      <label for="assessment-date">DATE:</label>
+
+      <label for="assessment-date" data-i18n="date_label">DATE:</label>
       <input type="date" id="assessment-date">
     </div>
 
     <!-- Music Type -->
     <div class="section">
-      <p>I sing the following kinds of music:</p>
-      <div class="checkbox-group">
-        <label><input type="checkbox" name="music" value="Country"> Country</label>
-        <label><input type="checkbox" name="music" value="Classical"> Classical</label>
-        <label><input type="checkbox" name="music" value="Choral"> Choral</label>
-        <label><input type="checkbox" name="music" value="Cantorial"> Cantorial</label>
-        <label><input type="checkbox" name="music" value="Broadway"> Broadway</label>
-        <label><input type="checkbox" name="music" value="Pop"> Pop</label>
-        <label><input type="checkbox" name="music" value="Rock"> Rock</label>
-        <label><input type="checkbox" name="music" value="Gospel"> Gospel</label>
-        <label><input type="checkbox" name="music" value="Jazz"> Jazz</label>
-      </div>
+      <p data-i18n="music_prompt">I sing the following kinds of music:</p>
+      <div class="button-group" id="music-types"></div>
     </div>
 
-    <!-- Singing Level -->
+    <!-- Singing Level & Income -->
     <div class="section">
-      <p>How would you categorize your singing level?</p>
-      <div class="radio-group">
-        <label><input type="radio" name="level" value="Professional entertainer"> Professional entertainer</label>
-        <label><input type="radio" name="level" value="Teacher"> Teacher</label>
-        <label><input type="radio" name="level" value="Music/singing student"> Music/singing student</label>
-        <label><input type="radio" name="level" value="Amateur choir/singing group"> Amateur choir/singing group</label>
-      </div>
-      <p>Singing is:</p>
-      <div class="radio-group">
-        <label><input type="radio" name="income" value="Primary source of income"> Primary source of income</label>
-        <label><input type="radio" name="income" value="Secondary source of income"> Secondary source of income</label>
-        <label><input type="radio" name="income" value="Not a source of income"> Not a source of income</label>
+      <p data-i18n="level_prompt">How would you categorize your singing level?</p>
+      <div class="button-group" id="singing-level"></div>
+
+      <p data-i18n="income_prompt">Singing is:</p>
+      <div class="button-group" id="income-level"></div>
+    </div>
+
+    <!-- Instructions Toggle -->
+    <div class="section">
+      <button class="toggle-btn" id="toggle-btn" data-i18n="toggle_btn">Instructions</button>
+      <div id="instructions-box" class="instructions-box hidden">
+        <h2 data-i18n="instructions_title">Instructions:</h2>
+        <p data-i18n="instructions_desc">
+          These are statements many people have used to describe their voices and the effects of their voices on their lives.
+          Select the response that indicates how frequently you have the same experience:
+        </p>
+        <p data-i18n="scale_info">0 = never, 1 = almost never, 2 = sometimes, 3 = almost always, 4 = always</p>
       </div>
     </div>
 
     <!-- SVHI Questions -->
     <div class="section" id="svhi-questions">
-      <h2>Instructions:</h2>
-      <p>These are statements many people have used to describe their voices and the effects of their voices on their lives. Circle the response that indicates how frequently you have the same experience:</p>
-      <p>0 = never, 1 = almost never, 2 = sometimes, 3 = almost always, 4 = always</p>
-      <!-- Questions injected here by JS -->
+      <div id="questions-container"></div>
     </div>
 
-    <button id="submit-svhi" class="submit-btn">Submit SVHI</button>
+    <!-- Submit & Download Buttons -->
+    <button id="submit-svhi" class="submit-btn" data-i18n="submit_btn">Submit</button>
 
     <!-- Results -->
     <div class="section" id="svhi-result" style="display:none;">
-      <h2>Results</h2>
-      <p><strong>Total Score:</strong> <span id="total-score"></span></p>
-      <p><strong>Interpretation:</strong> <span id="score-interpretation"></span></p>
-      <h3>Clinical Note:</h3>
-      <textarea id="clinical-note" rows="20" readonly></textarea>
+      <h2 data-i18n="results_title">Results</h2>
+      <p><strong data-i18n="total_score_label">Total Score:</strong> <span id="total-score"></span></p>
+      <p><strong data-i18n="interpretation_label">Interpretation:</strong> <span id="score-interpretation"></span></p>
+      <h3 data-i18n="clinical_note_title">Clinical Note:</h3>
+      <textarea id="clinical-note" rows="10" readonly></textarea>
     </div>
   </div>
 

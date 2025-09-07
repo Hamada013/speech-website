@@ -1,9 +1,12 @@
-/* General Container */
+/* ==========================
+   Global Styles
+   ========================== */
 body {
   font-family: Arial, sans-serif;
   background: #f7f9fc;
   margin: 0;
   padding: 0;
+  transition: direction 0.3s ease;
 }
 
 .container {
@@ -15,11 +18,77 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-h1 {
-  text-align: center;
+h1, h2, h3 {
   color: #2c3e50;
+  margin: 0 0 10px 0;
 }
 
+/* ==========================
+   Header
+   ========================== */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #34495e;
+  color: #fff;
+  padding: 15px 20px;
+  border-bottom: 3px solid #2980b9;
+}
+
+.logo-title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo {
+  height: 50px;
+  width: 50px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+#form-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Info button */
+.info-btn {
+  background: #2980b9;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.info-btn:hover {
+  background: #1f6692;
+}
+
+/* Language switcher */
+.language-switcher {
+  padding: 6px 8px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+/* ==========================
+   Sections
+   ========================== */
 .section {
   margin-bottom: 25px;
 }
@@ -42,51 +111,35 @@ h1 {
   font-size: 16px;
 }
 
-.checkbox-group label,
-.radio-group label {
-  display: inline-block;
-  margin-right: 15px;
-  margin-top: 5px;
-}
-
-h2 {
-  margin-top: 20px;
-  color: #34495e;
-}
-
-.svhi-item {
-  margin-bottom: 15px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-}
-
+/* Button Groups */
 .button-group {
-  margin-top: 5px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 8px;
 }
 
 .button-group .btn {
-  margin-right: 5px;
-  margin-top: 5px;
-  padding: 6px 12px;
-  border-radius: 5px;
-  border: 1px solid #3498db;
+  flex: 1 1 auto;
+  padding: 10px 14px;
   background: #fff;
+  border: 1px solid #3498db;
+  border-radius: 8px;
+  font-size: 15px;
   color: #3498db;
   cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s ease;
+  text-align: center;
+  transition: all 0.3s ease;
 }
 
+.button-group .btn:hover,
 .button-group .btn.active {
   background: #3498db;
   color: #fff;
+  font-weight: bold;
 }
 
-.button-group .btn:hover {
-  background: #2980b9;
-  color: #fff;
-}
-
+/* Submit Button */
 .submit-btn {
   display: block;
   width: 100%;
@@ -106,6 +159,7 @@ h2 {
   background: #1e8449;
 }
 
+/* Clinical Note */
 #clinical-note {
   width: 100%;
   padding: 10px;
@@ -115,4 +169,134 @@ h2 {
   box-sizing: border-box;
   margin-top: 10px;
   resize: vertical;
+  background: #fafafa;
+}
+
+/* Instructions Box */
+.instructions-box {
+  background: #f0f4f8;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 10px;
+  transition: max-height 0.5s ease, opacity 0.5s ease, padding 0.5s ease;
+  overflow: hidden;
+}
+
+.instructions-box.hidden {
+  max-height: 0;
+  opacity: 0;
+  padding: 0 15px;
+  border: none;
+}
+
+/* Toggle Instructions Button */
+.toggle-btn {
+  display: inline-block;
+  padding: 10px 16px;
+  background: #3498db;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.toggle-btn:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+}
+
+.toggle-btn:active {
+  background: #1f6692;
+  transform: translateY(0);
+}
+
+/* ==========================
+   Info Modal
+   ========================== */
+#info-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#info-modal .modal-content {
+  background: #fff;
+  max-width: 600px;
+  width: 90%;
+  padding: 25px;
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  text-align: left;
+}
+
+#info-modal .close-btn {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ==========================
+   RTL Support
+   ========================== */
+body[dir="rtl"] {
+  direction: rtl;
+}
+
+body[dir="rtl"] .logo-title {
+  flex-direction: row-reverse;
+}
+
+body[dir="rtl"] .header-controls {
+  flex-direction: row-reverse;
+}
+
+body[dir="rtl"] .button-group .btn {
+  margin-left: 5px;
+  margin-right: 0;
+}
+
+/* ==========================
+   Responsive
+   ========================== */
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .logo-title {
+    justify-content: center;
+  }
+
+  .header-controls {
+    justify-content: center;
+  }
+
+  .container {
+    padding: 15px;
+  }
+
+  #form-title {
+    font-size: 18px;
+  }
+
+  .button-group .btn {
+    flex: 1 1 100%;
+  }
 }
