@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VB-MAPP Assessment - Level 1</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Header -->
+<header class="page-header">
+  <div class="header-logo">
+    <img src="../../../images/logo.png" alt="Logo">
+  </div>
+  <h1>VB-MAPP Assessment</h1>
+  <button class="btn-info" onclick="showTestInfo()">i</button>
+  <button class="btn-arabic" onclick="window.location.href='../assessment_arabic/index.html'">Ar</button>
+</header>
+
+<!-- Info Box Modal for VB-MAPP -->
+<div id="info-overlay" class="info-overlay hidden" onclick="overlayClick(event)">
+  <div id="info-box-page" class="info-box-content">
+    <h2>VB-MAPP Level 1 Guide</h2>
+    <p>
+      The VB-MAPP (Verbal Behavior Milestones Assessment and Placement Program) is designed to assess language,
+      learning, and social skills of children with autism or other developmental disabilities.
+      Level 1 evaluates foundational communication and social behaviors typically observed in children
+      up to 18 months of age.
+    </p>
+
+    <h3>Core Domains in Level 1</h3>
+    <ul>
+      <li><strong>Mand:</strong> Requesting desired items or actions.</li>
+      <li><strong>Tact:</strong> Labeling or naming objects, actions, or events.</li>
+      <li><strong>Listener:</strong> Responding to spoken language (receptive skills).</li>
+      <li><strong>VP/MTS:</strong> Visual perceptual and matching-to-sample tasks.</li>
+      <li><strong>Play:</strong> Independent and interactive play skills.</li>
+      <li><strong>Social:</strong> Social engagement and interaction skills.</li>
+      <li><strong>Imitation:</strong> Motor and verbal imitation skills.</li>
+      <li><strong>Echoic:</strong> Repeating sounds or words.</li>
+      <li><strong>Vocal:</strong> Vocal output and early speech sounds.</li>
+    </ul>
+
+    <button class="btn-close" onclick="closeInfoBox()">Close</button>
+  </div>
+</div>
+<div class="container">
+
+<!-- Section 0: Identifying Information -->
+<section id="section0" class="info-section">
+  <h2>Identifying Information</h2>
+  <div class="info-grid">
+
+    <div class="info-field">
+      <label for="name">Name</label>
+      <input type="text" id="name" placeholder="Enter name">
+    </div>
+
+    <div class="info-field">
+      <label for="dob">Date of Birth / Age</label>
+      <div class="dob-group">
+        <input type="date" id="dob" onchange="calculateAge()">
+        <input type="text" id="age" readonly placeholder="Age">
+      </div>
+    </div>
+
+<div class="info-field">
+  <label>Gender</label>
+  <div class="button-group" id="genderButtons">
+    <button type="button" class="btn-gender" data-value="Female">Female</button>
+    <button type="button" class="btn-gender" data-value="Male">Male</button>
+    <button type="button" class="btn-gender" data-value="Other">Other</button>
+  </div>
+  <!-- Hidden field to store selected gender -->
+  <input type="hidden" id="gender" value="">
+</div>
+
+
+    <div class="info-field">
+      <label for="testDate">Date of Assessment</label>
+      <input type="date" id="testDate">
+    </div>
+
+    <div class="info-field">
+      <label for="examiner">Evaluator</label>
+      <input type="text" id="examiner" placeholder="Enter evaluator name">
+    </div>
+
+    <div class="info-field">
+      <label for="referralSource">Referral Source</label>
+      <input type="text" id="referralSource" placeholder="Enter referral source">
+    </div>
+
+    <div class="info-field">
+      <label for="occupation">Occupation</label>
+      <input type="text" id="occupation" placeholder="Enter occupation">
+    </div>
+
+    <div class="info-field">
+      <label for="languages">Language(s) Spoken</label>
+      <input type="text" id="languages" placeholder="Enter languages">
+    </div>
+  </div>
+
+<!-- ===== LEVEL 1 SECTION ===== -->
+<section id="level1" class="level-section">
+  <h2>VB-MAPP Level 1 Assessment</h2>
+
+  <div class="subsections">
+
+    <!-- ===== Mand ===== -->
+    <div class="subsection" id="lev1-mand">
+      <h3>Mand</h3>
+      <div class="questions">
+        
+        <!-- Q1 -->
+        <div class="question">
+          <span>1. Requests preferred item spontaneously</span>
+          <div class="actions">
+            <button class="info-btn" onclick="toggleInfo(this)">i</button>
+            <button class="pic-btn" onclick="openImage('mand1.png')">p</button>
+            <button class="score-btn" onclick="addScore(this,1)">+</button>
+            <button class="score-btn" onclick="addScore(this,0.5)">/</button>
+            <button class="score-btn" onclick="addScore(this,0)">-</button>
+          </div>
+          <div class="info hidden">
+            Instructions: Observe if the child mands without echoic prompts.
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="question">
+          <span>2. Requests missing item when needed</span>
+          <div class="actions">
+            <button class="info-btn" onclick="toggleInfo(this)">i</button>
+            <button class="pic-btn" onclick="openImage('mand2.png')">p</button>
+            <button class="score-btn" onclick="addScore(this,1)">+</button>
+            <button class="score-btn" onclick="addScore(this,0.5)">/</button>
+            <button class="score-btn" onclick="addScore(this,0)">-</button>
+          </div>
+          <div class="info hidden">
+            Instructions: Example — puzzle missing a piece, child should request it.
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="question">
+          <span>3. Uses appropriate mand for attention</span>
+          <div class="actions">
+            <button class="info-btn" onclick="toggleInfo(this)">i</button>
+            <button class="pic-btn" onclick="openImage('mand3.png')">p</button>
+            <button class="score-btn" onclick="addScore(this,1)">+</button>
+            <button class="score-btn" onclick="addScore(this,0.5)">/</button>
+            <button class="score-btn" onclick="addScore(this,0)">-</button>
+          </div>
+          <div class="info hidden">
+            Instructions: Example — says "come here" or signs for attention.
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="question">
+          <span>4. Requests help appropriately</span>
+          <div class="actions">
+            <button class="info-btn" onclick="toggleInfo(this)">i</button>
+            <button class="pic-btn" onclick="openImage('mand4.png')">p</button>
+            <button class="score-btn" onclick="addScore(this,1)">+</button>
+            <button class="score-btn" onclick="addScore(this,0.5)">/</button>
+            <button class="score-btn" onclick="addScore(this,0)">-</button>
+          </div>
+          <div class="info hidden">
+            Instructions: When struggling with a task, child asks for help instead of whining.
+          </div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="question">
+          <span>5. Mands with new vocabulary items</span>
+          <div class="actions">
+            <button class="info-btn" onclick="toggleInfo(this)">i</button>
+            <button class="pic-btn" onclick="openImage('mand5.png')">p</button>
+            <button class="score-btn" onclick="addScore(this,1)">+</button>
+            <button class="score-btn" onclick="addScore(this,0.5)">/</button>
+            <button class="score-btn" onclick="addScore(this,0)">-</button>
+          </div>
+          <div class="info hidden">
+            Instructions: Observe if the child uses a new word or sign to mand for a novel item.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== Other Sections as Placeholders ===== -->
+    <div class="subsection"><h3>Tact</h3></div>
+    <div class="subsection"><h3>Listener</h3></div>
+    <div class="subsection"><h3>Visual Perceptual & Imitative Matching to Sample (VP/MTS)</h3></div>
+    <div class="subsection"><h3>Play</h3></div>
+    <div class="subsection"><h3>Social</h3></div>
+    <div class="subsection"><h3>Imitation</h3></div>
+    <div class="subsection"><h3>Echoic</h3></div>
+    <div class="subsection"><h3>Vocal</h3></div>
+
+  </div>
+</section>
+  
+
+  <!-- Section reprot : Final Report -->
+  <section id="section-report" class="info-section">
+    <h2 style="display:flex; align-items:center; gap:8px;">
+      Final Report
+    </h2>
+
+    <div id="info-box-report" class="info-box hidden">
+      <p>
+        This section automatically generates a final report combining results from the assessment.
+      </p>
+      <button onclick="closeInfoBox('report')">Close</button>
+    </div>
+
+    <textarea id="report" readonly rows="15" placeholder="Final report will appear here..."></textarea>
+    <button class="btn-download" onclick="downloadReport()">Download Report</button>
+  </section>
+
+</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
+

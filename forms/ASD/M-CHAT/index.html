@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>مصحح M-CHAT — فحص فرز التوحد</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+      <div>
+        <h1>قائمة استبيان التوحد عند الأطفال — M-CHAT</h1>
+        <p class="subtitle">أداة  للأطفال 16–30 شهرًا — ليست تشخيصًا</p>
+      </div>
+      <div class="top-actions">
+        <button id="infoBtn" class="btn outline">معلومة حول التصحيح</button>
+      </div>
+    </header>
+
+    <section class="meta">
+      <label class="meta-field">اسم الطفل / المعرف
+        <input id="childName" type="text" placeholder="اختياري — يظهر في التقرير">
+      </label>
+      <label class="meta-field">اسم الفاحص
+        <input id="clinicianName" type="text" placeholder="مثلاً: SLP.Ahmad Ghanem">
+      </label>
+      <label class="meta-field">تاريخ الفحص
+        <input id="examDate" type="date">
+      </label>
+    </section>
+
+    <section class="card questions-card" id="questionsCard">
+      <div class="card-header">
+        <h2>الإرشادات:</h2>
+        <p>اضغط على "نعم" أو "لا" لكل بند. النتيجة تُحدث تلقائياً. إذا لم تُجب على بند، لا يُحسب.</p>
+      </div>
+
+      <div id="questionsList" class="questions-list">
+        <!-- أسئلة ثابتة — مُنشأة من script.js -->
+      </div>
+    </section>
+
+    <section class="card results-card" id="resultsCard" aria-live="polite">
+      <div class="result-grid">
+        <div>
+          <div class="label">الدرجة الكمية</div>
+          <div id="totalScore" class="big">-</div>
+        </div>
+        <div>
+          <div class="label">الدرجة الحرجة</div>
+          <div id="criticalScore" class="big">-</div>
+        </div>
+        <div class="interpretation-area">
+          <div class="label">التفسير السريري الموجز</div>
+          <div id="interpretation" class="interp">-</div>
+        </div>
+      </div>
+      <div class="result-actions">
+        <button id="resetBtn" class="btn">إعادة تعيين</button>
+        <button id="downloadBtn" class="btn primary">تنزيل التقرير (نص)</button>
+      </div>
+    </section>
+
+    <section class="card report-card">
+      <h3>تقرير نصي جاهز</h3>
+      <textarea id="reportArea" rows="8" readonly placeholder="اضغط تنزيل أو غيّر الإجابات لتحديث التقرير"></textarea>
+    </section>
+
+
+  </main>
+
+  <!-- Info modal (hidden) -->
+  <div id="overlay" class="overlay hidden">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h3 id="modalTitle">معلومة حول التصحيح والـ "غير طبيعي"</h3>
+      <div class="modal-body">
+        <p>في هذا النموذج نحن لا نعرض عمود "الجواب الذي يعتبر غير طبيعي" لكل سؤال — بدلاً من ذلك، هذه الخلاصة تشرح لكل بند ما هي الإجابة التي تُحتسب كعلامة خطر (غير طبيعية) وكيف تُعامل البنود الحرجة:</p>
+
+        <ul>
+          <li>العناصر الحرجة في هذه النسخة: <strong>1, 7, 9, 13, 14, 15</strong>. وجود عنصرين أو أكثر من هذه العناصر بعبارات غير طبيعية يستوجب إحالة عاجلة.</li>
+          <li>التعيين الافتراضي لِما يُعتبر "غير طبيعي" مبني على النسخة المعربة الشائعة: لكل سؤال ذُكر أدناه يتضح أي إجابة تُحتسب كغير طبيعية. تحقق سريريًا قبل اتخاذ قرار نهائي.</li>
+        </ul>
+
+        <table class="modal-table">
+          <thead><tr><th>رقم</th><th>موجز السؤال</th><th>تُحتسب كـ "غير طبيعي" إذا كانت الإجابة</th></tr></thead>
+          <tbody id="modalTableBody">
+            <!-- تُملأ من السكربت -->
+          </tbody>
+        </table>
+
+      </div>
+      <div class="modal-foot">
+        <button id="closeModal" class="btn">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
