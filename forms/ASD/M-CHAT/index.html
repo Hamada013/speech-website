@@ -1,43 +1,54 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>مصحح M-CHAT — فحص فرز التوحد</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>استبيان التوحد M-CHAT</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="wrap">
-    <header class="top">
-      <div>
-        <h1>قائمة استبيان التوحد عند الأطفال — M-CHAT</h1>
-        <p class="subtitle">أداة  للأطفال 16–30 شهرًا — ليست تشخيصًا</p>
+  <div class="wrap">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-left">
+        <img src="../../../images/logo.png" alt="شعار" class="logo">
+        <div class="header-text">
+          <h1>قائمة الملاحظة الأولية للأطفال</h1>
+          <p class="subtitle">أداة للأطفال من 16 إلى 30 شهرًا — للاستخدام كأداة فرز أولية وليست للتشخيص</p>
+        </div>
       </div>
-      <div class="top-actions">
-        <button id="infoBtn" class="btn outline">معلومة حول التصحيح</button>
-      </div>
+      <button id="infoBtn" class="btn info-btn">معلومة حول الفحص</button>
     </header>
 
-    <section class="meta">
-      <label class="meta-field">اسم الطفل / المعرف
-        <input id="childName" type="text" placeholder="اختياري — يظهر في التقرير">
-      </label>
-      <label class="meta-field">اسم الفاحص
-        <input id="clinicianName" type="text" placeholder="مثلاً: SLP.Ahmad Ghanem">
-      </label>
-      <label class="meta-field">تاريخ الفحص
-        <input id="examDate" type="date">
-      </label>
+    <!-- PERSONAL INFO -->
+    <section class="card meta-card">
+      <h2 class="section-title">المعلومات التعريفية</h2>
+      <div class="meta-grid">
+        <div class="meta-field">
+          <label for="childName">اسم الطفل / المعرف</label>
+          <input id="childName" type="text" placeholder="اختياري — يظهر في التقرير">
+        </div>
+        <div class="meta-field">
+          <label for="clinicianName">اسم الفاحص</label>
+          <input id="clinicianName" type="text" placeholder="مثلاً: SLP. أحمد غانم">
+        </div>
+        <div class="meta-field">
+          <label for="examDate">تاريخ الفحص</label>
+          <input id="examDate" type="date">
+        </div>
+      </div>
     </section>
+
+
 
     <section class="card questions-card" id="questionsCard">
       <div class="card-header">
         <h2>الإرشادات:</h2>
-        <p>اضغط على "نعم" أو "لا" لكل بند. النتيجة تُحدث تلقائياً. إذا لم تُجب على بند، لا يُحسب.</p>
+        <p>اضغط على "نعم" أو "لا" لكل بند. اضغط على السؤال نفسه لعرض وصف قصير ومثال. النتيجة تُحدث تلقائياً. إذا تركت بنداً بدون إجابة لا يُحتسب.</p>
       </div>
 
-      <div id="questionsList" class="questions-list">
-        <!-- أسئلة ثابتة — مُنشأة من script.js -->
+      <div id="questionsList" class="questions-list" aria-live="polite">
+        <!-- يُملأ من script.js -->
       </div>
     </section>
 
@@ -67,27 +78,82 @@
       <textarea id="reportArea" rows="8" readonly placeholder="اضغط تنزيل أو غيّر الإجابات لتحديث التقرير"></textarea>
     </section>
 
-
   </main>
+<!-- Info modal (hidden) -->
+<div id="overlay" class="overlay hidden" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    
+    <h3 id="modalTitle">معلومة حول التصحيح والعناصر الحرجة</h3>
+    
+    <div class="modal-body">
 
-  <!-- Info modal (hidden) -->
-  <div id="overlay" class="overlay hidden">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <h3 id="modalTitle">معلومة حول التصحيح والـ "غير طبيعي"</h3>
-      <div class="modal-body">
-        <p>في هذا النموذج نحن لا نعرض عمود "الجواب الذي يعتبر غير طبيعي" لكل سؤال — بدلاً من ذلك، هذه الخلاصة تشرح لكل بند ما هي الإجابة التي تُحتسب كعلامة خطر (غير طبيعية) وكيف تُعامل البنود الحرجة:</p>
+      <!-- Intro paragraph -->
+      <p>
+        هذا الاختبار هو أداة فحص أولية لفرز احتمالية وجود صعوبات تطورية.  
+        كل بند يُحتسب كـ "طبيعي" أو "غير طبيعي" بناءً على الإجابة.  
+        الإجابة غير الطبيعية تعني وجود سلوك أو نقص مهاري يتطلب متابعة أو تقييم أعمق.
+      </p>
 
-        <ul>
-          <li>العناصر الحرجة في هذه النسخة: <strong>1, 7, 9, 13, 14, 15</strong>. وجود عنصرين أو أكثر من هذه العناصر بعبارات غير طبيعية يستوجب إحالة عاجلة.</li>
-          <li>التعيين الافتراضي لِما يُعتبر "غير طبيعي" مبني على النسخة المعربة الشائعة: لكل سؤال ذُكر أدناه يتضح أي إجابة تُحتسب كغير طبيعية. تحقق سريريًا قبل اتخاذ قرار نهائي.</li>
-        </ul>
+      <!-- Spacer -->
+      <div class="spacer"></div>
 
-        <table class="modal-table">
-          <thead><tr><th>رقم</th><th>موجز السؤال</th><th>تُحتسب كـ "غير طبيعي" إذا كانت الإجابة</th></tr></thead>
-          <tbody id="modalTableBody">
-            <!-- تُملأ من السكربت -->
-          </tbody>
-        </table>
+      <!-- List of key points -->
+      <ul>
+        <li>
+          العناصر الحرجة المدرجة أدناه هي مؤشرات قوية؛  
+          وجود <strong>عنصرين حرجيين أو أكثر</strong> بإجابات غير طبيعية  
+          يوصي بالإحالة الفورية لتقييم تشخيصي.
+        </li>
+        <div class="spacer"></div>
+        <li>
+          الدرجة الكمية مهمة لكنها لا تغني عن التقدير السريري:  
+          يجب على الفاحص تقييم الطفل سريريًا مع استخدام المعلومات المستمدة من تاريخ النمو والملاحظات المباشرة.
+          <p>الفشل على 5 فقرات من القائمة ككل يعني ضرورة إجراء تقييم شامل للتوحد.</p>
+        </li>
+        <div class="spacer"></div>
+        <li>
+          خريطة "غير الطبيعي" الموجودة بالجدول توضّح أي إجابة تُحتسب كإشارة خطر لكل بند.
+        </li>
+      </ul>
+
+      <div class="spacer"></div>
+
+      <!-- Table for dynamic data -->
+      <table class="modal-table" aria-describedby="modalTitle">
+        <thead>
+          <tr>
+            <th>رقم</th>
+            <th>السؤال</th>
+            <th>تُعد غير طبيعية إذا</th>
+            <th>حرجة</th>
+          </tr>
+        </thead>
+        <tbody id="modalTableBody">
+          <!-- يتم تعبئة الأسطر ديناميكياً عبر JavaScript -->
+        </tbody>
+      </table>
+
+      <div class="spacer"></div>
+
+      <!-- Acknowledgment -->
+      <div class="acknowledgment">
+        <p>
+          تم تطوير هذه القائمة من قبل روبينز وفيين وبارتون وجريين (2001)  
+          وتم تعريبها من قبل الدكتور محمود رشاد (الجمهورية العربية المصرية)  
+          دبلوم الاضطرابات السلوكية والنفسية — مؤسسة تنامي ترين — المحور 3 — د. شوقي غانم.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Footer button -->
+    <div class="modal-foot">
+      <button id="closeModal" class="btn">إغلاق</button>
+    </div>
+
+  </div>
+</div>
+
 
       </div>
       <div class="modal-foot">
