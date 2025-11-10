@@ -303,31 +303,23 @@
             </div>
         </div>
     </div>
-
-    <!-- Image Select (Category) Modal -->
-    <div id="modal-image-select" class="modal">
-        <!-- MODIFIED: Added max-h-[90vh] and flex-col for better mobile responsiveness -->
+.<div id="modal-image-select" class="modal">
         <div class="bg-white rounded-2xl shadow-xl p-6 relative w-full max-w-2xl max-h-[90vh] flex flex-col">
-            <button class="modal-close-btn absolute top-3 right-3 text-gray-400 hover:text-gray-700 transition-colors" dir="ltr">
+            <button class="modal-close-btn absolute top-3 end-3 text-gray-400 hover:text-gray-700 transition-colors">
                 <ion-icon name="close-circle" class="text-4xl"></ion-icon>
             </button>
             <h3 class="text-2xl font-bold mb-4 flex-shrink-0" data-key="add_image">Add an Image</h3>
             
-            <!-- Search Bar -->
             <div class="relative mb-4 flex-shrink-0">
-                <input type="search" id="image-search-bar" data-key="search_placeholder" placeholder="Search for an image..." class="w-full p-3 pl-10 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0">
-                <ion-icon name="search-outline" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl" dir="ltr"></ion-icon>
+                <input type="search" id="image-search-bar" data-key="search_placeholder" placeholder="Search for an image..." class="w-full p-3 ps-10 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0">
+                <ion-icon name="search-outline" class="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl"></ion-icon>
             </div>
             
-            <!-- Categories -->
-             <h4 class="font-bold mb-2 flex-shrink-0" data-key="categories">Categories</h4>
+            <h4 class="font-bold mb-2 flex-shrink-0" data-key="categories">Categories</h4>
              
-            <!-- MODIFIED: This is the horizontally scrolling container you requested -->
-            <div id="image-categories" class="flex space-x-3 mb-6 overflow-x-auto py-3 px-2 bg-gray-100 rounded-lg">
-                <!-- Categories injected by JS -->
-            </div>
+            <div id="image-categories" class="flex gap-3 mb-6 overflow-x-auto py-3 px-2 bg-gray-100 rounded-lg">
+                </div>
             
-            <!-- Upload Footer -->
             <div class="border-t pt-4 text-center flex-shrink-0">
                 <label for="upload-image-input" class="cursor-pointer bg-green-100 text-green-700 font-bold py-3 px-6 rounded-lg hover:bg-green-200 transition-colors">
                     <ion-icon name="cloud-upload-outline" class="mr-2 align-middle"></ion-icon>
@@ -337,7 +329,6 @@
             </div>
         </div>
     </div>
-    
 <div id="modal-image-picker" class="modal">
 <div class="bg-white rounded-xl shadow-2xl max-h-full flex flex-col relative">
         <button class="modal-back-btn absolute top-5 left-5 text-gray-400 hover:text-gray-700 transition-colors z-10" dir="ltr">
@@ -1755,7 +1746,7 @@
             "vegetables": "leaf-outline",
             "drinks": "cafe-outline",
             "family": "people-outline",
-            "toys": "game-controller-outline",
+            "toys": "balloon-outline",
             "common_items": "key-outline",
             "prepositions": "cube-outline",
             "senses": "eye-outline",
