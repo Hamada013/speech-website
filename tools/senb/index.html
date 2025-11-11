@@ -188,12 +188,21 @@
             gap: 1.5rem; /* gap-6 */
         }
 
+        /* --- CHANGE #2: Responsive Small Cards --- */
         /* The small cards */
         .sentence-slot-small {
-            width: 12rem; /* w-48 */
+            width: 8rem; /* w-32, for small phones */
             aspect-ratio: 1 / 1;
             flex-shrink: 0;
         }
+        
+        /* On 'sm' screens (640px) and up, go back to the original 12rem */
+        @media (min-width: 640px) {
+            .sentence-slot-small {
+                width: 12rem; /* w-48 */
+            }
+        }
+        /* --- End of CHANGE #2 --- */
         
         /* Class to hide the big card (from "Toggle Big Card" button) */
         #card-grid.big-card-hidden .sentence-slot-big {
@@ -246,7 +255,13 @@
                 </div>
                 <span class="font-bold text-xl text-sky-600">Building Sentence</span>
             </div>
+            
+            <!-- --- CHANGE #1: Added Return Button --- -->
             <div id="header-controls" class="flex items-center gap-4">
+                <!-- NEW Back Button (Return) -->
+                <button id="btn-back" title="Go Back" class="hidden text-slate-500 hover:text-sky-500 transition-colors">
+                    <ion-icon name="arrow-back-circle-outline" class="text-3xl"></ion-icon>
+                </button>
                 <!-- Back to Home Button (visible on inner pages) -->
                 <button id="btn-back-home" title="Back to Home" class="hidden text-slate-500 hover:text-sky-500 transition-colors">
                     <ion-icon name="home" class="text-3xl"></ion-icon>
@@ -256,6 +271,7 @@
                     عربي
                 </button>
             </div>
+            <!-- --- End of CHANGE #1 --- -->
         </header>
 
         <!-- ===== Main Content Area (Pages) ===== -->
@@ -787,6 +803,7 @@
             };
         }
         
+        // --- CHANGE #3: Updated showPage function ---
         // Shows the specified page and hides others
         function showPage(pageId) {
             currentPage = pageId;
@@ -796,16 +813,35 @@
             document.getElementById(`page-${pageId}`).classList.remove('hidden');
             
             const footer = document.getElementById('app-footer');
-            const backButton = document.getElementById('btn-back-home');
+            const homeButton = document.getElementById('btn-back-home');
+            const backButton = document.getElementById('btn-back'); // NEW
             
             if (pageId === 'home') {
                 footer.classList.remove('hidden');
+                homeButton.classList.add('hidden');
                 backButton.classList.add('hidden');
-            } else {
+            } else if (pageId === 'templates') {
                 footer.classList.add('hidden');
-                backButton.classList.remove('hidden');
+                homeButton.classList.add('hidden'); // Hide, redundant
+                backButton.classList.remove('hidden'); // Show, goes to home
+            } else if (pageId === 'cards') {
+                footer.classList.add('hidden');
+                homeButton.classList.remove('hidden'); // Show, goes to home
+                backButton.classList.remove('hidden'); // Show, goes to templates
             }
         }
+        // --- End of CHANGE #3 ---
+
+        // --- CHANGE #4: New handleGoBack function ---
+        // Handles the new back button
+        function handleGoBack() {
+            if (currentPage === 'cards') {
+                showPage('templates');
+            } else if (currentPage === 'templates') {
+                showPage('home');
+            }
+        }
+        // --- End of CHANGE #4 ---
         
         // Shows a modal by its ID
         function showModal(modalId) {
@@ -1210,11 +1246,13 @@
         
         // --- Event Handlers ---
         
+        // --- CHANGE #5: Updated initApp function ---
         // Main function to initialize the app
         function initApp() {
             // Page navigation
             document.getElementById('btn-start').addEventListener('click', () => showPage('templates'));
             document.getElementById('btn-back-home').addEventListener('click', () => showPage('home'));
+            document.getElementById('btn-back').addEventListener('click', handleGoBack); // NEW LISTENER
             document.getElementById('btn-info').addEventListener('click', () => showModal('modal-info'));
             
             // Language
@@ -1262,6 +1300,7 @@
             setLanguage('en');
             renderTemplatePage();
         }
+        // --- End of CHANGE #5 ---
         
         // Handles click on an empty slot
         function handleEmptySlotClick(slotId) {
