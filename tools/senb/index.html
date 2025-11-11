@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Sentence</title>
+    <!-- 1. Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. Google Font (Inter) for a clean, modern look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- 3. Ionicons for icons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    
+    <!-- 4. Custom CSS Styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc; /* gray-50 */
+            overflow: hidden; /* Prevents browser-level scrolling */
+        }
+        
+        /* Main container for the app, allows internal scrolling */
+        #app-container {
+            height: 100vh;
+            overflow-y: auto;
+            width: 100%;
+        }
+        
+        /* Modal base styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 50;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        /* Forces the inner Image Picker Modal container to 95% width */
+        .modal-image-picker > div {
+            max-width: initial !important; 
+            width: 95vw !important;      
+        }
+        
+        /* Base style for all card slots */
+        .card-slot {
+            border: 4px dashed #cbd5e1; /* slate-300 */
+            border-radius: 1.5rem; /* rounded-3xl */
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+        }
+        
+        .card-slot:hover {
+            border-color: #0ea5e9; /* sky-500 */
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        /* Plus icon for empty slots */
+        .card-slot[data-filled="false"] ion-icon {
+            font-size: 3.75rem; /* 6xl */
+            color: #cbd5e1; /* slate-300 */
+            opacity: 0.75;
+            transition: all 0.2s ease;
+        }
+        .card-slot[data-filled="false"]:hover ion-icon {
+            opacity: 1;
+            color: #0ea5e9; /* sky-500 */
+            transform: scale(1.1);
+        }
+        
+        /* Style for filled slots */
+        .card-slot[data-filled="true"] {
+            border-style: solid;
+            border-color: #7dd3fc; /* sky-300 */
+            padding: 0;
+        }
+        
+        .card-slot-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .card-slot-title {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+            padding: 0.5rem;
+            text-align: center;
+            font-weight: 600; /* semibold */
+            color: #1e293b; /* slate-800 */
+            font-size: 1rem;
+            line-height: 1.5rem;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Class to hide titles (from "Toggle Titles" button) */
+        #card-grid.titles-hidden .card-slot-title {
+            opacity: 0;
+            transform: translateY(100%);
+            pointer-events: none;
+        }
+        
+        /* Card options menu (dots) */
+        .card-options-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 9999px;
+            padding: 0.25rem;
+            z-index: 10;
+            transition: background-color 0.2s;
+        }
+        .card-options-btn:hover {
+            background-color: rgba(255, 255, 255, 1);
+        }
+
+        /* RTL support for dots button */
+        [dir="rtl"] .card-options-btn {
+            right: auto;
+            left: 0.5rem;
+        }
+        
+        .card-options-menu {
+            display: none;
+            position: absolute;
+            top: 2.5rem;
+            right: 0.5rem;
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            z-index: 20;
+            overflow: hidden;
+            width: 160px;
+        }
+        [dir="rtl"] .card-options-menu {
+            right: auto;
+            left: 0.5rem;
+        }
+        
+        /* Layout for the cards page, as requested */
+        #card-grid {
+            width: 100%;
+            max-width: 72rem; /* max-w-6xl */
+            margin-left: auto;
+            margin-right: auto;
+            padding: 2rem 1rem;
+        }
+
+        /* The big card */
+        .sentence-slot-big {
+            width: 100%;
+            max-width: 32rem; /* max-w-lg */
+            margin-left: auto;
+            margin-right: auto;
+            aspect-ratio: 16 / 11;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Container for the small cards */
+        .sentence-slots-small-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center; /* This centers the small cards */
+            gap: 1.5rem; /* gap-6 */
+        }
+
+        /* The small cards */
+        .sentence-slot-small {
+            width: 12rem; /* w-48 */
+            aspect-ratio: 1 / 1;
+            flex-shrink: 0;
+        }
+        
+        /* Class to hide the big card (from "Toggle Big Card" button) */
+        #card-grid.big-card-hidden .sentence-slot-big {
+            transform: scale(0.9);
+            opacity: 0;
+            height: 0;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            overflow: hidden;
+        }
+        
+        /* "Pop up" animation for Play All */
+        .card-playing {
+            transform: scale(1.1) translateY(-10px);
+            box-shadow: 0 0 30px 10px #0ea4e966; /* sky-500 with opacity */
+            border-color: #0ea5e9; /* sky-500 */
+        }
+        
+        /* Feedback modal animation */
+        .feedback-modal {
+            animation: fadeInOut 2s ease-in-out;
+        }
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; transform: scale(0.9); }
+            10%, 90% { opacity: 1; transform: scale(1); }
+        }
+        
+        /* Recording animation */
+        .recording-indicator {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800">
+
+    <!-- The main container that will be scaled -->
+    <div id="app-container" class="min-h-screen flex flex-col">
+
+        <!-- ===== App Header ===== -->
+        <header id="app-header" class="p-4 bg-white shadow-sm flex justify-between items-center relative z-20 border-b border-slate-200">
+            <div class="flex items-center gap-3">
+                <!-- Logo -->
+                <div class="w-10 h-10 bg-sky-500 text-white flex items-center justify-center rounded-lg">
+                    <ion-icon name="chatbubbles-outline" class="text-2xl"></ion-icon>
+                </div>
+                <span class="font-bold text-xl text-sky-600">Building Sentence</span>
+            </div>
+            <div id="header-controls" class="flex items-center gap-4">
+                <!-- Back to Home Button (visible on inner pages) -->
+                <button id="btn-back-home" title="Back to Home" class="hidden text-slate-500 hover:text-sky-500 transition-colors">
+                    <ion-icon name="home" class="text-3xl"></ion-icon>
+                </button>
+                <!-- Language Toggle Button -->
+                <button id="btn-lang-toggle" class="font-semibold text-slate-600 hover:text-sky-500 bg-slate-100 hover:bg-sky-100 px-4 py-2 rounded-lg text-lg transition-colors">
+                    عربي
+                </button>
+            </div>
+        </header>
+
+        <!-- ===== Main Content Area (Pages) ===== -->
+        <main class="flex-grow">
+
+            <!-- ===== Page 1: Home ===== --> 
+            <div id="page-home" class="flex flex-col items-center justify-center p-8 text-center min-h-[70vh]">
+                <div class="w-24 h-24 bg-sky-500 text-white flex items-center justify-center rounded-2xl shadow-lg mb-6">
+                    <ion-icon name="chatbubbles-outline" class="text-6xl"></ion-icon>
+                </div>
+                <h1 class="text-5xl font-extrabold text-slate-800 mb-12" data-key="welcome_title">Building Sentence</h1>
+                
+                <div class="space-y-6 w-full max-w-sm">
+                    <button id="btn-start" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold text-2xl py-4 px-6 rounded-2xl shadow-lg transition transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-sky-300 focus:ring-opacity-50" data-key="lets_start">
+                        Let's Start
+                    </button>
+                    <button id="btn-info" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold text-2xl py-4 px-6 rounded-2xl shadow-lg transition transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-teal-200 focus:ring-opacity-50" data-key="info">
+                        Info for Parents
+                    </button>
+                </div>
+            </div>
+
+            <!-- ===== Page 2: Template Selection ===== -->
+            <div id="page-templates" class="hidden p-8">
+                <h2 class="text-3xl font-bold text-center mb-8" data-key="select_template">Choose a Sentence Template</h2>
+                <!-- Template Buttons (as requested) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+                    
+                    <!-- Template: 1 Big + 2 Small -->
+                    <button class="template-btn group" data-slots="2">
+                        <span class="font-bold text-lg" data-key="template_1_2">Main + 2 Words</span>
+                        <div class="flex-grow flex flex-col items-center justify-center w-full px-4">
+                            <div class="w-full h-16 bg-slate-200 rounded-lg mb-3 group-hover:bg-sky-200 transition-colors"></div>
+                            <div class="flex justify-center gap-3 w-full">
+                                <div class="w-12 h-12 bg-slate-200 rounded-lg group-hover:bg-sky-200 transition-colors"></div>
+                                <div class="w-12 h-12 bg-slate-200 rounded-lg group-hover:bg-sky-200 transition-colors"></div>
+                            </div>
+                        </div>
+                    </button>
+                    
+                    <!-- Template: 1 Big + 3 Small -->
+                    <button class="template-btn group" data-slots="3">
+                        <span class="font-bold text-lg" data-key="template_1_3">Main + 3 Words</span>
+                        <div class="flex-grow flex flex-col items-center justify-center w-full px-4">
+                            <div class="w-full h-16 bg-slate-200 rounded-lg mb-3 group-hover:bg-sky-200 transition-colors"></div>
+                            <div class="flex justify-center gap-3 w-full">
+                                <div class="w-12 h-12 bg-slate-200 rounded-lg group-hover:bg-sky-200 transition-colors"></div>
+                                <div class="w-12 h-12 bg-slate-200 rounded-lg group-hover:bg-sky-200 transition-colors"></div>
+                                <div class="w-12 h-12 bg-slate-200 rounded-lg group-hover:bg-sky-200 transition-colors"></div>
+                            </div>
+                        </div>
+                    </button>
+
+                    <!-- Template: 1 Big + 4 Small -->
+                    <button class="template-btn group" data-slots="4">
+                        <span class="font-bold text-lg" data-key="template_1_4">Main + 4 Words</span>
+                        <div class="flex-grow flex flex-col items-center justify-center w-full px-4">
+                            <div class="w-full h-16 bg-slate-200 rounded-lg mb-3 group-hover:bg-sky-200 transition-colors"></div>
+                            <div class="flex justify-center gap-3 w-full">
+                                <div class="w-12 h-12 bg-slate-200 rounded-lg group-hover:bg-sky-200 transition-colors"></div>
+                                <div class="w-12 h-12 bg-slate-200 rounded-lg group-hover:bg-sky-200 transition-colors"></div>
+                                <div class="w-12 h-12 bg-slate-200 rounded-lg group-hover:bg-sky-200 transition-colors"></div>
+                                <div class="w-12 h-12 bg-slate-200 rounded-lg group-hover:bg-sky-200 transition-colors"></div>
+                            </div>
+                        </div>
+                    </button>
+                    
+                    <!-- Template: 1 Big + 5 Small -->
+                    <button class="template-btn group" data-slots="5">
+                        <span class="font-bold text-lg" data-key="template_1_5">Main + 5 Words</span>
+                        <div class="flex-grow flex flex-col items-center justify-center w-full px-4">
+                            <div class="w-full h-16 bg-slate-200 rounded-lg mb-3 group-hover:bg-sky-200 transition-colors"></div>
+                            <div class="flex justify-center gap-3 w-full">
+                                <div class="w-12 h-12 bg-slate-200 rounded-lg group-hover:bg-sky-200 transition-colors"></div>
+                                <div class="w-12 h-12 bg-slate-200 rounded-lg group-hover:bg-sky-200 transition-colors"></div>
+                                <div class="w-12 h-12 bg-slate-200 rounded-lg group-hover:bg-sky-200 transition-colors"></div>
+                                <div class="w-12 h-12 bg-slate-200 rounded-lg group-hover:bg-sky-200 transition-colors"></div>
+                                <div class="w-12 h-12 bg-slate-200 rounded-lg group-hover:bg-sky-200 transition-colors"></div>
+                            </div>
+                        </div>
+                    </button>
+                    
+                </div>
+            </div>
+
+            <!-- ===== Page 3: Cards Page ===== -->
+            <div id="page-cards" class="hidden">
+                <!-- Control Bar (NOW with 4 buttons) -->
+                <div class="flex justify-center items-center gap-2 md:gap-4 py-4 px-2 md:px-8 flex-wrap bg-white shadow-sm border-b border-slate-200">
+                    <!-- Button: Play All -->
+                    <button id="btn-play-all" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition transform hover:scale-105 text-lg flex items-center gap-2">
+                        <ion-icon name="play" class="text-xl"></ion-icon>
+                        <span data-key="play_all">Play All</span>
+                    </button>
+                    <!-- Button: Toggle Titles -->
+                    <button id="btn-toggle-titles" title="Toggle Titles" class="bg-slate-500 hover:bg-slate-600 text-white font-bold p-3 rounded-xl shadow-lg transition transform hover:scale-105 text-lg">
+                        <ion-icon name="eye-outline" class="text-2xl align-middle"></ion-icon>
+                    </button>
+                    <!-- Button: Toggle Big Card -->
+                    <button id="btn-toggle-big-card" title="Toggle Big Card" class="bg-slate-500 hover:bg-slate-600 text-white font-bold p-3 rounded-xl shadow-lg transition transform hover:scale-105 text-lg">
+                        <ion-icon name="image-outline" class="text-2xl align-middle"></ion-icon>
+                    </button>
+                    <!-- NEW BUTTON: Reset Cards -->
+                    <button id="btn-reset-cards" title="Reset Cards" class="bg-red-500 hover:bg-red-600 text-white font-bold p-3 rounded-xl shadow-lg transition transform hover:scale-105 text-lg">
+                        <ion-icon name="refresh-outline" class="text-2xl align-middle"></ion-icon>
+                        <span class="sr-only" data-key="reset_cards">Reset</span>
+                    </button>
+                </div>
+                
+                <!-- Card Grid (will be populated by JS) -->
+                <div id="card-grid">
+                    <!-- K-Content will be built by JS -->
+                </div>
+            </div>
+
+        </main>
+
+        <!-- ===== App Footer ===== -->
+        <footer id="app-footer" class="text-center p-4 text-slate-500 text-xs bg-white/50 border-t border-slate-100">
+            <p>Speech and Language Pathology &copy; 2024 Ahmad Ghanem</p>
+        </footer>
+    </div>
+
+
+    <!-- =================================== -->
+    <!-- ===== Modals and Popups ===== -->
+    <!-- =================================== -->
+
+    <!-- Info for Parents Modal -->
+    <div id="modal-info" class="modal">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 relative">
+            <button class="modal-close-btn absolute top-3 right-3 text-slate-400 hover:text-slate-700 transition-colors" dir="ltr">
+                <ion-icon name="close-circle" class="text-4xl"></ion-icon>
+            </button>
+            <h3 class="text-2xl font-bold mb-4 text-sky-600" data-key="info_title">Information for Parents</h3>
+            <div class="space-y-3 text-slate-700 max-h-[60vh] overflow-y-auto pr-2">
+                <p data-key="info_welcome">Welcome! This tool is designed to help with building sentences in a fun and interactive way.</p>
+                <p><strong class="text-sky-500" data-key="info_how_to_use">How to use:</strong></p>
+                <ol class="list-decimal space-y-2 ltr:list-inside rtl:list-outside rtl:mr-6">
+                    <li data-key="info_item_1">Click "Let's Start" to choose a sentence template (e.g., 1 main card + 3 word cards).</li>
+                    <li data-key="info_item_2">Click the "+" on the big card to add a scene or main idea.</li>
+                    <li data-key="info_item_3">Click the "+" on the small cards to add words (verbs, subjects, etc.) from specific categories.</li>
+                    <li data-key="info_item_4">Once cards are added, you can click the "dots" icon on any card to edit its title or record your own voice.</li>
+                    <li data-key="info_item_5">Use the "Play All" button to hear your sentence spoken out loud.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Image Select Modal -->
+    <div id="modal-image-select" class="modal">
+        <div class="bg-white rounded-2xl shadow-xl p-6 relative w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <button class="modal-close-btn absolute top-3 end-3 text-slate-400 hover:text-slate-700 transition-colors">
+                <ion-icon name="close-circle" class="text-4xl"></ion-icon>
+            </button>
+            <h3 class="text-2xl font-bold mb-4 flex-shrink-0" data-key="add_image">Add an Image</h3>
+            
+            <!-- Global search (for big card) -->
+            <div id="global-search-container" class="relative mb-4 flex-shrink-0">
+                <input type="search" id="image-search-bar" data-key="search_placeholder" placeholder="Search for a scene or image..." class="w-full p-3 ps-10 border-2 border-slate-300 rounded-lg focus:border-sky-500 focus:ring-0">
+                <ion-icon name="search-outline" class="absolute start-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl"></ion-icon>
+            </div>
+            
+            <h4 id="categories-title" class="font-bold mb-2 flex-shrink-0" data-key="categories">Categories</h4>
+             
+            <!-- Category buttons container -->
+            <div id="image-categories" class="flex gap-3 mb-6 overflow-x-auto py-3 px-2 bg-slate-100 rounded-lg">
+                <!-- Categories will be injected here by JS -->
+            </div>
+            
+            <!-- Upload from device button -->
+            <div class="border-t pt-4 text-center flex-shrink-0">
+                <label for="upload-image-input" class="cursor-pointer bg-green-100 text-green-700 font-bold py-3 px-6 rounded-lg hover:bg-green-200 transition-colors">
+                    <ion-icon name="cloud-upload-outline" class="mr-2 align-middle"></ion-icon>
+                    <span data-key="upload_device">Upload from your device</span>
+                </label>
+                <input type="file" id="upload-image-input" class="hidden" accept="image/*">
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Picker Modal (shows images from a category) -->
+    <div id="modal-image-picker" class="modal modal-image-picker">
+        <div class="bg-white rounded-xl shadow-2xl max-h-full flex flex-col relative">
+            <button class="modal-back-btn absolute top-5 left-5 text-slate-400 hover:text-slate-700 transition-colors z-10" dir="ltr">
+                <ion-icon name="arrow-back-circle" class="text-4xl"></ion-icon>
+            </button>
+            <button class="modal-close-btn absolute top-5 right-5 text-slate-400 hover:text-slate-700 transition-colors z-10" dir="ltr">
+                <ion-icon name="close-circle" class="text-4xl"></ion-icon>
+            </button>
+
+            <h3 id="picker-title" class="text-2xl font-bold mt-10 mb-4 text-center">Select Image</h3>
+            
+            <!-- Category-specific search bar -->
+            <div class="relative mb-4 w-full max-w-lg mx-auto px-4">
+                <input type="search" id="category-search-bar" data-key="search_category_placeholder" placeholder="Search in this category..." class="w-full p-3 pl-10 border-2 border-slate-300 rounded-lg focus:border-sky-500 focus:ring-0">
+                <ion-icon name="search-outline" class="absolute left-7 top-1/2 -translate-y-1/2 text-slate-400 text-xl" dir="ltr"></ion-icon>
+            </div>
+            
+            <!-- Grid to show images -->
+            <div class="flex-grow overflow-y-auto min-h-0">
+                <div id="picker-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6 gap-4 p-4 bg-slate-50 rounded-lg mx-auto max-w-full">
+                    <!-- Images will be injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Title Modal (for card options) -->
+    <div id="modal-edit-title" class="modal">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 relative">
+            <button class="modal-close-btn absolute top-3 right-3 text-slate-400 hover:text-slate-700 transition-colors" dir="ltr">
+                <ion-icon name="close-circle" class="text-4xl"></ion-icon>
+            </button>
+            <h3 class="text-2xl font-bold mb-4" data-key="edit_title">Edit Title</h3>
+            <input type="text" id="edit-title-input" class="w-full p-3 border-2 border-slate-300 rounded-lg focus:border-sky-500 focus:ring-0 mb-4">
+            <button id="btn-save-title" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-4 rounded-lg transition-colors" data-key="save">
+                Save
+            </button>
+        </div>
+    </div>
+
+    <!-- Record Voice Modal (for card options) -->
+    <div id="modal-record-voice" class="modal">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 relative text-center">
+            <button class="modal-close-btn absolute top-3 right-3 text-slate-400 hover:text-slate-700 transition-colors" dir="ltr">
+                <ion-icon name="close-circle" class="text-4xl"></ion-icon>
+            </button>
+            <h3 class="text-2xl font-bold mb-6" data-key="record_voice">Record Voice</h3>
+            
+            <!-- Start Record Button -->
+            <div id="record-btn-container" class="mb-4">
+                <button id="btn-start-record" class="bg-red-500 hover:bg-red-600 text-white p-6 rounded-full shadow-lg transition-colors">
+                    <ion-icon name="mic" class="text-4xl"></ion-icon>
+                </button>
+            </div>
+            
+            <!-- Recording Controls (timer, stop) -->
+            <div id="recording-controls" class="hidden items-center justify-center gap-4 mb-4">
+                <span id="record-timer" class="text-xl font-bold text-slate-700 recording-indicator">00:00</span>
+                <button id="btn-stop-record" class="bg-slate-700 hover:bg-slate-800 text-white p-4 rounded-full shadow-lg transition-colors">
+                    <ion-icon name="stop" class="text-3xl"></ion-icon>
+                </button>
+            </div>
+            
+            <!-- Playback Controls (audio, save, re-record) -->
+            <div id="playback-controls" class="hidden space-y-4">
+                 <audio id="audio-playback" controls class="w-full"></audio>
+                <button id="btn-save-recording" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-4 rounded-lg transition-colors" data-key="save">
+                    Save
+                </button>
+                 <button id="btn-rerecord" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-4 rounded-lg transition-colors" data-key="rerecord">
+                    Re-record
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Card View Modal (when clicking a filled card) -->
+    <div id="modal-card-view" class="modal">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative">
+            <img id="card-view-img" src="" alt="Card Image" class="w-full aspect-square object-cover rounded-lg mb-4">
+            <h3 id="card-view-title" class="text-3xl font-bold text-center"></h3>
+        </div>
+    </div>
+    
+    <!-- Feedback Modal (Good/Try Again) -->
+    <div id="modal-feedback" class="modal feedback-modal !justify-center !items-center !bg-transparent !backdrop-filter-none">
+        <div id="feedback-content" class="p-8 rounded-2xl shadow-2xl flex flex-col items-center justify-center">
+            <ion-icon id="feedback-icon" name="checkmark-circle-outline" class="text-8xl mb-4"></ion-icon>
+            <span id="feedback-text" class="text-4xl font-bold"></span>
+        </div>
+    </div>
+    
+
+    <!-- =================================== -->
+    <!-- ===== JavaScript ===== -->
+    <!-- =================================== -->
+    <script type="module">
+        // --- State Management ---
+        let currentPage = 'home';
+        let currentLanguage = 'en';
+        let titlesVisible = true;
+        let bigCardVisible = true; // State for big card visibility
+        let isPlayingAll = false; // State to prevent clicks during "Play All"
+        let cardSlots = []; // Array of { id, isBig, image, titleKey, customTitle: {en, ar}, recording }
+        let activeSlotId = null; // The ID of the slot being edited
+        let activeRecording = {
+            slotId: null,
+            mediaRecorder: null,
+            audioChunks: [],
+            audioUrl: null,
+            timerInterval: null
+        };
+        
+        // --- Mock Image Database ---
+        // This database provides the images for the categories.
+        const imageDatabase = {
+            // Category for the big card, as requested
+            big_cards: { 
+                titleKey: "big_cards", 
+                images: [
+                    { src: "https://placehold.co/400x300/a7f3d0/166534?text=Garden", titleKey: "garden" },
+                    { src: "https://placehold.co/400x300/fecaca/991b1b?text=Hospital", titleKey: "hospital" },
+                    { src: "https://placehold.co/400x300/bfdbfe/1e3a8a?text=School", titleKey: "school" },
+                    { src: "https://placehold.co/400x300/fef08a/854d0e?text=Zoo", titleKey: "zoo" },
+                    { src: "https://placehold.co/400x300/d9f99d/3f6212?text=Playground", titleKey: "playground" },
+                    { src: "https://placehold.co/400x300/fde68a/854d0e?text=Farm", titleKey: "farm_animals" },
+                    { src: "https://placehold.co/400x300/a7f3d0/166534?text=Jungle", titleKey: "jungle_animals" },
+                    { src: "https://placehold.co/400x300/bae6fd/0c4a6e?text=Beach", titleKey: "crab" },
+                ] 
+            },
+            // Category for "Subject", as requested
+            subject: { 
+                titleKey: "subject", 
+                images: [
+                    { src: "https://placehold.co/200x200/e0e7ff/3730a3?text=Astronaut", titleKey: "astronaut" },
+                    { src: "https://placehold.co/200x200/f1f5f9/1e293b?text=Chef", titleKey: "chef_male" },
+                    { src: "https://placehold.co/200x200/f0f9ff/0c4a6e?text=Doctor", titleKey: "doctor_female" },
+                    { src: "https://placehold.co/200x200/fde68a/854d0e?text=Farmer", titleKey: "farmer_male" },
+                    { src: "https://placehold.co/200x200/fee2e2/991b1b?text=Firefighter", titleKey: "firefighter_male" },
+                    { src: "https://placehold.co/200x200/dbeafe/1e40af?text=Pilot", titleKey: "pilot" },
+                    { src: "https://placehold.co/200x200/dbeafe/1e3a8a?text=Police", titleKey: "police_officer_male" },
+                    { src: "https://placehold.co/200x200/f3e8ff/581c87?text=Teacher", titleKey: "teacher_female" },
+                ]
+            },
+            // Category for "Pronoun", as requested
+            pronoun: {
+                titleKey: "pronoun",
+                images: [
+                    { src: "https://placehold.co/200x200/e0f2fe/075985?text=I", titleKey: "i" },
+                    { src: "https://placehold.co/200x200/e0f2fe/075985?text=You", titleKey: "you" },
+                    { src: "https://placehold.co/200x200/fce7f3/9d174d?text=Mom", titleKey: "mom" },
+                    { src: "https://placehold.co/200x200/dbeafe/1e40af?text=Dad", titleKey: "dad" },
+                    { src: "https://placehold.co/200x200/dbeafe/1e40af?text=Brother", titleKey: "brother" },
+                    { src: "https://placehold.co/200x200/fce7f3/9d174d?text=Sister", titleKey: "sister" },
+                    { src: "https://placehold.co/200x200/e0e7ff/3730a3?text=Family", titleKey: "family" },
+                ]
+            },
+            // Category for "Verb", as requested
+            verbs: { 
+                titleKey: "verbs", 
+                images: [
+                    { src: "https://placehold.co/200x200/fef9c3/854d0e?text=Bake", titleKey: "bake" },
+                    { src: "https://placehold.co/200x200/e0f2fe/075985?text=Bath", titleKey: "bath" },
+                    { src: "https://placehold.co/200x200/fee2e2/991b1b?text=Build", titleKey: "build" },
+                    { src: "https://placehold.co/200x200/dcfce7/166534?text=Buy", titleKey: "buy" },
+                    { src: "https://placehold.co/200x200/f3e8ff/581c87?text=Carry", titleKey: "carry" },
+                    { src: "https://placehold.co/200x200/f1f5f9/1e293b?text=Climb", titleKey: "climb" },
+                    { src: "https://placehold.co/200x200/fef9c3/854d0e?text=Cook", titleKey: "cook" },
+                    { src: "https://placehold.co/200x200/dbeafe/1e40af?text=Cry", titleKey: "cry" },
+                    { src: "https://placehold.co/200x200/fef2f2/991b1b?text=Cut", titleKey: "cut" },
+                    { src: "https://placehold.co/200x200/f3e8ff/581c87?text=Draw", titleKey: "draw" },
+                    { src: "https://placehold.co/200x200/e0f2fe/075985?text=Drink", titleKey: "drink" },
+                    { src: "https://placehold.co/200x200/f1f5f9/1e293b?text=Drive", titleKey: "drive" },
+                    { src: "https://placehold.co/200x200/fef9c3/854d0e?text=Eat", titleKey: "eat" },
+                    { src: "https://placehold.co/200x200/dcfce7/166534?text=Jump", titleKey: "jump" },
+                    { src: "https://placehold.co/200x200/dcfce7/166534?text=Kick", titleKey: "kick" },
+                    { src: "https://placehold.co/200x200/fef9c3/854d0e?text=Laugh", titleKey: "laugh" },
+                    { src: "https://placehold.co/200x200/dcfce7/166534?text=Play", titleKey: "play" },
+                    { src: "https://placehold.co/200x200/f3e8ff/581c87?text=Read", titleKey: "read" },
+                    { src: "https://placehold.co/200x200/dcfce7/166534?text=Run", titleKey: "run" },
+                    { src: "https://placehold.co/200x200/f3e8ff/581c87?text=See", titleKey: "see" },
+                    { src: "https://placehold.co/200x200/fce7f3/9d174d?text=Sing", titleKey: "sing" },
+                    { src: "https://placehold.co/200x200/f1f5f9/1e293b?text=Sit", titleKey: "sit" },
+                    { src: "https://placehold.co/200x200/e0e7ff/3730a3?text=Sleep", titleKey: "sleep" },
+                    { src: "https://placehold.co/200x200/e0f2fe/075985?text=Swim", titleKey: "swim" },
+                    { src: "https://placehold.co/200x200/fce7f3/9d174d?text=Talk", titleKey: "talk" },
+                    { src: "https://placehold.co/200x200/fee2e2/991b1b?text=Throw", titleKey: "throw" },
+                    { src: "https://placehold.co/200x200/f1f5f9/1e293b?text=Walk", titleKey: "walk" },
+                    { src: "https://placehold.co/200x200/e0f2fe/075985?text=Wash", titleKey: "wash" },
+                    { src: "https://placehold.co/200x200/f3e8ff/581c87?text=Write", titleKey: "write" },
+                ]
+            },
+            // Category for "Place", as requested
+            places: { 
+                titleKey: "places", 
+                images: [
+                    { src: "https://placehold.co/200x200/f1f5f9/1e293b?text=Airport", titleKey: "airport" },
+                    { src: "https://placehold.co/200x200/fef9c3/854d0e?text=Bakery", titleKey: "bakery" },
+                    { src: "https://placehold.co/200x200/f1f5f9/1e293b?text=City", titleKey: "city" },
+                    { src: "https://placehold.co/200x200/fef9c3/854d0e?text=Library", titleKey: "library" },
+                    { src: "https://placehold.co/200x200/dcfce7/166534?text=Market", titleKey: "market" },
+                    { src: "https://placehold.co/400x300/bfdbfe/1e3a8a?text=School", titleKey: "school" },
+                    { src: "https://placehold.co/400x300/fef08a/854d0e?text=Zoo", titleKey: "zoo" },
+                    { src: "https://placehold.co/400x300/d9f99d/3f6212?text=Playground", titleKey: "playground" },
+                    { src: "https://placehold.co/400x300/a7f3d0/166534?text=Garden", titleKey: "garden" },
+                ] 
+            },
+            // Category for "Time", as requested
+            time: {
+                titleKey: "time",
+                images: [
+                    { src: "https://placehold.co/200x200/fef08a/854d0e?text=Sunny", titleKey: "sunny" },
+                    { src: "https://placehold.co/200x200/dbeafe/1e40af?text=Rainy", titleKey: "rainy" },
+                    { src: "https://placehold.co/200x200/e2e8f0/334155?text=Cloudy", titleKey: "cloudy" },
+                    { src: "https://placehold.co/200x200/f1f5f9/1e293b?text=Snowy", titleKey: "snow" },
+                    { src: "https://placehold.co/200x200/e0e7ff/3730a3?text=Stormy", titleKey: "storm" },
+                    { src: "https://placehold.co/200x200/e0e7ff/3730a3?text=Windy", titleKey: "windy" },
+                    { src: "https://placehold.co/200x200/fef08a/854d0e?text=Day", titleKey: "day" },
+                    { src: "https://placehold.co/200x200/1e293b/f1f5f9?text=Night", titleKey: "night" },
+                ]
+            }
+        };
+
+        // Icons for the categories
+        const categoryIcons = {
+            "big_cards": "image-outline",
+            "subject": "person-outline",
+            "pronoun": "people-outline",
+            "verbs": "walk-outline",
+            "places": "map-outline",
+            "time": "time-outline",
+            "default": "grid-outline"
+        };
+
+        // --- Translations ---
+        const translations = {
+            en: {
+                // UI
+                "welcome_title": "Building Sentence",
+                "lets_start": "Let's Start",
+                "info": "Info for Parents",
+                "select_template": "Choose a Sentence Template",
+                "template_1_2": "Main + 2 Words",
+                "template_1_3": "Main + 3 Words",
+                "template_1_4": "Main + 4 Words",
+                "template_1_5": "Main + 5 Words",
+                "play_all": "Play All",
+                "reset_cards": "Reset", // NEW TRANSLATION
+                "add_image": "Add an Image",
+                "search_placeholder": "Search for an image...",
+                "categories": "Categories",
+                "upload_device": "Upload from your device",
+                "edit_title": "Edit Title",
+                "save": "Save",
+                "record_voice": "Record Voice",
+                "rerecord": "Re-record",
+                "search_category_placeholder": "Search in this category...",
+                "search_results_title": "Search Results",
+                "lang_toggle": "عربي",
+                "info_title": "Information for Parents",
+                "info_welcome": "Welcome! This tool is designed to help with building sentences in a fun and interactive way.",
+                "info_how_to_use": "How to use:",
+                "info_item_1": "Click \"Let's Start\" to choose a sentence template (e.g., 1 main card + 3 word cards).",
+                "info_item_2": "Click the \"+\" on the big card to add a scene or main idea.",
+                "info_item_3": "Click the \"+\" on the small cards to add words (verbs, subjects, etc.) from specific categories.",
+                "info_item_4": "Once cards are added, you can click the \"dots\" icon on any card to edit its title or record your own voice.",
+                "info_item_5": "Use the \"Play All\" button to hear your sentence spoken out loud.",
+
+                // Categories
+                "big_cards": "Main Scenes",
+                "subject": "Subject",
+                "pronoun": "Pronoun",
+                "verbs": "Verbs",
+                "places": "Places",
+                "time": "Time",
+                
+                // Image Titles (Sample)
+                "garden": "Garden", "hospital": "Hospital", "school": "School", "zoo": "Zoo", "playground": "Playground", "farm_animals": "Farm", "jungle_animals": "Jungle", "crab": "Beach",
+                "astronaut": "Astronaut", "chef_male": "Chef", "doctor_female": "Doctor", "farmer_male": "Farmer", "firefighter_male": "Firefighter", "pilot": "Pilot", "police_officer_male": "Police", "teacher_female": "Teacher",
+                "i": "I", "you": "You", "mom": "Mom", "dad": "Dad", "brother": "Brother", "sister": "Sister", "family": "Family",
+                "bake": "Bake", "bath": "Bath", "build": "Build", "buy": "Buy", "carry": "Carry", "climb": "Climb", "cook": "Cook", "cry": "Cry", "cut": "Cut", "draw": "Draw", "drink": "Drink", "drive": "Drive", "eat": "Eat", "jump": "Jump", "kick": "Kick", "laugh": "Laugh", "play": "Play", "read": "Read", "run": "Run", "see": "See", "sing": "Sing", "sit": "Sit", "sleep": "Sleep", "swim": "Swim", "talk": "Talk", "throw": "Throw", "walk": "Walk", "wash": "Wash", "write": "Write",
+                "airport": "Airport", "bakery": "Bakery", "city": "City", "library": "Library", "market": "Market",
+                "sunny": "Sunny", "rainy": "Rainy", "cloudy": "Cloudy", "snow": "Snowy", "storm": "Stormy", "windy": "Windy", "day": "Day", "night": "Night"
+            },
+            ar: {
+                // UI
+                "welcome_title": "بناء جملة",
+                "lets_start": "لنبدأ",
+                "info": "معلومات للأهل",
+                "select_template": "اختر نموذج جملة",
+                "template_1_2": "رئيسي + كلمتان",
+                "template_1_3": "رئيسي + 3 كلمات",
+                "template_1_4": "رئيسي + 4 كلمات",
+                "template_1_5": "رئيسي + 5 كلمات",
+                "play_all": "تشغيل الكل",
+                "reset_cards": "إعادة تعيين", // NEW TRANSLATION
+                "add_image": "أضف صورة",
+                "search_placeholder": "ابحث عن صورة...",
+                "categories": "الفئات",
+                "upload_device": "رفع من جهازك",
+                "edit_title": "تعديل العنوان",
+                "save": "حفظ",
+                "record_voice": "تسجيل صوت",
+                "rerecord": "إعادة التسجيل",
+                "search_category_placeholder": "ابحث في هذه الفئة...",
+                "search_results_title": "نتائج البحث",
+                "lang_toggle": "English",
+                "info_title": "معلومات للأهل",
+                "info_welcome": "أهلاً بكم! تم تصميم هذه الأداة للمساعدة في بناء الجمل بطريقة ممتعة وتفاعلية.",
+                "info_how_to_use": "كيفية الاستخدام:",
+                "info_item_1": "انقر على \"لنبدأ\" لاختيار نموذج جملة (مثل: بطاقة رئيسية + 3 بطاقات كلمات).",
+                "info_item_2": "انقر على \"+\" على البطاقة الكبيرة لإضافة مشهد أو فكرة رئيسية.",
+                "info_item_3": "انقر على \"+\" على البطاقات الصغيرة لإضافة كلمات (أفعال، أسماء، إلخ) من فئات محددة.",
+                "info_item_4": "بمجرد إضافة البطاقات، يمكنك النقر على أيقونة \"النقاط\" على أي بطاقة لتعديل عنوانها أو تسجيل صوتك الخاص.",
+                "info_item_5": "استخدم زر \"تشغيل الكل\" لسماع جملتك.",
+
+                // Categories
+                "big_cards": "مشاهد رئيسية",
+                "subject": "فاعل",
+                "pronoun": "ضمير",
+                "verbs": "فعل",
+                "places": "مكان",
+                "time": "زمان",
+
+                // Image Titles (Sample)
+                "garden": "حديقة", "hospital": "مستشفى", "school": "مدرسة", "zoo": "حديقة حيوان", "playground": "ملعب", "farm_animals": "مزرعة", "jungle_animals": "غابة", "crab": "شاطئ",
+                "astronaut": "رائد فضاء", "chef_male": "طباخ", "doctor_female": "طبيبة", "farmer_male": "مزارع", "firefighter_male": "رجل إطفاء", "pilot": "طيار", "police_officer_male": "شرطي", "teacher_female": "معلمة",
+                "i": "أنا", "you": "أنت", "mom": "أمي", "dad": "أبي", "brother": "أخ", "sister": "أخت", "family": "عائلة",
+                "bake": "يخبز", "bath": "يستحم", "build": "يبني", "buy": "يشتري", "carry": "يحمل", "climb": "يتسلق", "cook": "يطبخ", "cry": "يبكي", "cut": "يقص", "draw": "يرسم", "drink": "يشرب", "drive": "يقود", "eat": "يأكل", "jump": "يقفز", "kick": "يركل", "laugh": "يضحك", "play": "يلعب", "read": "يقرأ", "run": "يركض", "see": "يرى", "sing": "يغني", "sit": "يجلس", "sleep": "ينام", "swim": "يسبح", "talk": "يتكلم", "throw": "يرمي", "walk": "يمشي", "wash": "يغسل", "write": "يكتب",
+                "airport": "مطار", "bakery": "مخبز", "city": "مدينة", "library": "مكتبة", "market": "سوق",
+                "sunny": "مشمس", "rainy": "ممطر", "cloudy": "غائم", "snow": "مثلج", "storm": "عاصف", "windy": "ريح", "day": "نهار", "night": "ليل"
+            }
+        };
+
+        // --- Utility Functions ---
+
+        // Debounce function to limit how often a function can run
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        // Shows the specified page and hides others
+        function showPage(pageId) {
+            currentPage = pageId;
+            document.querySelectorAll('#page-home, #page-templates, #page-cards').forEach(page => {
+                page.classList.add('hidden');
+            });
+            document.getElementById(`page-${pageId}`).classList.remove('hidden');
+            
+            const footer = document.getElementById('app-footer');
+            const backButton = document.getElementById('btn-back-home');
+            
+            if (pageId === 'home') {
+                footer.classList.remove('hidden');
+                backButton.classList.add('hidden');
+            } else {
+                footer.classList.add('hidden');
+                backButton.classList.remove('hidden');
+            }
+        }
+        
+        // Shows a modal by its ID
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'flex';
+            } else {
+                console.error("Modal not found:", modalId);
+            }
+        }
+        
+        // Hides a modal by its ID
+        function hideModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+            }
+
+             // Special cleanup for record modal
+            if (modalId === 'modal-record-voice') {
+                stopRecording(false); // Stop recording if user closes modal
+                if (activeRecording.audioUrl) {
+                    URL.revokeObjectURL(activeRecording.audioUrl);
+                }
+                resetRecordModalUI();
+                activeRecording = { slotId: null, mediaRecorder: null, audioChunks: [], audioUrl: null, timerInterval: null };
+            }
+        }
+        
+        // Translates all elements with a [data-key] attribute
+        function translateUI() {
+            const lang = translations[currentLanguage];
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (lang[key]) {
+                    if (el.tagName === 'INPUT' && el.type === 'search') {
+                        el.placeholder = lang[key];
+                    } else if (el.classList.contains('sr-only')) {
+                        // Handle screen-reader only text if needed, or just set textContent
+                        el.textContent = lang[key];
+                    }
+                     else {
+                        el.textContent = lang[key];
+                    }
+                }
+            });
+            document.getElementById('btn-lang-toggle').textContent = lang['lang_toggle'];
+        }
+
+        // Sets the language and updates the UI
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            translateUI();
+            renderCardGrid(); // Re-render grid to update titles
+        }
+
+        // Gets the correct title for a card (custom or default)
+        function getCardTitle(card) {
+            if (!card) return '';
+            // 1. Check for custom title in the current language
+            if (card.customTitle && card.customTitle[currentLanguage]) {
+                return card.customTitle[currentLanguage];
+            }
+            // 2. Check for default title key in the current language
+            if (card.titleKey && translations[currentLanguage][card.titleKey]) {
+                return translations[currentLanguage][card.titleKey];
+            }
+            // 3. Fallback for uploaded images (titleKey is the filename)
+            if (card.titleKey && !translations.en[card.titleKey]) {
+                return card.titleKey;
+            }
+            return card.titleKey || '';
+        }
+
+        // Plays text using browser's Text-to-Speech
+        function playTTS(text) {
+            return new Promise((resolve) => {
+                if (!text || typeof window.speechSynthesis === 'undefined') {
+                    console.warn('TTS not supported or no text provided.');
+                    resolve(); // Resolve immediately to not block the chain
+                    return;
+                }
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = currentLanguage === 'ar' ? 'ar-SA' : 'en-US';
+                utterance.onend = resolve;
+                utterance.onerror = (e) => {
+                    console.error("TTS Error:", e);
+                    resolve(); // Resolve even on error
+                };
+                window.speechSynthesis.speak(utterance);
+            });
+        }
+        
+        // Plays a recorded audio blob URL
+        function playRecording(audioUrl) {
+             return new Promise((resolve) => {
+                 const audio = new Audio(audioUrl);
+                 audio.onended = resolve;
+                 audio.onerror = (e) => {
+                    console.error("Audio Playback Error:", e);
+                    resolve(); // Resolve even on error
+                 };
+                 audio.play();
+             });
+        }
+
+        // Helper to play either recording or TTS for a card
+        async function playCardSoundWithPromise(card) {
+            if (card.recording) {
+                await playRecording(card.recording);
+            } else {
+                await playTTS(getCardTitle(card));
+            }
+        }
+        
+        // Shows a "Good Job" or "Try Again" feedback modal
+        function showFeedback(isCorrect) {
+            const modal = document.getElementById('modal-feedback');
+            const content = document.getElementById('feedback-content');
+            const icon = document.getElementById('feedback-icon');
+            const text = document.getElementById('feedback-text');
+
+            content.classList.remove('bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700');
+            
+            if (isCorrect) {
+                content.classList.add('bg-green-100', 'text-green-700');
+                icon.name = 'checkmark-circle-outline';
+                text.textContent = "Good Job!"; // Simple feedback
+            } else {
+                content.classList.add('bg-red-100', 'text-red-700');
+                icon.name = 'close-circle-outline';
+                text.textContent = "Try Again!"; // Simple feedback
+            }
+            
+            showModal('modal-feedback');
+            setTimeout(() => hideModal('modal-feedback'), 1500);
+        }
+
+        // --- Page/Component Rendering ---
+
+        // Renders the template selection buttons on Page 2
+        function renderTemplatePage() {
+            const container = document.getElementById('page-templates').querySelector('.grid');
+            container.innerHTML = '';
+            // Style for the template buttons
+            const btnClass = "template-btn group flex flex-col items-center p-4 bg-white rounded-2xl shadow-md hover:shadow-lg transition transform hover:scale-105 border-2 border-transparent hover:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-300 text-slate-700 h-48";
+
+            // Create the 4 template buttons (2, 3, 4, 5 small slots)
+            [2, 3, 4, 5].forEach(count => {
+                const btn = document.createElement('button');
+                btn.className = btnClass;
+                btn.dataset.slots = count;
+                
+                const templateKey = `template_1_${count}`;
+                const text = translations[currentLanguage][templateKey] || `Main + ${count} Words`;
+                
+                let smallSlotsHtml = '';
+                for(let i = 0; i < count; i++) {
+                    smallSlotsHtml += `<div class="w-10 h-10 sm:w-12 sm:h-12 bg-slate-200 rounded-lg group-hover:bg-sky-200 transition-colors"></div>`;
+                }
+                
+                btn.innerHTML = `
+                    <span class="font-bold text-lg text-slate-700" data-key="${templateKey}">${text}</span>
+                    <div class="flex-grow flex flex-col items-center justify-center w-full px-2 sm:px-4">
+                        <div class="w-full h-12 sm:h-16 bg-slate-200 rounded-lg mb-3 group-hover:bg-sky-200 transition-colors"></div>
+                        <div class="flex justify-center gap-2 sm:gap-3 w-full">
+                            ${smallSlotsHtml}
+                        </div>
+                    </div>
+                `;
+                
+                btn.addEventListener('click', () => handleTemplateSelect(count));
+                container.appendChild(btn);
+            });
+        }
+        
+        // Creates the card data structure when a template is selected
+        function handleTemplateSelect(smallSlotCount) {
+            cardSlots = [];
+            const totalSlots = 1 + smallSlotCount;
+            
+            for (let i = 0; i < totalSlots; i++) {
+                cardSlots.push({
+                    id: i,
+                    isBig: i === 0, // First slot is the big one
+                    image: null,
+                    titleKey: null,
+                    customTitle: { en: '', ar: '' },
+                    recording: null
+                });
+            }
+            renderCardGrid();
+            showPage('cards');
+        }
+        
+        // Renders the main card grid on Page 3
+        function renderCardGrid() {
+            const grid = document.getElementById('card-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            // Apply visibility classes based on state
+            grid.classList.toggle('titles-hidden', !titlesVisible);
+            grid.classList.toggle('big-card-hidden', !bigCardVisible);
+
+            const bigCard = cardSlots.find(c => c.isBig);
+            const smallCards = cardSlots.filter(c => !c.isBig);
+            
+            // 1. Create Big Card
+            if (bigCard) {
+                const slot = createCardElement(bigCard);
+                slot.classList.add('sentence-slot-big');
+                grid.appendChild(slot);
+            }
+            
+            // 2. Create Small Cards Container
+            const smallContainer = document.createElement('div');
+            smallContainer.className = 'sentence-slots-small-container';
+            smallCards.forEach(card => {
+                const slot = createCardElement(card);
+                slot.classList.add('sentence-slot-small');
+                smallContainer.appendChild(slot);
+            });
+            grid.appendChild(smallContainer);
+
+            // Global click to close open menus
+            document.body.addEventListener('click', (e) => {
+                if (!e.target.closest('.card-options-btn')) {
+                    document.querySelectorAll('.card-options-menu').forEach(m => m.style.display = 'none');
+                }
+            }, true);
+        }
+        
+        // Helper to create a single card slot element (filled or empty)
+        function createCardElement(card) {
+            const slot = document.createElement('div');
+            slot.className = 'card-slot';
+            slot.dataset.id = card.id;
+            
+            if (card.image) {
+                // --- FILLED CARD ---
+                slot.dataset.filled = "true";
+                const title = getCardTitle(card);
+                slot.innerHTML = `
+                    <img src="${card.image}" alt="${title}" class="card-slot-img" onerror="this.src='https://placehold.co/200x200/ef4444/ffffff?text=Error'; this.onerror=null;">
+                    <div class="card-slot-title">${title}</div>
+                    <!-- The "dots" options button -->
+                    <button class="card-options-btn" data-action="toggle-menu" title="Options">
+                        <ion-icon name="ellipsis-vertical" class="text-2xl text-slate-700"></ion-icon>
+                    </button>
+                    <!-- The options menu -->
+                    <div class="card-options-menu">
+                        <button data-action="edit-title" class="flex items-center gap-2 w-full text-left p-3 hover:bg-slate-100 text-slate-700 transition-colors">
+                            <ion-icon name="pencil" class="text-yellow-500"></ion-icon>
+                            <span data-key="edit_title">${translations[currentLanguage]['edit_title']}</span>
+                        </button>
+                        <button data-action="record-voice" class="flex items-center gap-2 w-full text-left p-3 hover:bg-slate-100 text-slate-700 transition-colors">
+                            <ion-icon name="mic" class="${card.recording ? 'text-green-500' : 'text-red-500'}"></ion-icon>
+                            <span data-key="record_voice">${translations[currentLanguage]['record_voice']}</span>
+                        </button>
+                    </div>
+                `;
+                
+                // Click to view/hear
+                slot.addEventListener('click', (e) => {
+                    if (isPlayingAll) return; // Don't trigger if "Play All" is running
+                    if (e.target.closest('.card-options-btn')) return; // Don't trigger if clicking the options button
+                    
+                    handleCardClick(card.id);
+                });
+                
+                // Options menu logic
+                const optionsBtn = slot.querySelector('[data-action="toggle-menu"]');
+                const optionsMenu = slot.querySelector('.card-options-menu');
+                
+                optionsBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // Close other menus
+                    document.querySelectorAll('.card-options-menu').forEach(m => {
+                        if (m !== optionsMenu) m.style.display = 'none';
+                    });
+                    optionsMenu.style.display = optionsMenu.style.display === 'block' ? 'none' : 'block';
+                });
+
+                slot.querySelector('[data-action="edit-title"]').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    optionsMenu.style.display = 'none';
+                    handleEditTitle(card.id);
+                });
+                slot.querySelector('[data-action="record-voice"]').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    optionsMenu.style.display = 'none';
+                    handleRecordVoice(card.id);
+                });
+
+            } else {
+                // --- EMPTY CARD ---
+                slot.dataset.filled = "false";
+                slot.innerHTML = `<ion-icon name="add-outline"></ion-icon>`;
+                slot.addEventListener('click', () => handleEmptySlotClick(card.id));
+            }
+            return slot;
+        }
+
+        // Renders category buttons into the #image-categories container
+        function renderImageCategories(categoryKeys) {
+            const container = document.getElementById('image-categories');
+            container.innerHTML = '';
+            
+            if (!categoryKeys || categoryKeys.length === 0) {
+                 container.innerHTML = `<p class="text-slate-500 p-4">No categories found.</p>`;
+                 return;
+            }
+            
+            categoryKeys.forEach(key => {
+                const category = imageDatabase[key];
+                if (!category) return;
+                
+                const title = translations[currentLanguage][category.titleKey] || category.titleKey;
+                const btn = document.createElement('button');
+                const iconName = categoryIcons[key] || categoryIcons['default'];
+                
+                btn.className = 'flex-shrink-0 flex items-center justify-center w-20 h-20 bg-white text-slate-600 rounded-xl shadow-md hover:shadow-lg transition transform hover:scale-105 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-sky-400';
+                btn.innerHTML = `<ion-icon name="${iconName}" class="text-4xl"></ion-icon>`;
+                btn.title = title; // Tooltip
+                
+                btn.dataset.categoryKey = key;
+                btn.addEventListener('click', () => showImagePicker(key));
+                container.appendChild(btn);
+            });
+        }
+        
+        // Shows the image picker modal for a specific category
+        function showImagePicker(categoryKey) {
+            const category = imageDatabase[categoryKey];
+            if (!category) return;
+            
+            const grid = document.getElementById('picker-grid');
+            const titleEl = document.getElementById('picker-title');
+            const categorySearch = document.getElementById('category-search-bar');
+
+            titleEl.textContent = translations[currentLanguage][category.titleKey] || category.titleKey;
+            categorySearch.value = '';
+
+            renderPickerGrid(category.images, grid);
+
+            // Re-bind search listener for this category
+            const newSearchBar = categorySearch.cloneNode(true);
+            categorySearch.parentNode.replaceChild(newSearchBar, categorySearch);
+            newSearchBar.placeholder = translations[currentLanguage]['search_category_placeholder'];
+
+            newSearchBar.addEventListener('input', () => {
+                const searchTerm = newSearchBar.value.toLowerCase();
+                const lang = translations[currentLanguage];
+                const filteredImages = category.images.filter(image => {
+                    const title = lang[image.titleKey] || image.titleKey;
+                    return title.toLowerCase().includes(searchTerm);
+                });
+                renderPickerGrid(filteredImages, grid);
+            });
+            
+            hideModal('modal-image-select');
+            showModal('modal-image-picker');
+        }
+        
+        // Renders the grid of images inside the picker
+        function renderPickerGrid(images, gridContainer) {
+            gridContainer.innerHTML = '';
+            images.forEach(image => {
+                const title = translations[currentLanguage][image.titleKey] || image.titleKey;
+                const btn = document.createElement('button');
+                btn.className = 'block w-full flex-shrink-0 group relative aspect-square bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow duration-300 z-0';
+                btn.innerHTML = `
+                    <img src="${image.src}" alt="${title}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/200x200/ef4444/ffffff?text=Error'; this.onerror=null;">
+                    <span class="absolute bottom-0 inset-x-0 px-0.5 bg-black/50 text-white text-sm text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 truncate">
+                        ${title}
+                    </span>
+                `;
+                btn.addEventListener('click', () => {
+                    handleImageSelect(image.src, image.titleKey);
+                });
+                gridContainer.appendChild(btn);
+            });
+        }
+        
+        // Resets the Record Voice modal to its initial state
+        function resetRecordModalUI() {
+            document.getElementById('record-btn-container').classList.remove('hidden');
+            document.getElementById('recording-controls').classList.add('hidden');
+            document.getElementById('playback-controls').classList.add('hidden');
+            document.getElementById('audio-playback').src = '';
+            document.getElementById('record-timer').textContent = '00:00';
+            if (activeRecording.timerInterval) {
+                clearInterval(activeRecording.timerInterval);
+                activeRecording.timerInterval = null;
+            }
+        }
+        
+        // --- Event Handlers ---
+        
+        // Main function to initialize the app
+        function initApp() {
+            // Page navigation
+            document.getElementById('btn-start').addEventListener('click', () => showPage('templates'));
+            document.getElementById('btn-back-home').addEventListener('click', () => showPage('home'));
+            document.getElementById('btn-info').addEventListener('click', () => showModal('modal-info'));
+            
+            // Language
+            document.getElementById('btn-lang-toggle').addEventListener('click', () => {
+                setLanguage(currentLanguage === 'en' ? 'ar' : 'en');
+            });
+        
+            // Close modals
+            document.querySelectorAll('.modal-close-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const modal = btn.closest('.modal');
+                    hideModal(modal.id);
+                });
+            });
+            
+            // Back button in image picker
+            document.querySelector('#modal-image-picker .modal-back-btn').addEventListener('click', () => {
+                hideModal('modal-image-picker');
+                showModal('modal-image-select');
+            });
+
+            // Image Upload
+            document.getElementById('upload-image-input').addEventListener('change', handleUploadImage);
+
+            // Global Image Search (for big card)
+            const debouncedGlobalSearch = debounce(handleGlobalImageSearch, 400);
+            document.getElementById('image-search-bar').addEventListener('input', debouncedGlobalSearch);
+
+            // Edit Title Modal
+            document.getElementById('btn-save-title').addEventListener('click', handleSaveTitle);
+            
+            // Record Voice Modal
+            document.getElementById('btn-start-record').addEventListener('click', startRecording);
+            document.getElementById('btn-stop-record').addEventListener('click', () => stopRecording(true));
+            document.getElementById('btn-save-recording').addEventListener('click', handleSaveRecording);
+            document.getElementById('btn-rerecord').addEventListener('click', resetRecordModalUI);
+            
+            // Cards Page Controls
+            document.getElementById('btn-play-all').addEventListener('click', handlePlayAll);
+            document.getElementById('btn-toggle-titles').addEventListener('click', handleToggleTitles);
+            document.getElementById('btn-toggle-big-card').addEventListener('click', handleToggleBigCard);
+            document.getElementById('btn-reset-cards').addEventListener('click', handleResetCards); // NEW LISTENER
+            
+            // Initial setup
+            setLanguage('en');
+            renderTemplatePage();
+        }
+        
+        // Handles click on an empty slot
+        function handleEmptySlotClick(slotId) {
+            activeSlotId = slotId;
+            const card = cardSlots.find(s => s.id === slotId);
+            const searchContainer = document.getElementById('global-search-container');
+            const categoriesTitle = document.getElementById('categories-title');
+            
+            // This is the logic you requested:
+            if (card.isBig) {
+                // BIG CARD: Show search, upload, and "Main Scenes" category
+                searchContainer.style.display = 'block';
+                categoriesTitle.textContent = translations[currentLanguage]['big_cards'];
+                renderImageCategories(['big_cards']);
+            } else {
+                // SMALL CARD: Hide search, show 5 word categories
+                searchContainer.style.display = 'none';
+                categoriesTitle.textContent = translations[currentLanguage]['categories'];
+                renderImageCategories(['subject', 'pronoun', 'verbs', 'places', 'time']);
+            }
+            
+            document.getElementById('image-search-bar').value = '';
+            showModal('modal-image-select');
+        }
+        
+        // Handles click on a filled card (to view/hear)
+        function handleCardClick(slotId) {
+            const card = cardSlots.find(s => s.id === slotId);
+            if (!card || isPlayingAll) return;
+
+            document.getElementById('card-view-img').src = card.image;
+            document.getElementById('card-view-title').textContent = getCardTitle(card);
+            
+            showModal('modal-card-view');
+            playCardSoundWithPromise(card); // Play sound
+
+            // Auto-close modal
+            setTimeout(() => {
+                hideModal('modal-card-view');
+            }, 2500);
+        }
+        
+        // Handles selecting an image from the picker
+        function handleImageSelect(imageSrc, titleKey) {
+            const slot = cardSlots.find(s => s.id === activeSlotId);
+            if (slot) {
+                slot.image = imageSrc;
+                slot.titleKey = titleKey;
+                slot.customTitle = { en: '', ar: '' };
+                slot.recording = null; // Clear old recording
+            }
+            renderCardGrid();
+            hideModal('modal-image-picker');
+            hideModal('modal-image-select');
+            activeSlotId = null;
+        }
+        
+        // This search is only used by the "Big Card" workflow
+        function handleGlobalImageSearch(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const categoriesTitle = document.getElementById('categories-title');
+            
+            if (!searchTerm) {
+                if (document.getElementById('modal-image-picker').style.display === 'flex') {
+                    hideModal('modal-image-picker');
+                    showModal('modal-image-select');
+                    // Restore "Main Scenes"
+                    categoriesTitle.textContent = translations[currentLanguage]['big_cards'];
+                    renderImageCategories(['big_cards']);
+                }
+                return;
+            }
+
+            const lang = translations[currentLanguage];
+            let allImages = [];
+            Object.keys(imageDatabase).forEach(key => {
+                allImages = allImages.concat(imageDatabase[key].images);
+            });
+
+            const filteredImages = allImages.filter(image => {
+                const title = lang[image.titleKey] || image.titleKey;
+                return title.toLowerCase().includes(searchTerm);
+            });
+
+            const grid = document.getElementById('picker-grid');
+            const titleEl = document.getElementById('picker-title');
+
+            titleEl.textContent = `${translations[currentLanguage]['search_results_title']}: "${e.target.value}"`;
+            renderPickerGrid(filteredImages, grid);
+            
+            hideModal('modal-image-select');
+            showModal('modal-image-picker');
+        }
+        
+        // Handles image upload from device
+        function handleUploadImage(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const imageUrl = event.target.result;
+                    const titleKey = file.name.split('.')[0].replace(/[^a-zA-Z0-9 ]/g, ' ').trim();
+                    handleImageSelect(imageUrl, titleKey);
+                };
+                reader.readAsDataURL(file);
+            }
+            e.target.value = null; // Reset input
+        }
+        
+        // Shows the Edit Title modal
+        function handleEditTitle(slotId) {
+            activeSlotId = slotId;
+            const card = cardSlots.find(s => s.id === slotId);
+            const titleInput = document.getElementById('edit-title-input');
+            titleInput.value = getCardTitle(card);
+            showModal('modal-edit-title');
+        }
+        
+        // Saves the new custom title
+        function handleSaveTitle() {
+            const slot = cardSlots.find(s => s.id === activeSlotId);
+            const newTitle = document.getElementById('edit-title-input').value;
+            if (slot && newTitle) {
+                slot.customTitle[currentLanguage] = newTitle;
+            }
+            renderCardGrid();
+            hideModal('modal-edit-title');
+            activeSlotId = null;
+        }
+        
+        // Shows the Record Voice modal
+        function handleRecordVoice(slotId) {
+            activeRecording.slotId = slotId;
+            const card = cardSlots.find(s => s.id === slotId);
+            
+            resetRecordModalUI();
+            
+            if (card.recording) {
+                // If recording exists, show playback controls
+                document.getElementById('record-btn-container').classList.add('hidden');
+                document.getElementById('playback-controls').classList.remove('hidden');
+                document.getElementById('audio-playback').src = card.recording;
+                activeRecording.audioUrl = card.recording;
+            }
+            
+            showModal('modal-record-voice');
+        }
+        
+        // Starts the audio recording
+        async function startRecording() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showFeedback(false); // Simple "Try Again"
+                console.error('Recording not supported.');
+                return;
+            }
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const mimeTypes = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
+                let supportedMimeType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type)) || '';
+                
+                activeRecording.mediaRecorder = new MediaRecorder(stream, { mimeType: supportedMimeType });
+                activeRecording.audioChunks = [];
+                
+                activeRecording.mediaRecorder.ondataavailable = e => {
+                    if (e.data.size > 0) activeRecording.audioChunks.push(e.data);
+                };
+                
+                activeRecording.mediaRecorder.onstop = () => {
+                    const blobMimeType = activeRecording.mediaRecorder.mimeType || supportedMimeType || 'audio/webm';
+                    const audioBlob = new Blob(activeRecording.audioChunks, { type: blobMimeType });
+                    
+                    if (activeRecording.audioUrl && activeRecording.audioUrl.startsWith('blob:')) {
+                        URL.revokeObjectURL(activeRecording.audioUrl);
+                    }
+                    
+                    activeRecording.audioUrl = URL.createObjectURL(audioBlob);
+                    document.getElementById('audio-playback').src = activeRecording.audioUrl;
+                    document.getElementById('playback-controls').classList.remove('hidden');
+                    stream.getTracks().forEach(track => track.stop());
+                };
+                
+                document.getElementById('record-btn-container').classList.add('hidden');
+                document.getElementById('recording-controls').classList.remove('hidden');
+
+                // Start timer
+                let seconds = 0;
+                const timerEl = document.getElementById('record-timer');
+                timerEl.textContent = '00:00';
+                activeRecording.timerInterval = setInterval(() => {
+                    seconds++;
+                    const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+                    const secs = (seconds % 60).toString().padStart(2, '0');
+                    timerEl.textContent = `${mins}:${secs}`;
+                }, 1000);
+
+                activeRecording.mediaRecorder.start();
+
+            } catch (err) {
+                console.error("Error starting recording:", err);
+                showFeedback(false);
+                resetRecordModalUI();
+            }
+        }
+        
+        // Stops the audio recording
+        function stopRecording(processData) {
+            if (activeRecording.mediaRecorder && activeRecording.mediaRecorder.state === 'recording') {
+                if (processData) {
+                    activeRecording.mediaRecorder.stop();
+                } else {
+                    activeRecording.mediaRecorder.onstop = null;
+                    activeRecording.mediaRecorder.stop();
+                    if (activeRecording.mediaRecorder.stream) {
+                        activeRecording.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                    }
+                }
+            }
+            if (activeRecording.timerInterval) {
+                clearInterval(activeRecording.timerInterval);
+                activeRecording.timerInterval = null;
+            }
+            document.getElementById('recording-controls').classList.add('hidden');
+        }
+        
+        // Saves the recording to the card
+        function handleSaveRecording() {
+            const slot = cardSlots.find(s => s.id === activeRecording.slotId);
+            if (slot && activeRecording.audioUrl) {
+                if (slot.recording && slot.recording.startsWith('blob:')) {
+                    URL.revokeObjectURL(slot.recording);
+                }
+                slot.recording = activeRecording.audioUrl;
+                activeRecording.audioUrl = null;
+            }
+            renderCardGrid();
+            hideModal('modal-record-voice');
+        }
+        
+        // --- Control Bar Handlers ---
+        
+        // Handles "Play All" button (with corrected LTR/RTL logic)
+        async function handlePlayAll() {
+            if (isPlayingAll) return;
+            isPlayingAll = true;
+            
+            const playButton = document.getElementById('btn-play-all');
+            playButton.disabled = true;
+            playButton.classList.add('opacity-50');
+
+            // Get slots in their natural order (1, 2, 3...)
+            const smallSlots = cardSlots.filter(s => !s.isBig && s.image);
+            
+            // No reversal is needed.
+            // For LTR (English), [1, 2, 3] plays left-to-right.
+            // For RTL (Arabic), the visual layout is [3, 2, 1],
+            // so playing the array [1, 2, 3] will play the
+            // right-most card (1) first, which is the correct behavior.
+
+            for (const slot of smallSlots) {
+                const cardEl = document.querySelector(`.card-slot[data-id="${slot.id}"]`);
+                if (cardEl) {
+                    // This is the "pop up" animation
+                    cardEl.classList.add('card-playing');
+                    await playCardSoundWithPromise(slot);
+                    await new Promise(res => setTimeout(res, 200)); // Pause between cards
+                    cardEl.classList.remove('card-playing');
+                }
+            }
+            
+            isPlayingAll = false;
+            playButton.disabled = false;
+            playButton.classList.remove('opacity-50');
+        }
+
+        // Handles "Toggle Titles" button
+        function handleToggleTitles() {
+            titlesVisible = !titlesVisible;
+            const grid = document.getElementById('card-grid');
+            const btnIcon = document.querySelector('#btn-toggle-titles ion-icon');
+            
+            grid.classList.toggle('titles-hidden', !titlesVisible);
+            
+            if (btnIcon) {
+                btnIcon.name = titlesVisible ? 'eye-outline' : 'eye-off-outline';
+            } else {
+                console.error("Could not find the 'btn-toggle-titles' icon element.");
+            }
+        }
+
+        // Handles "Toggle Big Card" button
+        function handleToggleBigCard() {
+            bigCardVisible = !bigCardVisible;
+            const grid = document.getElementById('card-grid');
+            const btnIcon = document.querySelector('#btn-toggle-big-card ion-icon');
+            
+            grid.classList.toggle('big-card-hidden', !bigCardVisible);
+            
+            if (btnIcon) {
+                btnIcon.name = bigCardVisible ? 'image-outline' : 'images-outline';
+            } else {
+                console.error("Could not find the 'btn-toggle-big-card' icon element.");
+            }
+        }
+
+        // NEW FUNCTION: Handles "Reset Cards" button
+        function handleResetCards() {
+            // (Note: No confirmation is used, as per project constraints)
+            
+            // Reset all card data
+            cardSlots.forEach(slot => {
+                slot.image = null;
+                slot.titleKey = null;
+                slot.customTitle = { en: '', ar: '' };
+                slot.recording = null;
+            });
+
+            // Reset view toggles to default
+            titlesVisible = true;
+            bigCardVisible = true;
+            
+            // Re-render the grid to show all empty slots
+            renderCardGrid();
+
+            // Manually update toggle button icons to match reset state
+            const titleBtnIcon = document.querySelector('#btn-toggle-titles ion-icon');
+            if (titleBtnIcon) titleBtnIcon.name = 'eye-outline';
+            
+            const bigCardBtnIcon = document.querySelector('#btn-toggle-big-card ion-icon');
+            if (bigCardBtnIcon) bigCardBtnIcon.name = 'image-outline';
+        }
+
+        // --- App Initialization ---
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
