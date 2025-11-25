@@ -278,10 +278,8 @@
         <header id="app-header" class="p-4 bg-white shadow-sm flex justify-between items-center relative z-20 border-b border-slate-200">
             <div class="flex items-center gap-3">
                 <!-- Logo -->
-                <div class="w-10 h-10 bg-sky-500 text-white flex items-center justify-center rounded-lg">
-                    <ion-icon name="chatbubbles-outline" class="text-2xl"></ion-icon>
-                </div>
-                <span class="font-bold text-xl text-sky-600">Building Sentence</span>
+                <img src="file/logo.png" alt="SLP Cards Logo" class="h-10 w-10 object-contain rounded-full" onerror="this.style.display='none'">
+                <span class="font-bold text-xl text-sky-600">Building Sentence - Hamada ©</span>
             </div>
             
             <div id="header-controls" class="flex items-center gap-4">
@@ -313,6 +311,9 @@
                 <div class="space-y-6 w-full max-w-sm">
                     <button id="btn-start" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold text-2xl py-4 px-6 rounded-2xl shadow-lg transition transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-sky-300 focus:ring-opacity-50" data-key="lets_start">
                         Let's Start
+                    </button>
+                        <button id="btn-resources" class="w-full bg-green-400 hover:bg-green-500 text-white font-bold text-2xl py-4 px-6 rounded-2xl shadow-lg transition transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50" data-key="resources">
+                        Resources
                     </button>
                     <button id="btn-info" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold text-2xl py-4 px-6 rounded-2xl shadow-lg transition transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-teal-200 focus:ring-opacity-50" data-key="info">
                         Info for Parents
@@ -445,9 +446,10 @@
         </main>
 
         <!-- ===== App Footer ===== -->
-        <footer id="app-footer" class="text-center p-4 text-slate-500 text-xs bg-white/50 border-t border-slate-100">
+        <footer id="app-footer" class="text-center p-4 text-gray-500 text-xs bg-white/50">
             <p>Speech and Language Pathology &copy; 2024 Ahmad Ghanem</p>
-        </footer>
+            <p>Email: slp.ahmadghanem@gmail.com | Whatsapp: +963-988451245</p>
+        </footer>       
     </div>
 
 
@@ -4504,7 +4506,22 @@
                     hideModal(modal.id);
                 });
             });
-            
+                        document.getElementById('btn-resources').addEventListener('click', () => {
+                // FIX: Creates a temporary link element to trigger the download
+                const link = document.createElement('a');
+                link.href = 'file/sentence.pdf'; 
+                link.download = 'sentence.pdf'; 
+                
+                // Temporarily add and click the link to initiate the download
+                document.body.appendChild(link);
+                try {
+                    link.click(); 
+                } catch (err) {
+                    console.error('Failed to trigger download:', err);
+                    showFeedback(false, 'Error', 'Could not open resources file.');
+                }
+                document.body.removeChild(link); // Clean up the element
+            });
             document.querySelector('#modal-image-picker .modal-back-btn').addEventListener('click', () => {
                 hideModal('modal-image-picker');
                 // If we were navigating the Big Card Hierarchy, re-open Level 2
