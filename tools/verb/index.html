@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verbs in Use</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Font (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Ionicons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+        
+        #app-container {
+            height: 100vh;
+            overflow-y: auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Modal Base */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        /* Card Slot Styles */
+        .card-slot {
+            background-color: white;
+            border-radius: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: visible; /* Changed to visible to allow menu overflow if needed, though absolute positioning usually handles it inside */
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            border: 4px solid transparent;
+            aspect-ratio: 1/1; /* 1 by 1 Ratio */
+            width: 100%;
+            max-width: 18rem;
+            margin: 0 auto;
+        }
+
+        .card-slot:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        /* Empty State */
+        .card-slot[data-filled="false"] {
+            border: 4px dashed #cbd5e1;
+            background-color: #f8fafc;
+        }
+        .card-slot[data-filled="false"]:hover {
+            border-color: #0ea5e9;
+            background-color: #f0f9ff;
+        }
+        .card-slot[data-filled="false"] ion-icon.add-icon {
+            font-size: 4rem;
+            color: #cbd5e1;
+            transition: color 0.3s;
+        }
+        .card-slot[data-filled="false"]:hover ion-icon.add-icon {
+            color: #0ea5e9;
+        }
+
+        /* Filled State */
+        .card-slot[data-filled="true"] {
+            border-color: #e2e8f0;
+            overflow: hidden; /* Clip image */
+        }
+
+        /* Test Mode Covers - Specific Colors */
+        .cover-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s ease;
+            opacity: 1;
+        }
+        .cover-overlay.hidden-cover {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Colors as requested */
+        .cover-past { background-color: #fcd34d; } /* Yellow */
+        .cover-present { background-color: #f87171; } /* Red */
+        .cover-future { background-color: #4ade80; } /* Green */
+        
+        /* Shake Animation */
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Specific verb images mode */
+        .card-image.generic-icon {
+            width: 50%;
+            height: 50%;
+            object-fit: contain;
+            opacity: 0.5;
+        }
+
+        .card-title-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0.75rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1e293b;
+            z-index: 10;
+            border-top: 1px solid #f1f5f9;
+            transition: transform 0.3s ease;
+        }
+        
+        .titles-hidden .card-title-bar {
+            transform: translateY(100%);
+        }
+
+        /* Options Menu (3 dots) */
+        .options-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: white;
+            border-radius: 50%;
+            padding: 0.4rem;
+            z-index: 30;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: none; /* Hidden by default */
+            transition: transform 0.2s;
+        }
+        .options-btn:hover { transform: scale(1.1); }
+        .card-slot[data-filled="true"]:hover .options-btn { display: block; }
+        
+        /* The Dropdown Menu */
+        .options-dropdown {
+            position: absolute;
+            top: 3rem;
+            right: 0.75rem;
+            background: white;
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+            z-index: 40;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            min-width: 140px;
+            display: none; /* Hidden by default */
+            border: 1px solid #e2e8f0;
+        }
+        .options-dropdown.show {
+            display: block;
+            animation: fadeIn 0.1s ease-out;
+        }
+        .options-dropdown button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.5rem;
+            text-align: left;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #475569;
+            transition: background 0.1s;
+        }
+        .options-dropdown button:hover {
+            background-color: #f1f5f9;
+            color: #0ea5e9;
+        }
+
+        /* Pronoun Selection Box in Header */
+        .pronoun-selector {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 1rem;
+            border: 2px dashed #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f5f9;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        .pronoun-selector:hover { border-color: #6366f1; background: white; }
+        .pronoun-selector img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* RTL Specifics */
+        [dir="rtl"] .options-btn { right: auto; left: 0.75rem; }
+        [dir="rtl"] .options-dropdown { right: auto; left: 0.75rem; }
+        [dir="rtl"] .options-dropdown button { text-align: right; }
+
+        /* Recording Pulse */
+        .recording-pulse {
+            animation: pulse-red 1.5s infinite;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div id="app-container">
+        
+        <!-- ===== Header ===== -->
+        <header class="bg-white shadow-md p-4 flex justify-between items-center z-40 relative">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl flex items-center justify-center shadow-lg">
+                    <ion-icon name="language" class="text-2xl"></ion-icon>
+                </div>
+                <h1 class="font-extrabold text-xl text-slate-800 tracking-tight hidden sm:block" id="app-title">Verbs in Use</h1>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button id="btn-home" class="hidden text-slate-400 hover:text-indigo-600 transition-colors">
+                    <ion-icon name="home" class="text-3xl"></ion-icon>
+                </button>
+                <button id="btn-lang" class="bg-slate-100 text-slate-700 px-4 py-2 rounded-lg font-bold hover:bg-indigo-50 hover:text-indigo-600 transition border border-slate-200">
+                    عربي
+                </button>
+            </div>
+        </header>
+
+        <!-- ===== Main Content ===== -->
+        <main class="flex-grow relative bg-slate-50 overflow-y-auto w-full">
+
+            <!-- PAGE: HOME -->
+            <div id="page-home" class="flex flex-col items-center justify-center min-h-full p-6 text-center">
+                <div class="w-32 h-32 bg-gradient-to-tr from-blue-400 to-indigo-500 text-white rounded-[2rem] shadow-2xl flex items-center justify-center mb-8 animate-bounce">
+                    <ion-icon name="chatbubbles" class="text-7xl"></ion-icon>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-black text-slate-800 mb-4 tracking-tight" data-key="title_main">Verbs in Use</h1>
+                <p class="text-slate-500 text-lg mb-12 max-w-md mx-auto leading-relaxed" data-key="subtitle">Master Past, Present, and Future tenses with interactive learning.</p>
+                
+                <div class="w-full max-w-xs space-y-4 mx-auto">
+                    <button id="btn-start" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xl py-4 rounded-2xl shadow-xl transition transform hover:scale-105 active:scale-95" data-key="start">
+                        Start Learning
+                    </button>
+                    <button id="btn-info" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold text-xl py-4 rounded-2xl shadow-xl transition transform hover:scale-105 active:scale-95" data-key="info">
+                        Info for Parents
+                    </button>
+                </div>
+            </div>
+
+            <!-- PAGE: WORKPLACE -->
+            <div id="page-workplace" class="hidden flex flex-col min-h-full pb-8">
+                
+                <!-- Top Control Bar -->
+                <div class="bg-white border-b border-slate-200 p-3 md:p-4 sticky top-0 z-30 shadow-sm">
+                    <div class="max-w-6xl mx-auto flex flex-col md:flex-row gap-4 items-center justify-between">
+                        
+                        <!-- Pronoun Selector (Left) -->
+                        <div class="flex items-center gap-3 bg-slate-50 p-2 pr-6 rounded-2xl border border-slate-200 shadow-sm" id="pronoun-container">
+                            <div id="slot-pronoun" class="pronoun-selector shadow-inner">
+                                <ion-icon name="person" class="text-2xl text-slate-300"></ion-icon>
+                            </div>
+                            <div class="text-left rtl:text-right">
+                                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block" data-key="lbl_pronoun">Pronoun</span>
+                                <span id="pronoun-label" class="text-sm font-bold text-indigo-600 block min-h-[1.25rem]">-</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons (Right) -->
+                        <div class="flex items-center gap-2 flex-wrap justify-center">
+                            
+                            <!-- Toggle Titles (Eye) -->
+                            <button id="btn-toggle-titles" class="p-3 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 hover:text-indigo-600 transition shadow-sm" title="Toggle Titles">
+                                <ion-icon name="eye" class="text-xl"></ion-icon>
+                            </button>
+
+                            <!-- Toggle Images (Image Icon) -->
+                            <button id="btn-toggle-images" class="p-3 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 hover:text-indigo-600 transition shadow-sm relative group" title="Show Verb Images">
+                                <ion-icon name="image" class="text-xl"></ion-icon>
+                                <!-- Tooltip for instruction -->
+                                <span class="absolute -bottom-12 left-1/2 -translate-x-1/2 w-32 bg-slate-800 text-white text-xs p-2 rounded opacity-0 group-hover:opacity-100 transition pointer-events-none z-50 text-center">Toggle Illustrations</span>
+                            </button>
+
+                            <!-- Test Mode (Game) -->
+                            <button id="btn-test-mode" class="p-3 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition shadow-md font-bold flex items-center gap-2" title="Start Test">
+                                <ion-icon name="game-controller" class="text-xl"></ion-icon>
+                            </button>
+                            
+                            <!-- Reset -->
+                            <button id="btn-reset" class="p-3 bg-red-50 text-red-500 border border-red-100 rounded-xl hover:bg-red-100 transition shadow-sm" title="Reset All">
+                                <ion-icon name="refresh" class="text-xl"></ion-icon>
+                            </button>
+                            
+                            <div class="w-px h-8 bg-slate-300 mx-1"></div>
+
+                            <!-- Template Selector -->
+                            <button id="btn-template" class="px-4 py-3 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-xl hover:bg-indigo-100 transition text-sm font-bold flex items-center gap-2">
+                                <ion-icon name="grid-outline"></ion-icon>
+                                <span data-key="template">Template</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Canvas (Cards) -->
+                <div class="flex-grow flex items-center justify-center p-4 w-full overflow-x-hidden">
+                    <div id="cards-container" class="flex flex-wrap justify-center gap-4 md:gap-8 w-full max-w-6xl transition-all">
+                        
+                        <!-- Card: Past -->
+                        <div id="card-past" class="card-slot group" data-filled="false" data-time="past">
+                            <!-- Cover for Game Mode -->
+                            <div class="cover-overlay cover-past hidden-cover">
+                                <div class="bg-white/20 backdrop-blur-sm p-4 rounded-full">
+                                    <ion-icon name="help" class="text-5xl text-white drop-shadow-md"></ion-icon>
+                                </div>
+                            </div>
+                            
+                            <!-- Content -->
+                            <div class="content-placeholder text-center">
+                                <ion-icon name="add-circle" class="add-icon mb-2"></ion-icon>
+                                <span class="text-slate-400 font-bold block uppercase tracking-widest text-sm" data-key="past">Past</span>
+                            </div>
+                            
+                            <!-- Img & Title -->
+                            <img src="" class="card-image hidden" alt="Past">
+                            <div class="card-title-bar hidden"></div>
+                            
+                            <!-- Options Button -->
+                            <button class="options-btn" data-time="past" title="Options">
+                                <ion-icon name="ellipsis-horizontal" class="text-xl text-slate-600"></ion-icon>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div id="menu-past" class="options-dropdown">
+                                <button data-action="edit" data-time="past">
+                                    <ion-icon name="pencil" class="text-amber-500"></ion-icon>
+                                    <span data-key="edit_title">Edit Title</span>
+                                </button>
+                                <button data-action="record" data-time="past">
+                                    <ion-icon name="mic" class="text-red-500"></ion-icon>
+                                    <span data-key="record_voice">Record Voice</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card: Present -->
+                        <div id="card-present" class="card-slot group" data-filled="false" data-time="present">
+                            <div class="cover-overlay cover-present hidden-cover">
+                                <div class="bg-white/20 backdrop-blur-sm p-4 rounded-full">
+                                    <ion-icon name="help" class="text-5xl text-white drop-shadow-md"></ion-icon>
+                                </div>
+                            </div>
+                            
+                            <div class="content-placeholder text-center">
+                                <ion-icon name="add-circle" class="add-icon mb-2"></ion-icon>
+                                <span class="text-slate-400 font-bold block uppercase tracking-widest text-sm" data-key="present">Present</span>
+                            </div>
+                            
+                            <img src="" class="card-image hidden" alt="Present">
+                            <div class="card-title-bar hidden"></div>
+                            
+                            <button class="options-btn" data-time="present" title="Options">
+                                <ion-icon name="ellipsis-horizontal" class="text-xl text-slate-600"></ion-icon>
+                            </button>
+
+                            <div id="menu-present" class="options-dropdown">
+                                <button data-action="edit" data-time="present">
+                                    <ion-icon name="pencil" class="text-amber-500"></ion-icon>
+                                    <span data-key="edit_title">Edit Title</span>
+                                </button>
+                                <button data-action="record" data-time="present">
+                                    <ion-icon name="mic" class="text-red-500"></ion-icon>
+                                    <span data-key="record_voice">Record Voice</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card: Future -->
+                        <div id="card-future" class="card-slot group" data-filled="false" data-time="future">
+                            <div class="cover-overlay cover-future hidden-cover">
+                                <div class="bg-white/20 backdrop-blur-sm p-4 rounded-full">
+                                    <ion-icon name="help" class="text-5xl text-white drop-shadow-md"></ion-icon>
+                                </div>
+                            </div>
+                            
+                            <div class="content-placeholder text-center">
+                                <ion-icon name="add-circle" class="add-icon mb-2"></ion-icon>
+                                <span class="text-slate-400 font-bold block uppercase tracking-widest text-sm" data-key="future">Future</span>
+                            </div>
+                            
+                            <img src="" class="card-image hidden" alt="Future">
+                            <div class="card-title-bar hidden"></div>
+                            
+                            <button class="options-btn" data-time="future" title="Options">
+                                <ion-icon name="ellipsis-horizontal" class="text-xl text-slate-600"></ion-icon>
+                            </button>
+
+                            <div id="menu-future" class="options-dropdown">
+                                <button data-action="edit" data-time="future">
+                                    <ion-icon name="pencil" class="text-amber-500"></ion-icon>
+                                    <span data-key="edit_title">Edit Title</span>
+                                </button>
+                                <button data-action="record" data-time="future">
+                                    <ion-icon name="mic" class="text-red-500"></ion-icon>
+                                    <span data-key="record_voice">Record Voice</span>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <!-- Test Mode Score Board -->
+                <div id="score-board" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur text-white rounded-2xl shadow-2xl px-6 py-3 flex items-center gap-6 z-50 border border-slate-700/50">
+                    <div class="flex flex-col items-center">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Round</span>
+                        <span id="score-round" class="font-bold text-amber-400 text-xl">1/10</span>
+                    </div>
+                    <div class="h-8 w-px bg-slate-700"></div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Score</span>
+                        <span id="score-val" class="font-bold text-green-400 text-xl">0</span>
+                    </div>
+                    <button id="btn-quit-test" class="ml-2 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 p-2 rounded-full transition">
+                        <ion-icon name="close" class="text-xl"></ion-icon>
+                    </button>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ===== Modals ===== -->
+    
+    <!-- General Selection Modal -->
+    <div id="modal-select" class="modal">
+        <div class="bg-white w-full max-w-3xl rounded-3xl p-6 shadow-2xl m-4 max-h-[90vh] flex flex-col animate-[fadeIn_0.2s_ease-out]">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                <h3 id="modal-select-title" class="text-2xl font-black text-slate-800 tracking-tight">Select Item</h3>
+                <button class="btn-close-modal text-slate-300 hover:text-slate-600 transition">
+                    <ion-icon name="close-circle" class="text-4xl"></ion-icon>
+                </button>
+            </div>
+            <div id="modal-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 overflow-y-auto p-2">
+                <!-- JS will populate this -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Title Modal -->
+    <div id="modal-edit-title" class="modal">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl m-4">
+            <h3 class="text-xl font-bold mb-4" data-key="edit_title">Edit Title</h3>
+            <input type="text" id="edit-title-input" class="w-full border-2 border-slate-200 rounded-xl p-3 mb-4 focus:border-indigo-500 focus:outline-none" placeholder="Enter new title...">
+            <div class="flex gap-2">
+                <button id="btn-cancel-edit" class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200">Cancel</button>
+                <button id="btn-save-edit" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Record Voice Modal -->
+    <div id="modal-record" class="modal">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl m-4 text-center">
+            <h3 class="text-xl font-bold mb-6" data-key="record_voice">Record Voice</h3>
+            
+            <div id="record-status" class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6 text-red-500 transition-all">
+                <ion-icon name="mic" class="text-5xl"></ion-icon>
+            </div>
+            
+            <div id="record-timer" class="text-2xl font-mono text-slate-700 mb-6 font-bold">00:00</div>
+
+            <div class="flex flex-col gap-3">
+                <button id="btn-start-record" class="w-full bg-red-500 text-white font-bold py-4 rounded-xl hover:bg-red-600 shadow-lg flex items-center justify-center gap-2">
+                    <ion-icon name="radio-button-on"></ion-icon> Start Recording
+                </button>
+                <button id="btn-stop-record" class="w-full bg-slate-800 text-white font-bold py-4 rounded-xl hover:bg-slate-900 shadow-lg hidden flex items-center justify-center gap-2">
+                    <ion-icon name="square"></ion-icon> Stop
+                </button>
+                
+                <div id="playback-container" class="hidden flex flex-col gap-3">
+                    <button id="btn-play-record" class="w-full bg-indigo-100 text-indigo-700 font-bold py-3 rounded-xl hover:bg-indigo-200 flex items-center justify-center gap-2">
+                         <ion-icon name="play"></ion-icon> Play Preview
+                    </button>
+                    <div class="flex gap-2">
+                         <button id="btn-cancel-record" class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200">Cancel</button>
+                         <button id="btn-save-record" class="flex-1 bg-green-500 text-white font-bold py-3 rounded-xl hover:bg-green-600">Save</button>
+                    </div>
+                </div>
+            </div>
+            
+            <audio id="audio-preview" class="hidden"></audio>
+        </div>
+    </div>
+
+    <!-- Template Selector Modal -->
+    <div id="modal-template" class="modal">
+        <div class="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl m-4 text-center">
+            <h3 class="text-2xl font-bold text-slate-800 mb-2" data-key="select_template">Active Tenses</h3>
+            <p class="text-slate-500 mb-6 text-sm">Select which cards to show:</p>
+            
+            <div class="flex justify-center gap-3 mb-8">
+                <button class="template-toggle px-4 py-3 rounded-xl border-2 font-bold transition w-full" data-val="past" data-key="past">Past</button>
+                <button class="template-toggle px-4 py-3 rounded-xl border-2 font-bold transition w-full" data-val="present" data-key="present">Present</button>
+                <button class="template-toggle px-4 py-3 rounded-xl border-2 font-bold transition w-full" data-val="future" data-key="future">Future</button>
+            </div>
+            
+            <button id="btn-apply-template" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-lg">
+                Apply Template
+            </button>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="modal-info" class="modal">
+        <div class="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl m-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-teal-600 flex items-center gap-2">
+                    <ion-icon name="information-circle"></ion-icon>
+                    <span data-key="info">Info for Parents</span>
+                </h3>
+                <button class="btn-close-modal text-slate-300 hover:text-slate-600">
+                    <ion-icon name="close" class="text-2xl"></ion-icon>
+                </button>
+            </div>
+            <div class="space-y-4 text-slate-600 leading-relaxed">
+                <p data-key="info_1">This app helps children understand verb conjugations across time (Past, Present, Future).</p>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <h4 class="font-bold text-slate-800 mb-2 text-sm uppercase tracking-wide">How to use:</h4>
+                    <ul class="list-disc pl-5 space-y-2 text-sm">
+                        <li data-key="info_2">Select a <strong>Pronoun</strong> and a <strong>Verb</strong>.</li>
+                        <li data-key="info_3">The app will automatically generate the correct forms in Arabic and English.</li>
+                        <li data-key="info_4">Use <strong>Test Mode</strong> to play a game where the child listens and finds the correct card.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Game Over Modal -->
+    <div id="modal-gameover" class="modal">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl text-center transform transition-all scale-100">
+            <div class="mb-6 relative inline-block">
+                <div class="absolute inset-0 bg-yellow-200 rounded-full blur-xl opacity-50 animate-pulse"></div>
+                <ion-icon name="trophy" class="text-7xl text-yellow-400 relative z-10"></ion-icon>
+            </div>
+            <h2 class="text-3xl font-black text-slate-800 mb-2">Great Job!</h2>
+            <p class="text-lg text-slate-500 mb-6 font-medium">You scored <span id="final-score" class="font-bold text-indigo-600 text-2xl"></span> out of 10</p>
+            
+            <div id="wrong-answers" class="text-left bg-red-50 p-4 rounded-2xl mb-6 hidden border border-red-100">
+                <p class="text-xs font-bold text-red-500 uppercase mb-2 tracking-wider flex items-center gap-1">
+                    <ion-icon name="alert-circle"></ion-icon> Needs Practice:
+                </p>
+                <ul id="wrong-list" class="text-sm text-slate-700 space-y-1 font-medium"></ul>
+            </div>
+            
+            <button id="btn-restart-test" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition mb-3">Play Again</button>
+            <button id="btn-close-gameover" class="w-full text-slate-400 hover:text-slate-600 py-2 text-sm font-semibold transition">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Data Structure ---
+        const pronouns = [
+            { id: 'i', en: "I", ar: "أنا", img: "https://placehold.co/150/e0f2fe/075985?text=I" },
+            { id: 'you_m', en: "You (M)", ar: "أنتَ", img: "https://placehold.co/150/e0f2fe/075985?text=You+(M)" },
+            { id: 'you_f', en: "You (F)", ar: "أنتِ", img: "https://placehold.co/150/fce7f3/9d174d?text=You+(F)" },
+            { id: 'you_pl', en: "You (All)", ar: "أنتو", img: "https://placehold.co/150/e0e7ff/3730a3?text=You+(All)" },
+            { id: 'we', en: "We", ar: "نحن", img: "https://placehold.co/150/dcfce7/166534?text=We" },
+            { id: 'he', en: "He", ar: "هو", img: "https://placehold.co/150/dbeafe/1e40af?text=He" },
+            { id: 'she', en: "She", ar: "هي", img: "https://placehold.co/150/fce7f3/be185d?text=She" },
+            { id: 'they', en: "They", ar: "هم", img: "https://placehold.co/150/f1f5f9/475569?text=They" }
+        ];
+
+        const verbs = {
+            'eat': {
+                id: 'eat',
+                baseEn: 'Eat',
+                baseAr: 'أكل',
+                imgBase: "https://placehold.co/150/fef9c3/854d0e?text=Eat",
+                images: { past: "image1.png", present: "image1_1.png", future: "image1_2.png" },
+                conjugations: {
+                    'i': { past: { ar: "انا اكلت", en: "I ate" }, present: { ar: "انا اكل", en: "I eat" }, future: { ar: "انا بدي اكل", en: "I will eat" } },
+                    'you_m': { past: { ar: "انتَ اكلت", en: "You ate" }, present: { ar: "انتَ تاكل", en: "You eat" }, future: { ar: "انتَ بدك تاكل", en: "You will eat" } },
+                    'you_f': { past: { ar: "انتي اكلتي", en: "You ate" }, present: { ar: "انتِ تاكلي", en: "You eat" }, future: { ar: "انتِ بدك تاكلي", en: "You will eat" } },
+                    'you_pl': { past: { ar: "انتو اكلتوا", en: "You ate" }, present: { ar: "انتو تاكلوا", en: "You eat" }, future: { ar: "انتو بدكم تاكلوا", en: "You will eat" } },
+                    'we': { past: { ar: "نحن اكلنا", en: "We ate" }, present: { ar: "نحن ناكل", en: "We eat" }, future: { ar: "نحن بدنا ناكل", en: "We will eat" } },
+                    'he': { past: { ar: "هو اكل", en: "He ate" }, present: { ar: "هو ياكل", en: "He eats" }, future: { ar: "هو بدو ياكل", en: "He will eat" } },
+                    'she': { past: { ar: "هي اكلت", en: "She ate" }, present: { ar: "هي تاكل", en: "She eats" }, future: { ar: "هي بدا تاكل", en: "She will eat" } },
+                    'they': { past: { ar: "هم اكلوا", en: "They ate" }, present: { ar: "هم ياكلوا", en: "They eat" }, future: { ar: "هم بدهم ياكلوا", en: "They will eat" } }
+                }
+            },
+            'drink': {
+                id: 'drink',
+                baseEn: 'Drink',
+                baseAr: 'شرب',
+                imgBase: "https://placehold.co/150/bfdbfe/1e3a8a?text=Drink",
+                images: { past: "drink1.png", present: "drink2.png", future: "drink3.png" },
+                conjugations: {
+                    'i': { past: { ar: "انا شربت", en: "I drank" }, present: { ar: "انا اشرب", en: "I drink" }, future: { ar: "انا بدي اشرب", en: "I will drink" } },
+                    'he': { past: { ar: "هو شرب", en: "He drank" }, present: { ar: "هو يشرب", en: "He drinks" }, future: { ar: "هو بدو يشرب", en: "He will drink" } },
+                }
+            }
+        };
+
+        const translations = {
+            en: {
+                title_main: "Verbs in Use",
+                subtitle: "Master Past, Present, and Future tenses",
+                start: "Start Learning",
+                info: "Info for Parents",
+                lbl_pronoun: "Pronoun",
+                past: "Past",
+                present: "Present",
+                future: "Future",
+                select_pronoun: "Select Pronoun",
+                select_verb: "Select Verb",
+                template: "Template",
+                select_template: "Select Tenses",
+                edit_title: "Edit Title",
+                record_voice: "Record Voice",
+                info_1: "This app helps children understand verb conjugations across time.",
+                info_2: "Select a Pronoun and a Verb.",
+                info_3: "The app will automatically generate the correct forms.",
+                info_4: "Use Test Mode to play a game.",
+                msg_select_first: "Please select both a Pronoun and a Verb first!",
+                correct: "Correct!",
+                try_again: "Try Again!"
+            },
+            ar: {
+                title_main: "استخدام الأفعال",
+                subtitle: "اتقن الأزمنة: الماضي، الحاضر، والمستقبل",
+                start: "ابدأ التعلم",
+                info: "معلومات للأهل",
+                lbl_pronoun: "الضمير",
+                past: "ماضي",
+                present: "حاضر",
+                future: "مستقبل",
+                select_pronoun: "اختر الضمير",
+                select_verb: "اختر الفعل",
+                template: "النموذج",
+                select_template: "اختر الأزمنة",
+                edit_title: "تعديل العنوان",
+                record_voice: "تسجيل صوت",
+                info_1: "يساعد هذا التطبيق الأطفال على فهم تصريف الأفعال.",
+                info_2: "اختر الضمير والفعل.",
+                info_3: "سيقوم التطبيق بإنشاء الصيغ الصحيحة تلقائيًا.",
+                info_4: "استخدم وضع الاختبار للعب.",
+                msg_select_first: "الرجاء اختيار الضمير والفعل أولاً!",
+                correct: "صحيح!",
+                try_again: "حاول مرة أخرى!"
+            }
+        };
+
+        // --- State ---
+        let currentLang = 'en';
+        let currentPronoun = null;
+        let currentVerb = null;
+        let activeTenses = ['past', 'present', 'future']; 
+        let titlesVisible = true;
+        let showSpecificImages = false; 
+        
+        // Customization State (Title overrides & Recordings)
+        // Key format: "pronounId-verbId-time"
+        let cardCustomizations = {}; 
+
+        // Recording State
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordingBlob = null;
+        let recordingInterval = null;
+        let activeEditTime = null; // Which card is being edited (past/present/future)
+
+        // Game State
+        let isTestMode = false;
+        let testRound = 0;
+        let testScore = 0;
+        let testTargetTime = null; 
+        let wrongAnswersLog = [];
+
+        // --- Elements Helper ---
+        const els = {
+            pages: { home: document.getElementById('page-home'), workplace: document.getElementById('page-workplace') },
+            slots: { pronoun: document.getElementById('slot-pronoun'), pronounLabel: document.getElementById('pronoun-label') },
+            cards: { 
+                past: document.getElementById('card-past'), 
+                present: document.getElementById('card-present'), 
+                future: document.getElementById('card-future') 
+            },
+            modals: { 
+                select: document.getElementById('modal-select'), 
+                info: document.getElementById('modal-info'), 
+                gameover: document.getElementById('modal-gameover'),
+                template: document.getElementById('modal-template'),
+                edit: document.getElementById('modal-edit-title'),
+                record: document.getElementById('modal-record')
+            },
+            btns: { 
+                start: document.getElementById('btn-start'), 
+                lang: document.getElementById('btn-lang'),
+                home: document.getElementById('btn-home'),
+                template: document.getElementById('btn-template'),
+                toggleTitles: document.getElementById('btn-toggle-titles'),
+                toggleImages: document.getElementById('btn-toggle-images'),
+                reset: document.getElementById('btn-reset'),
+                testMode: document.getElementById('btn-test-mode'),
+                quitTest: document.getElementById('btn-quit-test'),
+                restartTest: document.getElementById('btn-restart-test'),
+                closeGameover: document.getElementById('btn-close-gameover'),
+                applyTemplate: document.getElementById('btn-apply-template'),
+                saveEdit: document.getElementById('btn-save-edit'),
+                cancelEdit: document.getElementById('btn-cancel-edit'),
+                startRecord: document.getElementById('btn-start-record'),
+                stopRecord: document.getElementById('btn-stop-record'),
+                playRecord: document.getElementById('btn-play-record'),
+                saveRecord: document.getElementById('btn-save-record'),
+                cancelRecord: document.getElementById('btn-cancel-record')
+            },
+            inputs: { editTitle: document.getElementById('edit-title-input') },
+            record: {
+                status: document.getElementById('record-status'),
+                timer: document.getElementById('record-timer'),
+                playbackContainer: document.getElementById('playback-container'),
+                audioPreview: document.getElementById('audio-preview')
+            },
+            testBoard: document.getElementById('score-board'),
+            scoreRound: document.getElementById('score-round'),
+            scoreVal: document.getElementById('score-val')
+        };
+
+        // --- Init ---
+        function init() {
+            setLanguage('en');
+            setupListeners();
+            updateGridVisibility(); 
+        }
+
+        function setupListeners() {
+            els.btns.lang.addEventListener('click', toggleLanguage);
+            els.btns.start.addEventListener('click', () => showPage('workplace'));
+            els.btns.home.addEventListener('click', () => showPage('home'));
+            document.getElementById('btn-info').addEventListener('click', () => openModal('info'));
+            
+            // Interaction Clicks
+            document.getElementById('pronoun-container').addEventListener('click', () => openSelectionModal('pronoun'));
+            
+            // Card Clicks (Main Area)
+            ['past', 'present', 'future'].forEach(time => {
+                const card = els.cards[time];
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('.options-btn') || e.target.closest('.options-dropdown')) return;
+                    
+                    if (isTestMode) {
+                        handleGameCardClick(time);
+                    } else if (!currentVerb) {
+                        openSelectionModal('verb');
+                    } else {
+                         playCardAudio(time);
+                    }
+                });
+            });
+
+            // Options Buttons (Three dots)
+            document.querySelectorAll('.options-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const time = btn.dataset.time;
+                    toggleDropdown(time);
+                });
+            });
+
+            // Dropdown Menu Items
+            document.querySelectorAll('.options-dropdown button').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const action = btn.dataset.action;
+                    const time = btn.dataset.time;
+                    // Hide menu
+                    document.querySelectorAll('.options-dropdown').forEach(d => d.classList.remove('show'));
+                    
+                    if (action === 'edit') openEditTitle(time);
+                    if (action === 'record') openRecordVoice(time);
+                });
+            });
+
+            // Close dropdowns when clicking elsewhere
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.options-dropdown').forEach(d => d.classList.remove('show'));
+            });
+
+            // Edit Title Modal
+            els.btns.saveEdit.addEventListener('click', saveTitleEdit);
+            els.btns.cancelEdit.addEventListener('click', () => closeModal('edit'));
+
+            // Record Modal
+            els.btns.startRecord.addEventListener('click', startRecording);
+            els.btns.stopRecord.addEventListener('click', stopRecording);
+            els.btns.playRecord.addEventListener('click', playRecordingPreview);
+            els.btns.saveRecord.addEventListener('click', saveRecording);
+            els.btns.cancelRecord.addEventListener('click', closeRecordModal);
+
+            // Control Bar
+            els.btns.reset.addEventListener('click', resetWorkplace);
+            els.btns.toggleTitles.addEventListener('click', toggleTitles);
+            els.btns.toggleImages.addEventListener('click', toggleImagesMode);
+            
+            // Template
+            els.btns.template.addEventListener('click', () => openModal('template'));
+            document.querySelectorAll('.template-toggle').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.target.classList.toggle('bg-indigo-100');
+                    e.target.classList.toggle('border-indigo-500');
+                    e.target.classList.toggle('text-indigo-700');
+                });
+            });
+            els.btns.applyTemplate.addEventListener('click', applyTemplate);
+
+            // Test Mode
+            els.btns.testMode.addEventListener('click', startTestMode);
+            els.btns.quitTest.addEventListener('click', stopTestMode);
+            els.btns.restartTest.addEventListener('click', () => { closeModal('gameover'); startTestMode(); });
+            els.btns.closeGameover.addEventListener('click', () => closeModal('gameover'));
+
+            // Modal Closers
+            document.querySelectorAll('.btn-close-modal').forEach(b => {
+                b.addEventListener('click', (e) => {
+                    e.target.closest('.modal').style.display = 'none';
+                });
+            });
+        }
+
+        // --- Core Logic ---
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            els.btns.lang.textContent = lang === 'en' ? 'عربي' : 'English';
+            
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.dataset.key;
+                if (translations[lang][key]) el.textContent = translations[lang][key];
+            });
+
+            // Update Dynamic Content
+            if (currentPronoun) els.slots.pronounLabel.textContent = currentPronoun[lang];
+            updateCardContent();
+        }
+
+        function toggleLanguage() {
+            setLanguage(currentLang === 'en' ? 'ar' : 'en');
+        }
+
+        function showPage(page) {
+            els.pages.home.classList.add('hidden');
+            els.pages.workplace.classList.add('hidden');
+            els.btns.home.classList.add('hidden');
+
+            if (page === 'home') {
+                els.pages.home.classList.remove('hidden');
+            } else {
+                els.pages.workplace.classList.remove('hidden');
+                els.btns.home.classList.remove('hidden');
+            }
+        }
+
+        function openModal(id) {
+            els.modals[id].style.display = 'flex';
+            if (id === 'template') {
+                document.querySelectorAll('.template-toggle').forEach(btn => {
+                    const t = btn.dataset.val;
+                    if (activeTenses.includes(t)) {
+                        btn.classList.add('bg-indigo-100', 'border-indigo-500', 'text-indigo-700');
+                    } else {
+                        btn.classList.remove('bg-indigo-100', 'border-indigo-500', 'text-indigo-700');
+                    }
+                });
+            }
+        }
+
+        function closeModal(id) {
+            els.modals[id].style.display = 'none';
+        }
+
+        // --- Selection Logic ---
+        function openSelectionModal(type) {
+            if (isTestMode) return;
+            
+            const grid = document.getElementById('modal-grid');
+            const title = document.getElementById('modal-select-title');
+            grid.innerHTML = '';
+            
+            if (type === 'pronoun') {
+                title.textContent = translations[currentLang].select_pronoun;
+                pronouns.forEach(p => {
+                    const btn = createSelectBtn(p.img, p[currentLang], () => selectPronoun(p));
+                    grid.appendChild(btn);
+                });
+            } else {
+                title.textContent = translations[currentLang].select_verb;
+                Object.values(verbs).forEach(v => {
+                    const label = currentLang === 'en' ? v.baseEn : v.baseAr;
+                    const btn = createSelectBtn(v.imgBase, label, () => selectVerb(v));
+                    grid.appendChild(btn);
+                });
+            }
+            openModal('select');
+        }
+
+        function createSelectBtn(imgSrc, text, onClick) {
+            const btn = document.createElement('div');
+            btn.className = "flex flex-col items-center gap-2 p-4 rounded-2xl hover:bg-slate-50 cursor-pointer transition border-2 border-transparent hover:border-indigo-200 hover:shadow-lg animate-[fadeIn_0.3s_ease-out]";
+            btn.innerHTML = `
+                <img src="${imgSrc}" class="w-20 h-20 object-cover rounded-xl shadow-sm bg-white">
+                <span class="font-bold text-slate-700 text-center">${text}</span>
+            `;
+            btn.addEventListener('click', () => {
+                onClick();
+                closeModal('select');
+            });
+            return btn;
+        }
+
+        function selectPronoun(p) {
+            currentPronoun = p;
+            els.slots.pronoun.innerHTML = `<img src="${p.img}" class="w-full h-full object-cover">`;
+            els.slots.pronounLabel.textContent = p[currentLang];
+            if (currentVerb) updateCardContent();
+            else openSelectionModal('verb'); 
+        }
+
+        function selectVerb(v) {
+            currentVerb = v;
+            updateCardContent();
+        }
+
+        function getCustomizationKey(time) {
+            if (!currentPronoun || !currentVerb) return null;
+            return `${currentPronoun.id}-${currentVerb.id}-${time}`;
+        }
+
+        function updateCardContent() {
+            if (!currentPronoun || !currentVerb) {
+                ['past', 'present', 'future'].forEach(time => setCardState(time, false));
+                return;
+            }
+
+            const conjData = currentVerb.conjugations[currentPronoun.id];
+            
+            ['past', 'present', 'future'].forEach(time => {
+                let text = "No Data";
+                const key = getCustomizationKey(time);
+                const customData = cardCustomizations[key];
+
+                // 1. Determine Text (Custom > Default)
+                if (customData && customData.title) {
+                    text = customData.title;
+                } else if (conjData && conjData[time]) {
+                    text = currentLang === 'en' ? conjData[time].en : conjData[time].ar;
+                }
+
+                // 2. Determine Image
+                let imgUrl = "";
+                if (showSpecificImages && currentVerb.images && currentVerb.images[time]) {
+                     imgUrl = `https://placehold.co/400x300/e2e8f0/475569?text=${currentVerb.images[time]}`;
+                } else {
+                    const genericIcons = {
+                        past: 'https://placehold.co/200/fcd34d/ffffff?text=PAST',
+                        present: 'https://placehold.co/200/f87171/ffffff?text=NOW',
+                        future: 'https://placehold.co/200/4ade80/ffffff?text=SOON'
+                    };
+                    imgUrl = genericIcons[time];
+                }
+
+                setCardState(time, true, text, imgUrl, showSpecificImages);
+            });
+        }
+
+        function setCardState(time, filled, title = "", img = "", isSpecific = false) {
+            const card = els.cards[time];
+            const imgEl = card.querySelector('img');
+            const titleEl = card.querySelector('.card-title-bar');
+            const placeholder = card.querySelector('.content-placeholder');
+
+            if (filled) {
+                card.dataset.filled = "true";
+                imgEl.src = img;
+                imgEl.classList.remove('hidden');
+                if (isSpecific) imgEl.classList.remove('generic-icon');
+                else imgEl.classList.add('generic-icon');
+
+                titleEl.textContent = title;
+                titleEl.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            } else {
+                card.dataset.filled = "false";
+                imgEl.classList.add('hidden');
+                titleEl.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+            }
+        }
+
+        function resetWorkplace() {
+            if(isTestMode) return;
+            currentPronoun = null;
+            currentVerb = null;
+            els.slots.pronoun.innerHTML = '<ion-icon name="person" class="text-2xl text-slate-300"></ion-icon>';
+            els.slots.pronounLabel.textContent = '-';
+            updateCardContent();
+        }
+
+        // --- Menu & Customization Logic ---
+        function toggleDropdown(time) {
+            const menu = document.getElementById(`menu-${time}`);
+            // Close others
+            document.querySelectorAll('.options-dropdown').forEach(d => {
+                if (d !== menu) d.classList.remove('show');
+            });
+            menu.classList.toggle('show');
+        }
+
+        function openEditTitle(time) {
+            activeEditTime = time;
+            const cardTitle = els.cards[time].querySelector('.card-title-bar').textContent;
+            els.inputs.editTitle.value = cardTitle;
+            openModal('edit');
+            // Focus input
+            setTimeout(() => els.inputs.editTitle.focus(), 100);
+        }
+
+        function saveTitleEdit() {
+            if (!activeEditTime) return;
+            const newTitle = els.inputs.editTitle.value.trim();
+            if (newTitle) {
+                const key = getCustomizationKey(activeEditTime);
+                if (!cardCustomizations[key]) cardCustomizations[key] = {};
+                cardCustomizations[key].title = newTitle;
+                updateCardContent(); // Refresh UI
+            }
+            closeModal('edit');
+            activeEditTime = null;
+        }
+
+        // --- Recording Logic ---
+        function openRecordVoice(time) {
+            activeEditTime = time;
+            openModal('record');
+            // Reset UI
+            els.btns.startRecord.classList.remove('hidden');
+            els.btns.stopRecord.classList.add('hidden');
+            els.record.playbackContainer.classList.add('hidden');
+            els.record.status.classList.remove('recording-pulse');
+            els.record.timer.textContent = "00:00";
+            audioChunks = [];
+            recordingBlob = null;
+        }
+
+        async function startRecording() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert("Audio recording is not supported in this browser.");
+                return;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                // Determine supported mime type for Safari/Chrome compatibility
+                let mimeType = 'audio/webm';
+                if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                    mimeType = 'audio/webm;codecs=opus';
+                } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                    mimeType = 'audio/mp4'; // Better for Safari
+                }
+
+                mediaRecorder = new MediaRecorder(stream, { mimeType });
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    recordingBlob = new Blob(audioChunks, { type: mimeType });
+                    stream.getTracks().forEach(track => track.stop()); // Stop mic
+                };
+
+                mediaRecorder.start();
+                
+                // UI Updates
+                els.btns.startRecord.classList.add('hidden');
+                els.btns.stopRecord.classList.remove('hidden');
+                els.record.status.classList.add('recording-pulse');
+
+                // Timer
+                let seconds = 0;
+                recordingInterval = setInterval(() => {
+                    seconds++;
+                    const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+                    const secs = (seconds % 60).toString().padStart(2, '0');
+                    els.record.timer.textContent = `${mins}:${secs}`;
+                }, 1000);
+
+            } catch (err) {
+                console.error("Error accessing microphone:", err);
+                alert("Could not access microphone.");
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                clearInterval(recordingInterval);
+                
+                els.btns.stopRecord.classList.add('hidden');
+                els.record.playbackContainer.classList.remove('hidden'); // Show save/play
+                els.record.status.classList.remove('recording-pulse');
+            }
+        }
+
+        function playRecordingPreview() {
+            if (!recordingBlob) return;
+            const audioUrl = URL.createObjectURL(recordingBlob);
+            const audio = new Audio(audioUrl);
+            audio.play();
+        }
+
+        function saveRecording() {
+            if (recordingBlob && activeEditTime) {
+                const key = getCustomizationKey(activeEditTime);
+                const audioUrl = URL.createObjectURL(recordingBlob);
+                
+                if (!cardCustomizations[key]) cardCustomizations[key] = {};
+                cardCustomizations[key].audio = audioUrl;
+                
+                // Reset Blob so we don't save duplicates easily
+                recordingBlob = null;
+                closeRecordModal();
+            }
+        }
+
+        function closeRecordModal() {
+             // Cleanup if closed while recording
+             if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                clearInterval(recordingInterval);
+            }
+            closeModal('record');
+            activeEditTime = null;
+        }
+
+        // --- Audio Playback (TTS or Recorded) ---
+        function playCardAudio(time) {
+            const key = getCustomizationKey(time);
+            const customData = cardCustomizations[key];
+
+            // 1. Check for Recording
+            if (customData && customData.audio) {
+                const audio = new Audio(customData.audio);
+                audio.play();
+            } 
+            // 2. Fallback to TTS
+            else {
+                const card = els.cards[time];
+                const text = card.querySelector('.card-title-bar').textContent;
+                if (text) speak(text);
+            }
+        }
+
+        function speak(text) {
+            if (!text) return;
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = currentLang === 'ar' ? 'ar-SA' : 'en-US';
+            window.speechSynthesis.speak(u);
+        }
+
+        // --- View Toggles ---
+        function toggleTitles() {
+            titlesVisible = !titlesVisible;
+            const container = document.getElementById('cards-container');
+            const icon = els.btns.toggleTitles.querySelector('ion-icon');
+            
+            if (titlesVisible) {
+                container.classList.remove('titles-hidden');
+                icon.name = "eye";
+            } else {
+                container.classList.add('titles-hidden');
+                icon.name = "eye-off";
+            }
+        }
+
+        function toggleImagesMode() {
+            if (!currentVerb || !currentPronoun) {
+                alert(translations[currentLang].msg_select_first);
+                return;
+            }
+            showSpecificImages = !showSpecificImages;
+            
+            if (showSpecificImages) {
+                els.btns.toggleImages.classList.add('bg-indigo-50', 'text-indigo-600', 'border-indigo-200');
+            } else {
+                els.btns.toggleImages.classList.remove('bg-indigo-50', 'text-indigo-600', 'border-indigo-200');
+            }
+            updateCardContent();
+        }
+
+        // --- Template Logic ---
+        function applyTemplate() {
+            const selected = [];
+            document.querySelectorAll('.template-toggle').forEach(btn => {
+                if (btn.classList.contains('bg-indigo-100')) {
+                    selected.push(btn.dataset.val);
+                }
+            });
+            
+            if (selected.length === 0) {
+                alert("Please select at least one tense.");
+                return;
+            }
+            activeTenses = selected;
+            updateGridVisibility();
+            closeModal('template');
+        }
+
+        function updateGridVisibility() {
+            ['past', 'present', 'future'].forEach(time => {
+                if (activeTenses.includes(time)) {
+                    els.cards[time].style.display = 'flex';
+                } else {
+                    els.cards[time].style.display = 'none';
+                }
+            });
+        }
+
+        // --- Test Mode Logic ---
+        function startTestMode() {
+            if (!currentPronoun || !currentVerb) {
+                alert(translations[currentLang].msg_select_first);
+                return;
+            }
+            
+            isTestMode = true;
+            testRound = 1;
+            testScore = 0;
+            wrongAnswersLog = [];
+            
+            els.btns.testMode.classList.add('ring-4', 'ring-amber-300');
+            els.testBoard.classList.remove('hidden');
+            document.querySelectorAll('.cover-overlay').forEach(el => el.classList.remove('hidden-cover'));
+            
+            playRound();
+        }
+
+        function playRound() {
+            if (testRound > 10) {
+                endTestGame();
+                return;
+            }
+            
+            els.scoreRound.textContent = `${testRound}/10`;
+            els.scoreVal.textContent = testScore;
+
+            // Pick random time
+            const availableTimes = activeTenses;
+            testTargetTime = availableTimes[Math.floor(Math.random() * availableTimes.length)];
+            
+            setTimeout(() => {
+                playCardAudio(testTargetTime); // Updated to use the smart player
+            }, 500);
+        }
+
+        function handleGameCardClick(clickedTime) {
+            if (clickedTime === testTargetTime) {
+                // Correct
+                testScore++;
+                els.scoreVal.textContent = testScore;
+                
+                const cover = els.cards[clickedTime].querySelector('.cover-overlay');
+                cover.classList.add('hidden-cover');
+                speak(translations[currentLang].correct);
+
+                setTimeout(() => {
+                    cover.classList.remove('hidden-cover');
+                    testRound++;
+                    playRound();
+                }, 1500);
+
+            } else {
+                // Incorrect
+                const card = els.cards[clickedTime];
+                card.classList.add('shake');
+                setTimeout(() => card.classList.remove('shake'), 500);
+                
+                const existing = wrongAnswersLog.find(x => x.time === testTargetTime);
+                if (existing) existing.count++;
+                else wrongAnswersLog.push({ time: testTargetTime, count: 1 });
+                
+                speak(translations[currentLang].try_again);
+            }
+        }
+
+        function endTestGame() {
+            const finalScoreEl = document.getElementById('final-score');
+            finalScoreEl.textContent = testScore;
+            
+            const wrongList = document.getElementById('wrong-list');
+            const wrongContainer = document.getElementById('wrong-answers');
+            
+            wrongList.innerHTML = '';
+            if (wrongAnswersLog.length > 0) {
+                wrongContainer.classList.remove('hidden');
+                wrongAnswersLog.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = `${translations[currentLang][item.time]} (${item.count})`;
+                    wrongList.appendChild(li);
+                });
+            } else {
+                wrongContainer.classList.add('hidden');
+            }
+            openModal('gameover');
+            stopTestMode();
+        }
+
+        function stopTestMode() {
+            isTestMode = false;
+            els.testBoard.classList.add('hidden');
+            els.btns.testMode.classList.remove('ring-4', 'ring-amber-300');
+            document.querySelectorAll('.cover-overlay').forEach(el => el.classList.add('hidden-cover'));
+        }
+
+        // Run
+        init();
+
+    </script>
+</body>
+</html>
