@@ -1,291 +1,315 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="html-root">
 <head>
-  <meta charset="UTF-8">
-  <title>Forms | Ahmad Ghanem SLP</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Google Fonts -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&display=swap">
-  <!-- Tab Icon -->
-  <link rel="icon" href="images/logo.png" type="image/png">
-  <style>
-body {
-  font-family: 'Segoe UI', Arial, 'Noto Sans Arabic', sans-serif;
-  background: #f8fafd;
-  margin: 0;
-  color: #233;
-}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forms | Ahmad Ghanem SLP</title>
+    <link rel="icon" href="images/logo.png" type="image/png">
+    
+    <!-- Fonts: Inter (English) and Noto Sans Arabic (Arabic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        arabic: ['Noto Sans Arabic', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
-/* Navigation Bar */
-.site-nav-bar {
-  margin-bottom: 1.7em;
-  text-align: center;
-  width: 100%;
-  background: #fcfdff;
-  border-bottom: 1px solid #e3f1ff;
-  padding: 0.45em 0;
-  position: relative;
-  z-index: 2;
-}
-
-.site-nav-bar a {
-  color: #43a6f8;
-  text-decoration: none;
-  padding: 10px 22px;
-  border-radius: 18px;
-  font-weight: bold;
-  font-size: 1em;
-  margin: 0 0.5em;
-  transition: background 0.13s;
-}
-
-.site-nav-bar a.active,
-.site-nav-bar a:hover {
-  background: #e0f2ff;
-  color: #2693d9;
-}
-
-/* Header */
-.forms-header {
-  margin-top: 2em;
-  margin-bottom: 2.5em;
-  text-align: center;
-}
-
-.subtitle {
-  font-size: 1.11em;
-  color: #3496d8;
-  margin-bottom: 0.5em;
-  font-weight: bold;
-}
-
-/* Layout for first two cards */
-.top-two-cards {
-  display: flex;
-  justify-content: center;
-  gap: 1.5em;
-  max-width: 800px;
-  margin: 2em auto 3em;
-  padding: 0 1em;
-}
-
-.top-two-cards .form-card {
-  flex: 1 1 300px;
-  max-width: 350px;
-}
-
-/* Layout for remaining cards */
-.other-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5em;
-  max-width: 1200px;
-  margin: 0 auto 3em;
-  padding: 0 1em;
-}
-
-/* Card styles */
-.form-card {
-  background: #fcfdff;
-  border-radius: 16px;
-  box-shadow: 0 3px 14px #a4d4ff16;
-  border: 1.8px solid #e3f1ff;
-  padding: 25px 18px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: box-shadow 0.17s, border-color 0.17s, transform 0.17s;
-  min-height: 280px;
-  box-sizing: border-box;
-  width: 100%;
-  cursor: pointer;
-  text-decoration: none;
-  color: inherit;
-}
-
-.form-card:hover {
-  box-shadow: 0 5px 18px #43a6f833;
-  border-color: #43a6f8;
-  transform: translateY(-3px);
-}
-
-.form-card img {
-  width: 70px;
-  height: 70px;
-  margin-bottom: 0.9em;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 12px #43a6f814);
-}
-
-.form-card-title {
-  font-size: 1.16em;
-  font-weight: bold;
-  color: #233;
-  margin: 0.5em 0;
-}
-
-.form-card-desc {
-  color: #6b7689;
-  font-size: 0.95em;
-  margin: 0.5em 0 1.2em;
-  flex-grow: 1;
-}
-
-/* Footer / Contact Section */
-.about-contact {
-  margin-top: 2.5em;
-  font-size: 1.05em;
-  line-height: 1.7;
-  color: #3e4666;
-  text-align: center;
-}
-
-.about-contact a {
-  color: #3496d8;
-  text-decoration: none;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 1024px) {
-  .form-card img {
-    width: 60px;
-    height: 60px;
-  }
-  .form-card {
-    min-height: 250px;
-    padding: 20px 15px;
-  }
-}
-
-@media (max-width: 768px) {
-  .top-two-cards {
-    flex-direction: column;
-    align-items: center;
-  }
-  .top-two-cards .form-card {
-    max-width: 100%;
-  }
-  .other-cards {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1em;
-  }
-  .form-card img {
-    width: 55px;
-    height: 55px;
-  }
-  .form-card {
-    min-height: 220px;
-    padding: 18px 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .other-cards {
-    grid-template-columns: 1fr;
-    gap: 0.9em;
-  }
-  .form-card img {
-    width: 50px;
-    height: 50px;
-    margin-bottom: 0.7em;
-  }
-  .form-card-title {
-    font-size: 1.05em;
-  }
-  .form-card-desc {
-    font-size: 0.9em;
-  }
-}
-  </style>
+    <style>
+        /* Smooth transitions for layout changes */
+        body, .tool-card {
+            transition: all 0.3s ease-in-out;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
-<body>
-  <!-- Simple Nav Bar -->
-  <nav class="site-nav-bar">
-    <a href="index.html">Home</a>
-    <a href="tools.html">Tools</a>
-    <a href="resources.html">Resources</a>
-  </nav>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans transition-all duration-300">
 
-<main>
-  <div class="forms-header">
-    <h1>Forms</h1>
-    <div class="subtitle">All digital assessment and intake forms</div>
-  </div>
+    <!-- NAVIGATION -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-2">
+                    <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                        AG
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-slate-800">Ahmad Ghanem <span class="text-primary-600">SLP</span></span>
+                </div>
 
-  <div class="forms-list">
-    <!-- Top row with two cards -->
-    <div class="top-two-cards">
-      <a class="form-card" href="forms/child-case-history/index.html" target="_blank" rel="noopener">
-        <img src="images/baby-smile.gif" alt="Child icon">
-        <div class="form-card-title">Child Case History</div>
-        <div class="form-card-desc">Basic developmental and family intake.</div>
-      </a>
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-6 rtl:space-x-reverse">
+                    <a href="index.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_home">Home</a>
+                    <a href="tools.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_tools">Tools</a>
+                    <a href="#" class="text-primary-700 bg-primary-50 px-3 py-2 rounded-md text-sm font-bold" data-i18n="nav_forms">Forms</a>
+                    <a href="resources.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_resources">Resources</a>
+                    
+                    <!-- Language Switcher Button -->
+                    <button onclick="toggleLanguage()" class="flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-300 text-sm font-medium hover:bg-slate-50 hover:border-primary-500 transition-colors ml-4 rtl:mr-4">
+                        <span id="lang-icon">🌐</span>
+                        <span id="lang-text">العربية</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-      <a class="form-card" href="forms/adult-case-history/index.html" target="_blank" rel="noopener">
-        <img src="images/adult.gif" alt="Adult icon">
-        <div class="form-card-title">Adult Case History</div>
-        <div class="form-card-desc">Basic intake for adults.</div>
-      </a>
-    </div>
+    <!-- HERO SECTION -->
+    <header class="bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-4" data-i18n="header_title">
+                Forms
+            </h1>
+            <p class="max-w-2xl mx-auto text-lg text-slate-500" data-i18n="header_subtitle">
+                All digital assessment and intake forms for your practice.
+            </p>
+        </div>
+    </header>
 
-    <!-- Remaining cards -->
-    <div class="other-cards">
-      <a class="form-card" href="forms/language/index.html" target="_blank" rel="noopener">
-        <img src="images/language.gif" alt="Language forms icon">
-        <div class="form-card-title">Language</div>
-        <div class="form-card-desc">Explore language-related assessment.</div>
-      </a>
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+        
+        <!-- Primary Forms (Top 2) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 max-w-4xl mx-auto">
+            
+            <a href="forms/child-case-history/index.html" target="_blank" rel="noopener" class="tool-card flex flex-col items-center p-8 bg-white rounded-2xl border border-slate-200 text-center">
+                <div class="w-24 h-24 mb-6 relative">
+                    <div class="absolute inset-0 bg-blue-50 rounded-full scale-110 opacity-50"></div>
+                    <img src="images/baby-smile.gif" alt="Child Case History" class="relative z-10 w-full h-full object-contain">
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800 mb-2" data-i18n="card_child_title">Child Case History</h3>
+                <p class="text-slate-500" data-i18n="card_child_desc">Basic developmental and family intake.</p>
+            </a>
 
-      <a class="form-card" href="forms/speech/index.html" target="_blank" rel="noopener">
-        <img src="images/speech.gif" alt="Speech forms icon">
-        <div class="form-card-title">Speech</div>
-        <div class="form-card-desc">Explore speech-related assessment.</div>
-      </a>
+            <a href="forms/adult-case-history/index.html" target="_blank" rel="noopener" class="tool-card flex flex-col items-center p-8 bg-white rounded-2xl border border-slate-200 text-center">
+                <div class="w-24 h-24 mb-6 relative">
+                    <div class="absolute inset-0 bg-blue-50 rounded-full scale-110 opacity-50"></div>
+                    <img src="images/adult.gif" alt="Adult Case History" class="relative z-10 w-full h-full object-contain">
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800 mb-2" data-i18n="card_adult_title">Adult Case History</h3>
+                <p class="text-slate-500" data-i18n="card_adult_desc">Basic intake for adults.</p>
+            </a>
 
-      <a class="form-card" href="forms/ASD/index.html" target="_blank" rel="noopener">
-        <img src="images/ASD.gif" alt="ASD/Autism forms icon">
-        <div class="form-card-title">ASD</div>
-        <div class="form-card-desc">Assessment for autism spectrum.</div>
-      </a>
+        </div>
 
-      <a class="form-card" href="forms/Hearing/index.html" target="_blank" rel="noopener">
-        <img src="images/hearingaid.gif" alt="Hearing Loss icon">
-        <div class="form-card-title">Hearing Loss</div>
-        <div class="form-card-desc">Assessments for hearing loss and related disorders.</div>
-      </a>
+        <!-- Secondary Forms (Grid) -->
+        <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center md:text-left rtl:text-right" data-i18n="section_assessments">Specific Assessments</h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
-      <a class="form-card" href="forms/voice/index.html" target="_blank" rel="noopener">
-        <img src="images/voice.gif" alt="Voice icon">
-        <div class="form-card-title">Voice Evaluation</div>
-        <div class="form-card-desc">Assessment for voice issues.</div>
-      </a>
+            <!-- Language -->
+            <a href="forms/language/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                <img src="images/language.gif" alt="Language" class="w-16 h-16 mx-auto mb-4 object-contain">
+                <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_lang_title">Language</h3>
+                <p class="text-sm text-slate-500" data-i18n="card_lang_desc">Explore language-related assessment.</p>
+            </a>
 
-      <a class="form-card" href="forms/aphasia/index.html" target="_blank" rel="noopener">
-        <img src="images/aphasia.gif" alt="Aphasia icon">
-        <div class="form-card-title">Aphasia</div>
-        <div class="form-card-desc">Assessment for neurodevelopmental issues.</div>
-      </a>
+            <!-- Speech -->
+            <a href="forms/speech/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                <img src="images/speech.gif" alt="Speech" class="w-16 h-16 mx-auto mb-4 object-contain">
+                <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_speech_title">Speech</h3>
+                <p class="text-sm text-slate-500" data-i18n="card_speech_desc">Explore speech-related assessment.</p>
+            </a>
 
-      <a class="form-card" href="forms/stuttering/index.html" target="_blank" rel="noopener">
-        <img src="images/stutter.gif" alt="Stuttering icon">
-        <div class="form-card-title">Stuttering</div>
-        <div class="form-card-desc">Assessment for fluency issues.</div>
-      </a>
+            <!-- ASD -->
+            <a href="forms/ASD/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                <img src="images/ASD.gif" alt="ASD" class="w-16 h-16 mx-auto mb-4 object-contain">
+                <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_asd_title">ASD</h3>
+                <p class="text-sm text-slate-500" data-i18n="card_asd_desc">Assessment for autism spectrum.</p>
+            </a>
 
-      <a class="form-card" href="forms/other/index.html" target="_blank" rel="noopener">
-        <img src="images/other.gif" alt="Other icon">
-        <div class="form-card-title">Other</div>
-        <div class="form-card-desc">Other related assessments.</div>
-      </a>
-    </div>
-  </div>
+            <!-- Hearing -->
+            <a href="forms/Hearing/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                <img src="images/hearingaid.gif" alt="Hearing Loss" class="w-16 h-16 mx-auto mb-4 object-contain">
+                <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_hearing_title">Hearing Loss</h3>
+                <p class="text-sm text-slate-500" data-i18n="card_hearing_desc">Assessments for hearing loss disorders.</p>
+            </a>
 
-  <div class="about-contact">
-    <strong>Questions?</strong>
-    <a href="mailto:slp.ahmadghanem@gmail.com">slp.ahmadghanem@gmail.com</a> &bull;
-    <a href="tel:+963988451245">+963 988 451 245</a>
-  </div>
-</main>
+            <!-- Voice -->
+            <a href="forms/voice/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                <img src="images/voice.gif" alt="Voice" class="w-16 h-16 mx-auto mb-4 object-contain">
+                <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_voice_title">Voice Evaluation</h3>
+                <p class="text-sm text-slate-500" data-i18n="card_voice_desc">Assessment for voice issues.</p>
+            </a>
+
+            <!-- Aphasia -->
+            <a href="forms/aphasia/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                <img src="images/aphasia.gif" alt="Aphasia" class="w-16 h-16 mx-auto mb-4 object-contain">
+                <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_aphasia_title">Aphasia</h3>
+                <p class="text-sm text-slate-500" data-i18n="card_aphasia_desc">Neurodevelopmental issues.</p>
+            </a>
+
+            <!-- Stuttering -->
+            <a href="forms/stuttering/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                <img src="images/stutter.gif" alt="Stuttering" class="w-16 h-16 mx-auto mb-4 object-contain">
+                <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_stutter_title">Stuttering</h3>
+                <p class="text-sm text-slate-500" data-i18n="card_stutter_desc">Assessment for fluency issues.</p>
+            </a>
+
+            <!-- Other -->
+            <a href="forms/other/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                <img src="images/other.gif" alt="Other" class="w-16 h-16 mx-auto mb-4 object-contain">
+                <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_other_title">Other</h3>
+                <p class="text-sm text-slate-500" data-i18n="card_other_desc">Other related assessments.</p>
+            </a>
+            
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mb-4">
+                <strong data-i18n="footer_questions">Questions?</strong>
+                <a href="mailto:slp.ahmadghanem@gmail.com" class="text-primary-600 hover:text-primary-800 ml-2">slp.ahmadghanem@gmail.com</a>
+                <span class="mx-2 text-slate-300">|</span>
+                <a href="tel:+963988451245" class="text-primary-600 hover:text-primary-800" dir="ltr">+963 988 451 245</a>
+            </div>
+            <div class="text-slate-400 text-sm">
+                &copy; 2024 Ahmad Ghanem SLP. <span data-i18n="footer_rights">All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LANGUAGE SWITCHER LOGIC -->
+    <script>
+        // Translation Dictionary
+        const translations = {
+            en: {
+                nav_home: "Home",
+                nav_tools: "Tools",
+                nav_forms: "Forms",
+                nav_resources: "Resources",
+                header_title: "Forms",
+                header_subtitle: "All digital assessment and intake forms for your practice.",
+                section_assessments: "Specific Assessments",
+                
+                card_child_title: "Child Case History",
+                card_child_desc: "Basic developmental and family intake.",
+                card_adult_title: "Adult Case History",
+                card_adult_desc: "Basic intake for adults.",
+                
+                card_lang_title: "Language",
+                card_lang_desc: "Explore language-related assessment.",
+                card_speech_title: "Speech",
+                card_speech_desc: "Explore speech-related assessment.",
+                card_asd_title: "ASD",
+                card_asd_desc: "Assessment for autism spectrum.",
+                card_hearing_title: "Hearing Loss",
+                card_hearing_desc: "Assessments for hearing loss disorders.",
+                card_voice_title: "Voice Evaluation",
+                card_voice_desc: "Assessment for voice issues.",
+                card_aphasia_title: "Aphasia",
+                card_aphasia_desc: "Neurodevelopmental issues.",
+                card_stutter_title: "Stuttering",
+                card_stutter_desc: "Assessment for fluency issues.",
+                card_other_title: "Other",
+                card_other_desc: "Other related assessments.",
+                
+                footer_questions: "Questions?",
+                footer_rights: "All rights reserved."
+            },
+            ar: {
+                nav_home: "الرئيسية",
+                nav_tools: "الأدوات",
+                nav_forms: "النماذج",
+                nav_resources: "المصادر",
+                header_title: "النماذج",
+                header_subtitle: "جميع نماذج التقييم الرقمية ونماذج البيانات الأولية لعيادتك.",
+                section_assessments: "تقييمات محددة",
+                
+                card_child_title: "تاريخ حالة الطفل",
+                card_child_desc: "النمو الأساسي وبيانات الأسرة.",
+                card_adult_title: "تاريخ حالة البالغين",
+                card_adult_desc: "البيانات الأولية للبالغين.",
+                
+                card_lang_title: "اللغة",
+                card_lang_desc: "استكشاف التقييمات المتعلقة باللغة.",
+                card_speech_title: "النطق",
+                card_speech_desc: "استكشاف التقييمات المتعلقة بالنطق.",
+                card_asd_title: "طيف التوحد",
+                card_asd_desc: "تقييم طيف التوحد.",
+                card_hearing_title: "فقدان السمع",
+                card_hearing_desc: "تقييمات فقدان السمع والاضطرابات ذات الصلة.",
+                card_voice_title: "تقييم الصوت",
+                card_voice_desc: "تقييم مشاكل الصوت.",
+                card_aphasia_title: "الحبسة الكلامية",
+                card_aphasia_desc: "مشاكل النمو العصبي.",
+                card_stutter_title: "التأتأة",
+                card_stutter_desc: "تقييم مشاكل الطلاقة.",
+                card_other_title: "أخرى",
+                card_other_desc: "تقييمات أخرى ذات صلة.",
+                
+                footer_questions: "لديك أسئلة؟",
+                footer_rights: "جميع الحقوق محفوظة."
+            }
+        };
+
+        let currentLang = 'en';
+
+        function toggleLanguage() {
+            // Toggle state
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            const isArabic = currentLang === 'ar';
+            
+            // 1. Update HTML direction and font family
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', isArabic ? 'rtl' : 'ltr');
+            
+            const body = document.body;
+            if (isArabic) {
+                body.classList.remove('font-sans');
+                body.classList.add('font-arabic');
+            } else {
+                body.classList.remove('font-arabic');
+                body.classList.add('font-sans');
+            }
+
+            // 2. Update Button Text
+            const btnText = document.getElementById('lang-text');
+            btnText.textContent = isArabic ? 'English' : 'العربية';
+
+            // 3. Update All Text Content
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    el.textContent = translations[currentLang][key];
+                }
+            });
+        }
+    </script>
 </body>
 </html>
