@@ -1,201 +1,251 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Tools | Ahmad Ghanem SLP</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      font-family: 'Segoe UI', Arial, 'Noto Sans Arabic', sans-serif;
-      background: #f8fafd;
-      margin: 0;
-      color: #233;
-    }
-    .site-nav-bar {
-      margin-bottom: 1.7em;
-      text-align: center;
-      width: 100%;
-      background: #fcfdff;
-      border-bottom: 1px solid #e3f1ff;
-      padding: 0.45em 0;
-      position: relative;
-      z-index: 2;
-    }
-    .site-nav-bar a {
-      color: #43a6f8;
-      text-decoration: none;
-      padding: 10px 22px;
-      border-radius: 18px;
-      font-weight: bold;
-      font-size: 1em;
-      margin: 0 0.5em;
-      transition: background 0.13s;
-    }
-    .site-nav-bar a.active, .site-nav-bar a:hover {
-      background: #e0f2ff;
-      color: #2693d9;
-    }
-    .tools-section-header {
-      margin-top: 2em;
-      margin-bottom: 2.1em;
-      text-align: center;
-    }
-    .tools-title {
-      font-size: 2em;
-      color: #2567aa;
-      font-weight: 800;
-      letter-spacing: 0.01em;
-      margin-bottom: 0.3em;
-    }
-    .tools-subtitle {
-      color: #3496d8;
-      font-weight: bold;
-      font-size: 1.07em;
-      margin-bottom: 0.3em;
-    }
-    .tools-area {
-      max-width: 1080px;
-      margin: 0 auto 10vh auto;
-      min-height: 75vh;
-      height: 75vh;         /* For demo: force height so scrollbar demo visible */
-      background: #fafdff;
-      border-radius: 18px;
-      box-shadow: 0 4px 24px #43a6f810;
-      overflow-y: auto;
-      padding-bottom: 1.5em;
-    }
-    .tools-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 2em 2.2em;
-      padding: 2.2em 2.2em 1.5em 2.2em;
-      justify-items: center;
-    }
-    .tool-card {
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 2px 16px #47a5ff11;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      height: 182px;
-      width: 182px;
-      min-width: 132px;
-      min-height: 132px;
-      cursor: pointer;
-      transition: box-shadow 0.18s, transform 0.19s;
-      border: 2px solid #e3f1ff;
-      position: relative;
-      overflow: hidden;
-      text-align: center;
-      aspect-ratio: 1/1;
-    }
-    .tool-card:hover, .tool-card:focus-within {
-      box-shadow: 0 8px 32px #43a6f829;
-      transform: translateY(-2px) scale(1.04);
-      border-color: #81c7fc;
-      z-index: 2;
-    }
-    .tool-card-icon {
-      display: block;
-      width: 80px;
-      height: 80px;
-      margin: 28px auto 12px auto;
-      object-fit: contain;
-      filter: drop-shadow(0 1.5px 7px #43a6f81e);
-      transition: filter 0.18s;
-    }
-    .tool-card-label {
-      font-size: 1.02em;
-      font-weight: 600;
-      color: #2561ae;
-      margin-bottom: 6px;
-      margin-top: 0;
-      text-align: center;
-      letter-spacing: 0.02em;
-      padding: 0 3px;
-      line-height: 1.13;
-    }
-    .tool-card-subtext {
-      font-size: 0.89em;
-      color: #8890a5;
-      font-weight: 400;
-      text-align: center;
-      padding: 0 0.4em;
-      margin-top: 2px;
-      margin-bottom: 0;
-    }
-    .tool-card-link {
-      position: absolute;
-      inset: 0;
-      text-indent: -9999px; /* let whole card be clickable if a <a> wrapper is not used */
-      outline: none;
-    }
-    @media (max-width: 840px) {
-      .tools-grid { grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 1.3em; padding: 1.1em 1vw; }
-      .tool-card { width: 128px; height: 128px;}
-      .tool-card-icon { width: 48px; height: 48px; margin:17px auto 6px auto;}
-    }
-    @media (max-width:540px) {
-      .tools-area { padding:0 0; }
-      .tools-grid { gap: 0.8em; padding: 0.7em 1vw;}
-      .tool-card { width: 90px; height: 90px;}
-      .tool-card-icon { width: 28px; height: 28px; margin:7px auto 2px auto;}
-      .tool-card-label { font-size: 0.94em;}
-    }
-    /* Custom slim & colored scrollbar for area */
-    .tools-area { scrollbar-width: thin; scrollbar-color: #96cdff #e6f5ff; }
-    .tools-area::-webkit-scrollbar { width: 10px; background: #e6f5ff;}
-    .tools-area::-webkit-scrollbar-thumb { background: #96cdff; border-radius: 8px;}
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tools | Ahmad Ghanem SLP</title>
+    
+    <!-- Fonts: Inter for clean readability -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (via CDN for instant styling without build steps) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        },
+                        accent: {
+                            light: '#e0f2fe', // sky-100
+                            main: '#0ea5e9',  // sky-500
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar for the main page */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        
+        /* Smooth card hover lift */
+        .tool-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
-<body>
-  <nav class="site-nav-bar">
-    <a href="index.html">Home</a>
-    <a href="forms.html">Forms</a>
-    <a href="resources.html">Resources</a>
-  </nav>
-  <main>
-    <section class="tools-section-header">
-      <div class="tools-title">Tools</div>
-      <div class="tools-subtitle">Digital assistants an d calculators for SLP practice</div>
-    </section>
-    <section class="tools-area">
-      <div class="tools-grid">
-        <!-- Example tool cards, update src and labels as needed -->
-        <a href="voc/index.html" class="tool-card" tabindex="0">
-          <img src="../images/apple.gif" alt="Age Calculator" class="tool-card-icon">
-          <div class="tool-card-label">Vocabulary Cards</div>
-          <div class="tool-card-subtext">cards sets for different age groups</div>
-        </a>
-        <a href="senb/index.html" class="tool-card" tabindex="0">
-          <img src="images/tools-words.png" alt="Words per minute" class="tool-card-icon">
-          <div class="tool-card-label">Words-per-Minute</div>
-          <div class="tool-card-subtext">Calculate speech/reading rate</div>
-        </a>
-        <a href="verb/index.html" class="tool-card" tabindex="0">
-          <img src="images/tools-syllable.png" alt="Syllable Counter" class="tool-card-icon">
-          <div class="tool-card-label">Syllable Counter</div>
-          <div class="tool-card-subtext">Count from text</div>
-        </a>
-        <a href="tools/hearing-screening.html" class="tool-card" tabindex="0">
-          <img src="images/tools-hearing.png" alt="Hearing Screening" class="tool-card-icon">
-          <div class="tool-card-label">Hearing Screening</div>
-          <div class="tool-card-subtext">Quick 6Q screener</div>
-        </a>
-        <!-- Add more tool cards below. Just copy-paste as you want -->
-        <!-- Demo of overflow -->
-        <a href="#" class="tool-card"><img src="images/tools-placeholder.png" alt="" class="tool-card-icon"><div class="tool-card-label">Tool Demo</div><div class="tool-card-subtext">Information</div></a>
-        <a href="#" class="tool-card"><img src="images/tools-placeholder.png" alt="" class="tool-card-icon"><div class="tool-card-label">Tool Demo</div><div class="tool-card-subtext">Information</div></a>
-        <a href="#" class="tool-card"><img src="images/tools-placeholder.png" alt="" class="tool-card-icon"><div class="tool-card-label">Tool Demo</div><div class="tool-card-subtext">Information</div></a>
-        <a href="#" class="tool-card"><img src="images/tools-placeholder.png" alt="" class="tool-card-icon"><div class="tool-card-label">Tool Demo</div><div class="tool-card-subtext">Information</div></a>
-        <a href="#" class="tool-card"><img src="images/tools-placeholder.png" alt="" class="tool-card-icon"><div class="tool-card-label">Tool Demo</div><div class="tool-card-subtext">Information</div></a>
-        <a href="#" class="tool-card"><img src="images/tools-placeholder.png" alt="" class="tool-card-icon"><div class="tool-card-label">Tool Demo</div><div class="tool-card-subtext">Information</div></a>
-        <!-- ...and so on. The right scrollbar will appear when needed! -->
-      </div>
-    </section>
-  </main>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- NAVIGATION -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo / Brand -->
+                <div class="flex-shrink-0 flex items-center gap-2">
+                    <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                        AG
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-slate-800">Ahmad Ghanem <span class="text-primary-600">SLP</span></span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
+                    <a href="forms.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Forms</a>
+                    <!-- Active Link Styling -->
+                    <a href="#" class="text-primary-700 bg-primary-50 px-3 py-2 rounded-md text-sm font-bold">Tools</a>
+                    <a href="resources.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Resources</a>
+                </div>
+
+                <!-- Mobile Menu Button (Hamburger) -->
+                <div class="flex items-center md:hidden">
+                    <button type="button" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="text-slate-500 hover:text-slate-700 focus:outline-none p-2">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div class="hidden md:hidden bg-white border-t border-slate-100" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="index.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-primary-600 hover:bg-slate-50">Home</a>
+                <a href="forms.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-primary-600 hover:bg-slate-50">Forms</a>
+                <a href="#" class="block px-3 py-2 rounded-md text-base font-bold text-primary-700 bg-primary-50">Tools</a>
+                <a href="resources.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-primary-600 hover:bg-slate-50">Resources</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HEADER / HERO SECTION -->
+    <header class="bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
+                Clinical Tools & Assistants
+            </h1>
+            <p class="max-w-2xl mx-auto text-lg text-slate-500">
+                Digital assistants, sentence builders, and calculators designed to streamline your Speech-Language Pathology practice.
+            </p>
+            
+            <!-- Search / Filter Bar -->
+            <div class="mt-8 max-w-md mx-auto relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <input type="text" id="toolSearch" onkeyup="filterTools()" class="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-full leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm shadow-sm" placeholder="Find a tool (e.g., 'verbs', 'cards')...">
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN TOOLS GRID -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="toolsGrid">
+
+            <!-- Tool 1: Vocabulary Cards -->
+            <a href="voc/index.html" class="tool-card group block bg-white rounded-2xl border border-slate-200 p-6 h-full relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                <div class="relative z-10">
+                    <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-4 shadow-sm">
+                        <!-- Icon: Library/Cards -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-primary-600 transition-colors">Vocabulary Cards</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Interactive card sets tailored for different age groups to enhance lexical retrieval.</p>
+                </div>
+            </a>
+
+            <!-- Tool 2: Sentence Builder -->
+            <a href="senb/index.html" class="tool-card group block bg-white rounded-2xl border border-slate-200 p-6 h-full relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-green-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                <div class="relative z-10">
+                    <div class="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center text-green-600 mb-4 shadow-sm">
+                        <!-- Icon: Puzzle/Builder -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-green-600 transition-colors">Sentence Builder</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Visual aids to construct sentence order ranging from two to six words.</p>
+                </div>
+            </a>
+
+            <!-- Tool 3: Verbs in Use -->
+            <a href="verb/index.html" class="tool-card group block bg-white rounded-2xl border border-slate-200 p-6 h-full relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-purple-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                <div class="relative z-10">
+                    <div class="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 mb-4 shadow-sm">
+                        <!-- Icon: Activity/Verbs -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-purple-600 transition-colors">Verbs in Use</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Practice verb tenses and conjugations in context with visual cues.</p>
+                </div>
+            </a>
+
+            <!-- Placeholder for Future Tool -->
+            <div class="tool-card block bg-slate-50 rounded-2xl border-2 border-dashed border-slate-300 p-6 h-full flex flex-col items-center justify-center text-center opacity-70 hover:opacity-100 hover:border-slate-400 cursor-default">
+                <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-400 mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-600">More Coming Soon</h3>
+                <p class="text-xs text-slate-400 mt-1">Articulation & Swallowing Tools</p>
+            </div>
+
+        </div>
+
+        <!-- No Results Message (Hidden by default) -->
+        <div id="noResults" class="hidden text-center py-12">
+            <p class="text-slate-400 text-lg">No tools found matching your search.</p>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+            <div class="text-slate-400 text-sm mb-4 md:mb-0">
+                &copy; 2024 Ahmad Ghanem SLP. All rights reserved.
+            </div>
+            <div class="flex space-x-6">
+                <a href="#" class="text-slate-400 hover:text-primary-500 text-sm">Privacy Policy</a>
+                <a href="#" class="text-slate-400 hover:text-primary-500 text-sm">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Search/Filter Logic -->
+    <script>
+        function filterTools() {
+            // Get input value
+            let input = document.getElementById('toolSearch');
+            let filter = input.value.toUpperCase();
+            
+            // Get grid and cards
+            let grid = document.getElementById('toolsGrid');
+            let cards = grid.getElementsByTagName('a'); // Selecting the 'a' tags which are the tool cards
+            let hasResults = false;
+
+            // Loop through all cards
+            for (let i = 0; i < cards.length; i++) {
+                let title = cards[i].getElementsByTagName("h3")[0];
+                let desc = cards[i].getElementsByTagName("p")[0];
+                
+                if (title || desc) {
+                    let txtValue = (title.textContent || title.innerText) + " " + (desc.textContent || desc.innerText);
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        cards[i].style.display = ""; // Show
+                        hasResults = true;
+                    } else {
+                        cards[i].style.display = "none"; // Hide
+                    }
+                }       
+            }
+
+            // Toggle "No Results" message
+            document.getElementById('noResults').classList.toggle('hidden', hasResults);
+        }
+    </script>
 </body>
 </html>
