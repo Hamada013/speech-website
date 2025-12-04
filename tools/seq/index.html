@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sequencing Fun</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Confetti for Game Wins -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Google Font (Readex Pro for Arabic/English) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Ionicons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlNlcXVlbmNpbmcgQXBwIiwKICAic2hvcnRfbmFtZSI6ICJTZXF1ZW5jaW5nIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmZmZmZmYiLAogICJ0aGVtZV9jb2xvciI6ICIjNDMzOGNhIiwKICAiaWNvbnMiOiBbXQp9">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#4338ca">
+    
+    <style>
+        body {
+            font-family: 'Readex Pro', sans-serif;
+            background: #f1f5f9;
+            overflow: hidden; 
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #app-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- Card Interactions --- */
+        .card-slot {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s, border-color 0.3s;
+            user-select: none;
+            touch-action: none; /* Critical for custom touch drag */
+            cursor: grab;
+            position: relative;
+        }
+        
+        .card-slot:active { cursor: grabbing; }
+
+        .card-slot.dragging {
+            opacity: 0.8;
+            transform: scale(1.08) rotate(2deg);
+            z-index: 50;
+            border-color: #6366f1; /* Indigo-500 */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Updated Playing State: Blue Glow & Pop Up */
+        .card-slot.playing {
+            border-color: #3b82f6 !important; /* Blue-500 */
+            box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.4) !important; /* Blue Glow */
+            transform: scale(1.1) translateY(-8px) !important; /* Pop up */
+            z-index: 100 !important;
+        }
+
+        /* --- Game Feedback Animations --- */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-2deg); }
+            75% { transform: translateX(5px) rotate(2deg); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+            border-color: #ef4444 !important; /* Red border */
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.3);
+        }
+
+        @keyframes pop-success {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .animate-success {
+            animation: pop-success 0.4s ease-out;
+            border-color: #22c55e !important; /* Green border */
+            box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.4);
+        }
+
+        /* --- Cover Mode --- */
+        .cover-overlay {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .card-slot.covered .cover-overlay { opacity: 1; pointer-events: auto; }
+        .card-slot.covered.revealed .cover-overlay { opacity: 0; pointer-events: none; }
+
+        /* --- Scrollbar Hide --- */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* --- Animations --- */
+        @keyframes bounce-in {
+            0% { transform: scale(0.8); opacity: 0; }
+            60% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        .animate-bounce-in { animation: bounce-in 0.4s ease-out forwards; }
+        
+        .recording-pulse { animation: pulse-red 1.5s infinite; }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* --- Modals --- */
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div id="app-container">
+        
+        <!-- ===== HEADER ===== -->
+        <header class="bg-white shadow-md z-30 flex-none">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+                
+                <!-- Left: Home/Logo -->
+                <div class="flex items-center gap-3">
+                    <button id="btn-home-nav" class="hidden w-10 h-10 bg-slate-100 text-slate-600 rounded-full flex items-center justify-center hover:bg-indigo-100 hover:text-indigo-600 transition">
+                        <ion-icon name="home" class="text-xl"></ion-icon>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <!-- Logo Image -->
+                        <img src="images/logo.png" alt="Logo" class="w-10 h-10 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/100x100/6366f1/ffffff?text=H';">
+                        <h1 class="font-extrabold text-xl tracking-tight text-slate-700 hidden sm:block" data-key="app_title">Sequencing - Hamada ©</h1>
+                    </div>
+                </div>
+
+                <!-- Center: Controls (Only in Workplace) -->
+                <div id="workplace-controls" class="hidden flex items-center gap-2 md:gap-4">
+                    <button id="btn-template" class="flex items-center gap-2 px-3 py-2 bg-indigo-50 text-indigo-700 rounded-xl font-bold hover:bg-indigo-100 border-2 border-indigo-100 transition">
+                        <ion-icon name="grid"></ion-icon>
+                        <span id="template-count" class="text-lg">3</span>
+                    </button>
+
+                    <button id="btn-add-event" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition animate-bounce-in">
+                        <ion-icon name="images"></ion-icon>
+                        <span class="hidden sm:inline" data-key="add_event">Events</span>
+                    </button>
+                </div>
+
+                <!-- Right: Settings -->
+                <div class="flex items-center gap-2">
+                    <!-- Install App Button (Visible Now) -->
+                    <button id="btn-install" class="flex items-center gap-1 bg-slate-800 text-white px-3 py-2 rounded-lg text-xs font-bold hover:bg-slate-700 shadow-md">
+                        <ion-icon name="download"></ion-icon> App
+                    </button>
+                    
+                    <!-- Parents Info Button -->
+                    <button id="btn-info" class="w-10 h-10 bg-yellow-50 text-yellow-600 rounded-full border border-yellow-200 flex items-center justify-center hover:bg-yellow-100 transition shadow-sm">
+                        <ion-icon name="information-circle" class="text-2xl"></ion-icon>
+                    </button>
+                    <button id="btn-lang" class="w-16 py-2 bg-white border-2 border-slate-200 text-slate-700 rounded-lg font-bold text-sm hover:border-indigo-300 transition">
+                        عربي
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="flex-grow relative overflow-hidden flex flex-col bg-slate-50">
+
+            <!-- PAGE: HOME -->
+            <div id="page-home" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-20 bg-slate-50 transition-opacity duration-300">
+                <div class="w-full max-w-md bg-white rounded-3xl p-8 shadow-xl border border-slate-100">
+                    <!-- Home Logo -->
+                    <div class="w-32 h-32 mx-auto mb-6 flex items-center justify-center animate-bounce">
+                        <img src="images/logo.png" alt="App Logo" class="w-full h-full object-contain drop-shadow-lg" onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center text-5xl\'>🧩</div>';">
+                    </div>
+                    
+                    <h1 class="text-3xl md:text-5xl font-black text-slate-800 mb-4 tracking-tight" data-key="welcome_title">Sequencing Fun</h1>
+                    <p class="text-slate-500 text-lg mb-8 leading-relaxed" data-key="welcome_desc">Learn the order of events! Interactive stories for kids aged 2-6.</p>
+                    
+                    <button id="btn-start" class="w-full bg-indigo-600 text-white font-bold text-xl py-4 rounded-2xl shadow-lg hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-3">
+                        <ion-icon name="play-circle" class="text-3xl"></ion-icon>
+                        <span data-key="start">Start Playing</span>
+                    </button>
+
+                    <div class="mt-6">
+                        <button onclick="openModal('info')" class="text-indigo-500 font-bold hover:underline text-sm flex items-center justify-center gap-1 mx-auto">
+                            <ion-icon name="information-circle-outline" class="text-lg"></ion-icon>
+                            <span data-key="parents_guide_link">Parents Guide</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: WORKPLACE -->
+            <div id="page-workplace" class="absolute inset-0 flex flex-col hidden bg-slate-50">
+                
+                <!-- Top Toolbar -->
+                <div class="bg-white border-b border-slate-200 p-2 flex justify-center gap-2 md:gap-4 shadow-sm z-10 shrink-0 overflow-x-auto no-scrollbar">
+                    
+                    <!-- Check Button -->
+                    <button id="btn-check" class="flex flex-col items-center gap-1 w-16 group shrink-0">
+                        <div class="w-12 h-12 rounded-2xl bg-green-500 text-white shadow-md border-2 border-green-600 flex items-center justify-center group-hover:bg-green-600 group-hover:scale-105 transition-all">
+                            <ion-icon name="checkmark" class="text-3xl font-bold"></ion-icon>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase text-green-600" data-key="btn_check">Check</span>
+                    </button>
+
+                    <!-- Auto Sort Button -->
+                    <button id="btn-solve" class="flex flex-col items-center gap-1 w-16 group shrink-0">
+                        <div class="w-12 h-12 rounded-2xl bg-yellow-100 text-yellow-600 border-2 border-yellow-300 flex items-center justify-center group-hover:bg-yellow-200 group-hover:scale-105 transition-all shadow-sm">
+                            <ion-icon name="hand-left" class="text-2xl font-bold"></ion-icon>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase text-yellow-600" data-key="btn_solve">Solve</span>
+                    </button>
+
+                    <div class="w-px h-10 bg-slate-200 my-auto mx-1 md:mx-2 shrink-0"></div>
+
+                    <!-- Play Btn -->
+                    <button id="btn-play-all" class="flex flex-col items-center gap-1 w-16 group shrink-0">
+                        <div class="w-12 h-12 rounded-2xl bg-slate-50 border-2 border-slate-200 flex items-center justify-center text-slate-400 group-hover:border-blue-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all">
+                            <ion-icon name="play" class="text-2xl"></ion-icon>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase text-slate-400 group-hover:text-blue-600" data-key="btn_play">Play</span>
+                    </button>
+
+                    <!-- NEW: Sound/Voice Button -->
+                    <button id="btn-sound-mode" class="flex flex-col items-center gap-1 w-16 group shrink-0">
+                        <div id="sound-indicator" class="w-12 h-12 rounded-2xl bg-slate-50 border-2 border-slate-200 flex items-center justify-center text-slate-400 group-hover:border-orange-400 group-hover:bg-orange-50 group-hover:text-orange-600 transition-all">
+                            <ion-icon name="volume-high" class="text-2xl"></ion-icon>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase text-slate-400 group-hover:text-orange-600" data-key="btn_sound">Sound</span>
+                    </button>
+
+                    <!-- Cover Btn -->
+                    <button id="btn-cover-mode" class="flex flex-col items-center gap-1 w-16 group shrink-0">
+                        <div id="cover-indicator" class="w-12 h-12 rounded-2xl bg-slate-50 border-2 border-slate-200 flex items-center justify-center text-slate-400 group-hover:border-purple-400 group-hover:bg-purple-50 group-hover:text-purple-600 transition-all">
+                            <ion-icon name="eye-off" class="text-2xl"></ion-icon>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase text-slate-400 group-hover:text-purple-600" data-key="btn_cover">Cover</span>
+                    </button>
+
+                    <!-- Reset Btn -->
+                    <button id="btn-reset" class="flex flex-col items-center gap-1 w-16 group shrink-0">
+                        <div class="w-12 h-12 rounded-2xl bg-slate-50 border-2 border-slate-200 flex items-center justify-center text-slate-400 group-hover:border-red-400 group-hover:bg-red-50 group-hover:text-red-600 transition-all">
+                            <ion-icon name="refresh" class="text-2xl"></ion-icon>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase text-slate-400 group-hover:text-red-600" data-key="btn_reset">Reset</span>
+                    </button>
+                </div>
+
+                <!-- Slot Area -->
+                <div class="flex-grow flex items-center justify-start w-full overflow-x-auto no-scrollbar relative p-4 bg-slate-50/50">
+                    <div id="slots-container" class="flex gap-4 md:gap-6 mx-auto px-4 min-w-max">
+                        <!-- Slots injected here -->
+                    </div>
+                </div>
+
+                <!-- Text Readout Footer -->
+                <div class="bg-white border-t border-slate-200 p-4 min-h-[6rem] flex items-center justify-center text-center shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
+                    <p id="text-readout" class="text-lg md:text-xl font-medium text-slate-700 leading-snug max-w-4xl dir-auto">
+                        <span class="text-slate-300 italic" data-key="select_msg">Select an event to start...</span>
+                    </p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ===== MODALS ===== -->
+
+    <!-- Template (Count) Modal -->
+    <div id="modal-template" class="modal">
+        <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm m-4 shadow-2xl text-center transform transition-all scale-100">
+            <h3 class="text-2xl font-bold text-slate-800 mb-6" data-key="select_slots">How many steps?</h3>
+            <div class="grid grid-cols-3 gap-3 mb-8">
+                <!-- Generated by JS -->
+            </div>
+            <button class="w-full py-4 rounded-xl bg-slate-100 font-bold text-slate-500 hover:bg-slate-200 transition" onclick="closeModals()" data-key="cancel">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Events Selection Modal -->
+    <div id="modal-events" class="modal">
+        <div class="bg-white rounded-[2rem] p-6 w-full max-w-3xl m-4 shadow-2xl flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
+                <h3 class="text-2xl font-bold text-slate-800" data-key="choose_event">Choose Event</h3>
+                <button onclick="closeModals()" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition">
+                    <ion-icon name="close" class="text-xl"></ion-icon>
+                </button>
+            </div>
+            <div id="events-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 overflow-y-auto p-2 no-scrollbar">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit/Record Modal -->
+    <div id="modal-edit" class="modal">
+        <div class="bg-white rounded-[2rem] p-6 w-full max-w-md m-4 shadow-2xl text-center">
+            <h3 class="text-xl font-bold text-slate-800 mb-4" data-key="edit_card">Edit Card</h3>
+            
+            <textarea id="input-edit-text" class="w-full border-2 border-slate-200 rounded-2xl p-4 mb-4 focus:border-indigo-500 focus:ring-0 outline-none text-center text-lg resize-none bg-slate-50" rows="3"></textarea>
+            
+            <div class="bg-slate-50 rounded-2xl p-6 mb-6 border border-slate-100">
+                <div id="record-status-icon" class="w-20 h-20 bg-white border-4 border-slate-100 text-slate-300 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl shadow-sm transition-colors duration-300">
+                    <ion-icon name="mic"></ion-icon>
+                </div>
+                <div id="record-timer" class="font-mono font-bold text-slate-500 mb-4 text-xl">00:00</div>
+                
+                <div class="flex gap-3 justify-center">
+                    <button id="btn-record-start" class="w-14 h-14 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-lg flex items-center justify-center text-2xl transition"><ion-icon name="mic"></ion-icon></button>
+                    <button id="btn-record-stop" class="hidden w-14 h-14 bg-slate-800 text-white rounded-full hover:bg-slate-900 shadow-lg flex items-center justify-center text-2xl transition"><ion-icon name="square"></ion-icon></button>
+                    <button id="btn-record-play" class="hidden w-14 h-14 bg-green-500 text-white rounded-full hover:bg-green-600 shadow-lg flex items-center justify-center text-2xl transition"><ion-icon name="play"></ion-icon></button>
+                    <button id="btn-record-delete" class="hidden w-14 h-14 bg-white text-red-500 border-2 border-red-100 rounded-full hover:bg-red-50 flex items-center justify-center text-2xl transition"><ion-icon name="trash"></ion-icon></button>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="closeModals()" class="flex-1 py-4 bg-slate-100 rounded-xl font-bold text-slate-600 hover:bg-slate-200 transition" data-key="cancel">Cancel</button>
+                <button id="btn-save-edit" class="flex-1 py-4 bg-indigo-600 rounded-xl font-bold text-white hover:bg-indigo-700 shadow-lg hover:shadow-xl transition" data-key="save">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info / Instructions Modal (New) -->
+    <div id="modal-info" class="modal">
+        <div class="bg-white rounded-[2rem] p-6 w-full max-w-lg m-4 shadow-2xl flex flex-col max-h-[85vh] relative">
+            <button onclick="closeModals()" class="absolute top-4 right-4 text-slate-300 hover:text-slate-600 text-2xl z-10">
+                <ion-icon name="close"></ion-icon>
+            </button>
+            
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-yellow-100 text-yellow-600 rounded-2xl mx-auto mb-3 flex items-center justify-center text-3xl">
+                    <ion-icon name="information-circle"></ion-icon>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800" data-key="info_title">Parents Guide</h3>
+            </div>
+            
+            <div class="overflow-y-auto no-scrollbar space-y-4 px-2">
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <h4 class="font-bold text-slate-700 mb-2 flex items-center gap-2">
+                        <ion-icon name="game-controller" class="text-indigo-500"></ion-icon> 
+                        <span data-key="info_goal_title">Goal</span>
+                    </h4>
+                    <p class="text-slate-500 text-sm leading-relaxed" data-key="info_goal_desc">Drag and drop the cards to arrange the story in the correct order. This helps develop logical thinking and sequencing skills.</p>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <h4 class="font-bold text-slate-700 mb-2 flex items-center gap-2">
+                        <ion-icon name="construct" class="text-indigo-500"></ion-icon> 
+                        <span data-key="info_tools_title">Tools</span>
+                    </h4>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li class="flex items-start gap-3">
+                            <div class="p-1 bg-green-100 text-green-600 rounded text-xs"><ion-icon name="checkmark"></ion-icon></div>
+                            <span data-key="info_tool_check"><strong>Check:</strong> Verifies if the order is correct.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <!-- UPDATED ICON -->
+                            <div class="p-1 bg-yellow-100 text-yellow-600 rounded text-xs"><ion-icon name="hand-left"></ion-icon></div>
+                            <span data-key="info_tool_solve"><strong>Solve:</strong> Automatically arranges cards in the right order.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="p-1 bg-blue-100 text-blue-600 rounded text-xs"><ion-icon name="play"></ion-icon></div>
+                            <span data-key="info_tool_play"><strong>Play:</strong> Reads the story aloud card by card.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="p-1 bg-orange-100 text-orange-600 rounded text-xs"><ion-icon name="volume-high"></ion-icon></div>
+                            <span data-key="info_tool_sound"><strong>Sound:</strong> Activates prerecorded files.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="p-1 bg-purple-100 text-purple-600 rounded text-xs"><ion-icon name="eye-off"></ion-icon></div>
+                            <span data-key="info_tool_cover"><strong>Cover:</strong> Hides images to test memory.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="p-1 bg-red-100 text-red-600 rounded text-xs"><ion-icon name="refresh"></ion-icon></div>
+                            <span data-key="info_tool_reset"><strong>Reset:</strong> Shuffles cards to start over.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <button onclick="closeModals()" class="mt-6 w-full py-3 bg-indigo-600 rounded-xl font-bold text-white hover:bg-indigo-700 transition" data-key="got_it">Got it!</button>
+        </div>
+    </div>
+
+    <!-- Install Instructions -->
+    <div id="modal-install" class="modal">
+        <div class="bg-white rounded-[2rem] p-8 w-full max-w-sm m-4 shadow-2xl text-center relative">
+            <button onclick="closeModals()" class="absolute top-4 right-4 text-slate-300 hover:text-slate-600 text-2xl"><ion-icon name="close"></ion-icon></button>
+            <div class="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-2xl mx-auto mb-4 flex items-center justify-center text-4xl">
+                <ion-icon name="phone-portrait"></ion-icon>
+            </div>
+            <h3 class="text-xl font-bold mb-2 text-slate-800">Install App</h3>
+            <p class="text-slate-500 mb-6 text-sm">Add to Home Screen for the best experience.</p>
+            <div class="text-left bg-slate-50 p-5 rounded-2xl space-y-4 text-sm text-slate-700 border border-slate-100">
+                <div class="flex items-center gap-3">
+                    <ion-icon name="share-outline" class="text-blue-500 text-2xl"></ion-icon>
+                    <span>1. Tap <strong>Share</strong> (iOS) or <strong>Menu</strong> (Android).</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <ion-icon name="add-circle-outline" class="text-slate-600 text-2xl"></ion-icon>
+                    <span>2. Select <strong>Add to Home Screen</strong>.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // DATA: 12 Events with 10 Steps Each & Custom Logic
+        // ==========================================
+        const eventsDB = [
+            {
+                id: 1,
+                icon: "👐",
+                title: { en: "Washing Hands", ar: "غسل اليدين" },
+                logic: {
+                    2: [1, 10],
+                    3: [1, 6, 10],
+                    4: [1, 2, 6, 10],
+                    5: [1, 2, 6, 8, 10],
+                    6: [1, 2, 3, 6, 8, 10],
+                    7: [1, 2, 3, 4, 6, 8, 10],
+                    8: [1, 2, 3, 4, 6, 7, 8, 10],
+                    9: [1, 2, 3, 4, 5, 6, 7, 8, 10],
+                    10: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                },
+                steps: [
+                    { en: "The boy has dirty hands.", ar: "وَلَدْ إِيدَيْهْ وِسْخِينْ" },
+                    { en: "Next, the boy wants to wash his hands.", ar: "بَعْدَيْن، وَلَدْ بِدُّهْ يِغْسِلْ إِيدَيْهْ" },
+                    { en: "Next, the boy went to the sink.", ar: "بَعْدَيْن، الوَلَدْ رَاحْ عَلَى المَغْسَلَةِ" },
+                    { en: "Next, the boy opened the tap.", ar: "بَعْدَيْن، الوَلَدْ فَتَحْ الحَنَفِيَةْ" },
+                    { en: "Next, the boy held the soap.", ar: "بَعْدَيْن، الوَلَدْ مِسِكْ الصَّابُونَةْ" },
+                    { en: "Next, the boy washes his hands with water and soap.", ar: "بَعْدَيْن، الوَلَدْ يِغْسِلْ إِيدَيْهْ بِالمَيّ وَالصَّابُونْ" },
+                    { en: "Next, the boy closed the tap.", ar: "بَعْدَيْن، سَكَّرْ الوَلَدْ الحَنَفِيَةْ" },
+                    { en: "Next, the boy dries his hands with the towel.", ar: "بَعْدَيْن، الوَلَدْ يِنَشِّفْ إِيدَيْهْ بِالمَنْشَفَةْ" },
+                    { en: "Next, the boy hangs the towel.", ar: "بَعْدَيْن، الوَلَدْ يِعَلِّقْ المَنْشَفَةْ" },
+                    { en: "Finally, the boy's hands are clean.", ar: "آخِرْ شِي، إِيدَيْنْ الوَلَدْ نَظِيفَةْ" }
+                ]
+            },
+            {
+                id: 2,
+                icon: "🦷",
+                title: { en: "Brushing Teeth", ar: "تنظيف الأسنان" },
+                logic: {
+                    2: [1, 10],
+                    3: [1, 6, 10],
+                    4: [1, 2, 6, 10],
+                    5: [1, 2, 4, 6, 10],
+                    6: [1, 2, 4, 6, 9, 10],
+                    7: [1, 2, 3, 4, 6, 9, 10],
+                    8: [1, 2, 3, 4, 6, 7, 9, 10],
+                    9: [1, 2, 3, 4, 6, 7, 8, 9, 10],
+                    10: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                },
+                steps: [
+                    { en: "The kid needs to brush their teeth.", ar: "الوَلَدْ لَازِمْ يْفَرِّشْ إِسْنَانُه." },
+                    { en: "Next, the kid goes to the bathroom.", ar: "بَعْدَيْن، الوَلَدْ بِيْرُوحْ عَلَى الحَمَّامْ." },
+                    { en: "Next, the kid takes the toothbrush and toothpaste.", ar: "بَعْدَيْن، الوَلَدْ بِيْأَخُدْ الفُرْشَاةْ وَالمَعْجُونْ." },
+                    { en: "Next, the kid puts toothpaste on the brush.", ar: "بَعْدَيْن، الوَلَدْ بِيْحُطّ مَعْجُونْ عَلَى الفُرْشَاةْ." },
+                    { en: "Next, the kid opens the tap and wets the brush.", ar: "بَعْدَيْن، الوَلَدْ بِيْفْتَحْ الحَنَفِيَةْ وَبِيْبِلّ الفُرْشَاةْ." },
+                    { en: "Next, the kid starts brushing their teeth.", ar: "بَعْدَيْن، الوَلَدْ بِيْبَلِّشْ يْفَرِّشْ إِسْنَانُه." },
+                    { en: "Next, the kid rinses and spits out the paste.", ar: "بَعْدَيْن، الوَلَدْ بِيْمَضْمِضْ وَبِيْطَلِّعْ المَعْجُونْ." },
+                    { en: "Next, the kid rinses the toothbrush with water.", ar: "بَعْدَيْن، الوَلَدْ بِيْغْسِلْ الفُرْشَاةْ بِالمَيّ." },
+                    { en: "Next, the kid puts the brush and paste back in place.", ar: "بَعْدَيْن، الوَلَدْ بِيْرَجِّعْ الفُرْشَاةْ وَالمَعْجُونْ مَكَانْهُمْ." },
+                    { en: "Finally, the kid's teeth are clean.", ar: "آخِرْ شِي، إِسْنَانُه صَارَتْ نَظِيفَةْ." }
+                ]
+            },
+            {
+                id: 3,
+                icon: "🥪",
+                title: { en: "Making Sandwich", ar: "صنع شطيرة" },
+                logic: {
+                    2: [1, 9],
+                    3: [1, 7, 9],
+                    4: [1, 4, 7, 9],
+                    5: [1, 4, 6, 7, 9],
+                    6: [1, 2, 4, 6, 7, 9],
+                    7: [1, 2, 3, 4, 6, 9, 10],
+                    8: [1, 2, 3, 4, 6, 8, 9, 10],
+                    9: [1, 2, 3, 4, 5, 6, 8, 9, 10],
+                    10: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                },
+                steps: [
+                    { en: "The girl is hungry and wants to make a sandwich.", ar: "البِنْتْ جُوعَانَةْ وَبِدَّهَا تِعْمَلْ سَنْدْوِيشَةْ." },
+                    { en: "Next, the girl goes to the kitchen.", ar: "بَعْدَيْن، البِنْتْ بِتْرُوحْ عَلَى المَطْبَخْ." },
+                    { en: "Next, the girl gets a plate and takes out the bread.", ar: "بَعْدَيْن، البِنْتْ بِتْجِيبْ صَحْنْ وَبِتْطَلِّعْ الخُبْزْ." },
+                    { en: "Next, the girl gets the cheese and tomato.", ar: "بَعْدَيْن، البِنْتْ بِتْجِيبْ الجِبْنَةْ وَبَنْدُورَةْ." },
+                    { en: "Next, the girl puts a piece of bread on the plate.", ar: "بَعْدَيْن، البِنْتْ بِتْحُطّ خُبْزَةْ عَلَى الصَّحْنْ." },
+                    { en: "Next, she spreads cheese and on a slice of bread with a knife.", ar: "بَعْدَيْن، بِتْدَهِّنْ جِبْنَةْ عَلَى شَرِيحَةْ خُبْزْ بِالسِّكِّينَةْ." },
+                    { en: "Next, she folds the bread and makes a sandwich.", ar: "بَعْدَيْن، بِتْلِفّ الخُبْزَةْ وَبِتِعْمَلْ سَنْدْوِيشَةْ." },
+                    { en: "Next, she puts the ingredients back in their place in the fridge.", ar: "بَعْدَيْن، بِتْرَجِّعْ الأَغْرَاضْ مَكَانْهَا فِي الثَّلَّاجَةِ." },
+                    { en: "Next, the girl eats the sandwich.", ar: "بَعْدَيْن، البِنْتْ بْتَاكُلْ السَّنْدْوِيشَةْ." },
+                    { en: "Finally, the girl is full and happy.", ar: "آخِرْ شِي، البِنْتْ شِبْعَتْ وَمَبْسُوطَةْ." }
+                ]
+            },
+            {
+                id: 4,
+                icon: "👕",
+                title: { en: "Getting Dressed", ar: "ارتداء الملابس" },
+                logic: {
+                    2: [1, 10],
+                    3: [1, 9, 10],
+                    4: [1, 3, 9, 10],
+                    5: [1, 2, 3, 9, 10],
+                    6: [1, 2, 3, 8, 9, 10],
+                    7: [1, 2, 3, 6, 8, 9, 10],
+                    8: [1, 2, 3, 4, 6, 8, 9, 10],
+                    9: [1, 2, 3, 4, 5, 6, 8, 9, 10],
+                    10: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                },
+                steps: [
+                    { en: "The boy woke up and wants to get dressed.", ar: "الوَلَدْ فَاقْ مِنْ النَّوْمْ وَبِدُّهْ يِلْبَسْ." },
+                    { en: "Next, the boy goes to the closet to choose his clothes.", ar: "بَعْدَيْن، الوَلَدْ بِيْرُوحْ عَلَى الخِزَانَةِ عَشَانْ يِخْتَارْ ثِيَابُه." },
+                    { en: "Next, the boy takes out his pants, shirt, and socks.", ar: "بَعْدَيْن، الوَلَدْ بِيْطَلِّعْ بَنْطَلُونُه وَبْلُوزْتُه وَجْرَابَاتُه." },
+                    { en: "Next, the boy puts on his shirt.", ar: "بَعْدَيْن، الوَلَدْ بِيْلْبَسْ البْلُوزَةْ." },
+                    { en: "Next, the boy puts on his pants.", ar: "بَعْدَيْن، الوَلَدْ بِيْلْبَسْ بَنْطَلُونُه." },
+                    { en: "Next, the boy sits down to put on his socks.", ar: "بَعْدَيْن، الوَلَدْ بِيْقْعُدْ من شَانْ يِلْبَسْ جْرَابَاتُه." },
+                    { en: "Next, the boy looks for his boots/shoes.", ar: "بَعْدَيْن، الوَلَدْ بِيْدَوِّرْ عَلَى بُوطُه." },
+                    { en: "Next, the boy puts on his boots/shoes.", ar: "بَعْدَيْن، الوَلَدْ بِيْلْبَسْ بُوطُه." },
+                    { en: "Next, the boy looks in the mirror to see his clothes.", ar: "بَعْدَيْن، الوَلَدْ بِيْتْطَلَّعْ عَلَى المَرَايَةِ عَشَانْ يِشُوفْ ثِيَابُه." },
+                    { en: "Finally, the boy is dressed and ready.", ar: "آخِرْ شِي، الوَلَدْ لَابِسْ وَصَارْ جَاهِزْ." }
+                ]
+            },
+            {
+                id: 5,
+                icon: "🌻",
+                title: { en: "Planting a Flower", ar: "زراعة زهرة" },
+                logic: {
+                    2: [1, 10],
+                    3: [1, 9, 10],
+                    4: [1, 2, 9, 10],
+                    5: [1, 2, 8, 9, 10],
+                    6: [1, 2, 5, 8, 9, 10],
+                    7: [1, 2, 3, 5, 8, 9, 10],
+                    8: [1, 2, 3, 5, 6, 8, 9, 10],
+                    9: [1, 2, 3, 4, 5, 6, 8, 9, 10],
+                    10: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                },
+                steps: [
+                    { en: "The girl decided to plant a flower in a pot.", ar: "البِنْتْ قَرَّرَتْ تِزْرَعْ وَرْدَةْ فِي أَصِيصْ." },
+                    { en: "Next, the girl gets the pot, soil, and seed.", ar: "بَعْدَيْن، البِنْتْ بِتْجِيبْ الأَصِيصْ وَالتُّرَابْ وَالبِذْرَةْ." },
+                    { en: "Next, the girl puts some soil in the pot.", ar: "بَعْدَيْن، البِنْتْ بِتْحُطّ شْوَيِّةْ تُرَابْ فِي الأَصِيصْ." },
+                    { en: "Next, the girl makes a small hole in the soil with her finger.", ar: "بَعْدَيْن، البِنْتْ بِتِعْمَلْ حُفْرَةْ صْغِيرَةْ فِي التُّرَابْ بِإِصْبَعْهَا." },
+                    { en: "Next, she puts the seed into the hole gently.", ar: "بَعْدَيْن، بِتْحُطّ البِذْرَةْ فِي الحُفْرَةْ بِهُدُوءْ." },
+                    { en: "Next, she covers the seed with soil.", ar: "بَعْدَيْن، بِتْغَطِّي البِذْرَةْ بِتُرَابْ." },
+                    { en: "Next, she presses down on the soil gently so it settles.", ar: "بَعْدَيْن، بِتْضْغَطْ عَلَى التُّرَابْ شْوَيْ شْوَيْ عَشَانْ يِثْبَتْ." },
+                    { en: "Next, the girl gets the small watering can.", ar: "بَعْدَيْن، البِنْتْ بِتْجِيبْ مَرَّشَةْ المَيّ الصَّغِيرَةْ." },
+                    { en: "Next, the girl waters the flower she planted.", ar: "بَعْدَيْن، البِنْتْ بِتْسْقِي الوَرْدَةْ الَّلِي زَرَعَتْهَا مَيّ." },
+                    { en: "Finally, the flower grew and became very beautiful.", ar: "آخِرْ شِي، كِبْرَتْ الوَرْدَةْ وَصَارَتْ حِلْوَةْ كْتِيرْ." }
+                ]
+            },
+            {
+                id: 6,
+                icon: "🚦",
+                title: { en: "Crossing Street", ar: "عبور الشارع" },
+                logic: {
+                    2: [1, 10],
+                    3: [1, 2, 10],
+                    4: [1, 2, 9, 10],
+                    5: [1, 2, 8, 9, 10],
+                    6: [1, 2, 3, 8, 9, 10],
+                    7: [1, 2, 3, 5, 8, 9, 10],
+                    8: [1, 2, 3, 4, 5, 8, 9, 10],
+                    9: [1, 2, 3, 4, 5, 7, 8, 9, 10],
+                    10: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                },
+                steps: [
+                    { en: "The girl and Grandma arrived at the street.", ar: "وَصَلَتْ البِنْتْ وَتَاتَا عِنْدَ الشَّارِعِ." },
+                    { en: "Next, Teta stops and holds the girl's hand tightly.", ar: "بَعْدَيْن، تَاتَا بِتْوَقَّفْ وَبِتْمِسِكْ إِيدْ البِنْتِ مَنِيحْ." },
+                    { en: "Next, Teta looks to the left, and then to the right.", ar: "بَعْدَيْن، تَاتَا بِتِتْطَلَّعْ عَلَى الشِّمَالْ، وَبَعْدَهَا عَلَى اليَمِينِ." },
+                    { en: "Next, she looks back to the left one more time.", ar: "بَعْدَيْن، بِتْرَجِّعْ تِتْطَلَّعْ عَلَى الشِّمَالْ مَرَّةً ثَانِيَةً." },
+                    { en: "Next, they make sure the street is clear and there are no cars.", ar: "بَعْدَيْن، بِتْأَكَّدُوا إِنُّ الشَّارِعِ فَاضِي وَمَا فِي سَيَّارَاتْ." },
+                    { en: "Next, they step off the sidewalk to cross the street.", ar: "بَعْدَيْن، بِيْنْزَلُوا عَنْ الرَّصِيفْ لِيْقْطَعُوا الشَّارِعِ." },
+                    { en: "They walk in a straight line.", ar: "بِيْمْشُوا بِخَطٍّ مُسْتَقِيمٍ." },
+                    { en: "Next, they keep looking at the road while they are crossing.", ar: "بَعْدَيْن، بِيْضَلُّوا يِتْطَلَّعُوا عَلَى الطَّرِيقِ وَهُمْ بِيْقْطَعُوا." },
+                    { en: "Next, they arrive at the sidewalk.", ar: "بَعْدَيْن، بِيْوَصَلُوا لِلرَّصِيفِ." },
+                    { en: "Finally, they have crossed the street safely.", ar: "آخِرْ شِي، قَطَعُوا الشَّارِعَ بِأَمَانٍ." }
+                ]
+            },
+            {
+                id: 7,
+                icon: "🎂",
+                title: { en: "Baking Cake", ar: "خبز كعكة" },
+                logic: {
+                    2: [1, 10],
+                    3: [1, 7, 10],
+                    4: [1, 2, 7, 10],
+                    5: [1, 2, 4, 7, 10],
+                    6: [1, 2, 3, 4, 7, 10],
+                    7: [1, 2, 3, 4, 7, 8, 10],
+                    8: [1, 2, 3, 4, 7, 8, 9, 10],
+                    9: [1, 2, 3, 4, 5, 7, 8, 9, 10],
+                    10: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                },
+                steps: [
+                    { en: "Mom and the boy decided to bake a cake.", ar: "الأُمّ وَالوَلَدْ قَرَّرُوا يِخْبِزُوا كِيكْ." },
+                    { en: "Next, they gather all the necessary ingredients (flour, eggs, and milk).", ar: "بَعْدَيْن، بِيْجَمِّعُوا كُلّ المَكَوِّنَاتِ اللَّازِمَةِ (طَحِينْ، بَيْضْ، وَحَلِيبْ)." },
+                    { en: "Next, Mom puts the flour into the mixing bowl.", ar: "بَعْدَيْن، الأُمّ بِتْحُطّ الطَّحِينْ فِي وِعَاءْ الخَلْطِ." },
+                    { en: "Next, the boy puts the eggs and milk into the bowl.", ar: "بَعْدَيْن، الوَلَدْ بِيْحُطّ البَيْضْ وَالحَلِيبْ فِي الوِعَاءْ." },
+                    { en: "Next, Mom helps the boy mix the batter well.", ar: "بَعْدَيْن، الأُمّ بِتْسَاعِدْ الوَلَدْ لِيَخْلُطُوا العَجِينَةَ مَنِيحْ." },
+                    { en: "Next, they grease the baking pan with butter.", ar: "بَعْدَيْن، بِيْدْهَنُوا صِينِيَّةَ الخَبْزِ بِالزِّبْدَةِ." },
+                    { en: "Next, they pour the cake batter into the pan.", ar: "بَعْدَيْن، بِيْصُبُّوا خَلِيطَ الكِيكْ فِي الصِّينِيَّةِ." },
+                    { en: "Next, Mom carefully puts the pan into the hot oven.", ar: "بَعْدَيْن، الأُمّ بِتْحُطّ الصِّينِيَّةَ بِحَذَرْ فِي الفُرْنْ السُّخُنْ." },
+                    { en: "Next, they wait until the cake is baked and ready.", ar: "بَعْدَيْن، بِيْسْتَنُّوا لَحَدّ مَا الكِيكْ يِسْتَوِي وَيْجَهَزْ." },
+                    { en: "Finally, the cake is baked and ready to eat.", ar: "آخِرْ شِي، الكِيكْ انْخَبَزْ وَصَارَ جَاهِزْ لِلْأَكْلِ." }
+                ]
+            },
+            {
+                id: 8,
+                icon: "🐕",
+                title: { en: "Dog Bath", ar: "حمام الكلب" },
+                logic: {
+                    2: [1, 10],
+                    3: [1, 6, 10],
+                    4: [1, 5, 6, 10],
+                    5: [1, 4, 5, 6, 10],
+                    6: [1, 3, 4, 5, 6, 10],
+                    7: [1, 2, 3, 4, 5, 6, 10],
+                    8: [1, 2, 3, 4, 5, 6, 8, 10],
+                    9: [1, 2, 3, 4, 5, 6, 8, 9, 10],
+                    10: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                },
+                steps: [
+                    { en: "The boy decided that the dog needs to take a bath.", ar: "الوَلَدْ قَرَّرْ إِنُّ الكَلْبْ لَازِمْ يِتْحَمَّمْ." },
+                    { en: "Next, the boy gets the dog shampoo and towels.", ar: "بَعْدَيْن، الوَلَدْ بِيْجِيبْ شَامْبُو الكِلَابْ وَالمَنَاشِفْ." },
+                    { en: "Next, the boy takes the dog to the bathtub.", ar: "بَعْدَيْن، الوَلَدْ بِيْأَخُدْ الكَلْبْ عَلَى حَوْضِ الإِسْتِحْمَامِ." },
+                    { en: "Next, the boy fills the tub with warm water.", ar: "بَعْدَيْن، الوَلَدْ بِيْعَبِّي الحَوْضْ مَيّ دَافِيَة." },
+                    { en: "Next, the boy pours the water over the dog.", ar: "بَعْدَيْن، الوَلَدْ بِيْكُبّ عَلَى الكَلْبْ المَيّ." },
+                    { en: "Next, he puts on the shampoo and scrubs the dog's body well.", ar: "بَعْدَيْن، بِيْحُطّ الشَّامْبُو وَبِيْفْرُكْ جِسْمْ الكَلْبْ مَنِيحْ." },
+                    { en: "Next, he pours water on the dog again until the dog is clean.", ar: "بَعْدَيْن، بِيْرْجَعْ يْكُبّ عَلَى الكَلْبْ مَيّ لَحَدْ مَا يَنْضَفْ الكَلْبْ." },
+                    { en: "Next, the boy takes the dog out (of the tub).", ar: "بَعْدَيْن، الوَلَدْ بِيْطَلِّعْ الكَلْبْ." },
+                    { en: "Next, the boy wraps the dog in a towel and dries it well.", ar: "بَعْدَيْن، الوَلَدْ بِيْلُفّ الكَلْبْ بِمَنْشَفَةْ وَبِيْنِشِّفْهُ مَنِيحْ." },
+                    { en: "Finally, the dog is clean, dry, and happy.", ar: "آخِرْ شِي، الكَلْبْ صَارْ نِظِيفْ، نَاشِفْ، وَمَبْسُوطْ." }
+                ]
+            },
+            {
+                id: 9,
+                icon: "🛌",
+                title: { en: "Bedtime", ar: "وقت النوم" },
+                logic: {
+                    2: [1, 10],
+                    3: [1, 8, 10],
+                    4: [1, 8, 9, 10],
+                    5: [1, 3, 8, 9, 10],
+                    6: [1, 3, 6, 8, 9, 10],
+                    7: [1, 3, 4, 6, 8, 9, 10], /* Inferred logic step 4 added for 7 items */
+                    8: [1, 3, 4, 6, 7, 8, 9, 10],
+                    9: [1, 3, 4, 5, 6, 7, 8, 9, 10],
+                    10: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                },
+                steps: [
+                    { en: "It is bedtime, and the boy feels like he is tired.", ar: "صَارْ وَقْتْ النَّوْمْ، وَالوَلَدْ حَاسِسْ إِنُّه تَعْبَانْ." },
+                    { en: "Next, the boy stops playing and tidies up his toys.", ar: "بَعْدَيْن، الوَلَدْ بِيْوَقِّفْ لَعِبْ وَبِيْرَتِّبْ أَلْعَابُه." },
+                    { en: "Next, the boy says goodnight to his family members.", ar: "بَعْدَيْن، الوَلَدْ بِيْقُولْ تَصْبَحْ عَلَى خَيْرْ لِعَائِلْتُه." },
+                    { en: "Next, the boy goes to the bathroom to brush his teeth.", ar: "بَعْدَيْن، الوَلَدْ بِيْرُوحْ عَلَى الحَمَّامْ لِيْفَرِّشْ إِسْنَانُه." },
+                    { en: "Next, the boy washes his face and hands with water.", ar: "بَعْدَيْن، الوَلَدْ بِيْغْسِلْ وَجْهُه وَإِيدَيْه بِالمَيّ." },
+                    { en: "Next, the boy takes off his clothes and puts on his pajamas.", ar: "بَعْدَيْن، الوَلَدْ بِيْشْلَحْ ثِيَابُه وَبِيْلْبَسْ بِيْجَامْتُه." },
+                    { en: "Next, the boy goes to his bed and covers himself well.", ar: "بَعْدَيْن، الوَلَدْ بِيْرُوحْ عَلَى سَرِيرُه وَبِيْتْغَطَّى مَنِيحْ." },
+                    { en: "Next, Mom reads a bedtime story to him.", ar: "بَعْدَيْن، مَامَا بِتِقْرَأْ لُه قِصَّةْ قَبْلْ النَّوْمْ." },
+                    { en: "Next, the boy turns off the light.", ar: "بَعْدَيْن، الوَلَدْ بِيْطَفِّي الضَّوْ." },
+                    { en: "Finally, the boy closes his eyes and falls asleep.", ar: "آخِرْ شِي، الوَلَدْ بِيْغَمِّضْ عِينَيْه وَبِيْنَامْ." }
+                ]
+            },
+            {
+                id: 10,
+                icon: "🛒",
+                title: { en: "Shopping", ar: "التسوق" },
+                logic: {
+                    2: [1, 10],
+                    3: [1, 3, 10],
+                    4: [1, 3, 4, 10],
+                    5: [1, 3, 4, 7, 10],
+                    6: [1, 3, 4, 7, 9, 10],
+                    7: [1, 3, 4, 7, 8, 9, 10],
+                    8: [1, 3, 4, 5, 7, 8, 9, 10],
+                    9: [1, 2, 3, 4, 5, 7, 8, 9, 10],
+                    10: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                },
+                steps: [
+                    { en: "Dad and the girl decided to go shopping at the store.", ar: "الأَبْ وَالبِنْتْ قَرَّرُوا يِرُوحُوا يِشْتْرُوا مِنْ السُّوقْ." },
+                    { en: "Next, they take the money.", ar: "بَعْدَيْن، بِيْأَخْدُوا المَصَارِي." },
+                    { en: "Next, they go to the supermarket in the car.", ar: "بَعْدَيْن، بِيْرُوحُوا عَلَى السُوبَرْمَارْكِتْ فِي السَّيَّارَةِ." },
+                    { en: "Next, the girl takes a shopping cart.", ar: "بَعْدَيْن، البِنْتْ بِتْأَخُدْ عَرَبَايَةَ التَّسَوُّقِ." },
+                    { en: "Next, they start choosing the items.", ar: "بَعْدَيْن، بِيْبَلِّشُوا يِخْتَارُوا الأَغْرَاضْ." },
+                    { en: "Next, the girl helps Dad find the tissues.", ar: "بَعْدَيْن، البِنْتْ بِتْسَاعِدْ الأَبْ لِيْلَاقِي المَحَارِمْ." },
+                    { en: "Next, they finish and go to the cash register.", ar: "بَعْدَيْن، بِيْخَلْصُوا وَبِيْرُوحُوا عَلَى صُنْدُوقْ الحِسَابْ." },
+                    { en: "Next, Dad pays the cashier for all the items.", ar: "بَعْدَيْن، الأَبْ بِيْدْفَعْ حَقّ الأَغْرَاضْ كُلِّهَا لِلْكَاشِيرْ." },
+                    { en: "Next, they put the groceries and the bags into the car.", ar: "بَعْدَيْن، بِيْحُطُّوا الأَغْرَاضْ وَالأَكْيَاسْ فِي السَّيَّارَةِ." },
+                    { en: "Finally, they arrive home with the groceries.", ar: "آخِرْ شِي، بِيْوَصَلُوا البَيْتْ وَمَعَهُمْ الأَغْرَاضْ." }
+                ]
+            },
+            {
+                id: 11,
+                icon: "💇‍♀️",
+                title: { en: "Brushing Hair", ar: "تمشيط الشعر" },
+                logic: {
+                    2: [1, 8],
+                    3: [1, 7, 8],
+                    4: [1, 2, 7, 8],
+                    5: [1, 2, 7, 8, 10],
+                    6: [1, 2, 3, 5, 8, 10],
+                    7: [1, 2, 3, 4, 5, 8, 10],
+                    8: [1, 2, 3, 4, 5, 6, 8, 10],
+                    9: [1, 2, 3, 4, 5, 6, 7, 8, 10],
+                    10: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                },
+                steps: [
+                    { en: "The girl saw her hair was tangled and needs to brush it.", ar: "البِنْتْ شَافَتْ شَعْرَهَا مْنْكُوشْ وَلَازِمْ تْمَشِّطُه." },
+                    { en: "Next, the girl goes to the mirror to get the comb/brush.", ar: "بَعْدَيْن، البِنْتْ بِتْرُوحْ عَلَى المَرَايَةِ عَشَانْ تِجِيبْ المِشْطْ." },
+                    { en: "The girl did not find the comb in its place.", ar: "البِنْتْ مَا لَاقَتْ المِشْطْ فِي مَكَانُه." },
+                    { en: "Next, she looked for the comb on the table and on the bed.", ar: "بَعْدَيْن، دَوَّرَتْ عَلَى المِشْطْ عَلَى الطَّاوْلَةِ وَعَلَى التَّخْتْ." },
+                    { en: "Next, she went to look for it in the bathroom and found it.", ar: "بَعْدَيْن، رَاحَتْ دَوَّرَتْ عَلَيْهْ بِالحَمَّامْ وَلَاقَتْهُ." },
+                    { en: "Next, she goes back to the mirror again.", ar: "بَعْدَيْن، بِتْرُوحْ عَلَى المَرَايَةِ مَرَّةْ ثَانِيَةْ." },
+                    { en: "Next, she holds the comb and starts brushing her hair.", ar: "بَعْدَيْن، بِتْمَسِّكْ المِشْطْ وَبِتْبَلِّشْ تْمَشِّطْ الشَّعَر." },
+                    { en: "Next, she brushes all the hair and removes all the tangles.", ar: "بَعْدَيْن، بِتْمَشِّطْ الشَّعَر كُلُّه وَبِتْشِيلْ كُلّ العُقَدْ." },
+                    { en: "Next, she puts the comb back in its place next to the mirror.", ar: "بَعْدَيْن، بِتْرَجِّعْ المِشْطْ عَلَى مَكَانُه جَنْبْ المَرَايَةِ." },
+                    { en: "Finally, the girl's hair is beautiful and tidy.", ar: "آخِرْ شِي، شَعْرْ البِنْتْ صَارْ حِلْو وَمُرَتَّبْ." }
+                ]
+            },
+            {
+                id: 12,
+                icon: "🐶",
+                title: { en: "Dog & Cat", ar: "الكلب والقطة" },
+                logic: {
+                    2: [1, 5],
+                    3: [1, 2, 5],
+                    4: [1, 2, 4, 5],
+                    5: [1, 2, 3, 4, 5],
+                    6: [1, 2, 3, 4, 5, 7],
+                    7: [1, 2, 3, 4, 5, 6, 7],
+                    8: [1, 2, 3, 4, 5, 6, 7, 8],
+                    9: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                    10: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                },
+                steps: [
+                    { en: "The dog is sleeping on the floor.", ar: "الكَلْبْ نَايِمْ عَلَى الأَرْضْ." },
+                    { en: "Next, the cat walks slowly next to the dog.", ar: "بَعْدَيْن، القِطَّةْ بْتِمْشِي شْوَيْ شْوَيْ جَنْبْ الكَلْبْ." },
+                    { en: "Next, the small mouse comes out of its home.", ar: "بَعْدَيْن، الفَارْ الصَّغِيرْ بِيْطْلَعْ مِنْ بَيْتْهَا." },
+                    { en: "Next, the cat saw the mouse and starts chasing it quickly.", ar: "بَعْدَيْن، القِطَّةْ شَافَتْ الفَارْ وَبِتْبَلِّشْ تِلْحَقُه بِسُرْعَةْ." },
+                    { en: "Next, the sound of the cat wakes the dog from his sleep.", ar: "بَعْدَيْن، صَوْتْ القِطَّةْ بِيْفَيِّقْ الكَلْبْ مِنْ نَوْمُه." },
+                    { en: "Next, the dog sees the cat running.", ar: "بَعْدَيْن، الكَلْبْ بِيْشُوفْ القِطَّةْ عَمْ تِرْكُضْ." },
+                    { en: "Next, the dog starts chasing the cat quickly.", ar: "بَعْدَيْن، الكَلْبْ بِيْبَلِّشْ يِلْحَقْ القِطَّةْ بِسُرْعَةْ." },
+                    { en: "Next, the mouse runs and hides inside its home.", ar: "بَعْدَيْن، الفَارَةْ بِتْرْكُضْ وَبِتْتْخَبَّى جُوَّا بَيْتْهَا." },
+                    { en: "Next, the cat climbs the tree to escape from the dog.", ar: "بَعْدَيْن، القِطَّةْ بِتْطْلَعْ عَلَى الشَّجَرَةِ لِتَهْرُبْ مِنْ الكَلْبْ." },
+                    { en: "Finally, the dog is left alone and sleepy.", ar: "آخِرْ شِي، الكَلْبْ بِضَلّْ لَحَالُه نَعْسَانْ." }
+                ]
+            }
+        ];
+
+        // Translation Map
+        const translations = {
+            en: {
+                app_title: "Sequencing - Hamada ©",
+                welcome_title: "Sequencing Fun",
+                welcome_desc: "Learn the order of events! Interactive stories for kids aged 2-6.",
+                start: "Start Playing",
+                add_event: "Events",
+                btn_play: "Play",
+                btn_cover: "Cover",
+                btn_reset: "Reset",
+                btn_check: "Check",
+                btn_solve: "Solve",
+                btn_sound: "Sound",
+                select_slots: "How many steps?",
+                choose_event: "Choose Event",
+                edit_card: "Edit Card",
+                cancel: "Cancel",
+                save: "Save",
+                select_msg: "Select an event to start...",
+                parents_guide_link: "Parents Guide",
+                info_title: "Parents Guide",
+                info_goal_title: "Goal",
+                info_goal_desc: "Drag and drop the cards to arrange the story in the correct order. This helps develop logical thinking and sequencing skills.",
+                info_tools_title: "Tools",
+                info_tool_check: "<strong>Check:</strong> Verifies if the order is correct.",
+                info_tool_solve: "<strong>Solve:</strong> Automatically arranges cards in the right order.",
+                info_tool_play: "<strong>Play:</strong> Reads the story aloud card by card.",
+                info_tool_sound: "<strong>Sound:</strong> Activates prerecorded files.",
+                info_tool_cover: "<strong>Cover:</strong> Hides images to test memory.",
+                info_tool_reset: "<strong>Reset:</strong> Shuffles cards to start over.",
+                got_it: "Got it!"
+            },
+            ar: {
+                app_title: "التسلسل - حمادة ©",
+                welcome_title: "التسلسل ممتع",
+                welcome_desc: "تعلم ترتيب الأحداث! قصص تفاعلية للأطفال من 2-6 سنوات.",
+                start: "ابدأ اللعب",
+                add_event: "أحداث",
+                btn_play: "تشغيل",
+                btn_cover: "تغطية",
+                btn_reset: "مسح",
+                btn_check: "تحقق",
+                btn_solve: "حل",
+                btn_sound: "صوت",
+                select_slots: "كم عدد الخطوات؟",
+                choose_event: "اختر الحدث",
+                edit_card: "تعديل البطاقة",
+                cancel: "إلغاء",
+                save: "حفظ",
+                select_msg: "اختر حدثاً للبدء...",
+                parents_guide_link: "دليل الأهل",
+                info_title: "دليل الأهل",
+                info_goal_title: "الهدف",
+                info_goal_desc: "اسحب وأفلت البطاقات لترتيب القصة بالتسلسل الصحيح. هذا يساعد على تطوير التفكير المنطقي ومهارات التسلسل.",
+                info_tools_title: "الأدوات",
+                info_tool_check: "<strong>تحقق:</strong> التأكد من صحة الترتيب.",
+                info_tool_solve: "<strong>حل:</strong> ترتيب البطاقات تلقائياً بالشكل الصحيح.",
+                info_tool_play: "<strong>تشغيل:</strong> قراءة القصة بصوت عالٍ بطاقة تلو الأخرى.",
+                info_tool_sound: "<strong>صوت:</strong> تفعيل الملفات المسجلة مسبقاً.",
+                info_tool_cover: "<strong>تغطية:</strong> إخفاء الصور لاختبار الذاكرة.",
+                info_tool_reset: "<strong>مسح:</strong> خلط البطاقات للبدء من جديد.",
+                got_it: "فهمت!"
+            }
+        };
+
+        // ==========================================
+        // APP LOGIC
+        // ==========================================
+        let state = {
+            lang: 'en',
+            slotCount: 3,
+            currentEventId: null,
+            coverMode: false,
+            soundMode: false, // New State for File Access
+            cards: [],
+            editingIndex: -1,
+            isPlaying: false
+        };
+
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let tempRecordingBlob = null;
+        let recordInterval = null;
+        let dragSrcEl = null; // for DnD
+
+        // --- DOM REFERENCES ---
+        const els = {
+            pages: { home: document.getElementById('page-home'), workplace: document.getElementById('page-workplace') },
+            slotsContainer: document.getElementById('slots-container'),
+            templateCount: document.getElementById('template-count'),
+            textReadout: document.querySelector('#text-readout'),
+            modals: {
+                template: document.getElementById('modal-template'),
+                events: document.getElementById('modal-events'),
+                edit: document.getElementById('modal-edit'),
+                install: document.getElementById('modal-install'),
+                info: document.getElementById('modal-info')
+            },
+            btns: {
+                template: document.getElementById('btn-template'),
+                addEvent: document.getElementById('btn-add-event'),
+                playAll: document.getElementById('btn-play-all'),
+                coverMode: document.getElementById('btn-cover-mode'),
+                soundMode: document.getElementById('btn-sound-mode'), // New Button Ref
+                reset: document.getElementById('btn-reset'),
+                homeNav: document.getElementById('btn-home-nav'),
+                lang: document.getElementById('btn-lang'),
+                check: document.getElementById('btn-check'),
+                solve: document.getElementById('btn-solve'),
+                info: document.getElementById('btn-info')
+            }
+        };
+
+        // --- INIT ---
+        function init() {
+            renderTemplateOptions();
+            setupListeners();
+            resetSlots();
+        }
+
+        function setupListeners() {
+            document.getElementById('btn-start').onclick = () => showPage('workplace');
+            els.btns.homeNav.onclick = () => showPage('home');
+            
+            els.btns.lang.onclick = toggleLang;
+            
+            els.btns.template.onclick = () => openModal('template');
+            els.btns.addEvent.onclick = () => { openModal('events'); renderEventsGrid(); };
+            
+            els.btns.reset.onclick = resetSlots;
+            els.btns.coverMode.onclick = toggleCoverMode;
+            els.btns.soundMode.onclick = toggleSoundMode; // New Listener
+            els.btns.playAll.onclick = playSequence;
+            els.btns.check.onclick = checkOrder;
+            els.btns.solve.onclick = autoSolve;
+            
+            // Info Btn Listeners
+            els.btns.info.onclick = () => openModal('info');
+
+            // Modal Controls
+            document.getElementById('btn-record-start').onclick = startRecording;
+            document.getElementById('btn-record-stop').onclick = stopRecording;
+            document.getElementById('btn-record-play').onclick = playTempRecording;
+            document.getElementById('btn-record-delete').onclick = deleteTempRecording;
+            document.getElementById('btn-save-edit').onclick = saveCardEdit;
+            document.getElementById('btn-install').onclick = () => openModal('install');
+        }
+
+        // --- NAVIGATION ---
+        function showPage(page) {
+            if (page === 'workplace') {
+                els.pages.home.classList.add('opacity-0', 'pointer-events-none');
+                els.pages.workplace.classList.remove('hidden');
+                document.getElementById('workplace-controls').classList.remove('hidden');
+                els.btns.homeNav.classList.remove('hidden');
+            } else {
+                els.pages.home.classList.remove('opacity-0', 'pointer-events-none');
+                els.pages.workplace.classList.add('hidden');
+                document.getElementById('workplace-controls').classList.add('hidden');
+                els.btns.homeNav.classList.add('hidden');
+            }
+        }
+
+        function toggleLang() {
+            state.lang = state.lang === 'en' ? 'ar' : 'en';
+            document.documentElement.lang = state.lang;
+            document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr';
+            els.btns.lang.textContent = state.lang === 'en' ? 'عربي' : 'English';
+            
+            // Update UI Text
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (translations[state.lang][key]) el.innerHTML = translations[state.lang][key];
+            });
+
+            // Refresh cards if they exist to show new language text
+            if (state.cards.some(c => c)) {
+                // Re-fetch text from DB if we haven't manually edited it
+                state.cards.forEach(card => {
+                    if (card && !card.isEdited) {
+                        const ev = eventsDB.find(e => e.id === state.currentEventId);
+                        // Find step index from ID "evID-stepIndex"
+                        const stepIdx = parseInt(card.id.split('-')[1]) - 1;
+                        if(ev) card.text = ev.steps[stepIdx][state.lang];
+                    }
+                });
+                renderSlots(); 
+            }
+            renderEventsGrid();
+        }
+
+        // --- CORE LOGIC ---
+        function setTemplate(n) {
+            state.slotCount = n;
+            els.templateCount.textContent = n;
+            resetSlots();
+            closeModals();
+        }
+
+        function resetSlots() {
+            state.cards = new Array(state.slotCount).fill(null);
+            renderSlots();
+            state.coverMode = false;
+            // state.soundMode = false; // Optional: Reset sound mode on reset? Keeping it persistent for now.
+            updateCoverUI();
+            updateReadout(translations[state.lang].select_msg, true);
+        }
+
+        function renderSlots() {
+            els.slotsContainer.innerHTML = '';
+            
+            // Responsive Sizing
+            const baseW = state.slotCount > 6 ? 'w-40 md:w-48' : 'w-64 md:w-72';
+            
+            state.cards.forEach((card, i) => {
+                const slot = document.createElement('div');
+                // Common classes
+                slot.className = `card-slot ${baseW} aspect-square rounded-[2rem] relative shrink-0 overflow-hidden shadow-lg border-4 border-white transition-all duration-300`;
+                slot.setAttribute('data-index', i);
+                
+                if (!card) {
+                    // Empty
+                    slot.classList.add('bg-white', 'border-dashed', 'border-slate-300', 'flex', 'items-center', 'justify-center');
+                    slot.innerHTML = `<ion-icon name="add-circle" class="text-6xl text-slate-200"></ion-icon>`;
+                    slot.onclick = () => { openModal('events'); renderEventsGrid(); };
+                } else {
+                    // Filled
+                    slot.classList.add('bg-white');
+                    slot.setAttribute('draggable', 'true'); // Enable Native Drag
+                    slot.setAttribute('data-id', card.id);
+                    if (state.coverMode) slot.classList.add('covered');
+                    
+                    // Fallback to Emoji image if real image fails
+                    const safeImg = `https://placehold.co/400x400/e0e7ff/6366f1?text=${encodeURIComponent(card.fallbackIcon)}`;
+
+                    slot.innerHTML = `
+                        <div class="cover-overlay absolute inset-0 flex items-center justify-center text-white font-black text-6xl z-20">
+                            ${i + 1}
+                        </div>
+                        <img src="${card.img}" onerror="this.src='${safeImg}'" class="w-full h-full object-cover z-0 pointer-events-none rounded-[1.5rem]">
+                        <div class="absolute top-2 right-2 bg-white/80 backdrop-blur rounded-full p-2 shadow-sm z-10 cursor-pointer hover:bg-white hover:scale-110 transition" onclick="openEditModal(event, ${i})">
+                            <ion-icon name="ellipsis-horizontal" class="text-xl text-slate-600"></ion-icon>
+                        </div>
+                    `;
+                    
+                    // --- DRAG & DROP HANDLERS ---
+                    addDnDHandlers(slot);
+
+                    slot.onclick = (e) => {
+                        if (e.target.closest('ion-icon')) return; // ignore edit click
+                        handleSlotClick(i, slot);
+                    };
+                }
+                els.slotsContainer.appendChild(slot);
+            });
+        }
+
+        // --- DRAG AND DROP (Mouse & Touch) ---
+        function addDnDHandlers(slot) {
+            // Desktop
+            slot.addEventListener('dragstart', handleDragStart);
+            slot.addEventListener('dragover', handleDragOver);
+            slot.addEventListener('dragenter', handleDragEnter);
+            slot.addEventListener('dragleave', handleDragLeave);
+            slot.addEventListener('drop', handleDrop);
+            slot.addEventListener('dragend', handleDragEnd);
+
+            // Mobile (Touch)
+            slot.addEventListener('touchstart', handleTouchStart, {passive: false});
+            slot.addEventListener('touchmove', handleTouchMove, {passive: false});
+            slot.addEventListener('touchend', handleTouchEnd);
+        }
+
+        // Mouse DnD
+        function handleDragStart(e) {
+            if (state.coverMode || state.isPlaying) { e.preventDefault(); return; }
+            dragSrcEl = this;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+            this.classList.add('dragging');
+        }
+        function handleDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+        function handleDragEnter(e) { this.classList.add('scale-105', 'shadow-2xl'); }
+        function handleDragLeave(e) { this.classList.remove('scale-105', 'shadow-2xl'); }
+        function handleDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+            if (dragSrcEl !== this) {
+                // Swap Data in State first
+                updateStateFromDOMSwap(dragSrcEl, this);
+            }
+            return false;
+        }
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.card-slot').forEach(col => col.classList.remove('scale-105', 'shadow-2xl'));
+        }
+
+        // Mobile DnD (Custom Logic)
+        let touchStartItem = null;
+        function handleTouchStart(e) {
+            if (state.coverMode || state.isPlaying) return;
+            touchStartItem = this;
+            this.classList.add('dragging');
+        }
+        function handleTouchMove(e) {
+            if (!touchStartItem) return;
+            e.preventDefault(); // Stop scrolling
+            const touch = e.touches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            const slot = target ? target.closest('.card-slot') : null;
+
+            if (slot && slot !== touchStartItem && slot.parentElement === els.slotsContainer) {
+                // Live Swap Visuals
+                updateStateFromDOMSwap(touchStartItem, slot);
+            }
+        }
+        function handleTouchEnd(e) {
+            if (touchStartItem) touchStartItem.classList.remove('dragging');
+            touchStartItem = null;
+        }
+
+        // Helper to swap and re-render
+        function updateStateFromDOMSwap(el1, el2) {
+            // Get indices from current state (we need to find where these cards are currently in the array)
+            const id1 = el1.getAttribute('data-id');
+            const id2 = el2.getAttribute('data-id');
+            
+            const idx1 = state.cards.findIndex(c => c && c.id === id1);
+            const idx2 = state.cards.findIndex(c => c && c.id === id2);
+
+            if (idx1 > -1 && idx2 > -1) {
+                // Swap in Array
+                const temp = state.cards[idx1];
+                state.cards[idx1] = state.cards[idx2];
+                state.cards[idx2] = temp;
+                // Re-render to ensure clean DOM
+                renderSlots();
+                
+                // Clear animations if any
+                document.querySelectorAll('.animate-shake, .animate-success').forEach(el => {
+                    el.classList.remove('animate-shake', 'animate-success');
+                });
+            }
+        }
+
+        function renderEventsGrid() {
+            const grid = document.getElementById('events-grid');
+            grid.innerHTML = '';
+            
+            eventsDB.forEach(ev => {
+                const btn = document.createElement('button');
+                btn.className = "flex flex-col items-center gap-3 p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border-2 border-transparent hover:border-indigo-200 transition group";
+                
+                // Use user defined base path, fallback to emoji
+                const menuImg = `images/base_events/image${ev.id}.png`;
+                // Generates a placeholder using the emoji if image fails
+                const safeMenuImg = `https://placehold.co/150x150/ffffff/000000?text=${encodeURIComponent(ev.icon)}`;
+
+                btn.innerHTML = `
+                    <div class="w-20 h-20 rounded-2xl bg-white shadow-sm flex items-center justify-center overflow-hidden">
+                        <img src="${menuImg}" onerror="this.onerror=null;this.parentElement.innerHTML='<span class=\\'text-5xl\\'>${ev.icon}</span>'" class="w-full h-full object-contain">
+                    </div>
+                    <span class="font-bold text-slate-600 group-hover:text-indigo-600 text-sm">${ev.title[state.lang]}</span>
+                `;
+                btn.onclick = () => selectEvent(ev);
+                grid.appendChild(btn);
+            });
+        }
+
+        function renderTemplateOptions() {
+            const grid = els.modals.template.querySelector('.grid');
+            grid.innerHTML = '';
+            for (let i = 2; i <= 10; i++) {
+                const btn = document.createElement('button');
+                btn.className = "p-4 rounded-2xl bg-slate-100 font-bold text-xl text-slate-600 hover:bg-indigo-100 hover:text-indigo-600 border border-slate-200 transition";
+                btn.textContent = i;
+                btn.onclick = () => setTemplate(i);
+                grid.appendChild(btn);
+            }
+        }
+
+        // --- ALGORITHM: 2-10 Mapping WITH CUSTOM LOGIC ---
+        function selectEvent(ev) {
+            state.currentEventId = ev.id;
+            state.cards = [];
+            const count = state.slotCount;
+            
+            let indices = [];
+            
+            if (ev.logic && ev.logic[count]) {
+                indices = ev.logic[count];
+            } else {
+                // Fallback Math Logic
+                const totalSteps = 10;
+                for (let i = 0; i < count; i++) {
+                    if (count === 1) indices.push(1);
+                    else {
+                        const step = (totalSteps - 1) / (count - 1);
+                        indices.push(Math.round(1 + (step * i)));
+                    }
+                }
+            }
+
+            // Build Cards from indices
+            indices.forEach(stepIndex => {
+                // Get Text
+                const stepData = ev.steps[stepIndex - 1]; // Array is 0-indexed
+                const text = stepData[state.lang];
+
+                // Image Path
+                const imgSrc = `images/${ev.id}/image${stepIndex}.png`;
+
+                state.cards.push({
+                    id: `${ev.id}-${stepIndex}`,
+                    img: imgSrc,
+                    fallbackIcon: `${ev.icon} #${stepIndex}`,
+                    text: text,
+                    audio: null,
+                    isEdited: false
+                });
+            });
+
+            // *** SHUFFLE LOGIC ADDED FOR GAME MODE ***
+            // Random sort so the user has to play the game
+            state.cards.sort(() => Math.random() - 0.5);
+            
+            renderSlots();
+            closeModals();
+            updateReadout(ev.title[state.lang], true);
+        }
+
+        // --- GAME LOGIC: CHECK ORDER ---
+        function checkOrder() {
+            if (state.cards.some(c => !c)) return; // Don't check empty slots
+
+            // 1. Get current order of Step IDs (e.g., [1, 3, 2])
+            const currentSteps = state.cards.map(c => parseInt(c.id.split('-')[1]));
+            
+            // 2. Create a sorted copy (e.g., [1, 2, 3]) to know what constitutes "correct"
+            const correctSteps = [...currentSteps].sort((a, b) => a - b);
+
+            // 3. Compare
+            const isCorrect = JSON.stringify(currentSteps) === JSON.stringify(correctSteps);
+            const slots = document.querySelectorAll('.card-slot');
+
+            if (isCorrect) {
+                // SUCCESS
+                slots.forEach(slot => {
+                    slot.classList.add('animate-success');
+                    // Remove class after anim to allow re-trigger
+                    setTimeout(() => slot.classList.remove('animate-success'), 1000);
+                });
+                
+                // Play Confetti
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+                
+                // Play Ding Sound - ALWAYS TTS as per requirements
+                const u = new SpeechSynthesisUtterance(state.lang === 'ar' ? "أحسنت!" : "Good Job!");
+                u.lang = state.lang === 'ar' ? 'ar-SA' : 'en-US';
+                window.speechSynthesis.speak(u);
+                
+                updateReadout("🎉 Correct! Great Job! 🎉");
+
+            } else {
+                // ERROR
+                slots.forEach((slot, i) => {
+                    if (currentSteps[i] !== correctSteps[i]) {
+                        slot.classList.add('animate-shake');
+                        setTimeout(() => slot.classList.remove('animate-shake'), 500);
+                    }
+                });
+                updateReadout(state.lang === 'ar' ? "حاول مرة أخرى..." : "Try again...");
+            }
+        }
+
+        // --- NEW FEATURE: AUTO SOLVE ---
+        function autoSolve() {
+            if (state.cards.length === 0 || state.cards.some(c => !c)) return;
+
+            // Sort logic: The 'id' is like '5-1', '5-3'. We just need to sort by the second part.
+            state.cards.sort((a, b) => {
+                const stepA = parseInt(a.id.split('-')[1]);
+                const stepB = parseInt(b.id.split('-')[1]);
+                return stepA - stepB;
+            });
+
+            renderSlots();
+            
+            // Add a subtle success animation to all
+            const slots = document.querySelectorAll('.card-slot');
+            slots.forEach(slot => {
+                slot.classList.add('animate-success');
+                setTimeout(() => slot.classList.remove('animate-success'), 1000);
+            });
+            
+            updateReadout(state.lang === 'ar' ? "تم الترتيب!" : "Sorted!");
+        }
+
+
+        // --- INTERACTION ---
+        function handleSlotClick(index, slotEl) {
+            if (state.coverMode) {
+                // Toggle Peek
+                if (slotEl.classList.contains('revealed')) slotEl.classList.remove('revealed');
+                else slotEl.classList.add('revealed');
+            } else {
+                // Play
+                playCard(index);
+            }
+        }
+
+        // --- UPDATED AUDIO LOGIC ---
+        function playCard(index) {
+            const card = state.cards[index];
+            const slot = els.slotsContainer.children[index];
+            
+            // Visual
+            slot.classList.add('playing');
+            updateReadout(card.text);
+
+            // 1. User Recorded Audio (Priority 1)
+            if (card.audio) {
+                const a = new Audio(URL.createObjectURL(card.audio));
+                a.onended = () => slot.classList.remove('playing');
+                a.play();
+                return;
+            }
+
+            // 2. Prerecorded Files (Priority 2 - If Sound Mode is ON)
+            if (state.soundMode) {
+                // id is "eventId-stepIndex", e.g. "3-6"
+                const parts = card.id.split('-');
+                const evId = parts[0];
+                const stepIdx = parts[1];
+                
+                // Path: sounds/(language)/(eventId)/(stepIndex).mp3
+                // e.g., sounds/en/1/5.mp3 or sounds/ar/1/5.mp3
+                const mp3Path = `sounds/${state.lang}/${evId}/${stepIdx}.mp3`;
+                
+                const a = new Audio(mp3Path);
+                a.onended = () => slot.classList.remove('playing');
+                a.onerror = () => {
+                    // Fallback to TTS if MP3 is missing or fails
+                    console.warn(`Missing audio: ${mp3Path}, falling back to TTS`);
+                    playTTS(card.text, state.lang === 'ar' ? 'ar-SA' : 'en-US', () => slot.classList.remove('playing'));
+                };
+                a.play();
+                return;
+            }
+            
+            // 3. TTS (Default)
+            playTTS(card.text, state.lang === 'ar' ? 'ar-SA' : 'en-US', () => slot.classList.remove('playing'));
+        }
+
+        function playTTS(text, lang, callback) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = lang;
+            u.rate = 0.9;
+            u.onend = callback;
+            window.speechSynthesis.speak(u);
+        }
+
+        async function playSequence() {
+            if (state.isPlaying || state.coverMode) return;
+            state.isPlaying = true;
+            
+            for (let i = 0; i < state.cards.length; i++) {
+                if (!state.cards[i]) continue;
+                
+                const slot = els.slotsContainer.children[i];
+                const card = state.cards[i];
+                
+                // Scroll into view
+                slot.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+                slot.classList.add('playing');
+                updateReadout(card.text);
+
+                // Play & Wait
+                await new Promise(resolve => {
+                    // 1. User Audio
+                    if (card.audio) {
+                        const a = new Audio(URL.createObjectURL(card.audio));
+                        a.onended = resolve;
+                        a.play();
+                    } 
+                    // 2. Prerecorded Audio (Sound Mode)
+                    else if (state.soundMode) {
+                        const parts = card.id.split('-');
+                        const mp3Path = `sounds/${state.lang}/${parts[0]}/${parts[1]}.mp3`;
+                        
+                        const a = new Audio(mp3Path);
+                        a.onended = resolve;
+                        a.onerror = () => {
+                            // Fallback TTS
+                            playTTS(card.text, state.lang === 'ar' ? 'ar-SA' : 'en-US', resolve);
+                        };
+                        a.play();
+                    }
+                    // 3. Default TTS
+                    else {
+                        playTTS(card.text, state.lang === 'ar' ? 'ar-SA' : 'en-US', resolve);
+                    }
+                });
+                
+                slot.classList.remove('playing');
+                await new Promise(r => setTimeout(r, 500)); // Pause between cards
+            }
+            state.isPlaying = false;
+        }
+
+        function toggleCoverMode() {
+            if (state.cards.every(c => !c)) return;
+            state.coverMode = !state.coverMode;
+            updateCoverUI();
+            
+            // Update classes
+            Array.from(els.slotsContainer.children).forEach((slot, i) => {
+                if(!state.cards[i]) return;
+                if(state.coverMode) {
+                    slot.classList.add('covered');
+                    slot.classList.remove('revealed');
+                } else {
+                    slot.classList.remove('covered', 'revealed');
+                }
+            });
+        }
+
+        // --- NEW: SOUND MODE TOGGLE ---
+        function toggleSoundMode() {
+            state.soundMode = !state.soundMode;
+            updateSoundUI();
+            
+            // Optional: Provide feedback (beep or small toast)
+            const msg = state.soundMode ? (state.lang === 'ar' ? "تم تفعيل الأصوات" : "Sounds Enabled") : (state.lang === 'ar' ? "تم إيقاف الأصوات" : "Sounds Disabled");
+            updateReadout(msg);
+        }
+
+        function updateSoundUI() {
+            const btn = els.btns.soundMode;
+            const indicator = document.getElementById('sound-indicator');
+            if (state.soundMode) {
+                // Active State (Orange Filled)
+                indicator.className = "w-12 h-12 rounded-2xl bg-orange-500 text-white border-2 border-orange-600 flex items-center justify-center transition-all";
+                btn.querySelector('span').classList.add('text-orange-600');
+            } else {
+                // Inactive State (Outline)
+                indicator.className = "w-12 h-12 rounded-2xl bg-slate-50 border-2 border-slate-200 text-slate-400 flex items-center justify-center transition-all";
+                btn.querySelector('span').classList.remove('text-orange-600');
+            }
+        }
+
+        // --- EDITING & RECORDING ---
+        function openEditModal(e, index) {
+            state.editingIndex = index;
+            const card = state.cards[index];
+            document.getElementById('input-edit-text').value = card.text;
+            tempRecordingBlob = card.audio; // load existing
+            updateRecordUI();
+            openModal('edit');
+        }
+
+        function saveCardEdit() {
+            // Check if recording is still active
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                // Add a one-time listener to save AFTER the stop event has processed the data
+                mediaRecorder.addEventListener('stop', () => {
+                    commitSave();
+                }, { once: true });
+                mediaRecorder.stop();
+            } else {
+                commitSave();
+            }
+        }
+
+        function commitSave() {
+            const card = state.cards[state.editingIndex];
+            card.text = document.getElementById('input-edit-text').value;
+            card.audio = tempRecordingBlob;
+            card.isEdited = true; // prevent auto-translation override
+            closeModals();
+            updateReadout("Saved!");
+        }
+
+        // --- HELPERS ---
+        function updateReadout(text, isPlaceholder = false) {
+            const el = els.textReadout;
+            el.innerHTML = text;
+            if (isPlaceholder) el.classList.add('text-slate-400', 'italic');
+            else el.classList.remove('text-slate-400', 'italic');
+        }
+
+        function updateCoverUI() {
+            const btn = els.btns.coverMode;
+            const indicator = document.getElementById('cover-indicator');
+            if (state.coverMode) {
+                indicator.className = "w-12 h-12 rounded-2xl bg-purple-500 text-white border-2 border-purple-600 flex items-center justify-center transition-all";
+                btn.querySelector('span').classList.add('text-purple-600');
+            } else {
+                indicator.className = "w-12 h-12 rounded-2xl bg-slate-50 border-2 border-slate-200 text-slate-400 flex items-center justify-center transition-all";
+                btn.querySelector('span').classList.remove('text-purple-600');
+            }
+        }
+
+        function openModal(id) { els.modals[id].style.display = 'flex'; }
+        function closeModals() { 
+            Object.values(els.modals).forEach(m => m.style.display = 'none');
+            stopRecording();
+        }
+
+        // --- RECORDING (Standard MediaRecorder) ---
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.addEventListener('dataavailable', e => {
+                    if (e.data.size > 0) audioChunks.push(e.data);
+                });
+
+                mediaRecorder.addEventListener('stop', () => {
+                    // Use the recorder's reported mimeType for better compatibility (e.g. iOS/Safari)
+                    const mimeType = mediaRecorder.mimeType || 'audio/webm'; 
+                    tempRecordingBlob = new Blob(audioChunks, { type: mimeType });
+                    updateRecordUI();
+                    
+                    // Stop all tracks to release microphone
+                    stream.getTracks().forEach(track => track.stop());
+                });
+
+                mediaRecorder.start();
+                
+                document.getElementById('btn-record-start').classList.add('hidden');
+                document.getElementById('btn-record-stop').classList.remove('hidden');
+                document.getElementById('record-status-icon').classList.add('bg-red-50', 'text-red-500', 'border-red-100', 'recording-pulse');
+                
+                let sec = 0;
+                recordInterval = setInterval(() => {
+                    sec++;
+                    const m = Math.floor(sec/60).toString().padStart(2,'0');
+                    const s = (sec%60).toString().padStart(2,'0');
+                    document.getElementById('record-timer').textContent = `${m}:${s}`;
+                }, 1000);
+            } catch (err) { alert("Microphone not available or blocked."); }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+            }
+            clearInterval(recordInterval);
+            document.getElementById('record-status-icon').classList.remove('bg-red-50', 'text-red-500', 'border-red-100', 'recording-pulse');
+        }
+
+        function updateRecordUI() {
+            const hasRec = !!tempRecordingBlob;
+            document.getElementById('btn-record-start').classList.toggle('hidden', hasRec);
+            document.getElementById('btn-record-stop').classList.add('hidden');
+            document.getElementById('btn-record-play').classList.toggle('hidden', !hasRec);
+            document.getElementById('btn-record-delete').classList.toggle('hidden', !hasRec);
+            if(!hasRec) document.getElementById('record-timer').textContent = "00:00";
+        }
+
+        function playTempRecording() { if(tempRecordingBlob) new Audio(URL.createObjectURL(tempRecordingBlob)).play(); }
+        function deleteTempRecording() { tempRecordingBlob = null; updateRecordUI(); }
+
+        // Start
+        init();
+    </script>
+</body>
+</html>
