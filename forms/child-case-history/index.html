@@ -2,28 +2,1407 @@
 <html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Child Case History</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    /* --- CSS VARIABLES & RESET --- */
+    :root {
+      --baby-blue: #43a6f8;
+      --baby-blue-dark: #2c8be0;
+      --baby-blue-light: #d6eaff;
+      --baby-blue-faint: #f0f7ff;
+      --text: #1f2937;
+      --text-light: #4b5563;
+      --text-fade: #6b7689;
+      --white: #fff;
+      --danger: #e33d54;
+      --warning-bg: #fff4f4;
+      --warning-border: #ffcccc;
+      --success: #10b981;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    body {
+      font-family: 'Segoe UI', Arial, 'Noto Sans Arabic', sans-serif;
+      background: #f8fafd;
+      color: var(--text);
+      margin: 0;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* --- LAYOUT --- */
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 2rem 2.5rem 3rem;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 10px 25px -5px rgba(67, 166, 248, 0.15);
+      position: relative;
+    }
+
+    /* Header Area */
+    .header-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--baby-blue);
+      margin-bottom: 0.2em;
+      font-size: 2.2em;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-fade);
+      font-size: 0.95em;
+    }
+
+    /* --- SECTIONS --- */
+    section {
+      margin: 2em 0;
+      border: 1px solid var(--baby-blue-light);
+      border-radius: 12px;
+      background: #fff;
+      overflow: hidden;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    section:focus-within {
+      box-shadow: 0 4px 15px rgba(67, 166, 248, 0.15);
+      border-color: var(--baby-blue);
+    }
+
+    .section-head {
+      padding: 1em 1.5em;
+      font-size: 1.15em;
+      font-weight: 700;
+      background: var(--baby-blue-faint);
+      color: var(--text);
+      border-bottom: 1px solid var(--baby-blue-light);
+      display: flex;
+      align-items: center;
+    }
+    .section-head::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 1.2em;
+      background: var(--baby-blue);
+      margin-inline-end: 12px;
+      border-radius: 4px;
+    }
+
+    .section-content {
+      padding: 1.5em;
+    }
+
+    .subsection-title {
+        color: var(--baby-blue-dark);
+        font-weight: 700;
+        margin-top: 1.5em;
+        margin-bottom: 0.5em;
+        font-size: 1.05em;
+        border-bottom: 1px dashed var(--baby-blue-light);
+        padding-bottom: 5px;
+    }
+
+    /* --- FORM ELEMENTS --- */
+    label {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.4em;
+      margin-top: 1.1em;
+      display: block;
+      font-size: 0.95em;
+    }
+
+    .note {
+      color: var(--text-fade);
+      font-size: 0.85em;
+      margin-bottom: 0.8em;
+      font-style: italic;
+    }
+
+    /* Improved Input Styling */
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1.5px solid var(--baby-blue-light);
+      background: #fdfeff;
+      color: var(--text);
+      font-size: 1em;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    /* Custom Dropdown Arrow */
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2343a6f8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1em;
+      padding-right: 2.5rem;
+    }
+    html[dir="rtl"] select {
+      background-position: left 1rem center;
+      padding-right: 14px;
+      padding-left: 2.5rem;
+    }
+
+    textarea { min-height: 80px; resize: vertical; }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--baby-blue);
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(67, 166, 248, 0.1);
+      background: #fff;
+    }
+
+    /* --- BUTTONS & PILLS --- */
+    button, .btn {
+      background: var(--baby-blue);
+      background: linear-gradient(135deg, var(--baby-blue) 0%, var(--baby-blue-dark) 100%);
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      padding: 10px 24px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-top: 12px;
+      box-shadow: 0 4px 10px rgba(67, 166, 248, 0.3);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    button:hover, .btn:hover { 
+        transform: translateY(-2px); 
+        box-shadow: 0 6px 15px rgba(67, 166, 248, 0.4);
+    }
+    button:active { transform: translateY(0); }
+
+    .pills-box { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 15px 0; }
+    
+    .pill {
+      background: var(--baby-blue-faint);
+      border: 1px solid var(--baby-blue-light);
+      color: var(--text);
+      border-radius: 20px;
+      padding: 6px 18px;
+      font-size: 0.95em;
+      cursor: pointer;
+      font-weight: 500;
+      box-shadow: none;
+      margin: 0; 
+      transition: all 0.2s;
+    }
+    .pill:hover { background: #e6f3ff; border-color: var(--baby-blue); }
+    .pill.selected {
+      background: var(--baby-blue);
+      color: #fff;
+      border-color: var(--baby-blue);
+      box-shadow: 0 2px 8px rgba(67, 166, 248, 0.3);
+    }
+
+    /* --- CHECKBOX GRID (RED FLAGS) --- */
+    .checkbox-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+        margin-top: 10px;
+    }
+    .checkbox-item {
+        background: var(--warning-bg);
+        border: 1px solid var(--warning-border);
+        border-radius: 8px;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .checkbox-item:hover { background: #ffeaea; }
+    .checkbox-item.checked {
+        background: #ffe0e0;
+        border-color: var(--danger);
+        color: var(--danger);
+        font-weight: 600;
+    }
+    .checkbox-item input { width: auto; margin: 0; cursor: pointer; }
+
+    /* --- DYNAMIC LISTS --- */
+    .dynamic-list .row { display: flex; gap: 10px; margin-bottom: 8px; align-items: flex-start; }
+    .dynamic-list .row input, .dynamic-list .row select { margin-bottom: 0; }
+    
+    .btn-remove {
+      background: #ffecec;
+      color: var(--danger);
+      font-size: 1.2em;
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      box-shadow: none;
+      margin-top: 0;
+      flex-shrink: 0;
+      border: 1px solid #ffcccc;
+    }
+    .btn-remove:hover { background: var(--danger); color: white; border-color: var(--danger); transform: none; }
+
+    /* --- READ ONLY & LAYOUT UTILS --- */
+    .readonly-box {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      color: var(--text-light);
+      border-radius: 8px;
+      padding: 10px 14px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+    }
+
+    .row-flex { display: flex; gap: 20px; margin-bottom: 1em; flex-wrap: wrap; }
+    .row-flex .col2 { flex: 1 1 300px; }
+
+    /* --- TOGGLE SWITCH --- */
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1em;
+      margin: 1rem 0;
+      padding: 8px 16px;
+      background: #f0f7ff;
+      border: 1px solid #d6eaff;
+      border-radius: 50px;
+      width: fit-content;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    }
+    .toggle-switch { position: relative; width: 50px; height: 28px; }
+    .toggle-switch input { display: none; }
+    .slider {
+      cursor: pointer; position: absolute; inset: 0;
+      background: #cbd5e1; border-radius: 34px; transition: 0.3s;
+    }
+    .slider:before {
+      content: ""; position: absolute; height: 22px; width: 22px;
+      left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    input:checked + .slider { background: var(--baby-blue); }
+    input:checked + .slider:before { transform: translateX(22px); }
+    
+    /* Active Label Styling */
+    .lang-label { font-weight: bold; font-size: 0.95em; color: var(--text-fade); cursor: pointer; transition: color 0.2s;}
+    .lang-label.active { color: var(--baby-blue-dark); }
+
+    /* --- ACTION BAR --- */
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 2px dashed #e5e7eb;
+    }
+    .btn-secondary {
+      background: #64748b;
+      background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+      box-shadow: 0 4px 10px rgba(100, 116, 139, 0.2);
+    }
+    .btn-secondary:hover { background: #475569; }
+
+    /* --- FOOTER --- */
+    .slp-footer {
+        text-align: center;
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e5e7eb;
+        color: var(--text-fade);
+        font-size: 0.9em;
+    }
+    .slp-contact-item {
+        display: inline-block;
+        margin: 0 10px;
+    }
+
+    /* --- RTL SUPPORT --- */
+    html[dir="rtl"] { direction: rtl; font-family: 'Noto Sans Arabic', sans-serif; }
+    html[dir="rtl"] .section-head::before { margin-inline-end: 0; margin-inline-start: 12px; }
+    html[dir="rtl"] .slider:before { left: auto; right: 3px; }
+    html[dir="rtl"] input:checked + .slider:before { transform: translateX(-22px); }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 800px) {
+      main { padding: 1.5rem 1rem; margin: 1rem; }
+      .section-content { padding: 1.2em; }
+    }
+
+    /* --- PRINT STYLES (CLINICAL REPORT MODE) --- */
+    @media print {
+      body { background: white; color: black; }
+      main { box-shadow: none; margin: 0; padding: 0; max-width: 100%; border: none; }
+      h1 { color: black; text-align: left; font-size: 1.6em; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 10px;}
+      .subtitle { text-align: left; margin-bottom: 20px; font-style: italic; }
+      
+      section { border: none; margin: 0 0 15px 0; break-inside: avoid; }
+      .section-head { background: none; color: black; padding: 0; border-bottom: 1px solid #000; margin-bottom: 8px; font-size: 1.2em; text-transform: uppercase; font-weight: 800; }
+      .section-head::before { display: none; }
+      .section-content { padding: 0; }
+      
+      .subsection-title { color: black; border-bottom: 1px dotted #999; margin-top: 10px; font-size: 1em; }
+
+      /* Hide Interactive Elements */
+      .toggle-wrapper, .actions, .btn, .btn-remove, .note { display: none !important; }
+      
+      /* Make Inputs look like text */
+      input, textarea, select, .readonly-box {
+        border: none; background: transparent; padding: 0; margin: 0;
+        font-weight: 500; font-family: inherit; width: auto; display: inline-block;
+        color: black;
+        box-shadow: none;
+      }
+      textarea { min-height: auto; display: block; width: 100%; }
+      label { display: inline-block; color: #555; margin: 3px 5px 3px 0; font-weight: normal; font-size: 0.9em; }
+      label::after { content: ": "; }
+      
+      /* Pills - Show only selected */
+      .pills-box { display: block; margin: 0; }
+      .pill { display: none; border: none; background: none; padding: 0; color: black; font-weight: bold; }
+      .pill.selected { display: inline; }
+      .pill.selected::after { content: ", "; }
+      .pill.selected:last-child::after { content: ""; }
+      
+      /* Checkbox Grid - Only Show Checked */
+      .checkbox-grid { display: block; }
+      .checkbox-item { display: none; border: none; background: none; padding: 0; margin-bottom: 2px; }
+      .checkbox-item.checked { display: block; color: #d00; }
+      .checkbox-item input { display: none; }
+      .checkbox-item span::before { content: "⚠ "; }
+
+      /* Dynamic Lists */
+      .dynamic-list .row { border-bottom: 1px dotted #ccc; display: block; margin-bottom: 5px;}
+      
+      /* Layout adjustments for print */
+      .row-flex { display: block; }
+      .col2 { width: 100%; margin-bottom: 5px; }
+      
+      /* Footer */
+      .slp-footer { position: fixed; bottom: 0; left: 0; right: 0; font-size: 0.8em; border-top: 1px solid #000; padding: 5px; background: white; }
+
+      /* Force Colors */
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    }
+  </style>
 </head>
 <body>
   <main>
-    <h1 id="form-title"></h1>
-    <div class="toggle-wrapper">
-      <label id="label-en" for="lang-toggle"></label>
-      <label class="toggle-switch">
-        <input id="lang-toggle" type="checkbox">
-        <span class="slider"></span>
-      </label>
-      <label id="label-ar" for="lang-toggle"></label>
+    <div class="header-area">
+        <h1 id="form-title">Child Case History</h1>
+        <div class="subtitle" id="form-subtitle">Confidential Speech-Language Pathology Intake Form</div>
+        
+        <div class="toggle-wrapper">
+          <label id="label-en" class="lang-label active" for="lang-toggle">English</label>
+          <label class="toggle-switch">
+            <input id="lang-toggle" type="checkbox">
+            <span class="slider"></span>
+          </label>
+          <label id="label-ar" class="lang-label" for="lang-toggle">العربية</label>
+        </div>
     </div>
+
     <form id="case-form" novalidate></form>
+    
+    <div class="slp-footer">
+        <div class="slp-contact-item"><strong>Ahmad Ghanem</strong></div> |
+        <div class="slp-contact-item">slp.ahmadghanem@gmail.com</div> |
+        <div class="slp-contact-item">WhatsApp: +963988451245</div>
+    </div>
+
     <div class="actions">
-      <button type="button" id="export-pdf"></button>
+      <button type="button" id="btn-print" class="btn btn-secondary">⎙ Print / Save PDF</button>
+      <button type="button" id="export-txt" class="btn">⬇ Download Data (TXT)</button>
     </div>
   </main>
-  <!-- No library scripts needed for TXT export! -->
-  <script src="script.js"></script>
+
+  <script>
+    // ---- 1. TRANSLATION DATA (Expanded) ----
+    const translations = {
+      en: {
+        "form-title": "Child Case History",
+        "form-subtitle": "Confidential Speech-Language Pathology Intake Form",
+        "export-txt": "Download Data (.txt)",
+        "print-pdf": "Print / Save PDF",
+        "lang-en": "English",
+        "lang-ar": "Arabic",
+        "unit-years": "year(s)",
+        "unit-months": "month(s)",
+        "general-section": "General Information",
+        "today-date": "Today's Date",
+        "child-name": "Child's Name",
+        "dob": "Date of Birth",
+        "chronological-age": "Chronological Age",
+        "school": "School",
+        "grade": "Grade",
+        "address": "Child Address",
+        "mother-name": "Mother's Name",
+        "mother-phone": "Mother's Phone",
+        "father-name": "Father's Name",
+        "father-phone": "Father's Phone",
+        "specialist": "Referral Source / Specialist",
+        "specialist-phone": "Specialist Phone",
+        "live-with": "Who lives in the home?",
+        "live-with-note": "List siblings and others.",
+        "name": "Name",
+        "age": "Age",
+        "languages": "Languages",
+        "at-home": "Language(s) at Home",
+        "at-school": "Language(s) at School",
+        "others": "Others",
+        "with-whom": "Primary Caregivers",
+        "mom": "Mother",
+        "dad": "Father",
+        "siblings": "Siblings",
+        "grandparents": "Grandparents",
+        "other-family": "Extended Family",
+        "other": "Other",
+        "add": "+ Add",
+        "remove": "−",
+        "activities": "Favorite Activities / Interests",
+        "prenatal-section": "Prenatal and Birth History",
+        "pregnancy-health": "Mother’s health during pregnancy",
+        "preg-normal": "Unremarkable / Normal",
+        "illnesses": "Illnesses",
+        "accidents": "Accidents",
+        "medications": "Medications",
+        "details": "Details",
+        "length-pregnancy": "Length of pregnancy",
+        "full-term": "Full term (37-40 wks)",
+        "premature": "Premature",
+        "overdue": "Post-term / Overdue",
+        "weeks": "Weeks",
+        "birth-condition": "Child’s condition at birth",
+        "birth-normal": "Normal",
+        "minor-complications": "Minor Complications",
+        "serious-complications": "NICU / Serious Complications",
+        "birth-weight": "Birth Weight",
+        "kg": "kg",
+        "lbs": "lbs",
+        "unusual-condition": "Unusual conditions?",
+        "no-unusual": "No",
+        "medical-section": "Medical History",
+        "congenital-disorder": "Congenital syndromes/disorders?",
+        "no-congenital": "None known",
+        "psychiatric-disorder": "Psychiatric/Developmental Diagnoses?",
+        "no-psychiatric": "None known",
+        "adhd": "ADHD",
+        "autism": "Autism Spectrum (ASD)",
+        "anxiety": "Anxiety",
+        "depression": "Depression",
+        "conditions": "Chronic Conditions",
+        "chronic-condition": "Condition",
+        "no-chronic": "None",
+        "medical-events": "Surgeries / Hospitalizations",
+        "no-medical-events": "None",
+        "medical-event-desc": "Event Description",
+        "medical-event-date": "Date",
+        "medications-title": "Current Medications",
+        "medication": "Medication Name/Dosage",
+        "no-medications": "None",
+        "development-section": "Developmental Milestones",
+        "milestone-note": "Age in months when achieved.",
+        "sit": "Sat alone",
+        "crawl": "Crawled",
+        "stand": "Stood alone",
+        "walk": "Walked",
+        "babble": "Babbled",
+        "first-word": "First true word",
+        "combine-words": "Combined 2 words",
+        "use-toilet": "Toilet trained",
+        "receptive-vocab": "Estimated Receptive Vocab",
+        "word-example": "e.g., 50",
+        "sample-utterance": "Sample Utterance",
+        "sample-placeholder": "e.g., 'Me want juice now'",
+        
+        // SLP EXPANSION
+        "speech-section": "Speech-Language Assessment",
+        "red-flags-title": "Red Flags / Clinical Indicators",
+        "rf-no-babble": "No babbling by 12 months",
+        "rf-no-gestures": "No gesturing (pointing/waving) by 12 months",
+        "rf-no-words": "No single words by 16 months",
+        "rf-no-phrases": "No 2-word spontaneous phrases by 24 months",
+        "rf-regression": "Any loss of speech or social skills (Regression)",
+        "rf-inconsistent": "Inconsistent response to name",
+        "rf-eye-contact": "Poor eye contact",
+        
+        "slp-receptive": "Receptive Language (Understanding)",
+        "slp-expressive": "Expressive Language (Speaking)",
+        "slp-articulation": "Articulation & Intelligibility",
+        "slp-fluency": "Fluency & Voice",
+        "slp-feeding": "Feeding & Swallowing",
+        
+        "rec-instructions": "Follows instructions?",
+        "rec-identify": "Identifies objects/pictures?",
+        "exp-vocab-size": "Estimated Vocabulary Size",
+        "exp-sentence-len": "Average Sentence Length (MLU)",
+        "art-intelligibility": "Intelligibility Rating (1-10)",
+        "art-concerns": "Articulation Concerns",
+        "flu-stuttering": "Stuttering Behaviors?",
+        "voice-quality": "Voice Quality",
+        "feed-texture": "Texture Aversion?",
+        "feed-choking": "Choking/Coughing?",
+        
+        "describe-concern": "Primary Concern (Parent Report)",
+        "first-noticed": "When noticed?",
+        "progression": "Progression",
+        "communication-modes": "Communication Modes",
+        "gestures": "Gestures",
+        "single-words": "Single Words",
+        "phrases-sentences": "Phrases",
+        "other-modes": "AAC / Other",
+        "interaction": "Social Interaction",
+        "shy": "Shy/Anxious",
+        "aggressive": "Aggressive",
+        "reserved": "Reserved",
+        "friendly": "Friendly",
+        "other-interaction": "Other",
+        "previous-services": "Therapy History",
+        "no-services": "None",
+        "service-type": "Service Type",
+        "service-start": "Start Date",
+        "service-freq": "Frequency",
+        "st": "Speech Therapy",
+        "ot": "Occupational Therapy",
+        "pt": "Physical Therapy",
+        "aba": "ABA Therapy",
+        "psych": "Psychology",
+        "other-service": "Other",
+        "weekly": "Weekly",
+        "biweekly": "2x Week",
+        "monthly": "Monthly",
+        "other-freq": "Other",
+        "family-history": "Family History",
+        "add-notes": "Clinical Impressions / Notes",
+        "notes-placeholder": "Observations...",
+        "addendum": "Ahmad Ghanem | Speech-Language Pathologist\nEmail: slp.ahmadghanem@gmail.com | WhatsApp: +963988451245\nDate: "
+      },
+      ar: {
+        "form-title": "استمارة دراسة حالة طفل",
+        "form-subtitle": "نموذج تقييم أمراض النطق واللغة - سري",
+        "export-txt": "تحميل البيانات (نص)",
+        "print-pdf": "طباعة / حفظ PDF",
+        "lang-en": "English",
+        "lang-ar": "العربية",
+        "unit-years": "سنة",
+        "unit-months": "شهر",
+        "general-section": "المعلومات العامة",
+        "today-date": "تاريخ التقييم",
+        "child-name": "اسم الطفل",
+        "dob": "تاريخ الميلاد",
+        "chronological-age": "العمر الزمني",
+        "school": "المدرسة / الروضة",
+        "grade": "الصف",
+        "address": "العنوان",
+        "mother-name": "اسم الأم",
+        "mother-phone": "هاتف الأم",
+        "father-name": "اسم الأب",
+        "father-phone": "هاتف الأب",
+        "specialist": "جهة الإحالة / الأخصائي",
+        "specialist-phone": "هاتف الأخصائي",
+        "live-with": "أفراد الأسرة في المنزل",
+        "live-with-note": "اذكر الإخوة والآخرين",
+        "name": "الاسم",
+        "age": "العمر",
+        "languages": "اللغات",
+        "at-home": "اللغة في المنزل",
+        "at-school": "اللغة في المدرسة",
+        "others": "أخرى",
+        "with-whom": "مقدمو الرعاية الأساسيون",
+        "mom": "الأم",
+        "dad": "الأب",
+        "siblings": "الإخوة",
+        "grandparents": "الجد/الجدة",
+        "other-family": "أقارب آخرون",
+        "other": "غير ذلك",
+        "add": "+ إضافة",
+        "remove": "−",
+        "activities": "الأنشطة المفضلة",
+        "prenatal-section": "تاريخ الحمل والولادة",
+        "pregnancy-health": "صحة الأم أثناء الحمل",
+        "preg-normal": "طبيعية / دون مشاكل",
+        "illnesses": "أمراض",
+        "accidents": "حوادث",
+        "medications": "أدوية",
+        "details": "التفاصيل",
+        "length-pregnancy": "مدة الحمل",
+        "full-term": "مكتمل (37-40 أسبوع)",
+        "premature": "ولادة مبكرة",
+        "overdue": "تأخر الولادة",
+        "weeks": "أسبوع",
+        "birth-condition": "حالة الطفل عند الولادة",
+        "birth-normal": "طبيعية",
+        "minor-complications": "مضاعفات بسيطة",
+        "serious-complications": "عناية مركزة / مضاعفات شديدة",
+        "birth-weight": "الوزن عند الولادة",
+        "kg": "كجم",
+        "lbs": "باوند",
+        "unusual-condition": "ظروف غير معتادة؟",
+        "no-unusual": "لا توجد",
+        "medical-section": "التاريخ الطبي",
+        "congenital-disorder": "متلازمات أو عيوب خلقية؟",
+        "no-congenital": "لا يوجد",
+        "psychiatric-disorder": "تشخيصات نمائية أو نفسية؟",
+        "no-psychiatric": "لا يوجد",
+        "adhd": "فرط حركة وتشتت انتباه",
+        "autism": "طيف التوحد",
+        "anxiety": "قلق",
+        "depression": "اكتئاب",
+        "conditions": "حالات مزمنة",
+        "chronic-condition": "الحالة",
+        "no-chronic": "لا يوجد",
+        "medical-events": "عمليات جراحية / دخول مشفى",
+        "no-medical-events": "لا يوجد",
+        "medical-event-desc": "وصف الحدث",
+        "medical-event-date": "التاريخ",
+        "medications-title": "الأدوية الحالية",
+        "medication": "اسم الدواء والجرعة",
+        "no-medications": "لا يوجد",
+        "development-section": "التطور النمائي",
+        "milestone-note": "العمر (بالأشهر) عند الاكتساب.",
+        "sit": "الجلوس",
+        "crawl": "الحبو",
+        "stand": "الوقوف",
+        "walk": "المشي",
+        "babble": "المناغاة",
+        "first-word": "الكلمة الأولى",
+        "combine-words": "جملة من كلمتين",
+        "use-toilet": "تدريب الحمام",
+        "receptive-vocab": "المفردات الاستقبالية",
+        "word-example": "مثال: 50",
+        "sample-utterance": "مثال على كلام الطفل",
+        "sample-placeholder": "مثال: 'بدي عصير كمان'",
+        
+        // SLP EXPANSION ARABIC
+        "speech-section": "تقييم النطق واللغة",
+        "red-flags-title": "العلامات التحذيرة / مؤشرات إكلينيكية",
+        "rf-no-babble": "لا توجد مناغاة بعمر 12 شهر",
+        "rf-no-gestures": "لا توجد إيماءات (تأشير/تلويح) بعمر 12 شهر",
+        "rf-no-words": "لا كلمات مفردة بعمر 16 شهر",
+        "rf-no-phrases": "لا جمل من كلمتين بعمر 24 شهر",
+        "rf-regression": "أي فقدان لمهارات اللغة أو التواصل (تراجع)",
+        "rf-inconsistent": "استجابة غير ثابتة عند المناداة بالاسم",
+        "rf-eye-contact": "تواصل بصري ضعيف",
+        
+        "slp-receptive": "اللغة الاستقبالية (الفهم)",
+        "slp-expressive": "اللغة التعبيرية (الكلام)",
+        "slp-articulation": "النطق والوضوح",
+        "slp-fluency": "الطلاقة والصوت",
+        "slp-feeding": "البلع والإطعام",
+        
+        "rec-instructions": "هل يتبع التعليمات؟",
+        "rec-identify": "هل يتعرف على الأشياء/الصور؟",
+        "exp-vocab-size": "حجم المفردات التقديري",
+        "exp-sentence-len": "متوسط طول الجملة",
+        "art-intelligibility": "معدل وضوح الكلام (1-10)",
+        "art-concerns": "مخاوف نطقية محددة",
+        "flu-stuttering": "سلوكيات تأتأة؟",
+        "voice-quality": "جودة الصوت",
+        "feed-texture": "رفض لقوام معين؟",
+        "feed-choking": "شرقة أو سعال أثناء الأكل؟",
+
+        "describe-concern": "الشكوى الأساسية",
+        "first-noticed": "تاريخ الملاحظة",
+        "progression": "التطور",
+        "communication-modes": "طرق التواصل",
+        "gestures": "إيماءات",
+        "single-words": "كلمات مفردة",
+        "phrases-sentences": "جمل",
+        "other-modes": "أخرى",
+        "interaction": "التفاعل الاجتماعي",
+        "shy": "خجول / قلق",
+        "aggressive": "عدواني",
+        "reserved": "متحفظ",
+        "friendly": "ودود",
+        "other-interaction": "أخرى",
+        "previous-services": "تاريخ العلاج",
+        "no-services": "لا يوجد",
+        "service-type": "نوع الخدمة",
+        "service-start": "تاريخ البدء",
+        "service-freq": "التكرار",
+        "st": "علاج نطق",
+        "ot": "علاج وظيفي",
+        "pt": "علاج طبيعي",
+        "aba": "علاج سلوكي",
+        "psych": "دعم نفسي",
+        "other-service": "أخرى",
+        "weekly": "أسبوعياً",
+        "biweekly": "مرتين بالأسبوع",
+        "monthly": "شهرياً",
+        "other-freq": "غير ذلك",
+        "family-history": "تاريخ عائلي",
+        "add-notes": "ملاحظات سريرية",
+        "notes-placeholder": "ملاحظات...",
+        "addendum": "أحمد غانم | أخصائي نطق ولغة\nEmail: slp.ahmadghanem@gmail.com | WhatsApp: +963988451245\nDate: "
+      }
+    };
+
+    let lang = "en";
+    let res = translations[lang];
+
+    // ---- UTILITY FUNCTIONS ----
+    function makeElem(tag, attr = {}, children = []) {
+      const el = document.createElement(tag);
+      for (let key in attr) {
+        if (key === "class") el.className = attr[key];
+        else if (key === "for") el.htmlFor = attr[key];
+        else if (key === "text") el.textContent = attr[key];
+        else if (key === "html") el.innerHTML = attr[key];
+        else if (key === "style") el.style.cssText = attr[key];
+        else el.setAttribute(key, attr[key]);
+      }
+      if (Array.isArray(children)) children.forEach(ch => el.appendChild(ch));
+      return el;
+    }
+
+    function getVal(id) { const el = document.getElementById(id); return el ? (el.value || "").trim() : ""; }
+    
+    function getDynamicListValues(containerId, indices=[]) {
+      let container = document.getElementById(containerId);
+      if (!container) return [];
+      let values = [];
+      container.querySelectorAll(".row").forEach(row => {
+        const cs = row.querySelectorAll("input,select,textarea");
+        if(cs.length === 0) return; 
+        
+        let rowVal;
+        if (indices.length) {
+            rowVal = indices.map(i => cs[i] ? cs[i].value : "").join(" - ");
+        } else {
+            rowVal = cs[0] ? cs[0].value : "";
+        }
+        if(rowVal.replace(/[\s-]/g, "") !== "") values.push(rowVal);
+      });
+      return values;
+    }
+
+    function isPillSelected(id) {
+      const el = document.getElementById(id);
+      return el && el.classList.contains("selected");
+    }
+
+    function getSelectedPills(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return "";
+      return Array.from(container.querySelectorAll(".pill.selected")).map(p => p.textContent).join(", ");
+    }
+    
+    function getCheckedBoxes(containerId) {
+        const container = document.getElementById(containerId);
+        if(!container) return "";
+        let checked = [];
+        container.querySelectorAll(".checkbox-item.checked").forEach(item => {
+            checked.push(item.querySelector("span").textContent);
+        });
+        return checked.join("; ");
+    }
+
+    // ---- LANGUAGE LOGIC ----
+    function loadLanguage(selectedLang) {
+      lang = selectedLang;
+      res = translations[lang];
+      
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+      
+      document.getElementById("form-title").textContent = res["form-title"];
+      document.getElementById("form-subtitle").textContent = res["form-subtitle"];
+      document.getElementById("export-txt").textContent = res["export-txt"];
+      document.getElementById("btn-print").textContent = res["print-pdf"];
+      
+      if(lang === 'ar'){
+          document.getElementById('label-ar').classList.add('active');
+          document.getElementById('label-en').classList.remove('active');
+      } else {
+          document.getElementById('label-en').classList.add('active');
+          document.getElementById('label-ar').classList.remove('active');
+      }
+
+      renderForm(); 
+    }
+
+    const langToggle = document.getElementById("lang-toggle");
+    langToggle.addEventListener("change", () => {
+      loadLanguage(langToggle.checked ? "ar" : "en");
+    });
+    
+    document.getElementById("label-en").addEventListener("click", () => {
+       if(lang !== "en") { langToggle.checked = false; loadLanguage("en"); }
+    });
+    document.getElementById("label-ar").addEventListener("click", () => {
+       if(lang !== "ar") { langToggle.checked = true; loadLanguage("ar"); }
+    });
+
+    // ---- DYNAMIC ROWS HELPER ----
+    function addDynamicRow(container, values, types, names, placeholders=[]) {
+      const row = makeElem("div", {class:"row"});
+      for(let i=0; i<types.length; i++) {
+        const input = makeElem("input", {
+            type: types[i], 
+            name: names[i]+"[]", 
+            placeholder: res[placeholders[i]] || placeholders[i] || ""
+        });
+        if(types[i]==="number") input.min = 0;
+        row.appendChild(input);
+      }
+      const removeBtn = makeElem("button",{type:"button", class:"btn-remove", text:"×", title: res["remove"]});
+      removeBtn.addEventListener("click", () => container.removeChild(row));
+      row.appendChild(removeBtn);
+      container.appendChild(row);
+    }
+
+    function addServiceRow(container) {
+      const row = makeElem("div", {class:"row"});
+      const serviceSelect = makeElem("select", {name:"service-type[]"});
+      ["","st","ot","pt","aba","psych","other-service"].forEach(key=>{
+        serviceSelect.appendChild(makeElem("option", {value:key, text:res[key]||key}));
+      });
+      
+      const otherInput = makeElem("input", {type:"text", name:"service-other[]", placeholder:res["other-service"], style:"display:none;"});
+      serviceSelect.addEventListener("change",()=>{
+          otherInput.style.display = serviceSelect.value==="other-service" ? "" : "none";
+          if(serviceSelect.value!=="other-service") otherInput.value="";
+      });
+
+      const startDateInput = makeElem("input", {type:"text", onfocus:"(this.type='date')", onblur:"(this.type='text')", placeholder: res["service-start"], name:"service-start[]"});
+      
+      const freqSelect = makeElem("select", {name:"service-frequency[]"});
+      ["","weekly","biweekly","monthly","other-freq"].forEach(key=>{
+        freqSelect.appendChild(makeElem("option",{value:key, text:res[key]||key}));
+      });
+      
+      const freqOtherInput = makeElem("input", {type:"text", name:"freq-other[]", placeholder: res["other-freq"], style:"display:none;"});
+      freqSelect.addEventListener("change",()=>{
+          freqOtherInput.style.display = freqSelect.value==="other-freq" ? "" : "none";
+          if(freqSelect.value!=="other-freq") freqOtherInput.value="";
+      });
+
+      const btnRemove = makeElem("button",{type:"button", class:"btn-remove", text:"×"});
+      btnRemove.addEventListener("click", () => container.removeChild(row));
+      
+      row.appendChild(serviceSelect);
+      row.appendChild(otherInput);
+      row.appendChild(startDateInput);
+      row.appendChild(freqSelect);
+      row.appendChild(freqOtherInput);
+      row.appendChild(btnRemove);
+      container.appendChild(row);
+    }
+
+    // ============================================
+    // SECTIONS BUILDERS
+    // ============================================
+
+    // 1. GENERAL
+    function buildGeneralSection() {
+      const sec = makeElem("section");
+      sec.appendChild(makeElem("div", {class:"section-head", text: res["general-section"]}));
+      const content = makeElem("div", {class:"section-content"});
+      sec.appendChild(content);
+
+      const row = makeElem("div", {class:"row-flex"});
+      const left = makeElem("div", {class:"col2"});
+      const right = makeElem("div", {class:"col2"});
+
+      left.appendChild(makeElem("label", {for:"today-date", text: res["today-date"]}));
+      const todayInput = makeElem("input", {type:"date", id:"today-date"});
+      left.appendChild(todayInput);
+      
+      left.appendChild(makeElem("label", {for:"child-name", text: res["child-name"]}));
+      left.appendChild(makeElem("input", {type:"text", id:"child-name"}));
+      
+      left.appendChild(makeElem("label", {for:"dob", text: res["dob"]}));
+      const dobInput = makeElem("input", {type:"date", id:"dob"});
+      left.appendChild(dobInput);
+      
+      left.appendChild(makeElem("label", {for: "chron-age", text: res["chronological-age"]}));
+      const chronAgeDisplay = makeElem("div", {id: "chron-age", class: "readonly-box", text: "—"});
+      left.appendChild(chronAgeDisplay);
+
+      left.appendChild(makeElem("label", {for: "school", text: res["school"]}));
+      left.appendChild(makeElem("input", {type: "text", id: "school"}));
+      
+      left.appendChild(makeElem("label", {for: "grade", text: res["grade"]}));
+      left.appendChild(makeElem("input", {type: "text", id: "grade"}));
+      
+      left.appendChild(makeElem("label", {for: "address", text: res["address"]}));
+      left.appendChild(makeElem("textarea", {id: "address", style: "min-height: 50px;"}));
+
+      // Right Column Fields
+      [
+        ["mother-name","text"],["mother-phone","tel"],
+        ["father-name","text"],["father-phone","tel"],
+        ["specialist","text"],["specialist-phone","tel"]
+      ].forEach(([id,type])=>{
+        right.appendChild(makeElem("label", {for:id, text: res[id]}));
+        right.appendChild(makeElem("input", {type:type, id:id}));
+      });
+
+      row.appendChild(left); 
+      row.appendChild(right);
+      content.appendChild(row);
+
+      // Chronological Age Calculator
+      function updateChronAge() {
+        const dobVal = dobInput.value;
+        const todayVal = todayInput.value || new Date().toISOString().slice(0,10);
+        
+        if (dobVal && todayVal) {
+          const dob = new Date(dobVal), today = new Date(todayVal);
+          if (dob <= today) {
+            let y = today.getFullYear() - dob.getFullYear();
+            let m = today.getMonth() - dob.getMonth();
+            if (today.getDate() < dob.getDate()) m--;
+            if (m < 0) { y--; m += 12; }
+            chronAgeDisplay.textContent = (y > 0 ? y + " " + res["unit-years"] + " " : "") + m + " " + res["unit-months"];
+            return;
+          }
+        }
+        chronAgeDisplay.textContent = "—";
+      }
+      todayInput.addEventListener("change", updateChronAge);
+      dobInput.addEventListener("change", updateChronAge);
+      todayInput.value = new Date().toISOString().slice(0,10); 
+
+      // Living With
+      content.appendChild(makeElem("label", {text: res["live-with"]}));
+      content.appendChild(makeElem("div", {class: "note", text: res["live-with-note"]}));
+      const liveBox = makeElem("div", {id: "withwhom-list", class: "dynamic-list"});
+      content.appendChild(liveBox);
+      addDynamicRow(liveBox, ["",""], ["text","number"], ["name","age"], ["name","age"]);
+      
+      const addLiveBtn = makeElem("button", {type: "button", class: "btn", text: res["add"]});
+      addLiveBtn.onclick = () => addDynamicRow(liveBox, ["",""], ["text","number"], ["name","age"], ["name","age"]);
+      content.appendChild(addLiveBtn);
+
+      // Languages
+      content.appendChild(makeElem("label", {text: res["languages"]}));
+      const langRow = makeElem("div", {class: "row-flex"});
+      const homeDiv = makeElem("div", {class: "col2"});
+      homeDiv.appendChild(makeElem("div", {class:"note", text: res["at-home"]}));
+      const homeLangSelect = makeElem("select", {id:"lang-home"});
+      ["Arabic","English", res["others"]].forEach(l => homeLangSelect.appendChild(makeElem("option",{text:l, value:l})));
+      homeDiv.appendChild(homeLangSelect);
+      const homeOther = makeElem("input", {type:"text", id:"lang-home-other", placeholder:res["others"], style:"display:none;"});
+      homeDiv.appendChild(homeOther);
+      homeLangSelect.onchange = () => homeOther.style.display = (homeLangSelect.value === res["others"]) ? "" : "none";
+      
+      const schoolDiv = makeElem("div", {class: "col2"});
+      schoolDiv.appendChild(makeElem("div", {class:"note", text: res["at-school"]}));
+      const schoolLangSelect = makeElem("select", {id:"lang-school"});
+      ["Arabic","English", res["others"]].forEach(l => schoolLangSelect.appendChild(makeElem("option",{text:l, value:l})));
+      schoolDiv.appendChild(schoolLangSelect);
+      const schoolOther = makeElem("input", {type:"text", id:"lang-school-other", placeholder:res["others"], style:"display:none;"});
+      schoolDiv.appendChild(schoolOther);
+      schoolLangSelect.onchange = () => schoolOther.style.display = (schoolLangSelect.value === res["others"]) ? "" : "none";
+      langRow.appendChild(homeDiv); langRow.appendChild(schoolDiv);
+      content.appendChild(langRow);
+
+      // Caregivers Pills
+      content.appendChild(makeElem("label", {text: res["with-whom"]}));
+      const spendWithBox = makeElem("div", {class:"pills-box", id:"spendwith-pills"});
+      ["mom","dad","siblings","grandparents","other-family","other"].forEach(key => {
+        const pill = makeElem("button", {type:"button", class:"pill", "data-value":key, text: res[key]});
+        pill.onclick = () => {
+             pill.classList.toggle("selected");
+             if(key==="other") {
+                 const otherInput = document.getElementById("spendwith-other");
+                 otherInput.style.display = pill.classList.contains("selected") ? "" : "none";
+             }
+        };
+        spendWithBox.appendChild(pill);
+      });
+      content.appendChild(spendWithBox);
+      content.appendChild(makeElem("input", {type:"text", id:"spendwith-other", placeholder:res["details"], style:"display:none;"}));
+      return sec;
+    }
+
+    // 2. PRENATAL
+    function buildPrenatalSection() {
+      const sec = makeElem("section");
+      sec.appendChild(makeElem("div", {class:"section-head", text: res["prenatal-section"]}));
+      const content = makeElem("div", {class:"section-content"});
+      sec.appendChild(content);
+
+      content.appendChild(makeElem("label", {text: res["pregnancy-health"]}));
+      const healthRow = makeElem("div", {class:"pills-box"});
+      const normalPill = makeElem("button", {type:"button", class:"pill", id:"preg-normal-pill", text: res["preg-normal"]});
+      healthRow.appendChild(normalPill);
+      ["illnesses", "accidents", "medications"].forEach(type => {
+        const pill = makeElem("button", {type:"button", class:"pill", id:"preg-"+type+"-pill", text: res[type]});
+        pill.onclick = () => {
+            pill.classList.toggle("selected");
+            if(pill.classList.contains("selected")) normalPill.classList.remove("selected");
+            const txt = document.getElementById("preg-"+type+"-txt");
+            txt.style.display = pill.classList.contains("selected") ? "" : "none";
+        };
+        healthRow.appendChild(pill);
+      });
+      
+      normalPill.onclick = () => {
+         normalPill.classList.toggle("selected");
+         if(normalPill.classList.contains("selected")) {
+             ["illnesses", "accidents", "medications"].forEach(type => {
+                 document.getElementById("preg-"+type+"-pill").classList.remove("selected");
+                 document.getElementById("preg-"+type+"-txt").style.display = "none";
+             });
+         }
+      };
+
+      content.appendChild(healthRow);
+      ["illnesses", "accidents", "medications"].forEach(type => {
+          content.appendChild(makeElem("input", {type:"text", id:"preg-"+type+"-txt", placeholder: res["details"] + " (" + res[type] + ")", style:"display:none;"}));
+      });
+
+      const rowStats = makeElem("div", {class: "row-flex"});
+      const termDiv = makeElem("div", {class:"col2"});
+      termDiv.appendChild(makeElem("label", {text: res["length-pregnancy"]}));
+      const termSelect = makeElem("select", {id: "pregnancy-term"});
+      ["full-term", "premature", "overdue"].forEach(k => termSelect.appendChild(makeElem("option", {value:k, text:res[k]})));
+      termDiv.appendChild(termSelect);
+      termDiv.appendChild(makeElem("input", {type:"number", id:"preg-weeks", placeholder:res["weeks"], min:20, max:44, style:"margin-top:5px;"}));
+      const weightDiv = makeElem("div", {class:"col2"});
+      weightDiv.appendChild(makeElem("label", {text: res["birth-weight"]}));
+      const wWrapper = makeElem("div", {style: "display:flex; gap:10px;"});
+      wWrapper.appendChild(makeElem("input", {type:"number", id:"birth-weight", step:"0.1"}));
+      const unitSelect = makeElem("select", {id:"birth-weight-unit", style:"width:80px;"});
+      unitSelect.appendChild(makeElem("option", {value:"kg", text:res["kg"]}));
+      unitSelect.appendChild(makeElem("option", {value:"lbs", text:res["lbs"]}));
+      wWrapper.appendChild(unitSelect);
+      weightDiv.appendChild(wWrapper);
+      rowStats.appendChild(termDiv); rowStats.appendChild(weightDiv);
+      content.appendChild(rowStats);
+
+      content.appendChild(makeElem("label", {text: res["birth-condition"]}));
+      const condRow = makeElem("div", {class:"pills-box"});
+      ["birth-normal", "birth-minor", "birth-serious"].forEach(k => {
+          const pill = makeElem("button", {type:"button", class:"pill", id:k, text:res[k]});
+          pill.onclick = () => {
+              condRow.querySelectorAll(".pill").forEach(p => p.classList.remove("selected"));
+              pill.classList.add("selected");
+          };
+          condRow.appendChild(pill);
+      });
+      content.appendChild(condRow);
+      content.appendChild(makeElem("input", {type:"text", id:"birth-condition-details", placeholder:res["details"]}));
+      return sec;
+    }
+
+    // 3. MEDICAL
+    function buildMedicalSection() {
+        const sec = makeElem("section");
+        sec.appendChild(makeElem("div", {class:"section-head", text: res["medical-section"]}));
+        const content = makeElem("div", {class:"section-content"});
+        sec.appendChild(content);
+
+        function createBinaryPillGroup(labelKey, idPrefix, optionsList=[]) {
+            content.appendChild(makeElem("label", {text: res[labelKey]}));
+            const wrapper = makeElem("div", {class:"pills-box"});
+            const noPill = makeElem("button", {type:"button", class:"pill selected", id: `no-${idPrefix}`, text: res["no-"+idPrefix]});
+            const yesPill = makeElem("button", {type:"button", class:"pill", id: `yes-${idPrefix}`, text: res["other"]}); 
+            
+            const detailContainer = makeElem("div", {style:"display:none;"});
+            
+            noPill.onclick = () => { 
+                noPill.classList.add("selected"); yesPill.classList.remove("selected"); 
+                detailContainer.style.display="none"; 
+            };
+            yesPill.onclick = () => { 
+                noPill.classList.remove("selected"); yesPill.classList.add("selected"); 
+                detailContainer.style.display="block"; 
+            };
+            
+            wrapper.appendChild(noPill); wrapper.appendChild(yesPill);
+            content.appendChild(wrapper);
+
+            if(optionsList.length > 0) {
+                 const optsBox = makeElem("div", {class:"pills-box", style:"margin-left: 10px;"});
+                 optionsList.forEach(opt => {
+                     const p = makeElem("button", {type:"button", class:"pill", id:`${idPrefix}-${opt}`, text:res[opt]});
+                     p.onclick = () => p.classList.toggle("selected");
+                     optsBox.appendChild(p);
+                 });
+                 detailContainer.appendChild(optsBox);
+            }
+            detailContainer.appendChild(makeElem("input", {type:"text", id: `${idPrefix}-details`, placeholder: res["details"]}));
+            content.appendChild(detailContainer);
+        }
+
+        createBinaryPillGroup("congenital-disorder", "congenital");
+        createBinaryPillGroup("psychiatric-disorder", "psychiatric", ["autism", "adhd", "anxiety", "depression"]);
+        
+        content.appendChild(makeElem("label", {text: res["conditions"]}));
+        const chronicList = makeElem("div", {id:"chronic-list", class:"dynamic-list"});
+        content.appendChild(chronicList);
+        const addChronicBtn = makeElem("button", {type:"button", class:"btn", text: res["add"]});
+        addChronicBtn.onclick = () => addDynamicRow(chronicList, [""], ["text"], ["chronic-condition"], ["chronic-condition"]);
+        content.appendChild(addChronicBtn);
+        return sec;
+    }
+
+    // 4. DEVELOPMENT
+    function buildDevelopmentSection() {
+        const sec = makeElem("section");
+        sec.appendChild(makeElem("div", {class:"section-head", text: res["development-section"]}));
+        const content = makeElem("div", {class:"section-content"});
+        sec.appendChild(content);
+
+        content.appendChild(makeElem("div", {class:"note", text: res["milestone-note"]}));
+        
+        const grid = makeElem("div", {class:"row-flex", style:"gap:10px;"});
+        const milestones = [
+            "sit", "crawl", "stand", "walk", 
+            "babble", "first-word", "combine-words", 
+            "use-toilet"
+        ];
+        milestones.forEach(m => {
+            const item = makeElem("div", {style:"flex: 1 1 45%; border:1px solid #eee; padding:5px 10px; border-radius:8px;"});
+            item.appendChild(makeElem("label", {for:"ms-"+m, text: res[m], style:"margin-top:0;"}));
+            item.appendChild(makeElem("input", {type:"number", id:"ms-"+m, placeholder: res["unit-months"]}));
+            grid.appendChild(item);
+        });
+        content.appendChild(grid);
+
+        content.appendChild(makeElem("label", {text: res["receptive-vocab"]}));
+        content.appendChild(makeElem("input", {type:"number", id:"receptive-vocab", placeholder: res["word-example"]}));
+        content.appendChild(makeElem("label", {text: res["sample-utterance"]}));
+        content.appendChild(makeElem("textarea", {id:"sample-utterance", placeholder: res["sample-placeholder"]}));
+        return sec;
+    }
+
+    // 5. RED FLAGS & SPEECH (Updated & Expanded)
+    function buildSpeechSection() {
+        const sec = makeElem("section");
+        sec.appendChild(makeElem("div", {class:"section-head", text: res["speech-section"]}));
+        const content = makeElem("div", {class:"section-content"});
+        sec.appendChild(content);
+        
+        // --- RED FLAGS SUBSECTION ---
+        content.appendChild(makeElem("div", {class:"subsection-title", text: res["red-flags-title"]}));
+        const redFlagsGrid = makeElem("div", {class: "checkbox-grid", id: "red-flags-container"});
+        const flags = ["rf-no-babble", "rf-no-gestures", "rf-no-words", "rf-no-phrases", "rf-regression", "rf-inconsistent", "rf-eye-contact"];
+        
+        flags.forEach(f => {
+            const item = makeElem("div", {class: "checkbox-item"});
+            const chk = makeElem("input", {type: "checkbox", id: f});
+            const span = makeElem("span", {text: res[f]});
+            
+            // Toggle class for styling
+            item.onclick = (e) => {
+                if(e.target !== chk) chk.checked = !chk.checked;
+                item.classList.toggle("checked", chk.checked);
+            };
+            
+            item.appendChild(chk);
+            item.appendChild(span);
+            redFlagsGrid.appendChild(item);
+        });
+        content.appendChild(redFlagsGrid);
+
+        // --- EXPANDED SLP DOMAINS ---
+        
+        // Receptive
+        content.appendChild(makeElem("div", {class:"subsection-title", text: res["slp-receptive"]}));
+        const recRow = makeElem("div", {class: "row-flex"});
+        const recCol1 = makeElem("div", {class:"col2"});
+        recCol1.appendChild(makeElem("label", {text: res["rec-instructions"]}));
+        recCol1.appendChild(makeElem("input", {type:"text", id:"rec-instructions"}));
+        const recCol2 = makeElem("div", {class:"col2"});
+        recCol2.appendChild(makeElem("label", {text: res["rec-identify"]}));
+        recCol2.appendChild(makeElem("input", {type:"text", id:"rec-identify"}));
+        recRow.appendChild(recCol1); recRow.appendChild(recCol2);
+        content.appendChild(recRow);
+
+        // Expressive
+        content.appendChild(makeElem("div", {class:"subsection-title", text: res["slp-expressive"]}));
+        const expRow = makeElem("div", {class: "row-flex"});
+        const expCol1 = makeElem("div", {class:"col2"});
+        expCol1.appendChild(makeElem("label", {text: res["exp-vocab-size"]}));
+        expCol1.appendChild(makeElem("input", {type:"text", id:"exp-vocab-size"}));
+        const expCol2 = makeElem("div", {class:"col2"});
+        expCol2.appendChild(makeElem("label", {text: res["exp-sentence-len"]}));
+        expCol2.appendChild(makeElem("input", {type:"text", id:"exp-sentence-len"}));
+        expRow.appendChild(expCol1); expRow.appendChild(expCol2);
+        content.appendChild(expRow);
+
+        // Articulation
+        content.appendChild(makeElem("div", {class:"subsection-title", text: res["slp-articulation"]}));
+        const artRow = makeElem("div", {class: "row-flex"});
+        const artCol1 = makeElem("div", {class:"col2"});
+        artCol1.appendChild(makeElem("label", {text: res["art-intelligibility"]}));
+        artCol1.appendChild(makeElem("input", {type:"number", min:1, max:10, id:"art-intelligibility"}));
+        const artCol2 = makeElem("div", {class:"col2"});
+        artCol2.appendChild(makeElem("label", {text: res["art-concerns"]}));
+        artCol2.appendChild(makeElem("input", {type:"text", id:"art-concerns"}));
+        artRow.appendChild(artCol1); artRow.appendChild(artCol2);
+        content.appendChild(artRow);
+
+        // Fluency & Voice
+        content.appendChild(makeElem("div", {class:"subsection-title", text: res["slp-fluency"]}));
+        const fluRow = makeElem("div", {class: "row-flex"});
+        const fluCol1 = makeElem("div", {class:"col2"});
+        fluCol1.appendChild(makeElem("label", {text: res["flu-stuttering"]}));
+        fluCol1.appendChild(makeElem("input", {type:"text", id:"flu-stuttering"}));
+        const fluCol2 = makeElem("div", {class:"col2"});
+        fluCol2.appendChild(makeElem("label", {text: res["voice-quality"]}));
+        fluCol2.appendChild(makeElem("input", {type:"text", id:"voice-quality"}));
+        fluRow.appendChild(fluCol1); fluRow.appendChild(fluCol2);
+        content.appendChild(fluRow);
+        
+        // Feeding
+        content.appendChild(makeElem("div", {class:"subsection-title", text: res["slp-feeding"]}));
+        const feedRow = makeElem("div", {class: "row-flex"});
+        const feedCol1 = makeElem("div", {class:"col2"});
+        feedCol1.appendChild(makeElem("label", {text: res["feed-texture"]}));
+        feedCol1.appendChild(makeElem("input", {type:"text", id:"feed-texture"}));
+        const feedCol2 = makeElem("div", {class:"col2"});
+        feedCol2.appendChild(makeElem("label", {text: res["feed-choking"]}));
+        feedCol2.appendChild(makeElem("input", {type:"text", id:"feed-choking"}));
+        feedRow.appendChild(feedCol1); feedRow.appendChild(feedCol2);
+        content.appendChild(feedRow);
+
+        // General Concerns
+        content.appendChild(makeElem("div", {class:"subsection-title", text: res["general-section"]}));
+        content.appendChild(makeElem("label", {text: res["describe-concern"]}));
+        content.appendChild(makeElem("textarea", {id:"describe-concern"}));
+
+        // Interaction Style Pills
+        content.appendChild(makeElem("label", {text: res["interaction"]}));
+        const interactBox = makeElem("div", {class:"pills-box", id:"interact-pills"});
+        ["friendly", "shy", "reserved", "aggressive", "other-interaction"].forEach(k => {
+            const p = makeElem("button", {type:"button", class:"pill", "data-value":k, text:res[k]});
+            p.onclick = () => p.classList.toggle("selected");
+            interactBox.appendChild(p);
+        });
+        content.appendChild(interactBox);
+
+        // Services
+        content.appendChild(makeElem("label", {text: res["previous-services"]}));
+        const servList = makeElem("div", {id:"services-list", class:"dynamic-list"});
+        content.appendChild(servList);
+        const addServBtn = makeElem("button", {type:"button", class:"btn", text: res["add"]});
+        addServBtn.onclick = () => addServiceRow(servList);
+        content.appendChild(addServBtn);
+
+        content.appendChild(makeElem("label", {text: res["add-notes"]}));
+        content.appendChild(makeElem("textarea", {id:"additional-notes", placeholder: res["notes-placeholder"]}));
+
+        return sec;
+    }
+
+    // ==== MAIN RENDER ====
+    function renderForm() {
+      const form = document.getElementById("case-form");
+      form.innerHTML = "";
+      form.appendChild(buildGeneralSection());
+      form.appendChild(buildPrenatalSection());
+      form.appendChild(buildMedicalSection());
+      form.appendChild(buildDevelopmentSection());
+      form.appendChild(buildSpeechSection());
+    }
+
+    // ==== EXPORT FUNCTIONALITY ====
+    document.getElementById("export-txt").onclick = function() {
+        const lines = [];
+        const t = (k) => res[k] || k;
+        const v = (id) => getVal(id);
+        
+        lines.push("=== " + t("form-title") + " ===");
+        lines.push("Date: " + new Date().toLocaleDateString());
+        lines.push("Child: " + v("child-name"));
+        lines.push("DOB: " + v("dob") + " (" + document.getElementById("chron-age").textContent + ")");
+        lines.push("");
+
+        // Generic collection helper
+        const collect = (label, val) => { if(val && val!=="" && val!=="—") lines.push(t(label) + ": " + val); };
+        
+        collect("address", v("address"));
+        collect("mother-phone", v("mother-phone"));
+        collect("father-phone", v("father-phone"));
+        collect("live-with", getDynamicListValues("withwhom-list").join(", "));
+        collect("languages", v("lang-home") + " / " + v("lang-school"));
+        collect("with-whom", getSelectedPills("spendwith-pills"));
+        
+        lines.push("\n--- " + t("prenatal-section") + " ---");
+        const pregHealth = [];
+        if(isPillSelected("preg-normal-pill")) pregHealth.push(t("preg-normal"));
+        ["illnesses","accidents","medications"].forEach(k => { if(isPillSelected("preg-"+k+"-pill")) pregHealth.push(t(k) + ": " + v("preg-"+k+"-txt")); });
+        collect("pregnancy-health", pregHealth.join("; "));
+        
+        lines.push("\n--- " + t("medical-section") + " ---");
+        const psych = [];
+        ["autism","adhd","anxiety","depression"].forEach(k => { if(isPillSelected("psychiatric-"+k)) psych.push(t(k)); });
+        if(v("psychiatric-details")) psych.push(v("psychiatric-details"));
+        collect("psychiatric-disorder", psych.join(", "));
+        collect("conditions", getDynamicListValues("chronic-list").join("; "));
+
+        lines.push("\n--- " + t("speech-section") + " ---");
+        
+        // Red Flags Export
+        const redFlags = getCheckedBoxes("red-flags-container");
+        if(redFlags) lines.push(t("red-flags-title") + ": " + redFlags);
+        
+        // Detailed SLP Export
+        collect("rec-instructions", v("rec-instructions"));
+        collect("rec-identify", v("rec-identify"));
+        collect("exp-vocab-size", v("exp-vocab-size"));
+        collect("exp-sentence-len", v("exp-sentence-len"));
+        collect("art-intelligibility", v("art-intelligibility"));
+        collect("art-concerns", v("art-concerns"));
+        collect("flu-stuttering", v("flu-stuttering"));
+        collect("voice-quality", v("voice-quality"));
+        collect("feed-texture", v("feed-texture"));
+        collect("feed-choking", v("feed-choking"));
+
+        collect("describe-concern", v("describe-concern"));
+        
+        lines.push("\n" + t("addendum") + new Date().toLocaleDateString());
+        
+        const blob = new Blob([lines.join("\n")], {type: "text/plain;charset=utf-8"});
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "CaseHistory_" + (v("child-name") || "Child") + ".txt";
+        link.click();
+    };
+
+    document.getElementById("btn-print").onclick = function() {
+        window.print();
+    };
+
+    // Initialize
+    window.onload = function() {
+        loadLanguage("en");
+    };
+
+  </script>
 </body>
 </html>
