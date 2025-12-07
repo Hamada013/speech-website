@@ -3,165 +3,941 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>استبيان التوحد M-CHAT</title>
-  <link rel="stylesheet" href="style.css">
+  <title>M-CHAT-R/F Professional Screening</title>
+  <style>
+    /* --- CSS VARIABLES & RESET --- */
+    :root {
+      --primary: #43a6f8;       /* Baby Blue */
+      --primary-dark: #207bbb;  /* Darker Blue for text */
+      --primary-soft: #eef7ff;  /* Backgrounds */
+      --text: #334155;          /* Slate Grey */
+      --text-light: #64748b;
+      --bg: #f8fafc;
+      --white: #ffffff;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --success: #10b981;
+      --success-light: #f0fdf4;
+      --warning: #f59e0b;
+      --warning-light: #fffbeb;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --font: "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 30px 20px;
+    }
+
+    /* --- APP CONTAINER --- */
+    .app-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* --- HEADER --- */
+    .header {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+      text-align: center;
+      position: relative;
+    }
+
+    .header h1 { margin: 0; color: var(--primary-dark); font-size: 1.8rem; }
+    .subtitle { margin: 4px 0 0; color: var(--text-light); font-size: 0.95rem; }
+
+    /* Lang Toggle */
+    .lang-toggle {
+      display: inline-flex;
+      background: var(--primary-soft);
+      padding: 4px;
+      border-radius: 50px;
+      cursor: pointer;
+      position: relative;
+      border: 1px solid var(--primary);
+    }
+    .lang-opt {
+      padding: 6px 24px;
+      z-index: 2;
+      font-weight: 700;
+      color: var(--primary-dark);
+      font-size: 0.9rem;
+      transition: color 0.3s;
+    }
+    .lang-opt.active { color: white; }
+    .slider {
+      position: absolute;
+      top: 3px; bottom: 3px;
+      width: 50%;
+      background: var(--primary);
+      border-radius: 50px;
+      transition: transform 0.3s ease;
+      z-index: 1;
+    }
+    /* LTR Support */
+    html[dir="ltr"] .slider { left: 3px; transform: translateX(0); }
+    html[dir="ltr"] .lang-toggle.ar-active .slider { transform: translateX(100%); }
+    /* RTL Support */
+    html[dir="rtl"] .slider { right: 3px; transform: translateX(0); }
+    html[dir="rtl"] .lang-toggle.en-active .slider { transform: translateX(-100%); }
+
+    /* --- SECTIONS --- */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 2px solid var(--primary-soft);
+      padding-bottom: 10px;
+    }
+
+    /* --- INPUTS --- */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 0.9rem; font-weight: 600; color: var(--text-light); }
+    .form-group input {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1rem;
+      background: #fdfdfd;
+      transition: all 0.2s;
+    }
+    .form-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 166, 248, 0.15);
+      outline: none;
+      background: white;
+    }
+
+    /* --- QUESTION LIST --- */
+    .q-item {
+      padding: 18px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    .q-item:last-child { border-bottom: none; }
+    .q-item:hover { background: #fafcff; }
+
+    .q-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .q-content { flex: 1; }
+    .q-num {
+      display: inline-block;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+    }
+    .q-text { font-size: 1.05rem; font-weight: 600; color: var(--text); line-height: 1.5; }
+    
+    .q-info-btn {
+      background: none; border: none; color: var(--text-light);
+      cursor: pointer; font-size: 0.9rem; display: inline-flex; 
+      align-items: center; gap: 4px; margin-top: 5px;
+      padding: 4px 8px; border-radius: 4px; transition: background 0.2s;
+    }
+    .q-info-btn:hover { background: var(--border); color: var(--text); }
+
+    .q-info-panel {
+      margin-top: 10px;
+      padding: 12px;
+      background: var(--primary-soft);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: var(--primary-dark);
+      display: none;
+      border: 1px solid #dbeafe;
+    }
+    .q-info-panel.show { display: block; animation: slideDown 0.2s ease-out; }
+
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Buttons */
+    .btn-group { display: flex; gap: 8px; flex-shrink: 0; }
+    .choice-btn {
+      padding: 8px 20px;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text-light);
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.2s;
+      min-width: 70px;
+    }
+    .choice-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
+    
+    .choice-btn.selected-yes { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(67, 166, 248, 0.3); }
+    .choice-btn.selected-no { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(67, 166, 248, 0.3); }
+
+    /* --- RESULTS DASHBOARD --- */
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .metric-box {
+      background: var(--bg);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    .metric-val { font-size: 2.5rem; font-weight: 800; color: var(--primary-dark); line-height: 1; margin-bottom: 5px; }
+    .metric-lbl { font-size: 0.9rem; color: var(--text-light); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .risk-banner {
+      grid-column: 1 / -1;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      border: 2px solid transparent;
+    }
+    .risk-low { background: var(--success-light); color: var(--success); border-color: var(--success); }
+    .risk-med { background: var(--warning-light); color: var(--warning); border-color: var(--warning); }
+    .risk-high { background: var(--danger-light); color: var(--danger); border-color: var(--danger); }
+
+    /* --- ACTION BAR --- */
+    .action-bar {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 14px 28px;
+      border-radius: 50px;
+      border: none;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-dark { background: var(--text); color: white; }
+    .btn-outline { background: white; border: 2px solid var(--border); color: var(--text); }
+
+    /* --- FOOTER --- */
+    .app-footer {
+      text-align: center;
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--border);
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+    .contact-line { font-weight: 500; color: var(--text); margin-bottom: 5px; }
+
+    /* --- PRINT REPORT CONTAINER (Hidden by default) --- */
+    #print-report { display: none; }
+
+    /* =========================================
+       PRINT STYLES (PDF Generation Layout)
+    ========================================= */
+    @media print {
+      /* Force removal of browser header/footer (URL, Date, Page Info) */
+      @page {
+        margin: 0;
+        size: auto;
+      }
+
+      body { 
+        background: white; 
+        padding: 0; 
+        margin: 0; 
+        font-size: 12pt; 
+        color: black; 
+        -webkit-print-color-adjust: exact;
+      }
+      
+      /* Hide App Interface */
+      .app-container, .modal-overlay { display: none !important; }
+
+      /* Show Print Report with custom margins */
+      #print-report { 
+        display: block; 
+        width: 100%; 
+        max-width: 100%; 
+        padding: 15mm 20mm; /* Replaces the removed page margins */
+      }
+
+      /* Print Layout Components */
+      .print-header {
+        border-bottom: 2px solid #000;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+      .print-title { font-size: 24pt; font-weight: bold; margin: 0; color: #000; }
+      .print-subtitle { font-size: 12pt; font-style: italic; color: #444; margin: 5px 0 0; }
+      
+      .print-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 25px;
+        padding: 15px;
+        background: #f9f9f9; /* Light grey for paper contrast */
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      .print-meta-item { display: flex; gap: 10px; }
+      .print-meta-label { font-weight: bold; min-width: 100px; }
+
+      .print-score-box {
+        border: 2px solid #000;
+        padding: 15px;
+        margin-bottom: 25px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        background: #eee;
+        border-radius: 8px;
+      }
+      .print-score-item { text-align: center; }
+      .print-score-val { font-size: 18pt; font-weight: bold; display: block; }
+
+      .print-section { margin-bottom: 25px; }
+      .print-section-title {
+        font-size: 14pt;
+        font-weight: bold;
+        border-bottom: 1px solid #000;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        text-transform: uppercase;
+      }
+      
+      .print-table { width: 100%; border-collapse: collapse; font-size: 11pt; }
+      .print-table th { text-align: left; border-bottom: 1px solid #000; padding: 5px; }
+      .print-table td { border-bottom: 1px dotted #ccc; padding: 6px 5px; vertical-align: top; }
+      
+      /* RTL Print Adjustments */
+      html[dir="rtl"] .print-header { flex-direction: row-reverse; }
+      html[dir="rtl"] .print-table th { text-align: right; }
+      html[dir="rtl"] .print-meta-item { flex-direction: row; }
+
+      .print-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0; 
+        right: 0;
+        border-top: 1px solid #000;
+        padding-top: 10px;
+        text-align: center;
+        font-size: 10pt;
+        background: white;
+      }
+      
+      /* Status Badges for Print */
+      .status-pass { font-weight: bold; color: #000; }
+      .status-fail { font-weight: bold; color: #000; text-decoration: underline; }
+    }
+  </style>
 </head>
 <body>
-  <div class="wrap">
-    <!-- HEADER -->
+
+  <!-- === WEB APP INTERFACE === -->
+  <div class="app-container">
+    
+    <!-- Header -->
     <header class="header">
-      <div class="header-left">
-        <img src="../../../images/logo.png" alt="شعار" class="logo">
-        <div class="header-text">
-          <h1>قائمة الملاحظة الأولية للأطفال</h1>
-          <p class="subtitle">أداة للأطفال من 16 إلى 30 شهرًا — للاستخدام كأداة فرز أولية وليست للتشخيص</p>
-        </div>
+      <div>
+        <h1 id="app-title">M-CHAT-R/F Screening</h1>
+        <p class="subtitle" id="app-subtitle">Modified Checklist for Autism in Toddlers, Revised</p>
       </div>
-      <button id="infoBtn" class="btn info-btn">معلومة حول الفحص</button>
+      <div class="lang-toggle" id="langToggle">
+        <span class="slider"></span>
+        <span class="lang-opt" data-lang="ar">العربية</span>
+        <span class="lang-opt active" data-lang="en">English</span>
+      </div>
     </header>
 
-    <!-- PERSONAL INFO -->
-    <section class="card meta-card">
-      <h2 class="section-title">المعلومات التعريفية</h2>
+    <!-- Info Form -->
+    <section class="card">
+      <h3 class="card-title"><span id="meta-title">Child & Clinician Info</span></h3>
       <div class="meta-grid">
-        <div class="meta-field">
-          <label for="childName">اسم الطفل / المعرف</label>
-          <input id="childName" type="text" placeholder="اختياري — يظهر في التقرير">
+        <div class="form-group">
+          <label id="lbl-child" for="childName">Child Name</label>
+          <input type="text" id="childName">
         </div>
-        <div class="meta-field">
-          <label for="clinicianName">اسم الفاحص</label>
-          <input id="clinicianName" type="text" placeholder="مثلاً: SLP. أحمد غانم">
+        <div class="form-group">
+          <label id="lbl-clinician" for="clinicianName">Clinician Name</label>
+          <input type="text" id="clinicianName">
         </div>
-        <div class="meta-field">
-          <label for="examDate">تاريخ الفحص</label>
-          <input id="examDate" type="date">
+        <div class="form-group">
+          <label id="lbl-date" for="examDate">Assessment Date</label>
+          <input type="date" id="examDate">
         </div>
       </div>
     </section>
 
-
-
-    <section class="card questions-card" id="questionsCard">
-      <div class="card-header">
-        <h2>الإرشادات:</h2>
-        <p>اضغط على "نعم" أو "لا" لكل بند. اضغط على السؤال نفسه لعرض وصف قصير ومثال. النتيجة تُحدث تلقائياً. إذا تركت بنداً بدون إجابة لا يُحتسب.</p>
-      </div>
-
-      <div id="questionsList" class="questions-list" aria-live="polite">
-        <!-- يُملأ من script.js -->
+    <!-- Questions -->
+    <section class="card">
+      <h3 class="card-title"><span id="q-title">Screening Questions</span></h3>
+      <div id="questions-list">
+        <!-- Rendered by JS -->
       </div>
     </section>
 
-    <section class="card results-card" id="resultsCard" aria-live="polite">
-      <div class="result-grid">
-        <div>
-          <div class="label">الدرجة الكمية</div>
-          <div id="totalScore" class="big">-</div>
+    <!-- Results (Hidden until complete) -->
+    <section class="card" id="results-card" style="display:none;">
+      <h3 class="card-title"><span id="res-title">Results Analysis</span></h3>
+      <div class="dashboard">
+        <div class="metric-box">
+          <div class="metric-val" id="disp-total">0</div>
+          <div class="metric-lbl" id="lbl-total">Total Score</div>
         </div>
-        <div>
-          <div class="label">الدرجة الحرجة</div>
-          <div id="criticalScore" class="big">-</div>
+        <div class="metric-box">
+          <div class="metric-val" id="disp-crit">0/6</div>
+          <div class="metric-lbl" id="lbl-crit">Critical Items</div>
         </div>
-        <div class="interpretation-area">
-          <div class="label">التفسير السريري الموجز</div>
-          <div id="interpretation" class="interp">-</div>
+        <div class="risk-banner" id="disp-risk">
+          --
         </div>
-      </div>
-      <div class="result-actions">
-        <button id="resetBtn" class="btn">إعادة تعيين</button>
-        <button id="downloadBtn" class="btn primary">تنزيل التقرير (نص)</button>
       </div>
     </section>
 
-    <section class="card report-card">
-      <h3>تقرير نصي جاهز</h3>
-      <textarea id="reportArea" rows="8" readonly placeholder="اضغط تنزيل أو غيّر الإجابات لتحديث التقرير"></textarea>
-    </section>
+    <!-- Actions -->
+    <div class="action-bar">
+      <button class="btn btn-outline" id="btn-reset">Reset</button>
+      <button class="btn btn-primary" id="btn-txt">TXT</button>
+      <button class="btn btn-dark" id="btn-print">PDF</button>
+    </div>
 
-  </main>
-<!-- Info modal (hidden) -->
-<div id="overlay" class="overlay hidden" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    
-    <h3 id="modalTitle">معلومة حول التصحيح والعناصر الحرجة</h3>
-    
-    <div class="modal-body">
+    <!-- Web Footer -->
+    <footer class="app-footer">
+      <div class="contact-line">Ahmad Ghanem | Speech-Language Pathologist</div>
+      <div>Email: SLP.AhmadGhanem@gmail.com | WhatsApp: +963988451245</div>
+      <div style="margin-top:8px; font-size:0.8rem; opacity:0.7;">Based on M-CHAT-R/F™ © 2009 Robins, Fein, & Barton</div>
+    </footer>
+  </div>
 
-      <!-- Intro paragraph -->
-      <p>
-        هذا الاختبار هو أداة فحص أولية لفرز احتمالية وجود صعوبات تطورية.  
-        كل بند يُحتسب كـ "طبيعي" أو "غير طبيعي" بناءً على الإجابة.  
-        الإجابة غير الطبيعية تعني وجود سلوك أو نقص مهاري يتطلب متابعة أو تقييم أعمق.
-      </p>
+  <!-- === HIDDEN PRINT REPORT (For PDF) === -->
+  <div id="print-report">
+    <div class="print-header">
+      <div>
+        <h1 class="print-title" id="p-title">M-CHAT-R/F Report</h1>
+        <p class="print-subtitle">Screening Report for Autism Risk</p>
+      </div>
+      <div style="text-align: right; font-size:0.9rem;">
+        <div id="p-clinician">Clinician: -</div>
+        <div id="p-date">Date: -</div>
+      </div>
+    </div>
 
-      <!-- Spacer -->
-      <div class="spacer"></div>
+    <div class="print-meta">
+      <div class="print-meta-item">
+        <span class="print-meta-label" id="p-lbl-child">Child Name:</span>
+        <span id="p-child-val">-</span>
+      </div>
+      <div class="print-meta-item">
+        <span class="print-meta-label" id="p-lbl-dob">DOB / Age:</span>
+        <span>__</span>
+      </div>
+    </div>
 
-      <!-- List of key points -->
-      <ul>
-        <li>
-          العناصر الحرجة المدرجة أدناه هي مؤشرات قوية؛  
-          وجود <strong>عنصرين حرجيين أو أكثر</strong> بإجابات غير طبيعية  
-          يوصي بالإحالة الفورية لتقييم تشخيصي.
-        </li>
-        <div class="spacer"></div>
-        <li>
-          الدرجة الكمية مهمة لكنها لا تغني عن التقدير السريري:  
-          يجب على الفاحص تقييم الطفل سريريًا مع استخدام المعلومات المستمدة من تاريخ النمو والملاحظات المباشرة.
-          <p>الفشل على 5 فقرات من القائمة ككل يعني ضرورة إجراء تقييم شامل للتوحد.</p>
-        </li>
-        <div class="spacer"></div>
-        <li>
-          خريطة "غير الطبيعي" الموجودة بالجدول توضّح أي إجابة تُحتسب كإشارة خطر لكل بند.
-        </li>
-      </ul>
+    <div class="print-score-box">
+      <div class="print-score-item">
+        <span class="print-score-val" id="p-score-total">-</span>
+        <span id="p-lbl-total">Total Score</span>
+      </div>
+      <div class="print-score-item">
+        <span class="print-score-val" id="p-score-risk">-</span>
+        <span id="p-lbl-risk">Risk Level</span>
+      </div>
+    </div>
 
-      <div class="spacer"></div>
-
-      <!-- Table for dynamic data -->
-      <table class="modal-table" aria-describedby="modalTitle">
+    <!-- Group 1: Critical Items -->
+    <div class="print-section">
+      <div class="print-section-title" id="p-sec-critical">1. Critical Items Analysis</div>
+      <table class="print-table">
         <thead>
-          <tr>
-            <th>رقم</th>
-            <th>السؤال</th>
-            <th>تُعد غير طبيعية إذا</th>
-            <th>حرجة</th>
-          </tr>
+          <tr><th style="width:5%">#</th><th>Question</th><th style="width:15%">Status</th></tr>
         </thead>
-        <tbody id="modalTableBody">
-          <!-- يتم تعبئة الأسطر ديناميكياً عبر JavaScript -->
-        </tbody>
+        <tbody id="p-body-critical"></tbody>
       </table>
-
-      <div class="spacer"></div>
-
-      <!-- Acknowledgment -->
-      <div class="acknowledgment">
-        <p>
-          تم تطوير هذه القائمة من قبل روبينز وفيين وبارتون وجريين (2001)  
-          وتم تعريبها من قبل الدكتور محمود رشاد (الجمهورية العربية المصرية)  
-          دبلوم الاضطرابات السلوكية والنفسية — مؤسسة تنامي ترين — المحور 3 — د. شوقي غانم.
-        </p>
-      </div>
-
     </div>
 
-    <!-- Footer button -->
-    <div class="modal-foot">
-      <button id="closeModal" class="btn">إغلاق</button>
+    <!-- Group 2: Failed Items -->
+    <div class="print-section">
+      <div class="print-section-title" id="p-sec-failed">2. Other Failed Questions</div>
+      <div id="p-body-failed">
+        <!-- Content or "None" -->
+      </div>
     </div>
 
-  </div>
-</div>
-
-
+    <!-- Group 3: Passed Items -->
+    <div class="print-section">
+      <div class="print-section-title" id="p-sec-passed">3. Passed Questions</div>
+      <div id="p-body-passed">
+        <!-- Content -->
       </div>
-      <div class="modal-foot">
-        <button id="closeModal" class="btn">إغلاق</button>
-      </div>
+    </div>
+
+    <div class="print-footer">
+      Ahmad Ghanem | SLP.AhmadGhanem@gmail.com | +963988451245
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    // --- CONFIG & DATA ---
+    const ATYPICAL_MAP = {
+      1: 'no', 2: 'no', 3: 'no', 4: 'no', 5: 'no', 6: 'no', 7: 'no', 8: 'no',
+      9: 'no', 10: 'no', 11: 'yes', 12: 'no', 13: 'no', 14: 'no', 15: 'no',
+      16: 'no', 17: 'no', 18: 'yes', 19: 'no', 20: 'yes', 21: 'no', 22: 'yes', 23: 'no'
+    };
+    const CRITICAL_ITEMS = new Set([2,7,9,13,14,15]);
+
+    const LANG = {
+      en: {
+        appTitle: "M-CHAT-R/F Screening",
+        appSubtitle: "Modified Checklist for Autism in Toddlers, Revised",
+        metaTitle: "Child & Clinician Info",
+        lblChild: "Child Name",
+        lblClinician: "Clinician",
+        lblDate: "Date",
+        qTitle: "Screening Questions",
+        resTitle: "Results Analysis",
+        lblTotal: "Total Score",
+        lblCrit: "Critical Items",
+        riskLow: "Low Risk",
+        riskMed: "Medium Risk",
+        riskHigh: "High Risk",
+        btnReset: "Reset",
+        btnTxt: "TXT",
+        btnPrint: "PDF",
+        yes: "Yes",
+        no: "No",
+        pass: "PASS",
+        fail: "FAIL",
+        secCritical: "1. Critical Items Analysis",
+        secFailed: "2. Other Failed Questions",
+        secPassed: "3. Passed Questions",
+        none: "None",
+        infoLabel: "Clinical Info",
+        // Questions
+        qs: [
+        "1. Does your child enjoy being swung on your knee?",
+        "2. Is your child interested in other children?",
+        "3. Does your child like climbing on things (e.g. stairs)?",
+        "4. Does your child enjoy playing peek-a-boo?",
+        "5. Does your child pretend (e.g. talk on phone, feed dolls)?",
+        "6. Does your child use their index finger to point to ask for something?",
+        "7. Does your child use their index finger to point to indicate interest?",
+        "8. Does your child play properly with small toys (cars, blocks)?",
+        "9. Does your child bring things to you to show you something?",
+        "10. Can your child look you in the eye for more than a second?",
+        "11. Does your child seem sensitive to noise (e.g. covers ears)?",
+        "12. Does your child smile in response to your face or smile?",
+        "13. Does your child imitate you (e.g. make faces)?",
+        "14. Does your child respond/turn when you call his/her name?",
+        "15. If you point at a toy across the room, does your child look at it?",
+        "16. Does your child walk?",
+        "17. Does your child look at things you are looking at?",
+        "18. Does your child make unusual finger movements near his/her face?",
+        "19. Does your child try to attract your attention to his/her activity?",
+        "20. Have you ever wondered if your child is deaf?",
+        "21. Does your child understand what people say?",
+        "22. Does your child stare at nothing or wander with no purpose?",
+        "23. Does your child look at your face to check your reaction to new things?"
+        ],
+        descriptions: [
+        "Interactive play / Social anticipation.", "Interest in peers.", "Motor development.", "Social play.", "Imaginative play.", "Proto-imperative pointing.", "Proto-declarative pointing (Joint Attention).", "Functional play.", "Showing (Joint Attention).", "Eye contact.", "Sensory sensitivity.", "Social smiling.", "Imitation.", "Response to name.", "Responding to joint attention.", "Motor milestone.", "Following gaze.", "Stereotyped motor mannerisms.", "Sharing enjoyment.", "Hearing concern.", "Receptive language.", "Visual staring / Aimless wandering.", "Social referencing."
+        ]
+      },
+      ar: {
+        appTitle: "استبيان التوحد M-CHAT",
+        appSubtitle: "قائمة الملاحظة الأولية للأطفال (16-30 شهر)",
+        metaTitle: "معلومات الطفل والفاحص",
+        lblChild: "اسم الطفل",
+        lblClinician: "اسم الفاحص",
+        lblDate: "التاريخ",
+        qTitle: "بنود القائمة",
+        resTitle: "تحليل النتائج",
+        lblTotal: "الدرجة الكلية",
+        lblCrit: "العناصر الحرجة",
+        riskLow: "خطر منخفض",
+        riskMed: "خطر متوسط",
+        riskHigh: "خطر مرتفع",
+        btnReset: "↺ إعادة تعيين",
+        btnTxt: "⬇ تحميل نص (TXT)",
+        btnPrint: "⎙ طباعة / PDF",
+        yes: "نعم",
+        no: "لا",
+        pass: "اجتياز",
+        fail: "فشل",
+        secCritical: "1. تحليل العناصر الحرجة",
+        secFailed: "2. الأسئلة غير المجتازة (الأخرى)",
+        secPassed: "3. الأسئلة المجتازة (الطبيعية)",
+        none: "لا يوجد",
+        infoLabel: "معلومة سريرية",
+        qs: [
+        "1. هل يستمتع طفلك بالآرجحة على ركبتك أو عندما تحضنه؟",
+        "2. هل لطفلك اهتمام بالأطفال الآخرين؟",
+        "3. هل يحب طفلك التسلق على الأشياء مثل صعود الدرج؟",
+        "4. هل يستمتع طفلك بلعبة الاختباء (الغميضة)؟",
+        "5. هل يتظاهر طفلك بالحديث بالهاتف أو اللعب بالدمى؟",
+        "6. هل يستخدم طفلك سبابته للإشارة أو السؤال عن شيء؟",
+        "7. هل يستخدم طفلك سبابته للإشارة للتعبير عن اهتمامه بشيء؟",
+        "8. هل يلعب طفلك كما يجب باللعب الصغيرة (سيارات، مكعبات)؟",
+        "9. هل يحاول طفلك أن يجلب أشياء لكي يريك شيء ما؟",
+        "10. هل يمكن لطفلك أن يحدق في عينيك لاكثر من ثانية؟",
+        "11. هل يبدو طفلك حساساً للضوضاء (يغلق أذنيه)؟",
+        "12. هل يتجاوب طفلك لابتسامتك بابتسامه؟",
+        "13. هل يقلدك طفلك (وجهك أو حركاتك)؟",
+        "14. هل يستجيب الطفل عندما تناديه باسمه؟",
+        "15. عندما تشير إلى لعبة بعيدة، هل ينظر طفلك إليها؟",
+        "16. هل يمشي طفلك؟",
+        "17. هل ينظر طفلك إلى الأشياء التي تنظر إليها؟",
+        "18. هل يقوم طفلك بحركات غير اعتيادية بأصبعه أمام وجهه؟",
+        "19. هل يحاول طفلك جذب انتباهك إلى ما يفعله؟",
+        "20. هل تساءلت يوما إذا كان طفلك أصم (لايسمع)؟",
+        "21. هل يفهم طفلك مايقوله الآخرون؟",
+        "22. هل يحدق طفلك أحيانا في الفراغ أو يتجول بدون هدف؟",
+        "23. هل ينظر طفلك إلى وجهك لمعرفة ردة فعلك تجاه الأشياء الجديدة؟"
+        ],
+        descriptions: [
+        "التفاعل الجسدي.", "الاهتمام الاجتماعي.", "اللعب الحركي.", "اللعب الاجتماعي.", "اللعب التظاهري.", "طلب الاحتياجات.", "الانتباه المشترك.", "اللعب الوظيفي.", "المشاركة.", "التواصل البصري.", "المعالجة الحسية.", "الابتسام الاجتماعي.", "التقليد.", "الاستجابة للاسم.", "تتبع الإشارة.", "المشي.", "تتبع النظر.", "حركات نمطية.", "جذب الانتباه.", "السمع.", "اللغة الاستقبالية.", "السرحان.", "المرجعية الاجتماعية."
+        ]
+      }
+    };
+
+    // --- STATE ---
+    let currentLang = 'en';
+    const answers = new Array(24).fill(null); 
+
+    // --- INITIALIZATION ---
+    window.onload = function() {
+      // Set Date
+      document.getElementById('examDate').valueAsDate = new Date();
+      
+      // Render
+      renderApp();
+      
+      // Events
+      document.getElementById('langToggle').addEventListener('click', toggleLanguage);
+      document.getElementById('btn-reset').addEventListener('click', resetApp);
+      document.getElementById('btn-print').addEventListener('click', printReport);
+      document.getElementById('btn-txt').addEventListener('click', downloadTxt);
+    };
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'en' ? 'ar' : 'en';
+      renderApp();
+    }
+
+    function renderApp() {
+      const txt = LANG[currentLang];
+      const isRtl = currentLang === 'ar';
+      
+      document.documentElement.lang = currentLang;
+      document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+
+      // Toggle Switch UI
+      const toggle = document.getElementById('langToggle');
+      toggle.classList.toggle('ar-active', isRtl);
+      toggle.classList.toggle('en-active', !isRtl);
+      toggle.querySelector('[data-lang="ar"]').classList.toggle('active', isRtl);
+      toggle.querySelector('[data-lang="en"]').classList.toggle('active', !isRtl);
+
+      // Labels
+      document.getElementById('app-title').textContent = txt.appTitle;
+      document.getElementById('app-subtitle').textContent = txt.appSubtitle;
+      document.getElementById('meta-title').textContent = txt.metaTitle;
+      document.getElementById('lbl-child').textContent = txt.lblChild;
+      document.getElementById('lbl-clinician').textContent = txt.lblClinician;
+      document.getElementById('lbl-date').textContent = txt.lblDate;
+      document.getElementById('q-title').textContent = txt.qTitle;
+      document.getElementById('res-title').textContent = txt.resTitle;
+      document.getElementById('lbl-total').textContent = txt.lblTotal;
+      document.getElementById('lbl-crit').textContent = txt.lblCrit;
+      document.getElementById('btn-reset').textContent = txt.btnReset;
+      document.getElementById('btn-txt').textContent = txt.btnTxt;
+      document.getElementById('btn-print').textContent = txt.btnPrint;
+
+      renderQuestionsList();
+      calculateResults();
+    }
+
+    function renderQuestionsList() {
+      const list = document.getElementById('questions-list');
+      list.innerHTML = '';
+      const txt = LANG[currentLang];
+
+      txt.qs.forEach((q, i) => {
+        const idx = i + 1;
+        const div = document.createElement('div');
+        div.className = 'q-item';
+        const isYes = answers[idx] === 'yes';
+        const isNo = answers[idx] === 'no';
+
+        div.innerHTML = `
+          <div class="q-header">
+            <div class="q-content">
+              <span class="q-num">Q${idx}</span>
+              <div class="q-text">${q}</div>
+              <button class="q-info-btn" onclick="toggleInfo(${idx})">
+                <span>?</span> ${txt.infoLabel}
+              </button>
+              <div class="q-info-panel" id="info-${idx}">${txt.descriptions[i]}</div>
+            </div>
+            <div class="btn-group">
+              <button class="choice-btn ${isYes ? 'selected-yes' : ''}" onclick="setAns(${idx}, 'yes')">${txt.yes}</button>
+              <button class="choice-btn ${isNo ? 'selected-no' : ''}" onclick="setAns(${idx}, 'no')">${txt.no}</button>
+            </div>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function toggleInfo(idx) {
+      const p = document.getElementById(`info-${idx}`);
+      p.classList.toggle('show');
+    }
+
+    window.setAns = function(idx, val) {
+      answers[idx] = val;
+      renderQuestionsList(); // Re-render to update selected classes
+      calculateResults();
+    }
+
+    function resetApp() {
+      if(confirm('Reset all data?')) {
+        answers.fill(null);
+        document.getElementById('childName').value = "";
+        document.getElementById('clinicianName').value = "";
+        renderApp();
+      }
+    }
+
+    // --- CALCULATIONS ---
+    function getResultsData() {
+      let total = 0;
+      let critical = 0;
+      let passedList = [];
+      let failedList = [];
+      let criticalList = [];
+      let allAnswered = true;
+
+      for(let i=1; i<=23; i++) {
+        const ans = answers[i];
+        if(!ans) { allAnswered = false; continue; }
+
+        const failVal = ATYPICAL_MAP[i]; // 'no' usually means fail
+        const isFail = (ans === failVal);
+        const isCrit = CRITICAL_ITEMS.has(i);
+
+        const itemObj = { id: i, text: LANG[currentLang].qs[i-1], answer: ans, status: isFail ? 'FAIL' : 'PASS' };
+
+        if(isFail) total++;
+        
+        if(isCrit) {
+          critical++;
+          itemObj.isCritical = true;
+          criticalList.push(itemObj);
+        } else {
+          if(isFail) failedList.push(itemObj);
+          else passedList.push(itemObj);
+        }
+      }
+
+      // Risk Logic
+      const txt = LANG[currentLang];
+      let riskStr = "";
+      let riskClass = "";
+
+      if(total <= 2) { riskStr = txt.riskLow; riskClass = "risk-low"; }
+      else if(total <= 7) { riskStr = txt.riskMed; riskClass = "risk-med"; }
+      else { riskStr = txt.riskHigh; riskClass = "risk-high"; }
+
+      // Critical override logic (>=2 criticals is high risk usually)
+      if(critical >= 2) {
+        riskStr += ` (${txt.lblCrit} >= 2)`;
+        if(total <= 7) riskClass = "risk-high";
+      }
+
+      return { total, critical, passedList, failedList, criticalList, riskStr, riskClass, allAnswered };
+    }
+
+    function calculateResults() {
+      const res = getResultsData();
+      const card = document.getElementById('results-card');
+      
+      if(!res.allAnswered && res.total === 0 && res.passedList.length === 0) {
+        card.style.display = 'none';
+        return;
+      }
+      
+      card.style.display = 'block';
+      document.getElementById('disp-total').textContent = res.total;
+      document.getElementById('disp-crit').textContent = res.critical + "/6";
+      
+      const rDiv = document.getElementById('disp-risk');
+      rDiv.textContent = res.riskStr;
+      rDiv.className = "risk-banner " + res.riskClass;
+    }
+
+    // --- PRINTING (PDF GENERATION) ---
+    function printReport() {
+      const res = getResultsData();
+      const txt = LANG[currentLang];
+      
+      // Populate Print DOM
+      document.getElementById('p-title').textContent = txt.appTitle;
+      document.getElementById('p-child-val').textContent = document.getElementById('childName').value || "-";
+      document.getElementById('p-clinician').textContent = txt.lblClinician + ": " + (document.getElementById('clinicianName').value || "-");
+      document.getElementById('p-date').textContent = txt.lblDate + ": " + document.getElementById('examDate').value;
+      
+      document.getElementById('p-lbl-child').textContent = txt.lblChild;
+      document.getElementById('p-lbl-total').textContent = txt.lblTotal;
+      document.getElementById('p-lbl-risk').textContent = "Risk Level";
+      
+      document.getElementById('p-score-total').textContent = res.total;
+      document.getElementById('p-score-risk').textContent = res.riskStr;
+
+      document.getElementById('p-sec-critical').textContent = txt.secCritical;
+      document.getElementById('p-sec-failed').textContent = txt.secFailed;
+      document.getElementById('p-sec-passed').textContent = txt.secPassed;
+
+      // Group 1: Critical Table
+      const critBody = document.getElementById('p-body-critical');
+      critBody.innerHTML = '';
+      res.criticalList.forEach(item => {
+        const row = document.createElement('tr');
+        const stClass = item.status === 'FAIL' ? 'status-fail' : 'status-pass';
+        const stText = item.status === 'FAIL' ? txt.fail : txt.pass;
+        row.innerHTML = `<td>${item.id}</td><td>${item.text}</td><td class="${stClass}">${stText}</td>`;
+        critBody.appendChild(row);
+      });
+
+      // Group 2: Other Failures
+      const failDiv = document.getElementById('p-body-failed');
+      failDiv.innerHTML = '';
+      if(res.failedList.length === 0) {
+        failDiv.textContent = txt.none;
+      } else {
+        const tbl = document.createElement('table');
+        tbl.className = "print-table";
+        res.failedList.forEach(item => {
+           tbl.innerHTML += `<tr><td style="width:5%">${item.id}</td><td>${item.text}</td><td style="width:15%" class="status-fail">${txt.fail}</td></tr>`;
+        });
+        failDiv.appendChild(tbl);
+      }
+
+      // Group 3: Passed
+      const passDiv = document.getElementById('p-body-passed');
+      passDiv.innerHTML = '';
+      if(res.passedList.length === 0) {
+        passDiv.textContent = txt.none;
+      } else {
+        const tbl = document.createElement('table');
+        tbl.className = "print-table";
+        res.passedList.forEach(item => {
+           tbl.innerHTML += `<tr><td style="width:5%">${item.id}</td><td>${item.text}</td><td style="width:15%">${txt.pass}</td></tr>`;
+        });
+        passDiv.appendChild(tbl);
+      }
+
+      // Trigger Print
+      window.print();
+    }
+
+    // --- TXT DOWNLOAD ---
+    function downloadTxt() {
+      const res = getResultsData();
+      const txt = LANG[currentLang];
+      const child = document.getElementById('childName').value || "Child";
+      
+      let lines = [];
+      lines.push("M-CHAT-R/F SCREENING REPORT");
+      lines.push("===========================");
+      lines.push(`${txt.lblChild}: ${child}`);
+      lines.push(`${txt.lblDate}: ${document.getElementById('examDate').value}`);
+      lines.push(`${txt.lblClinician}: ${document.getElementById('clinicianName').value}`);
+      lines.push("");
+      lines.push("RESULTS");
+      lines.push(`Total Score: ${res.total}`);
+      lines.push(`Critical Items Failed: ${res.criticalList.filter(x=>x.status==='FAIL').length}`);
+      lines.push(`Risk Assessment: ${res.riskStr}`);
+      lines.push("");
+      
+      lines.push(`--- ${txt.secCritical} ---`);
+      res.criticalList.forEach(x => lines.push(`[${x.status}] Q${x.id}: ${x.text}`));
+      
+      lines.push("");
+      lines.push(`--- ${txt.secFailed} ---`);
+      if(res.failedList.length === 0) lines.push(txt.none);
+      else res.failedList.forEach(x => lines.push(`[FAIL] Q${x.id}: ${x.text}`));
+      
+      lines.push("");
+      lines.push(`--- ${txt.secPassed} ---`);
+      if(res.passedList.length === 0) lines.push(txt.none);
+      else res.passedList.forEach(x => lines.push(`[PASS] Q${x.id}: ${x.text}`));
+
+      lines.push("");
+      lines.push("Generated by Ahmad Ghanem | SLP");
+      
+      const blob = new Blob([lines.join('\n')], {type: "text/plain;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `MCHAT_${child}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+  </script>
 </body>
 </html>
