@@ -1,25 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="html-root">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tools | Ahmad Ghanem SLP</title>
+    <link rel="icon" href="images/logo.png" type="image/png">
     
-    <!-- Fonts: Inter for clean readability -->
+    <!-- Fonts: Inter (English) and Noto Sans Arabic (Arabic) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS (via CDN for instant styling without build steps) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Tailwind Configuration -->
+    <!-- Tailwind Config -->
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                        arabic: ['Noto Sans Arabic', 'sans-serif'],
                     },
                     colors: {
                         primary: {
@@ -28,10 +31,6 @@
                             500: '#3b82f6',
                             600: '#2563eb',
                             700: '#1d4ed8',
-                        },
-                        accent: {
-                            light: '#e0f2fe', // sky-100
-                            main: '#0ea5e9',  // sky-500
                         }
                     }
                 }
@@ -40,38 +39,29 @@
     </script>
 
     <style>
-        /* Custom Scrollbar for the main page */
-        ::-webkit-scrollbar {
-            width: 8px;
+        /* Smooth transitions for layout changes */
+        body, .tool-card {
+            transition: all 0.3s ease-in-out;
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* Smooth card hover lift */
-        .tool-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
         .tool-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans transition-all duration-300">
 
     <!-- NAVIGATION -->
     <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
-                <!-- Logo / Brand -->
+                <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center gap-2">
                     <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
                         AG
@@ -80,15 +70,20 @@
                 </div>
 
                 <!-- Desktop Menu -->
-                <div class="hidden md:flex space-x-8">
-                    <a href="index.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
-                    <a href="forms.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Forms</a>
-                    <!-- Active Link Styling -->
-                    <a href="#" class="text-primary-700 bg-primary-50 px-3 py-2 rounded-md text-sm font-bold">Tools</a>
-                    <a href="resources.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Resources</a>
+                <div class="hidden md:flex items-center space-x-6 rtl:space-x-reverse">
+                    <a href="index.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_home">Home</a>
+                    <a href="#" class="text-primary-700 bg-primary-50 px-3 py-2 rounded-md text-sm font-bold" data-i18n="nav_tools">Tools</a>
+                    <a href="forms.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_forms">Forms</a>
+                    <a href="resources.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_resources">Resources</a>
+                    
+                    <!-- Language Switcher Button -->
+                    <button onclick="toggleLanguage()" class="flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-300 text-sm font-medium hover:bg-slate-50 hover:border-primary-500 transition-colors ml-4 rtl:mr-4">
+                        <span id="lang-icon">🌐</span>
+                        <span id="lang-text">العربية</span>
+                    </button>
                 </div>
-
-                <!-- Mobile Menu Button (Hamburger) -->
+                
+                <!-- Mobile Menu Button (Hamburger) - Added for consistency -->
                 <div class="flex items-center md:hidden">
                     <button type="button" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="text-slate-500 hover:text-slate-700 focus:outline-none p-2">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -98,36 +93,40 @@
                 </div>
             </div>
         </div>
-
+        
         <!-- Mobile Menu Dropdown -->
         <div class="hidden md:hidden bg-white border-t border-slate-100" id="mobile-menu">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="index.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-primary-600 hover:bg-slate-50">Home</a>
-                <a href="forms.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-primary-600 hover:bg-slate-50">Forms</a>
-                <a href="#" class="block px-3 py-2 rounded-md text-base font-bold text-primary-700 bg-primary-50">Tools</a>
-                <a href="resources.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-primary-600 hover:bg-slate-50">Resources</a>
+                <a href="index.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-primary-600 hover:bg-slate-50" data-i18n="nav_home">Home</a>
+                <a href="#" class="block px-3 py-2 rounded-md text-base font-bold text-primary-700 bg-primary-50" data-i18n="nav_tools">Tools</a>
+                <a href="forms.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-primary-600 hover:bg-slate-50" data-i18n="nav_forms">Forms</a>
+                <a href="resources.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-primary-600 hover:bg-slate-50" data-i18n="nav_resources">Resources</a>
+                <button onclick="toggleLanguage()" class="w-full text-left rtl:text-right mt-2 flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-primary-600 hover:bg-slate-50 border border-slate-300">
+                    <span>🌐</span>
+                    <span id="lang-text-mobile">العربية</span>
+                </button>
             </div>
         </div>
     </nav>
 
-    <!-- HEADER / HERO SECTION -->
+    <!-- HERO SECTION -->
     <header class="bg-white border-b border-slate-200">
         <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
+            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-4" data-i18n="header_title">
                 Clinical Tools & Assistants
             </h1>
-            <p class="max-w-2xl mx-auto text-lg text-slate-500">
+            <p class="max-w-2xl mx-auto text-lg text-slate-500" data-i18n="header_subtitle">
                 Digital assistants, sentence builders, and calculators designed to streamline your Speech-Language Pathology practice.
             </p>
             
             <!-- Search / Filter Bar -->
             <div class="mt-8 max-w-md mx-auto relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div class="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 pl-3 rtl:pr-3 rtl:pl-0 flex items-center pointer-events-none">
                     <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                     </svg>
                 </div>
-                <input type="text" id="toolSearch" onkeyup="filterTools()" class="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-full leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm shadow-sm" placeholder="Find a tool (e.g., 'verbs', 'cards')...">
+                <input type="text" id="toolSearch" onkeyup="filterTools()" class="block w-full pl-10 pr-3 rtl:pr-10 rtl:pl-3 py-3 border border-slate-300 rounded-full leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm shadow-sm transition-all" placeholder="Find a tool (e.g., 'verbs', 'cards')...">
             </div>
         </div>
     </header>
@@ -138,8 +137,8 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="toolsGrid">
 
             <!-- Tool 1: Vocabulary Cards -->
-            <a href="voc/index.html" class="tool-card group block bg-white rounded-2xl border border-slate-200 p-6 h-full relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+            <a href="voc/index.html" class="tool-card group block bg-white rounded-2xl border border-slate-200 p-6 h-full relative overflow-hidden rtl:text-right text-left">
+                <div class="absolute top-0 right-0 rtl:left-0 rtl:right-auto w-24 h-24 bg-blue-50 rounded-bl-full rtl:rounded-br-full rtl:rounded-bl-none -mr-4 ltr:-mr-4 rtl:-ml-4 -mt-4 transition-transform group-hover:scale-110"></div>
                 <div class="relative z-10">
                     <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-4 shadow-sm">
                         <!-- Icon: Library/Cards -->
@@ -147,14 +146,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-primary-600 transition-colors">Vocabulary Cards</h3>
-                    <p class="text-sm text-slate-500 leading-relaxed">Interactive card sets tailored for different age groups to enhance lexical retrieval.</p>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-primary-600 transition-colors" data-i18n="card_voc_title">Vocabulary Cards</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed" data-i18n="card_voc_desc">Interactive card sets tailored for different age groups to enhance lexical retrieval.</p>
                 </div>
             </a>
 
             <!-- Tool 2: Sentence Builder -->
-            <a href="senb/index.html" class="tool-card group block bg-white rounded-2xl border border-slate-200 p-6 h-full relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-green-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+            <a href="senb/index.html" class="tool-card group block bg-white rounded-2xl border border-slate-200 p-6 h-full relative overflow-hidden rtl:text-right text-left">
+                <div class="absolute top-0 right-0 rtl:left-0 rtl:right-auto w-24 h-24 bg-green-50 rounded-bl-full rtl:rounded-br-full rtl:rounded-bl-none -mr-4 ltr:-mr-4 rtl:-ml-4 -mt-4 transition-transform group-hover:scale-110"></div>
                 <div class="relative z-10">
                     <div class="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center text-green-600 mb-4 shadow-sm">
                         <!-- Icon: Puzzle/Builder -->
@@ -162,14 +161,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-green-600 transition-colors">Sentence Builder</h3>
-                    <p class="text-sm text-slate-500 leading-relaxed">Visual aids to construct sentence order ranging from two to six words.</p>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-green-600 transition-colors" data-i18n="card_senb_title">Sentence Builder</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed" data-i18n="card_senb_desc">Visual aids to construct sentence order ranging from two to six words.</p>
                 </div>
             </a>
 
             <!-- Tool 3: Verbs in Use -->
-            <a href="verb/index.html" class="tool-card group block bg-white rounded-2xl border border-slate-200 p-6 h-full relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-purple-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+            <a href="verb/index.html" class="tool-card group block bg-white rounded-2xl border border-slate-200 p-6 h-full relative overflow-hidden rtl:text-right text-left">
+                <div class="absolute top-0 right-0 rtl:left-0 rtl:right-auto w-24 h-24 bg-purple-50 rounded-bl-full rtl:rounded-br-full rtl:rounded-bl-none -mr-4 ltr:-mr-4 rtl:-ml-4 -mt-4 transition-transform group-hover:scale-110"></div>
                 <div class="relative z-10">
                     <div class="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 mb-4 shadow-sm">
                         <!-- Icon: Activity/Verbs -->
@@ -177,24 +176,26 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-purple-600 transition-colors">Verbs in Use</h3>
-                    <p class="text-sm text-slate-500 leading-relaxed">Practice verb tenses and conjugations in context with visual cues.</p>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-purple-600 transition-colors" data-i18n="card_verb_title">Verbs in Use</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed" data-i18n="card_verb_desc">Practice verb tenses and conjugations in context with visual cues.</p>
                 </div>
             </a>
-            <!-- Tool 3: Verbs in Use -->
-            <a href="seq/index.html" class="tool-card group block bg-white rounded-2xl border border-slate-200 p-6 h-full relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-purple-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+            
+            <!-- Tool 4: Sequencing -->
+            <a href="seq/index.html" class="tool-card group block bg-white rounded-2xl border border-slate-200 p-6 h-full relative overflow-hidden rtl:text-right text-left">
+                <div class="absolute top-0 right-0 rtl:left-0 rtl:right-auto w-24 h-24 bg-orange-50 rounded-bl-full rtl:rounded-br-full rtl:rounded-bl-none -mr-4 ltr:-mr-4 rtl:-ml-4 -mt-4 transition-transform group-hover:scale-110"></div>
                 <div class="relative z-10">
-                    <div class="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 mb-4 shadow-sm">
-                        <!-- Icon: Activity/Verbs -->
+                    <div class="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 mb-4 shadow-sm">
+                        <!-- Icon: Activity/Sequencing -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-purple-600 transition-colors">sequencing is fun</h3>
-                    <p class="text-sm text-slate-500 leading-relaxed">Practice sequencing and steps in context with visual cues.</p>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-orange-600 transition-colors" data-i18n="card_seq_title">Sequencing is fun</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed" data-i18n="card_seq_desc">Practice sequencing and steps in context with visual cues.</p>
                 </div>
             </a>
+            
             <!-- Placeholder for Future Tool -->
             <div class="tool-card block bg-slate-50 rounded-2xl border-2 border-dashed border-slate-300 p-6 h-full flex flex-col items-center justify-center text-center opacity-70 hover:opacity-100 hover:border-slate-400 cursor-default">
                 <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-400 mb-3">
@@ -202,45 +203,45 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                 </div>
-                <h3 class="text-lg font-semibold text-slate-600">More Coming Soon</h3>
-                <p class="text-xs text-slate-400 mt-1">Articulation & Swallowing Tools</p>
+                <h3 class="text-lg font-semibold text-slate-600" data-i18n="card_coming_title">More Coming Soon</h3>
+                <p class="text-xs text-slate-400 mt-1" data-i18n="card_coming_desc">Articulation & Swallowing Tools</p>
             </div>
 
         </div>
 
         <!-- No Results Message (Hidden by default) -->
         <div id="noResults" class="hidden text-center py-12">
-            <p class="text-slate-400 text-lg">No tools found matching your search.</p>
+            <p class="text-slate-400 text-lg" data-i18n="no_results">No tools found matching your search.</p>
         </div>
 
     </main>
 
     <!-- FOOTER -->
     <footer class="bg-white border-t border-slate-200 mt-auto">
-        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
-            <div class="text-slate-400 text-sm mb-4 md:mb-0">
-                &copy; 2024 Ahmad Ghanem SLP. All rights reserved.
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mb-4">
+                <strong data-i18n="footer_questions">Questions?</strong>
+                <a href="mailto:slp.ahmadghanem@gmail.com" class="text-primary-600 hover:text-primary-800 ml-2">slp.ahmadghanem@gmail.com</a>
+                <span class="mx-2 text-slate-300">|</span>
+                <a href="tel:+963988451245" class="text-primary-600 hover:text-primary-800" dir="ltr">+963 988 451 245</a>
             </div>
-            <div class="flex space-x-6">
-                <a href="#" class="text-slate-400 hover:text-primary-500 text-sm">Privacy Policy</a>
-                <a href="#" class="text-slate-400 hover:text-primary-500 text-sm">Contact</a>
+            <div class="text-slate-400 text-sm">
+                &copy; 2024 Ahmad Ghanem SLP. <span data-i18n="footer_rights">All rights reserved.</span>
             </div>
         </div>
     </footer>
 
-    <!-- Search/Filter Logic -->
+    <!-- LOGIC: Search Filter & Language Switcher -->
     <script>
+        // 1. Search Logic
         function filterTools() {
-            // Get input value
             let input = document.getElementById('toolSearch');
             let filter = input.value.toUpperCase();
             
-            // Get grid and cards
             let grid = document.getElementById('toolsGrid');
-            let cards = grid.getElementsByTagName('a'); // Selecting the 'a' tags which are the tool cards
+            let cards = Array.from(grid.children); // Get all direct children (a tags and placeholder div)
             let hasResults = false;
 
-            // Loop through all cards
             for (let i = 0; i < cards.length; i++) {
                 let title = cards[i].getElementsByTagName("h3")[0];
                 let desc = cards[i].getElementsByTagName("p")[0];
@@ -258,6 +259,107 @@
 
             // Toggle "No Results" message
             document.getElementById('noResults').classList.toggle('hidden', hasResults);
+        }
+
+        // 2. Language Switcher Logic
+        const translations = {
+            en: {
+                nav_home: "Home",
+                nav_tools: "Tools",
+                nav_forms: "Forms",
+                nav_resources: "Resources",
+                
+                header_title: "Clinical Tools & Assistants",
+                header_subtitle: "Digital assistants, sentence builders, and calculators designed to streamline your Speech-Language Pathology practice.",
+                search_placeholder: "Find a tool (e.g., 'verbs', 'cards')...",
+                
+                card_voc_title: "Vocabulary Cards",
+                card_voc_desc: "Interactive card sets tailored for different age groups to enhance lexical retrieval.",
+                
+                card_senb_title: "Sentence Builder",
+                card_senb_desc: "Visual aids to construct sentence order ranging from two to six words.",
+                
+                card_verb_title: "Verbs in Use",
+                card_verb_desc: "Practice verb tenses and conjugations in context with visual cues.",
+                
+                card_seq_title: "Sequencing is fun",
+                card_seq_desc: "Practice sequencing and steps in context with visual cues.",
+                
+                card_coming_title: "More Coming Soon",
+                card_coming_desc: "Articulation & Swallowing Tools",
+                
+                no_results: "No tools found matching your search.",
+                footer_questions: "Questions?",
+                footer_rights: "All rights reserved."
+            },
+            ar: {
+                nav_home: "الرئيسية",
+                nav_tools: "الأدوات",
+                nav_forms: "النماذج",
+                nav_resources: "المصادر",
+                
+                header_title: "الأدوات السريرية والمساعدين",
+                header_subtitle: "مساعدون رقميون، منشئو جمل، وحاسبات مصممة لتسهيل ممارسة علاج النطق واللغة.",
+                search_placeholder: "ابحث عن أداة (مثال: 'أفعال', 'بطاقات')...",
+                
+                card_voc_title: "بطاقات المفردات",
+                card_voc_desc: "مجموعات بطاقات تفاعلية مصممة لمختلف الفئات العمرية لتعزيز استرجاع الكلمات.",
+                
+                card_senb_title: "منشئ الجمل",
+                card_senb_desc: "مساعدات بصرية لبناء ترتيب الجمل من كلمتين إلى ست كلمات.",
+                
+                card_verb_title: "الأفعال في الاستخدام",
+                card_verb_desc: "تدرب على أزمنة الأفعال وتصريفاتها في السياق مع إشارات بصرية.",
+                
+                card_seq_title: "التسلسل ممتع",
+                card_seq_desc: "تدرب على التسلسل والخطوات في السياق مع إشارات بصرية.",
+                
+                card_coming_title: "المزيد قريباً",
+                card_coming_desc: "أدوات النطق والبلع",
+                
+                no_results: "لم يتم العثور على أدوات تطابق بحثك.",
+                footer_questions: "لديك أسئلة؟",
+                footer_rights: "جميع الحقوق محفوظة."
+            }
+        };
+
+        let currentLang = 'en';
+
+        function toggleLanguage() {
+            // Toggle state
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            const isArabic = currentLang === 'ar';
+            
+            // 1. Update HTML direction and font family
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', isArabic ? 'rtl' : 'ltr');
+            
+            const body = document.body;
+            if (isArabic) {
+                body.classList.remove('font-sans');
+                body.classList.add('font-arabic');
+            } else {
+                body.classList.remove('font-arabic');
+                body.classList.add('font-sans');
+            }
+
+            // 2. Update Button Text
+            document.getElementById('lang-text').textContent = isArabic ? 'English' : 'العربية';
+            if(document.getElementById('lang-text-mobile')) {
+                document.getElementById('lang-text-mobile').textContent = isArabic ? 'English' : 'العربية';
+            }
+
+            // 3. Update Input Placeholder
+            document.getElementById('toolSearch').placeholder = translations[currentLang]['search_placeholder'];
+
+            // 4. Update All Text Content
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    el.textContent = translations[currentLang][key];
+                }
+            });
         }
     </script>
 </body>

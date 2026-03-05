@@ -1,188 +1,291 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="html-root">
 <head>
-  <meta charset="UTF-8" />
-  <title>Ahmad Ghanem, Speech-Language Pathologist</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Google Fonts -->
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&display=swap"
-  />
-  <link rel="stylesheet" href="https://hamada013.github.io/speech-website/style.css?v=1753736325" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ahmad Ghanem | Speech-Language Pathologist</title>
+    <link rel="icon" href="https://hamada013.github.io/speech-website/images/logo.png" type="image/png">
+    
+    <!-- Fonts: Inter (English) and Noto Sans Arabic (Arabic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Original Stylesheet -->
+    <link rel="stylesheet" href="https://hamada013.github.io/speech-website/style.css?v=1753736325" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        arabic: ['Noto Sans Arabic', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Smooth transitions for layout changes */
+        body, .hub-card {
+            transition: all 0.3s ease-in-out;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .hub-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* GIF Icon Styling */
+        .hub-icon-container {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            border-radius: 1rem;
+            background-color: #eff6ff;
+            overflow: hidden;
+        }
+        .hub-icon-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Override some old styles that might clash with the new Tailwind layout */
+        .homepage-main { display: none; } 
+        
+        /* Ensure modals overlay properly over Tailwind elements */
+        .modal-bg { z-index: 100; }
+    </style>
 </head>
-<body>
-  <!-- Audio elements for cat sounds -->
-  <audio id="meow1-sound" preload="auto">
-    <source src="https://hamada013.github.io/speech-website/sounds/meow1.mp3" type="audio/mpeg" />
-  </audio>
-  <audio id="meow2-sound" preload="auto">
-    <source src="https://hamada013.github.io/speech-website/sounds/meow2.mp3" type="audio/mpeg" />
-  </audio>
-  <audio id="meow3-sound" preload="auto">
-    <source src="https://hamada013.github.io/speech-website/sounds/meow3.mp3" type="audio/mpeg" />
-  </audio>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans transition-all duration-300">
 
-  <!-- Audio elements for dog sounds -->
-  <audio id="dog1-sound" preload="auto">
-    <source src="https://hamada013.github.io/speech-website/sounds/dog1.mp3" type="audio/mpeg" />
-  </audio>
-  <audio id="dog2-sound" preload="auto">
-    <source src="https://hamada013.github.io/speech-website/sounds/dog2.mp3" type="audio/mpeg" />
-  </audio>
-  <audio id="dog3-sound" preload="auto">
-    <source src="https://hamada013.github.io/speech-website/sounds/dog3.mp3" type="audio/mpeg" />
-  </audio>
+    <!-- AUDIO ELEMENTS (Preserved from original) -->
+    <audio id="meow1-sound" preload="auto"><source src="https://hamada013.github.io/speech-website/sounds/meow1.mp3" type="audio/mpeg" /></audio>
+    <audio id="meow2-sound" preload="auto"><source src="https://hamada013.github.io/speech-website/sounds/meow2.mp3" type="audio/mpeg" /></audio>
+    <audio id="meow3-sound" preload="auto"><source src="https://hamada013.github.io/speech-website/sounds/meow3.mp3" type="audio/mpeg" /></audio>
+    <audio id="dog1-sound" preload="auto"><source src="https://hamada013.github.io/speech-website/sounds/dog1.mp3" type="audio/mpeg" /></audio>
+    <audio id="dog2-sound" preload="auto"><source src="https://hamada013.github.io/speech-website/sounds/dog2.mp3" type="audio/mpeg" /></audio>
+    <audio id="dog3-sound" preload="auto"><source src="https://hamada013.github.io/speech-website/sounds/dog3.mp3" type="audio/mpeg" /></audio>
 
-  <!-- Cat GIF Display (right side) -->
-  <div
-    id="cat-gif-display"
-    class="gif-display gif-right"
-    aria-live="polite"
-    aria-atomic="true"
-    role="region"
-    aria-label="Cat animation"
-  >
-    <img id="cat-random-gif" src="" alt="Cat GIF" />
-  </div>
-
-  <!-- Dog GIF Display (left side) -->
-  <div
-    id="dog-gif-display"
-    class="gif-display gif-left"
-    aria-live="polite"
-    aria-atomic="true"
-    role="region"
-    aria-label="Dog animation"
-  >
-    <img id="dog-random-gif" src="" alt="Dog GIF" />
-  </div>
-
-  <!-- Animated background elements -->
-  <ul class="bg-bubbles">
-    <li></li>
-    <li></li>
-    <li></li>
-    <li></li>
-    <li></li>
-  </ul>
-
-  <main class="homepage-main">
-    <!-- Logo -->
-    <div class="logo-container">
-      <img src="https://hamada013.github.io/speech-website/images/logo.png" alt="Ahmad Ghanem SLP Logo" class="logo" />
+    <!-- GIF DISPLAYS (Preserved from original) -->
+    <div id="cat-gif-display" class="gif-display gif-right" aria-live="polite" aria-atomic="true" role="region" aria-label="Cat animation">
+        <img id="cat-random-gif" src="" alt="Cat GIF" />
+    </div>
+    <div id="dog-gif-display" class="gif-display gif-left" aria-live="polite" aria-atomic="true" role="region" aria-label="Dog animation">
+        <img id="dog-random-gif" src="" alt="Dog GIF" />
     </div>
 
-    <!-- Main title and subtitle -->
-    <h1 class="home-title">Ahmad Ghanem</h1>
-    <div class="subtitle">Speech-Language Pathologist</div>
-    <div class="mission">"A voice is a voice no matter how small"</div>
+    <!-- BACKGROUND BUBBLES (Preserved) -->
+    <ul class="bg-bubbles">
+        <li></li><li></li><li></li><li></li><li></li>
+    </ul>
 
-    <!-- Floating About Me Button -->
-    <button id="open-about-btn" class="about-float-btn" aria-label="About Me">?</button>
+    <!-- NAVIGATION -->
+    <nav class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-3">
+                    <img src="https://hamada013.github.io/speech-website/images/logo.png" alt="Logo" class="w-8 h-8 object-contain rounded-md" />
+                    <span class="font-bold text-xl tracking-tight text-slate-800">Ahmad Ghanem <span class="text-primary-600">SLP</span></span>
+                </div>
 
-    <!-- Main navigation buttons -->
-    <nav class="main-nav">
-      <button id="open-forms-btn" class="main-btn">Forms</button>
-      <a href="tools/tools.html" class="main-btn">Tools</a>
-      <a href="resources.html" class="main-btn">Resources</a>
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-6 rtl:space-x-reverse">
+                    <a href="#" class="text-primary-700 bg-primary-50 px-3 py-2 rounded-md text-sm font-bold transition-colors" data-i18n="nav_home">Home</a>
+                    <a href="tools/tools.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_tools">Tools</a>
+                    <a href="#" onclick="document.getElementById('open-forms-btn').click(); return false;" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_forms">Forms</a>
+                    <a href="resources.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_resources">Resources</a>
+                    
+                    <button onclick="toggleLanguage()" class="flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-300 text-sm font-medium hover:bg-slate-50 hover:border-primary-500 transition-colors ml-4 rtl:mr-4">
+                        <span id="lang-icon">🌐</span>
+                        <span id="lang-text">العربية</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </nav>
 
-    <!-- Contact and about block -->
-    <div class="about-contact">
-      <div>
-        <strong>Contact:</strong>
-        <a href="mailto:slp.ahmadghanem@gmail.com">slp.ahmadghanem@gmail.com</a>
-        &bull;
-        <a href="tel:+963988451245">+963 988 451 245</a>
-      </div>
-      <div><strong>Clinic:</strong> speech clinic</div>
-      <div style="margin-top: 0.7em; color: #789; font-size: 0.9em;">
-        &copy; <span id="year"></span> Ahmad Ghanem &ndash; All rights reserved.
-      </div>
+    <!-- HERO SECTION -->
+    <header class="relative bg-white border-b border-slate-200 overflow-hidden z-10">
+        <div class="absolute inset-0 bg-gradient-to-b from-primary-50/50 to-transparent"></div>
+        <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <div class="mb-6 flex justify-center">
+                <img src="https://hamada013.github.io/speech-website/images/logo.png" alt="Ahmad Ghanem SLP Logo" class="w-32 h-32 object-contain drop-shadow-md rounded-2xl" />
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4" data-i18n="hero_title">
+                Ahmad Ghanem
+            </h1>
+            <p class="text-xl text-primary-600 font-semibold mb-6" data-i18n="hero_subtitle">
+                Speech-Language Pathologist
+            </p>
+            <div class="inline-block bg-white px-6 py-3 rounded-full shadow-sm border border-slate-100">
+                <p class="text-slate-500 italic font-medium" data-i18n="hero_quote">
+                    "A voice is a voice no matter how small"
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <!-- CLINIC HUB (MAIN CONTENT) -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full relative z-10">
+        
+        <h2 class="text-2xl font-bold text-slate-800 mb-8 text-center" data-i18n="section_hub">Clinic Hub</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+            <!-- About Me Card -->
+            <button id="open-about-btn" class="hub-card w-full text-left bg-white rounded-2xl border border-slate-200 p-8 flex flex-col items-center text-center hover:border-primary-400 focus:outline-none">
+                <div class="hub-icon-container">
+                    <img src="images/about.gif" alt="About Me" onerror="this.src='https://hamada013.github.io/speech-website/images/about.gif'">
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2" data-i18n="card_about_title">About Me</h3>
+                <p class="text-sm text-slate-500 flex-grow" data-i18n="card_about_desc">Learn more about my practice, background, and approach to therapy.</p>
+            </button>
+
+            <!-- Forms Card -->
+            <button id="open-forms-btn" class="hub-card w-full text-left bg-white rounded-2xl border border-slate-200 p-8 flex flex-col items-center text-center hover:border-primary-400 focus:outline-none">
+                <div class="hub-icon-container">
+                    <img src="images/forms.gif" alt="Forms" onerror="this.src='https://hamada013.github.io/speech-website/images/forms.gif'">
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2" data-i18n="card_forms_title">Client Forms</h3>
+                <p class="text-sm text-slate-500 flex-grow" data-i18n="card_forms_desc">Secure access to digital assessments, adult, and child intake forms.</p>
+            </button>
+
+            <!-- Tools Card -->
+            <a href="tools/tools.html" class="hub-card block bg-white rounded-2xl border border-slate-200 p-8 flex flex-col items-center text-center hover:border-primary-400">
+                <div class="hub-icon-container">
+                    <img src="images/tools.gif" alt="Tools" onerror="this.src='https://hamada013.github.io/speech-website/images/tools.gif'">
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2" data-i18n="card_tools_title">Clinical Tools</h3>
+                <p class="text-sm text-slate-500 flex-grow" data-i18n="card_tools_desc">Interactive tools, activities, and resources for speech therapy sessions.</p>
+            </a>
+
+            <!-- Resources Card -->
+            <a href="resources.html" class="hub-card block bg-white rounded-2xl border border-slate-200 p-8 flex flex-col items-center text-center hover:border-primary-400">
+                <div class="hub-icon-container">
+                    <img src="images/resources.gif" alt="Resources" onerror="this.src='https://hamada013.github.io/speech-website/images/resources.gif'">
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2" data-i18n="card_res_title">Resources</h3>
+                <p class="text-sm text-slate-500 flex-grow" data-i18n="card_res_desc">Helpful reading materials, guides, and links for parents and professionals.</p>
+            </a>
+            
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 mt-auto relative z-10">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mb-4">
+                <strong data-i18n="footer_questions" class="text-slate-700">Questions?</strong>
+                <a href="mailto:slp.ahmadghanem@gmail.com" class="text-primary-600 hover:text-primary-800 ml-2">slp.ahmadghanem@gmail.com</a>
+                <span class="mx-2 text-slate-300">|</span>
+                <a href="tel:+963988451245" class="text-primary-600 hover:text-primary-800" dir="ltr">+963 988 451 245</a>
+            </div>
+            <div class="text-slate-500 mb-2 font-medium">Speech Clinic</div>
+            <div class="text-slate-400 text-sm">
+                &copy; <span id="year"></span> Ahmad Ghanem. <span data-i18n="footer_rights">All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODALS -->
+    <!-- Forms Password Modal -->
+    <div id="password-modal" class="modal-bg" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="password-modal-title">
+        <div class="modal-box !bg-white !rounded-2xl !shadow-2xl !p-8 !max-w-sm !text-center !border !border-slate-100 relative">
+            <h2 id="password-modal-title" class="text-2xl font-bold text-slate-800 mb-2" data-i18n="modal_pw_title">Protected Forms</h2>
+            <div class="text-slate-500 mb-6 text-sm" data-i18n="modal_pw_desc">Enter password to access client forms</div>
+            <form id="pw-modal-form" autocomplete="off" class="flex flex-col gap-3">
+                <input type="password" id="pw-modal-input" placeholder="Password" autofocus class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition-all"/>
+                <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors" data-i18n="modal_pw_btn">Unlock</button>
+            </form>
+            <div id="pw-modal-error" class="text-red-500 mt-3 text-sm hidden" data-i18n="modal_pw_err">Incorrect password. Please try again.</div>
+            <button id="pw-close-btn" type="button" class="modal-close absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-2xl font-light">&times;</button>
+        </div>
     </div>
-  </main>
 
-  <!-- Forms Password Modal -->
-  <div
-    id="password-modal"
-    class="modal-bg"
-    aria-hidden="true"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="password-modal-title"
-  >
-    <div class="modal-box">
-      <h2 id="password-modal-title" style="margin-top: 0;">Protected Forms</h2>
-      <div style="margin-bottom: 10px;">Enter password to access client forms</div>
-      <form id="pw-modal-form" autocomplete="off">
-        <input
-          type="password"
-          id="pw-modal-input"
-          placeholder="Password"
-          autofocus
-          aria-describedby="pw-modal-error"
-        />
-        <button type="submit" style="margin-top: 12px;">Unlock</button>
-      </form>
-      <div
-        id="pw-modal-error"
-        style="color: #d33; margin-top: 7px; display: none; font-size: 0.9em;"
-      >
-        Incorrect password. Please try again.
-      </div>
-      <button
-        id="pw-close-btn"
-        type="button"
-        class="modal-close"
-        title="Close"
-        aria-label="Close Password Modal"
-      >
-        &times;
-      </button>
+    <!-- About Me Modal -->
+    <div id="about-modal" class="modal-bg" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="about-modal-title">
+        <div class="modal-box !bg-white !rounded-2xl !shadow-2xl !p-8 !max-w-lg !border !border-slate-100 relative text-left rtl:text-right">
+            <h2 id="about-modal-title" class="text-2xl font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100" data-i18n="modal_about_title">About Me</h2>
+            <div class="text-slate-600 space-y-4 leading-relaxed">
+                <p data-i18n="modal_about_p1">I'm a passionate Speech-Language Pathologist (SLP) dedicated to helping children and adults discover the power of communication.</p>
+                <p data-i18n="modal_about_p2">With a focus on empathy, evidence-based practice, and personalized care, I empower my clients to overcome challenges—unlocking confidence and connection in their daily lives.</p>
+                <p data-i18n="modal_about_p3">Specializing in speech and language disorders, I bring extensive experience helping clients achieve their communication goals.</p>
+            </div>
+            <button id="about-close-btn" type="button" class="modal-close absolute top-4 right-4 rtl:left-4 rtl:right-auto text-slate-400 hover:text-slate-700 text-2xl font-light">&times;</button>
+        </div>
     </div>
-  </div>
 
-  <!-- About Me Modal -->
-  <div
-    id="about-modal"
-    class="modal-bg"
-    aria-hidden="true"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="about-modal-title"
-  >
-    <div class="modal-box">
-      <h2 id="about-modal-title" style="margin-top: 0;">About Me</h2>
-      <div style="margin-bottom: 15px; text-align: left;">
-        <p>
-          I'm a passionate Speech-Language Pathologist (SLP) dedicated to helping
-          children and adults discover the power of communication.
-        </p>
+    <script src="https://hamada013.github.io/speech-website/script.js" defer></script>
 
-        <p>
-          With a focus on empathy, evidence-based practice, and personalized care,
-          I empower my clients to overcome challenges—unlocking confidence and
-          connection in their daily lives.
-        </p>
+    <script>
+        const translations = {
+            en: {
+                nav_home: "Home", nav_tools: "Tools", nav_forms: "Forms", nav_resources: "Resources",
+                hero_title: "Ahmad Ghanem", hero_subtitle: "Speech-Language Pathologist", hero_quote: "\"A voice is a voice no matter how small\"",
+                section_hub: "Clinic Hub",
+                card_about_title: "About Me", card_about_desc: "Learn more about my practice, background, and approach to therapy.",
+                card_forms_title: "Client Forms", card_forms_desc: "Secure access to digital assessments, adult, and child intake forms.",
+                card_tools_title: "Clinical Tools", card_tools_desc: "Interactive tools, activities, and resources for speech therapy sessions.",
+                card_res_title: "Resources", card_res_desc: "Helpful reading materials, guides, and links for parents and professionals.",
+                footer_questions: "Questions?", footer_rights: "All rights reserved.",
+                modal_pw_title: "Protected Forms", modal_pw_desc: "Enter password to access client forms", modal_pw_btn: "Unlock", modal_pw_err: "Incorrect password. Please try again.",
+                modal_about_title: "About Me", modal_about_p1: "...", modal_about_p2: "...", modal_about_p3: "..."
+            },
+            ar: {
+                nav_home: "الرئيسية", nav_tools: "الأدوات", nav_forms: "النماذج", nav_resources: "المصادر",
+                hero_title: "أحمد غانم", hero_subtitle: "أخصائي أمراض النطق واللغة", hero_quote: "\"كل صوت له قيمته، مهما كان صغيراً\"",
+                section_hub: "مركز العيادة",
+                card_about_title: "معلومات عني", card_about_desc: "تعرف أكثر على عيادتي، خلفيتي العلمية، ونهجي في العلاج.",
+                card_forms_title: "نماذج العملاء", card_forms_desc: "وصول آمن للتقييمات الرقمية ونماذج البيانات الأولية للأطفال والبالغين.",
+                card_tools_title: "أدوات سريرية", card_tools_desc: "أدوات تفاعلية، أنشطة، وموارد لجلسات علاج النطق.",
+                card_res_title: "مصادر", card_res_desc: "مواد قراءة مفيدة، أدلة، وروابط للآباء والمختصين.",
+                footer_questions: "لديك أسئلة؟", footer_rights: "جميع الحقوق محفوظة.",
+                modal_pw_title: "نماذج محمية", modal_pw_desc: "أدخل كلمة المرور للوصول إلى نماذج العملاء", modal_pw_btn: "فتح", modal_pw_err: "كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.",
+                modal_about_title: "معلومات عني", modal_about_p1: "...", modal_about_p2: "...", modal_about_p3: "..."
+            }
+        };
 
-        <p>
-          Specializing in speech and language disorders, I bring extensive
-          experience helping clients achieve their communication goals.
-        </p>
-      </div>
-      <button
-        id="about-close-btn"
-        type="button"
-        class="modal-close"
-        title="Close"
-        aria-label="Close About Modal"
-      >
-        &times;
-      </button>
-    </div>
-  </div>
+        let currentLang = 'en';
 
-  <script src="https://hamada013.github.io/speech-website/script.js" defer></script>
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            const isArabic = currentLang === 'ar';
+            document.getElementById('html-root').setAttribute('dir', isArabic ? 'rtl' : 'ltr');
+            document.body.classList.toggle('font-sans', !isArabic);
+            document.body.classList.toggle('font-arabic', isArabic);
+            document.getElementById('lang-text').textContent = isArabic ? 'English' : 'العربية';
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) el.textContent = translations[currentLang][key];
+            });
+        }
+    </script>
 </body>
 </html>
