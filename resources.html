@@ -1,71 +1,315 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="html-root">
 <head>
-  <meta charset="UTF-8">
-  <title>Resources | Ahmad Ghanem SLP</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap">
-  <style>
-    /* Nav and soon-banner styles already in tools.html */
-    .soon-container {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      height: 67vh;
-      margin-top: 2em;
-      text-align:center;
-    }
-    .soon-gif {
-      width: 180px; height: auto;
-      margin-bottom:23px;
-      filter: drop-shadow(0 2px 15px #43a6f830);
-    }
-    .soon-title {
-      font-size: 2em; color: #43a6f8; margin-bottom: 0.3em;
-    }
-    .soon-desc {
-      font-size: 1.12em; color: #6b7689;
-    }
-    .site-nav-bar {
-      margin-bottom: 1.7em;
-      text-align: center;
-      width: 100%;
-      background: #fcfdff;
-      border-bottom: 1px solid #e3f1ff;
-      padding: 0.45em 0;
-      position: relative;
-      z-index: 2;
-    }
-    .site-nav-bar a {
-      color: #43a6f8;
-      text-decoration: none;
-      padding: 10px 22px;
-      border-radius: 18px;
-      font-weight: bold;
-      font-size: 1em;
-      margin: 0 0.5em;
-      transition: background 0.13s;
-    }
-    .site-nav-bar a.active, .site-nav-bar a:hover {
-      background: #e0f2ff;
-      color: #2693d9;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resources | Ahmad Ghanem SLP</title>
+    <link rel="icon" href="images/logo.png" type="image/png">
+    
+    <!-- Fonts: Inter (English) and Noto Sans Arabic (Arabic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        arabic: ['Noto Sans Arabic', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Smooth transitions for layout changes */
+        body, .tool-card {
+            transition: all 0.3s ease-in-out;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
-<body>
-  <nav class="site-nav-bar">
-    <a href="index.html">Home</a>
-    <a href="tools.html">Tools</a>
-    <a href="resources.html" class="active">Resources</a>
-  </nav>
-  <main>
-    <div class="soon-container">
-      <!-- Use same or different GIF! Change src if needed -->
-      <img src="soon.gif" class="soon-gif" alt="Coming soon...">
-      <div class="soon-title">Coming Soon!</div>
-      <div class="soon-desc">
-        A library of clinical resources, downloads, and links is on the way.
-      </div>
-    </div>
-  </main>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans transition-all duration-300">
+
+    <!-- NAVIGATION -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-2">
+                    <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                        AG
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-slate-800">Ahmad Ghanem <span class="text-primary-600">SLP</span></span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-6 rtl:space-x-reverse">
+                    <a href="index.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_home">Home</a>
+                    <a href="tools.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_tools">Tools</a>
+                    <a href="forms.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_forms">Forms</a>
+                    <a href="#" class="text-primary-700 bg-primary-50 px-3 py-2 rounded-md text-sm font-bold" data-i18n="nav_resources">Resources</a>
+                    
+                    <!-- Language Switcher Button -->
+                    <button onclick="toggleLanguage()" class="flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-300 text-sm font-medium hover:bg-slate-50 hover:border-primary-500 transition-colors ml-4 rtl:mr-4">
+                        <span id="lang-icon">🌐</span>
+                        <span id="lang-text">العربية</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-4" data-i18n="header_title">
+                Resources
+            </h1>
+            <p class="max-w-2xl mx-auto text-lg text-slate-500" data-i18n="header_subtitle">
+                Educational materials, worksheets, and guides for therapy.
+            </p>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+        
+        <!-- Primary Resources (Top 2) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 max-w-4xl mx-auto">
+            
+            <a href="resources/phonics/" target="_blank" rel="noopener" class="tool-card flex flex-col items-center p-8 bg-white rounded-2xl border border-slate-200 text-center">
+                <div class="w-24 h-24 mb-6 relative">
+                    <div class="absolute inset-0 bg-blue-50 rounded-full scale-110 opacity-50"></div>
+                    <img src="images/phonics.gif" alt="Parent Handouts" class="relative z-10 w-full h-full object-contain">
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800 mb-2" data-i18n="card_handouts_title">phonitics</h3>
+                <p class="text-slate-500" data-i18n="card_handouts_desc">IPA assistant</p>
+            </a>
+
+            <a href="resources/worksheets/index.html" target="_blank" rel="noopener" class="tool-card flex flex-col items-center p-8 bg-white rounded-2xl border border-slate-200 text-center">
+                <div class="w-24 h-24 mb-6 relative">
+                    <div class="absolute inset-0 bg-blue-50 rounded-full scale-110 opacity-50"></div>
+                    <img src="images/worksheets.gif" alt="Therapy Worksheets" class="relative z-10 w-full h-full object-contain">
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800 mb-2" data-i18n="card_worksheets_title">Therapy Worksheets</h3>
+                <p class="text-slate-500" data-i18n="card_worksheets_desc">Ready-to-use therapy activities.</p>
+            </a>
+
+        </div>
+
+        <!-- Secondary Resources (Grid) -->
+        <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center md:text-left rtl:text-right" data-i18n="section_categories">Resource Categories</h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+            <!-- Articulation -->
+            <a href="resources/articulation/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                <img src="images/speech.gif" alt="Articulation" class="w-16 h-16 mx-auto mb-4 object-contain">
+                <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_articulation_title">Articulation</h3>
+                <p class="text-sm text-slate-500" data-i18n="card_articulation_desc">Speech sound practice sheets.</p>
+            </a>
+
+            <!-- Language Activities -->
+            <a href="resources/language/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                <img src="images/language.gif" alt="Language" class="w-16 h-16 mx-auto mb-4 object-contain">
+                <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_langact_title">Language Activities</h3>
+                <p class="text-sm text-slate-500" data-i18n="card_langact_desc">Expressive and receptive tasks.</p>
+            </a>
+
+            <!-- AAC Boards -->
+            <a href="resources/aac/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                <img src="images/aac.gif" alt="AAC Boards" class="w-16 h-16 mx-auto mb-4 object-contain">
+                <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_aac_title">AAC Boards</h3>
+                <p class="text-sm text-slate-500" data-i18n="card_aac_desc">Alternative communication tools.</p>
+            </a>
+
+            <!-- Stuttering Strategies -->
+            <a href="resources/stuttering/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                <img src="images/stutter.gif" alt="Stuttering" class="w-16 h-16 mx-auto mb-4 object-contain">
+                <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_stutter_title">Stuttering Strategies</h3>
+                <p class="text-sm text-slate-500" data-i18n="card_stutter_desc">Fluency shaping tools.</p>
+            </a>
+
+            <!-- Voice Exercises -->
+            <a href="resources/voice/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                <img src="images/voice.gif" alt="Voice" class="w-16 h-16 mx-auto mb-4 object-contain">
+                <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_voice_title">Voice Exercises</h3>
+                <p class="text-sm text-slate-500" data-i18n="card_voice_desc">Vocal hygiene and practice.</p>
+            </a>
+
+            <!-- Social Skills -->
+            <a href="resources/social/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                <img src="images/social.gif" alt="Social Skills" class="w-16 h-16 mx-auto mb-4 object-contain">
+                <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_social_title">Social Skills</h3>
+                <p class="text-sm text-slate-500" data-i18n="card_social_desc">Pragmatic language stories.</p>
+            </a>
+
+            <!-- Oral Motor -->
+            <a href="resources/oral-motor/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                <img src="images/oral.gif" alt="Oral Motor" class="w-16 h-16 mx-auto mb-4 object-contain">
+                <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_oral_title">Oral Motor</h3>
+                <p class="text-sm text-slate-500" data-i18n="card_oral_desc">Oral placement exercises.</p>
+            </a>
+
+            <!-- Info Guides -->
+            <a href="resources/guides/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                <img src="images/other.gif" alt="Guides" class="w-16 h-16 mx-auto mb-4 object-contain">
+                <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_guides_title">Info Guides</h3>
+                <p class="text-sm text-slate-500" data-i18n="card_guides_desc">General SLP information.</p>
+            </a>
+            
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mb-4">
+                <strong data-i18n="footer_questions">Questions?</strong>
+                <a href="mailto:slp.ahmadghanem@gmail.com" class="text-primary-600 hover:text-primary-800 ml-2">slp.ahmadghanem@gmail.com</a>
+                <span class="mx-2 text-slate-300">|</span>
+                <a href="tel:+963988451245" class="text-primary-600 hover:text-primary-800" dir="ltr">+963 988 451 245</a>
+            </div>
+            <div class="text-slate-400 text-sm">
+                &copy; 2024 Ahmad Ghanem SLP. <span data-i18n="footer_rights">All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LANGUAGE SWITCHER LOGIC -->
+    <script>
+        // Translation Dictionary
+        const translations = {
+            en: {
+                nav_home: "Home",
+                nav_tools: "Tools",
+                nav_forms: "Forms",
+                nav_resources: "Resources",
+                header_title: "Resources",
+                header_subtitle: "Educational materials, worksheets, and guides for therapy.",
+                section_categories: "Resource Categories",
+                
+                card_handouts_title: "Parent Handouts",
+                card_handouts_desc: "Guides and tips for home practice.",
+                card_worksheets_title: "Therapy Worksheets",
+                card_worksheets_desc: "Ready-to-use therapy activities.",
+                
+                card_articulation_title: "Articulation",
+                card_articulation_desc: "Speech sound practice sheets.",
+                card_langact_title: "Language Activities",
+                card_langact_desc: "Expressive and receptive tasks.",
+                card_aac_title: "AAC Boards",
+                card_aac_desc: "Alternative communication tools.",
+                card_stutter_title: "Stuttering Strategies",
+                card_stutter_desc: "Fluency shaping tools.",
+                card_voice_title: "Voice Exercises",
+                card_voice_desc: "Vocal hygiene and practice.",
+                card_social_title: "Social Skills",
+                card_social_desc: "Pragmatic language stories.",
+                card_oral_title: "Oral Motor",
+                card_oral_desc: "Oral placement exercises.",
+                card_guides_title: "Info Guides",
+                card_guides_desc: "General SLP information.",
+                
+                footer_questions: "Questions?",
+                footer_rights: "All rights reserved."
+            },
+            ar: {
+                nav_home: "الرئيسية",
+                nav_tools: "الأدوات",
+                nav_forms: "النماذج",
+                nav_resources: "المصادر",
+                header_title: "المصادر",
+                header_subtitle: "مواد تعليمية، أوراق عمل، وأدلة إرشادية للعلاج.",
+                section_categories: "فئات المصادر",
+                
+                card_handouts_title: "نطق الأصوات",
+                card_handouts_desc: "مساعد النطق الشخصي",
+                card_worksheets_title: "أوراق عمل علاجية",
+                card_worksheets_desc: "أنشطة علاجية جاهزة للاستخدام.",
+                
+                card_articulation_title: "النطق",
+                card_articulation_desc: "أوراق تدريب على أصوات الكلام.",
+                card_langact_title: "الأنشطة اللغوية",
+                card_langact_desc: "مهام تعبيرية واستقبالية.",
+                card_aac_title: "لوحات التواصل (AAC)",
+                card_aac_desc: "أدوات التواصل البديل.",
+                card_stutter_title: "استراتيجيات التأتأة",
+                card_stutter_desc: "أدوات تشكيل الطلاقة.",
+                card_voice_title: "تمارين الصوت",
+                card_voice_desc: "العناية بالصوت والتدريب.",
+                card_social_title: "المهارات الاجتماعية",
+                card_social_desc: "قصص اللغة البراغماتية.",
+                card_oral_title: "الحركية الفموية",
+                card_oral_desc: "تمارين لتحديد المواضع الفموية.",
+                card_guides_title: "أدلة معلوماتية",
+                card_guides_desc: "معلومات عامة في التخاطب.",
+                
+                footer_questions: "لديك أسئلة؟",
+                footer_rights: "جميع الحقوق محفوظة."
+            }
+        };
+
+        let currentLang = 'en';
+
+        function toggleLanguage() {
+            // Toggle state
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            const isArabic = currentLang === 'ar';
+            
+            // 1. Update HTML direction and font family
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', isArabic ? 'rtl' : 'ltr');
+            
+            const body = document.body;
+            if (isArabic) {
+                body.classList.remove('font-sans');
+                body.classList.add('font-arabic');
+            } else {
+                body.classList.remove('font-arabic');
+                body.classList.add('font-sans');
+            }
+
+            // 2. Update Button Text
+            const btnText = document.getElementById('lang-text');
+            btnText.textContent = isArabic ? 'English' : 'العربية';
+
+            // 3. Update All Text Content
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    el.textContent = translations[currentLang][key];
+                }
+            });
+        }
+    </script>
 </body>
 </html>
