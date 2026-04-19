@@ -1,29 +1,369 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>مؤشر شدة التأتأة SSI-4</title>
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* =========================
+       Global & Variables
+    ========================= */
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --secondary: #3b82f6;
+      --bg-color: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-main: #1f2937;
+      --text-muted: #4b5563;
+      --border-color: #e5e7eb;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Cairo', Tahoma, sans-serif;
+      background-color: var(--bg-color);
+      margin: 0;
+      padding: 0;
+      direction: rtl;
+      text-align: right;
+      color: var(--text-main);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 950px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* =========================
+       Typography & Layout
+    ========================= */
+    h1, h2, h3 { font-family: 'Cairo', sans-serif; margin-top: 0; }
+
+    h2 {
+      font-size: 1.5rem;
+      color: var(--primary);
+      border-bottom: 2px solid var(--secondary);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h3 { font-size: 1.25rem; color: var(--secondary); margin-bottom: 15px; }
+
+    section, .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    
+    section { padding: 25px; margin-bottom: 30px; }
+    .card { padding: 20px; border: 1px solid var(--border-color); margin-bottom: 20px; }
+
+    /* =========================
+       Header
+    ========================= */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 15px 25px;
+      box-shadow: var(--shadow);
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .header-logo img { width: 50px; height: 50px; object-fit: contain; }
+
+    .page-header h1 {
+      font-size: 1.5rem;
+      color: var(--primary);
+      margin: 0;
+      flex: 1;
+      text-align: center;
+    }
+
+    .header-buttons { display: flex; gap: 10px; }
+
+    .btn-info, .btn-arabic {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      border: none;
+      width: 44px;
+      height: 44px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      color: #fff;
+      transition: all 0.2s ease;
+    }
+    .btn-info { background: #38bdf8; }
+    .btn-info:hover { background: #0ea5e9; transform: scale(1.05); }
+    .btn-arabic { background: #14b8a6; }
+    .btn-arabic:hover { background: #0d9488; transform: scale(1.05); }
+
+    /* =========================
+       Forms & Inputs
+    ========================= */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .info-field { display: flex; flex-direction: column; }
+    label { margin-bottom: 6px; font-weight: 600; font-size: 0.95rem; color: var(--text-muted); }
+
+    input, textarea {
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1rem;
+      width: 100%;
+      transition: border-color 0.2s;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    textarea { resize: vertical; min-height: 100px; }
+
+    /* =========================
+       Buttons & Button Groups
+    ========================= */
+    .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+    .btn-group button {
+      padding: 8px 16px;
+      border: 1px solid var(--border-color);
+      background: #f8fafc;
+      color: var(--text-main);
+      cursor: pointer;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      flex: 1;
+      min-width: 80px;
+    }
+    .btn-group button:hover { background: #e2e8f0; }
+    .btn-group button.active-btn {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .btn-action {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      width: 100%;
+      margin-top: 15px;
+    }
+    .btn-action:hover { background-color: var(--primary-hover); }
+
+    .btn-download {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+      width: 100%;
+      margin-top: 15px;
+    }
+    .btn-download:hover { background: #059669; }
+
+    /* =========================
+       Sub-Options (Animation)
+    ========================= */
+    .sub-options {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      opacity: 1;
+      max-height: 100px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      margin-top: 12px;
+      padding-right: 15px;
+      border-right: 3px solid var(--secondary);
+    }
+    .sub-options.hidden-sub {
+      opacity: 0;
+      max-height: 0;
+      margin-top: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      border-right: none;
+      pointer-events: none;
+    }
+
+    /* =========================
+       Instruction Panel
+    ========================= */
+    .instruction-panel {
+      background-color: #eff6ff;
+      border-right: 4px solid var(--primary);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+    }
+    .instruction-panel strong { color: var(--primary); display: block; margin-bottom: 5px;}
+    .instruction-panel code {
+      background: #dbeafe;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-weight: bold;
+      color: #1e40af;
+    }
+
+    /* =========================
+       Resources Section
+    ========================= */
+    .resource-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+    .resource-buttons button {
+      padding: 10px 15px;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      border: none;
+      background-color: #f1f5f9;
+      color: var(--text-main);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      border: 1px solid var(--border-color);
+    }
+    .resource-buttons button:hover { background-color: #e2e8f0; border-color: #cbd5e1; }
+
+    /* =========================
+       Floating Image Box
+    ========================= */
+    #floating-box {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); display: flex; align-items: center;
+      justify-content: center; z-index: 1000; padding: 20px;
+    }
+    #floating-box img { max-width: 100%; max-height: 90vh; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .hidden { display: none !important; }
+
+    /* =========================
+       Physical Concomitants
+    ========================= */
+    .physical-item { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
+    .physical-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .category-title { display: block; font-weight: bold; margin-bottom: 10px; color: var(--text-main); }
+    .type-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+    .type-buttons button {
+      padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 20px;
+      background-color: #fff; color: var(--text-muted); font-size: 0.9rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .type-buttons button.selected { background-color: var(--primary); color: white; border-color: var(--primary); }
+
+    .rating {
+      display: flex; align-items: center; gap: 8px; font-size: 0.95rem; font-weight: 600;
+      background: #f8fafc; padding: 10px; border-radius: 8px;
+    }
+    .rating button {
+      width: 36px; height: 36px; border: none; border-radius: 50%;
+      background-color: #e2e8f0; font-weight: bold; cursor: pointer;
+      transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+    }
+    .rating button.selected {
+      background-color: #10b981; color: white; transform: scale(1.1); box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    }
+
+    /* =========================
+       Naturalness Scale
+    ========================= */
+    .scale-container { display: flex; align-items: center; gap: 15px; margin: 20px 0 10px; }
+    .scale-container input[type="range"] {
+      flex: 1; height: 8px; border-radius: 5px; background: #e2e8f0; -webkit-appearance: none; outline: none;
+    }
+    .scale-container input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%;
+      background: var(--primary); cursor: pointer; border: 3px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .scale-label { font-size: 0.9rem; font-weight: bold; color: var(--text-muted); min-width: 90px; text-align: center; }
+    .scale-numbers { display: flex; justify-content: space-between; padding: 0 100px; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; }
+
+    /* =========================
+       Info Boxes & Results Box
+    ========================= */
+    .info-box {
+      background-color: #fff; border: 1px solid var(--secondary); padding: 20px;
+      border-radius: var(--radius); margin-top: 10px; margin-bottom: 20px; box-shadow: var(--shadow); position: relative;
+    }
+    .info-box p { margin-top: 0; font-size: 0.95rem; }
+    .info-box button {
+      background-color: var(--secondary); color: white; border: none; padding: 8px 16px;
+      border-radius: 6px; cursor: pointer; font-size: 0.9rem;
+    }
+
+    pre {
+      font-family: monospace; white-space: pre-wrap; direction: ltr; text-align: left;
+      background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);
+      font-size: 0.9rem; margin: 0;
+    }
+
+    /* =========================
+       Responsive Design
+    ========================= */
+    @media (max-width: 768px) {
+      .container { padding: 10px; }
+      section { padding: 15px; }
+      .page-header { flex-direction: column; text-align: center; }
+      .page-header h1 { font-size: 1.25rem; }
+      .scale-numbers { padding: 0 80px; }
+      .rating { flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
 </head>
 <body>
 
-<header class="page-header">
-  <div class="header-logo">
-    <img src="images/logo.png" alt="الشعار">
-  </div>
-  <h1>مؤشر شدة التأتأة SSI-4</h1>
-  <button class="btn-info" onclick="showTestInfo('page')">i</button>
-    <button class="btn-arabic" onclick="window.location.href='../SSI4/index.html'">En</button>
-
-</header>
-
-<div id="info-box-page" class="info-box hidden">
-  <p>تُستخدم هذه القائمة لتقييم المهارات السمعية لدى الأطفال والبالغين. يمكن تسجيل الملاحظات وقياس التكرار، المدة، وطبيعية الكلام.</p>
-  <button onclick="closeInfoBox('page')">إغلاق</button>
-</div>
-
 <div class="container">
+  
+  <header class="page-header">
+    <div class="header-logo">
+      <img src="images/logo.png" alt="الشعار" onerror="this.style.display='none'">
+    </div>
+    <h1>مؤشر شدة التأتأة SSI-4</h1>
+    <div class="header-buttons">
+      <button class="btn-info" onclick="showTestInfo('page')">i</button>
+      <button class="btn-arabic" onclick="window.location.href='../SSI4/index.html'">En</button>
+    </div>
+  </header>
+
+  <div id="info-box-page" class="info-box hidden">
+    <p>تُستخدم هذه القائمة لتقييم المهارات السمعية لدى الأطفال والبالغين. يمكن تسجيل الملاحظات وقياس التكرار، المدة، وطبيعية الكلام.</p>
+    <button onclick="closeInfoBox('page')">إغلاق</button>
+  </div>
 
   <!-- القسم 0: المعلومات التعريفية -->
   <section id="section0" class="info-section">
@@ -34,16 +374,18 @@
       <div class="info-field"><label for="testDate">تاريخ الاختبار</label><input type="date" id="testDate"></div>
       <div class="info-field"><label for="school">المدرسة</label><input type="text" id="school" placeholder="أدخل اسم المدرسة"></div>
       <div class="info-field"><label for="dob">تاريخ الميلاد</label><input type="date" id="dob" onchange="calculateAge()"></div>
-      <div class="info-field"><label for="age">العمر</label><input type="text" id="age" readonly></div>
+      <div class="info-field"><label for="age">العمر</label><input type="text" id="age" readonly style="background:#f8fafc;"></div>
+      
       <div class="info-field">
         <label>الفئة</label>
         <div id="categoryBtns" class="btn-group">
-          <button type="button" onclick="selectOption('category','Preschool',this)">مرحلة ما قبل المدرسة</button>
-          <button type="button" onclick="selectOption('category','School Age',this)">السن المدرسي</button>
+          <button type="button" class="active-btn" onclick="selectOption('category','Preschool',this)">ما قبل المدرسة</button>
+          <button type="button" onclick="selectOption('category','School Age',this)">سن مدرسي</button>
           <button type="button" onclick="selectOption('category','Adult',this)">بالغ</button>
         </div>
-        <input type="hidden" id="category" name="category">
+        <input type="hidden" id="category" name="category" value="Preschool">
       </div>
+      
       <div class="info-field">
         <label>الجنس</label>
         <div id="genderBtns" class="btn-group">
@@ -52,7 +394,9 @@
         </div>
         <input type="hidden" id="gender" name="gender">
       </div>
-      <div class="info-field"><label>المقيّم</label><input type="text" id="examiner" placeholder="أدخل اسم المقيّم"></div>
+      
+      <div class="info-field"><label for="examiner">المقيّم</label><input type="text" id="examiner" placeholder="أدخل اسم المقيّم"></div>
+      
       <div class="info-field">
         <label>حالة القراءة</label>
         <div id="readerBtns" class="btn-group">
@@ -66,27 +410,25 @@
 
   <!-- قسم الموارد -->
   <section id="resources-section">
-    <h2 style="display:flex; align-items:center; gap:8px;">
-      الموارد
-      <button class="btn-info" onclick="showTestInfo('resources')">i</button>
+    <h2>
+      الموارد والصور
+      <button class="btn-info" style="width: 30px; height: 30px; font-size:14px;" onclick="showTestInfo('resources')">i</button>
     </h2>
 
     <div id="info-box-resources" class="info-box hidden">
-      <p>يعرض هذا القسم جميع الموارد المتاحة المتعلقة بالجلسة. اضغط على أي زر لعرض أو تنزيل المورد المقابل.</p>
+      <p>يعرض هذا القسم جميع الموارد المتاحة المتعلقة بالجلسة. اضغط على أي زر لعرض المورد المقابل.</p>
       <button onclick="closeInfoBox('resources')">إغلاق</button>
     </div>
 
     <div class="resource-buttons">
-      <button data-img="images/preschool.png">مرحلة ما قبل المدرسة</button>
-      <button data-img="images/school.png">السن المدرسي</button>
-      <button data-img="images/adult.png">بالغ</button>
-      <p> </p>
+      <button data-img="images/preschool.png">🏞 1</button>
+      <button data-img="images/school.png">🏞 2</button>
+      <button data-img="images/adult.png">🏞 3</button>
       <button data-img="images/reader1.png">📖 1</button>
       <button data-img="images/reader2.png">📖 2</button>
       <button data-img="images/reader3.png">📖 3</button>
       <button data-img="images/reader4.png">📖 4</button>
       <button data-img="images/reader5.png">📖 5</button>
-      <p> </p>
       <button data-img="images/reader6.png">📖 6</button>
       <button data-img="images/reader7.png">📖 7</button>
       <button data-img="images/reader8.png">📖 8</button>
@@ -97,82 +439,101 @@
 
   <!-- صندوق الصور العائم -->
   <div id="floating-box" class="hidden">
-    <img id="resource-img" src="" alt="المورد">
+    <img id="resource-img" src="" alt="المورد" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjIwIiBmaWxsPSIjOTk5Ij7YtSjZiNix2Kkg2LrZitixINmF2KrZiNmB2LHYqTwvdGV4dD48L3N2Zz4='">
   </div>
 
-  <!-- قسم مسجل الصوت -->
-  <section id="section-audio" class="info-section">
-    <h2>مسجل الصوت</h2>
-    <div class="card">
-      <div class="controls">
-        <button id="recordBtn">🎙 تسجيل</button>
-        <button id="stopBtn" disabled>⏹ إيقاف</button>
-        <span id="timer">0 مللي ثانية</span>
-      </div>
-
-      <canvas id="waveform" width="600" height="100"></canvas>
-
-      <div class="audio-player">
-        <button class="play-btn" id="playBtn">⏯</button>
-        <div class="progress-container" id="progressContainer">
-          <div class="progress" id="progress" style="position: absolute; right: 0; top: 0; height: 100%; width: 0%; border-radius: 6px;"></div>
-        </div>
-        <span class="current-time" id="currentTime">0.00 ث</span>
-      </div>
-
-      <textarea id="transcript" placeholder="اكتب الملاحظات أو انقل النص الصوتي..." rows="5"></textarea>
-    </div>
-  </section>
-
-  <!-- قسم التكرار والمدة -->
+  <!-- قسم التكرار والمدة (مُعدل ومُحسن) -->
   <section id="section-frequency" class="info-section">
-    <h2 style="display:flex; align-items:center; gap:8px;">
-      التكرار والمدة
-      <button class="btn-info" onclick="showTestInfo('frequency')">i</button>
+    <h2>
+      إدخال النص - التكرار والمدة
+      <button class="btn-info" style="width: 30px; height: 30px; font-size:14px;" onclick="showTestInfo('frequency')">i</button>
     </h2>
 
     <div id="info-box-frequency" class="info-box hidden">
-      <p>في هذا القسم، يمكنك لصق عينات الكلام أو القراءة لحساب مقاييس التكرار والمدة. اختر نوع العينة لكل نص واضغط زر الحساب لعرض النتائج.</p>
+      <p>في هذا القسم، يمكنك إدخال عينات الكلام أو القراءة لحساب مقاييس التكرار والمدة تلقائياً بناءً على العلامات المدخلة. تأكد من تحديد نوع المهمة بدقة (قارئ / غير قارئ) لأنها تؤثر على حساب النتيجة.</p>
       <button onclick="closeInfoBox('frequency')">إغلاق</button>
     </div>
 
-    <div class="card">
-      <label for="text1">النص 1</label>
-      <textarea id="text1" rows="5" placeholder="ألصق هنا عينة النص الأولى"></textarea>
-      <div class="btn-group">
-        <span>نوع العينة:</span>
-        <button type="button" onclick="selectSampleType('text1','Reader', this)">قارئ</button>
-        <button type="button" onclick="selectSampleType('text1','Nonreader', this)">غير قارئ</button>
-        <button type="button" onclick="selectSampleType('text1','Speaking / Readers', this)">متحدث / قارئ</button>
+    <!-- لوحة الإرشادات الجديدة -->
+    <div class="instruction-panel">
+      <strong>💡 طريقة الإدخال لحساب التأتأة:</strong>
+      <ul style="margin-top: 5px; margin-bottom: 5px; padding-right: 20px;">
+        <li><strong>للكلمات الطبيعية:</strong> اكتبها بشكل عادي دون إضافات.</li>
+        <li><strong>لكلمات التأتأة:</strong> ضع الكلمة متبوعة بمسافة ثم <strong>مدة التعثر بالثواني</strong> داخل أقواس.</li>
+      </ul>
+      <div style="margin-top: 10px;">
+        <em>مثال تطبيقي:</em> <code>(أنا 1.5) اسمي أحمد.</code> <br>
+        <small style="color: #64748b; margin-top: 5px; display: block;">* في هذا المثال، تم احتساب تعثر في كلمة "أنا" لمدة ثانية ونصف.</small>
       </div>
-
-      <label for="text2">النص 2 (اختياري)</label>
-      <textarea id="text2" rows="5" placeholder="ألصق هنا عينة النص الثانية"></textarea>
-      <div class="btn-group">
-        <span>نوع العينة:</span>
-        <button type="button" onclick="selectSampleType('text2','Reader', this)">قارئ</button>
-        <button type="button" onclick="selectSampleType('text2','Nonreader', this)">غير قارئ</button>
-        <button type="button" onclick="selectSampleType('text2','Speaking / Readers', this)">متحدث / قارئ</button>
-      </div>
-
-      <button type="button" onclick="calculateFrequencyDuration()">احسب التكرار والمدة</button>
     </div>
 
-    <div id="results" class="card" style="display:none; margin-top:15px;">
-      <h3>النتائج</h3>
-      <pre id="results-output"></pre>
+    <!-- إعدادات النص الأول -->
+    <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+      <label for="text1" style="font-size: 1.1rem; color: var(--primary);">النص الأول</label>
+      <textarea id="text1" rows="5" placeholder="اكتب أو الصق العينة الأولى هنا مع استخدام الأقواس (الكلمة المدة) لمواضع التأتأة..."></textarea>
+      
+      <div style="margin-top: 15px;">
+        <label>
+          نوع العينة للنص الأول:
+          <span style="cursor:help; color:var(--primary); font-size:1.1rem; margin-right:5px;" title="اختر 'غير قارئ' لمن لا يقرأون (أو قبل المدرسة). إذا كان الشخص يقرأ، اختر 'قارئ' ثم حدد نوع المهمة (قراءة أم تحدث).">ⓘ</span>
+        </label>
+        <div class="btn-group">
+          <button type="button" class="active-btn" onclick="selectMainType('text1', 'Reader', this)">قارئ (Reader)</button>
+          <button type="button" onclick="selectMainType('text1', 'Nonreader', this)">غير قارئ (Nonreader)</button>
+        </div>
+
+        <div id="text1-sub-options" class="sub-options">
+          <span style="font-size: 0.95rem; color: var(--text-muted); font-weight: bold; white-space: nowrap;">تحديد نوع المهمة:</span>
+          <div class="btn-group" style="margin: 0; flex: 1;">
+            <button type="button" class="active-btn" data-type="Reader" onclick="selectSubType('text1', 'Reader', this)">مهمة قراءة</button>
+            <button type="button" data-type="Speaking / Readers" onclick="selectSubType('text1', 'Speaking / Readers', this)">مهمة تحدث</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- إعدادات النص الثاني -->
+    <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+      <label for="text2" style="font-size: 1.1rem; color: var(--primary);">النص الثاني (اختياري)</label>
+      <textarea id="text2" rows="5" placeholder="اكتب العينة الثانية هنا إن وجدت..."></textarea>
+      
+      <div style="margin-top: 15px;">
+        <label>
+          نوع العينة للنص الثاني:
+          <span style="cursor:help; color:var(--primary); font-size:1.1rem; margin-right:5px;" title="اختر 'غير قارئ' لمن لا يقرأون (أو قبل المدرسة). إذا كان الشخص يقرأ، اختر 'قارئ' ثم حدد نوع المهمة (قراءة أم تحدث).">ⓘ</span>
+        </label>
+        <div class="btn-group">
+          <button type="button" class="active-btn" onclick="selectMainType('text2', 'Reader', this)">قارئ (Reader)</button>
+          <button type="button" onclick="selectMainType('text2', 'Nonreader', this)">غير قارئ (Nonreader)</button>
+        </div>
+
+        <div id="text2-sub-options" class="sub-options">
+          <span style="font-size: 0.95rem; color: var(--text-muted); font-weight: bold; white-space: nowrap;">تحديد نوع المهمة:</span>
+          <div class="btn-group" style="margin: 0; flex: 1;">
+            <button type="button" class="active-btn" data-type="Reader" onclick="selectSubType('text2', 'Reader', this)">مهمة قراءة</button>
+            <button type="button" data-type="Speaking / Readers" onclick="selectSubType('text2', 'Speaking / Readers', this)">مهمة تحدث</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="btn-action" onclick="calculateFrequencyDuration()">احسب التكرار والمدة</button>
+
+    <div id="results" class="card" style="display:none; margin-top:15px; border-color: var(--primary);">
+      <h3 style="color: var(--primary); margin-top:0;">تفاصيل نتائج التكرار والمدة</h3>
+      <pre id="results-output" style="border: none; background: transparent; padding: 0;"></pre>
     </div>
   </section>
 
   <!-- القسم 3: المظاهر الجسدية المصاحبة -->
   <section id="physical-concomitants" class="info-section">
-    <h2 style="display:flex; align-items:center; gap:8px;">
+    <h2>
       المظاهر الجسدية المصاحبة
-      <button class="btn-info" onclick="showTestInfo('physical')">i</button>
+      <button class="btn-info" style="width: 30px; height: 30px; font-size:14px;" onclick="showTestInfo('physical')">i</button>
     </h2>
 
     <div id="info-box-physical" class="info-box hidden">
-      <p>يمكنك تسجيل المظاهر الجسدية المصاحبة التي لوحظت أثناء الكلام. اختر نوع الملاحظة لكل فئة. يمكن اختيار نوع واحد فقط لكل فئة.</p>
+      <p>يمكنك تسجيل المظاهر الجسدية المصاحبة التي لوحظت أثناء الكلام. اختر نوع الملاحظة ثم حدد الدرجة من 0 إلى 5.</p>
       <button onclick="closeInfoBox('physical')">إغلاق</button>
     </div>
 
@@ -185,7 +546,7 @@
           <button onclick="selectType('Distracting Sounds','شم')">شم</button>
           <button onclick="selectType('Distracting Sounds','نفخ')">نفخ</button>
           <button onclick="selectType('Distracting Sounds','أصوات طقطقة')">أصوات طقطقة</button>
-          <button onclick="promptOther('Distracting Sounds')">أخرى</button>
+          <button onclick="promptOther('Distracting Sounds')">+ أخرى</button>
         </div>
         <div class="rating">
           الدرجة: 
@@ -205,7 +566,7 @@
           <button onclick="selectType('Facial Grimaces','بروز اللسان')">بروز اللسان</button>
           <button onclick="selectType('Facial Grimaces','ضغط الشفاه')">ضغط الشفاه</button>
           <button onclick="selectType('Facial Grimaces','توتر عضلات الفك')">توتر عضلات الفك</button>
-          <button onclick="promptOther('Facial Grimaces')">أخرى</button>
+          <button onclick="promptOther('Facial Grimaces')">+ أخرى</button>
         </div>
         <div class="rating">
           الدرجة: 
@@ -226,7 +587,7 @@
           <button onclick="selectType('Head Movements','الالتفاف بعيداً')">الالتفاف بعيداً</button>
           <button onclick="selectType('Head Movements','ضعف التواصل البصري')">ضعف التواصل البصري</button>
           <button onclick="selectType('Head Movements','النظر المستمر حوله')">النظر المستمر حوله</button>
-          <button onclick="promptOther('Head Movements')">أخرى</button>
+          <button onclick="promptOther('Head Movements')">+ أخرى</button>
         </div>
         <div class="rating">
           الدرجة: 
@@ -247,7 +608,7 @@
           <button onclick="selectType('Movements of the Extremities','حركة الجذع')">حركة الجذع</button>
           <button onclick="selectType('Movements of the Extremities','حركات الساق')">حركات الساق</button>
           <button onclick="selectType('Movements of the Extremities','نقر أو تأرجح القدم')">نقر أو تأرجح القدم</button>
-          <button onclick="promptOther('Movements of the Extremities')">أخرى</button>
+          <button onclick="promptOther('Movements of the Extremities')">+ أخرى</button>
         </div>
         <div class="rating">
           الدرجة: 
@@ -262,7 +623,7 @@
     </div>
 
     <div id="physical-results" class="card" style="margin-top:15px; display:none;">
-      <h3>النتائج</h3>
+      <h3>نتائج المظاهر الجسدية</h3>
       <pre id="physical-output"></pre>
     </div>
   </section>
@@ -271,21 +632,17 @@
   <section id="section-naturalness" class="info-section">
     <h2>
       طبيعية الكلام
-      <button class="btn-info" onclick="showTestInfo('naturalness')">i</button>
+      <button class="btn-info" style="width: 30px; height: 30px; font-size:14px;" onclick="showTestInfo('naturalness')">i</button>
     </h2>
 
     <div id="info-box-naturalness" class="info-box hidden">
-      <p>بعد تقييم عينة الكلام مباشرةً، تشير طبيعية الكلام إلى مدى اقتراب كلام المتحدث من المتحدثين الطبيعيين من نفس الجنس والعمر واللهجة. استخدم المقياس التالي: 1 = طبيعي للغاية؛ 9 = غير طبيعي للغاية.</p>
+      <p>تشير طبيعية الكلام إلى مدى اقتراب كلام المتحدث من المتحدثين الطبيعيين. استخدم المقياس: 1 = طبيعي للغاية؛ 9 = غير طبيعي للغاية.</p>
       <button onclick="closeInfoBox('naturalness')">إغلاق</button>
     </div>
 
     <div class="card">
-      <label for="naturalnessNotes">الملاحظات / الملاحظات</label>
-      <textarea id="naturalnessNotes" placeholder="أدخل ملاحظات طبيعية الكلام..." rows="4"></textarea>
-    </div>
-
-    <div class="card">
       <label for="naturalnessScale">مقياس طبيعية الكلام</label>
+      
       <div class="scale-container">
         <span class="scale-label">طبيعي للغاية</span>
         <input type="range" id="naturalnessScale" min="1" max="9" step="1" value="5">
@@ -293,37 +650,579 @@
       </div>
 
       <div class="scale-numbers">
-        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
-        <span>6</span><span>7</span><span>8</span><span>9</span>
+        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
       </div>
 
-      <p>طبيعية الكلام = <span id="naturalnessValue">5</span></p>
+      <p style="text-align: center; font-size: 1.1rem; margin-bottom: 20px;">
+        الدرجة المحددة: <strong style="color:var(--primary); font-size:1.4rem;" id="naturalnessValue">5</strong>
+      </p>
+
+      <label for="naturalnessNotes">الملاحظات</label>
+      <textarea id="naturalnessNotes" placeholder="أدخل أية ملاحظات إضافية حول طبيعية الكلام..." rows="3"></textarea>
     </div>
   </section>
 
-<!-- Section 5: Final Report -->
-<section id="section-report" class="info-section">
-  <h2 style="display:flex; align-items:center; gap:8px;">
-    التقرير النهائي
-    <button class="btn-info" onclick="showTestInfo('report')">i</button>
-  </h2>
+  <!-- Section 5: Final Report -->
+  <section id="section-report" class="info-section">
+    <h2>
+      التقرير النهائي
+      <button class="btn-info" style="width: 30px; height: 30px; font-size:14px;" onclick="showTestInfo('report')">i</button>
+    </h2>
 
-  <div id="info-box-report" class="info-box hidden">
-   <p>
-    يقوم هذا القسم بتوليد التقرير النهائي تلقائياً، حيث يجمع النتائج من قسم التكرار والمدة، 
-    الظواهر الجسدية المصاحبة، وطبيعية الكلام. يتم حساب النسبة المئوية وشدة التلعثم بناءً على 
-    الفئة المحددة: مرحلة ما قبل المدرسة، سن المدرسة، أو البالغين.
-  </p>
-    <button onclick="closeInfoBox('report')">Close</button>
-  </div>
+    <div id="info-box-report" class="info-box hidden">
+      <p>يقوم هذا القسم بتوليد التقرير النهائي تلقائياً، حيث يجمع النتائج والمقاييس والنسبة المئوية مع توضيح تفاصيل كل عينة نصية.</p>
+      <button onclick="closeInfoBox('report')">إغلاق</button>
+    </div>
 
-  <textarea id="report" readonly rows="15" placeholder="Final report will appear here..."></textarea>
-  <button class="btn-download" onclick="downloadReport()">تحميل التقرير</button>
-</section>
+    <div class="card" style="padding: 0; border: none; box-shadow: none;">
+      <textarea id="report" readonly rows="22" placeholder="سيظهر التقرير النهائي هنا تلقائياً بناءً على إدخالاتك..."></textarea>
+      <button class="btn-download" onclick="downloadReport()">📥 تحميل التقرير (TXT)</button>
+    </div>
+  </section>
 
 </div>
 
+<script>
+// ======= Identifying Info =======
+document.addEventListener("DOMContentLoaded", () => {
+  const today = new Date().toISOString().split("T")[0];
+  document.getElementById("testDate").value = today;
+  updateNaturalnessValue();
+  updateFinalReport(); // Initial report render
+});
 
-<script src="script.js"></script>
+function calculateAge() {
+  const dob = document.getElementById("dob").value;
+  if (!dob) return;
+  const birthDate = new Date(dob);
+  const today = new Date();
+  let years = today.getFullYear() - birthDate.getFullYear();
+  let months = today.getMonth() - birthDate.getMonth();
+  let days = today.getDate() - birthDate.getDate();
+  if (days < 0) { months--; days += new Date(today.getFullYear(), today.getMonth(), 0).getDate(); }
+  if (months < 0) { years--; months += 12; }
+  document.getElementById("age").value = `${years}y ${months}m ${days}d`;
+  updateFinalReport();
+}
+
+function selectOption(field, value, btn) {
+  document.getElementById(field).value = value;
+  const group = btn.parentNode.querySelectorAll("button");
+  group.forEach(b => b.classList.remove("active-btn"));
+  btn.classList.add("active-btn");
+  
+  if(field === "category") {
+    currentCategory = value;
+  }
+  updateFinalReport();
+}
+
+// ======= Resources Section: Floating Image Box =======
+const floatingBox = document.getElementById("floating-box");
+const resourceImg = document.getElementById("resource-img");
+
+document.querySelectorAll("#resources-section .resource-buttons button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const imgSrc = btn.getAttribute("data-img");
+    if (imgSrc) {
+      resourceImg.src = imgSrc;
+      floatingBox.classList.remove("hidden");
+    }
+  });
+});
+
+floatingBox.addEventListener("click", (e) => {
+  if (e.target === floatingBox) {
+    floatingBox.classList.add("hidden");
+    resourceImg.src = "";
+  }
+});
+
+// ======= Syllables Logic =======
+const syllableMap = {
+  "فقت": 2, "اليوم": 3, "الصبح": 2, "الساعة": 3, "ستة": 2, "أي": 1, "كتير": 2, "بكير": 2,
+  "شو": 1, "عملت": 2, "قهوة": 2, "بعدين": 2, "شربت": 2, "القهوة": 3, "عل":1, "الدرج":2,
+  "احيانا":3, "بقعد":2, "على":2, "نفسه":2, "وبشربها":3, "بعد":1, "ما":1, "درست":2,
+  "شوي":1, "انكليزي":3, "من":1, "كتاب":2, "حلو":2, "سمعت":2, "الصوتيات":3, "الخاصة":3,
+  "بالكتاب":3, "واشتغلت":4, "قواعد":2, "وغرامر":3, "اخد":2, "معي":2, "الموضوع":3,
+  "شي":1, "ساعتين":2, "بعدها":2, "فطور":2, "اكلت":2, "بيض":1, "وجبنة":3, "تستوي":2,
+  "بحط":2, "بطفي":2, "تحت":2, "بتركهن":3, "لحتى":3, "تدوب":2, "مكدوس":2, "جنبهن":2,
+  "خيارة":3
+};
+
+const vowels = /[اويًٌٍَُِْ]/g;
+
+function normalizeWord(word) {
+  return word.replace(/[.,!?؛:]/g,'').trim();
+}
+
+function estimateSyllables(word) {
+  word = normalizeWord(word);
+  const match = word.match(vowels);
+  return match ? match.length : Math.max(1, Math.ceil(word.length/3));
+}
+
+function analyzeText(text, textId) {
+  const regex = /\(([^)]+)\)/g;
+  let matches;
+  const uniqueEvents = new Set();
+  const durations = [];
+  let totalSyllables = 0;
+  let totalWords = 0;
+
+  let cursor = 0;
+  while (cursor < text.length) {
+    regex.lastIndex = cursor;
+    matches = regex.exec(text);
+    
+    if (matches && matches.index === cursor) {
+      const parts = matches[1].trim().split(' ');
+      const word = normalizeWord(parts[0]);
+      const dur = parseFloat(parts[1] || 0);
+
+      uniqueEvents.add(word);
+      durations.push(dur);
+      totalSyllables += syllableMap[word] || estimateSyllables(word);
+      totalWords++;
+
+      cursor = regex.lastIndex;
+    } else {
+      const nextParen = matches ? matches.index : text.length;
+      const segment = text.slice(cursor, nextParen).split(/\s+/).filter(Boolean);
+      segment.forEach(w => {
+        const word = normalizeWord(w);
+        totalSyllables += syllableMap[word] || estimateSyllables(word);
+        totalWords++;
+      });
+      cursor = nextParen;
+    }
+  }
+
+  return { stutterEvents: uniqueEvents.size, totalSyllables, totalWords, durations };
+}
+
+function mean(arr) {
+  if(arr.length === 0) return 0;
+  return arr.reduce((a,b)=>a+b,0)/arr.length;
+}
+
+// ======= Frequency & Duration Logic =======
+const sampleTypes = { text1: 'Reader', text2: 'Reader' }; // Internal states
+window.latestResults = []; // Store results globally for the report
+
+const frequencyTable = {
+  Reader: [
+    { range: [1,1], score: 2 }, { range: [2,2], score: 3 }, { range: [3,3], score: 4 },
+    { range: [4,5], score: 5 }, { range: [6,7], score: 6 }, { range: [8,11], score: 7 },
+    { range: [12,21], score: 8 }, { range: [22, Infinity], score: 9 }
+  ],
+  Nonreader: [
+    { range: [1,1], score: 4 }, { range: [2,2], score: 6 }, { range: [3,3], score: 8 },
+    { range: [4,5], score: 10 }, { range: [6,7], score: 12 }, { range: [8,11], score: 14 },
+    { range: [12,21], score: 16 }, { range: [22, Infinity], score: 18 }
+  ],
+  "Speaking / Readers": [
+    { range: [1,1], score: 2 }, { range: [2,2], score: 3 }, { range: [3,3], score: 4 },
+    { range: [4,5], score: 5 }, { range: [6,7], score: 6 }, { range: [8,11], score: 7 },
+    { range: [12,21], score: 8 }, { range: [22, Infinity], score: 9 }
+  ]
+};
+
+const durationTable = [
+  { max: 0.5, score: 2 }, { max: 0.9, score: 4 }, { max: 1.9, score: 6 },
+  { max: 2.9, score: 8 }, { max: 4.9, score: 10 }, { max: 9.9, score: 12 },
+  { max: 29.9, score: 14 }, { max: 59.9, score: 16 }, { max: Infinity, score: 18 }
+];
+
+// Handles switching between Main types (Reader / Nonreader)
+function selectMainType(textId, mainType, btn) {
+  const group = btn.parentNode;
+  group.querySelectorAll('button').forEach(b => b.classList.remove('active-btn'));
+  btn.classList.add('active-btn');
+
+  const subOptions = document.getElementById(textId + '-sub-options');
+  if (mainType === 'Nonreader') {
+    subOptions.classList.add('hidden-sub');
+    sampleTypes[textId] = 'Nonreader';
+  } else {
+    subOptions.classList.remove('hidden-sub');
+    const activeSubBtn = subOptions.querySelector('.active-btn');
+    sampleTypes[textId] = activeSubBtn ? activeSubBtn.getAttribute('data-type') : 'Reader';
+  }
+  calculateFrequencyDuration();
+}
+
+// Handles switching between Sub types for Readers (Reading / Speaking Task)
+function selectSubType(textId, subType, btn) {
+  const group = btn.parentNode;
+  group.querySelectorAll('button').forEach(b => b.classList.remove('active-btn'));
+  btn.classList.add('active-btn');
+
+  sampleTypes[textId] = subType;
+  calculateFrequencyDuration();
+}
+
+function getFrequencyScore(frequencyPercent, type) {
+  const table = frequencyTable[type] || frequencyTable["Reader"];
+  const val = parseFloat(frequencyPercent);
+  for(let i=0;i<table.length;i++){
+    const [min,max] = table[i].range;
+    if(val >= min && val <= max) return table[i].score;
+  }
+  return 0;
+}
+
+function getDurationScore(avgDuration) {
+  const row = durationTable.find(r => avgDuration <= r.max);
+  return row ? row.score : 0;
+}
+
+function calculateFrequencyDuration() {
+  const text1 = document.getElementById('text1').value;
+  const text2 = document.getElementById('text2').value;
+
+  const results = [];
+
+  if(text1.trim()) results.push(processText(text1, 'text1'));
+  if(text2.trim()) results.push(processText(text2, 'text2'));
+
+  let combinedResult;
+
+  if(results.length > 1){
+    combinedResult = combineResults(results);
+    results.push(combinedResult);
+  } else if(results.length === 1){
+    combinedResult = results[0];
+  } else {
+    combinedResult = { frequencyScore:0, durationScore:0 };
+  }
+
+  // Update globals
+  window.combinedFrequencyScore = combinedResult.frequencyScore;
+  window.combinedDurationScore = combinedResult.durationScore;
+  window.latestResults = results;
+
+  displayResults(results);
+  updateFinalReport();
+}
+
+function processText(text, textId){
+  const syllableData = analyzeText(text, textId);
+  const top3 = syllableData.durations.sort((a,b)=>b-a).slice(0,3);
+  const durationMean = mean(top3);
+  const frequencyPercent = ((syllableData.stutterEvents / syllableData.totalSyllables)*100).toFixed(2);
+  const frequencyScore = getFrequencyScore(frequencyPercent, sampleTypes[textId]);
+  const durationScore = getDurationScore(durationMean);
+
+  return {
+    id: textId,
+    label: textId === 'text1' ? 'النص الأول' : 'النص الثاني',
+    stutterEvents: syllableData.stutterEvents,
+    totalSyllables: syllableData.totalSyllables,
+    totalWords: syllableData.totalWords,
+    frequencyPercent: isNaN(frequencyPercent) ? 0 : frequencyPercent,
+    frequencyScore,
+    durationMean,
+    durationScore
+  };
+}
+
+function combineResults(results){
+  const combinedType = results.some(r => sampleTypes[r.id]==='Nonreader') ? 'Nonreader' :
+                       results.some(r => sampleTypes[r.id]==='Speaking / Readers') ? 'Speaking / Readers' :
+                       'Reader';
+
+  const stutterEvents = results[0].stutterEvents + results[1].stutterEvents;
+  const totalSyllables = results[0].totalSyllables + results[1].totalSyllables;
+  const totalWords = results[0].totalWords + results[1].totalWords;
+  const durationMean = mean([results[0].durationMean, results[1].durationMean]);
+  const frequencyPercent = ((stutterEvents / totalSyllables)*100).toFixed(2);
+  const frequencyScore = getFrequencyScore(frequencyPercent, combinedType);
+  const durationScore = getDurationScore(durationMean);
+
+  return {
+    label: 'النتيجة المدمجة (النصين معاً)',
+    stutterEvents,
+    totalSyllables,
+    totalWords,
+    frequencyPercent: isNaN(frequencyPercent) ? 0 : frequencyPercent,
+    frequencyScore,
+    durationMean,
+    durationScore
+  };
+}
+
+function displayResults(results){
+  let output = '';
+  if(results.length === 0) {
+    output = "لم يتم إدخال نصوص بعد.";
+  } else {
+    results.forEach(res => {
+      output += `[ ${res.label} ]\n`;
+      output += `- عدد المقاطع اللفظية: ${res.totalSyllables}\n`;
+      output += `- عدد الكلمات: ${res.totalWords}\n`;
+      output += `- نسبة التكرار: ${res.frequencyPercent}%\n`;
+      output += `- درجة التكرار: ${res.frequencyScore}\n`;
+      output += `- متوسط المدة: ${res.durationMean ? res.durationMean.toFixed(2) : 0} ثانية\n`;
+      output += `- درجة المدة: ${res.durationScore}\n\n`;
+    });
+  }
+
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.style.display = 'block';
+  document.getElementById('results-output').textContent = output;
+}
+
+// ======= Physical Concomitants Logic =======
+const physicalData = {
+  "Distracting Sounds": { types: [], score: 0 },
+  "Facial Grimaces": { types: [], score: 0 },
+  "Head Movements": { types: [], score: 0 },
+  "Movements of the Extremities": { types: [], score: 0 }
+};
+
+function selectType(category, type) {
+  const index = physicalData[category].types.indexOf(type);
+  if (index === -1) {
+    physicalData[category].types.push(type);
+  } else {
+    physicalData[category].types.splice(index, 1);
+  }
+  updateButtonState(category, type);
+  updatePhysicalResults();
+  updateFinalReport();
+}
+
+function promptOther(category) {
+  const custom = prompt("أدخل مظهر آخر لقسم " + category + ":");
+  if (custom) {
+    physicalData[category].types.push(custom);
+    updatePhysicalResults();
+    updateFinalReport();
+  }
+}
+
+function setScore(category, score) {
+  physicalData[category].score = score;
+  updateRatingButtons(category, score);
+  updatePhysicalResults();
+  updateFinalReport();
+}
+
+function updateButtonState(category, type) {
+  document.querySelectorAll(`#physical-concomitants .physical-item[data-category="${category}"] .type-buttons button`)
+    .forEach(btn => {
+      if (btn.textContent === type) btn.classList.toggle('selected');
+    });
+}
+
+function updateRatingButtons(category, score) {
+  document.querySelectorAll(`#physical-concomitants .physical-item[data-category="${category}"] .rating button`)
+    .forEach(btn => {
+      if (parseInt(btn.textContent) === score) {
+        btn.classList.add('selected');
+      } else {
+        btn.classList.remove('selected');
+      }
+    });
+}
+
+function updatePhysicalResults() {
+  let output = "";
+  let total = 0;
+  for (const [cat, data] of Object.entries(physicalData)) {
+    if(data.types.length > 0 || data.score > 0) {
+       output += `${cat}: [${data.types.join("، ")}] = ${data.score}\n`;
+    }
+    total += data.score;
+  }
+  output += `\nإجمالي درجة المظاهر الجسدية = ${total}`;
+  
+  if (total > 0 || output.length > 50) {
+    document.getElementById("physical-results").style.display = "block";
+    document.getElementById("physical-output").textContent = output;
+  }
+}
+
+// ======= Naturalness Logic =======
+const naturalnessScale = document.getElementById('naturalnessScale');
+const naturalnessValue = document.getElementById('naturalnessValue');
+
+function updateNaturalnessValue() {
+  naturalnessValue.textContent = naturalnessScale.value;
+  updateFinalReport();
+}
+naturalnessScale.addEventListener('input', updateNaturalnessValue);
+
+
+// ======= Info Boxes =======
+const infoMessages = {
+  page: "تقوم هذه الأداة بتقييم شدة التلعثم لدى الأطفال والكبار. يُستخدم هذا التقييم لتسجيل الملاحظات وقياس التكرار، والمدة، والظواهر الجسدية المصاحبة، وطبيعية الكلام.",
+  resources: "يعرض هذا القسم جميع الموارد المتاحة. اضغط على زر المورد لمشاهدة العنصر المقابل.",
+  frequency: "أدخل عينات الكلام أو القراءة هنا. ضع كل كلمة تعثرت بها داخل قوسين متبوعة بالمدة، مثال: (الكلمة 1.5). للخيارات: اختر 'غير قارئ' للأطفال أو من لا يقرأون. اختر 'قارئ' ثم حدد ما إذا كانت العينة قراءة من كتاب أو مهمة تحدث.",
+  physical: "يجب تسجيل فقط الظواهر القابلة للملاحظة المرتبطة بالتلعثم. السلوك العام مثل القلق أو الحركة المستمرة لا يتم تقييمه هنا.",
+  naturalness: "يتم التقييم فور الانتهاء من تسجيل عينة الكلام. طبيعية الكلام تشير إلى مدى تشابه كلام المتحدث مع معظم المتحدثين الطبيعيين من نفس الجنس والعمر واللهجة.",
+  report: "التقرير النهائي يُحدث نفسه تلقائياً ويجمع النقاط لحساب الشدة والنسبة المئوية."
+};
+
+function showTestInfo(key) {
+  const boxId = `info-box-${key}`;
+  const box = document.getElementById(boxId);
+  if (!box) return;
+  const p = box.querySelector("p");
+  if (p && infoMessages[key]) p.textContent = infoMessages[key];
+  box.classList.remove("hidden");
+}
+
+function closeInfoBox(key) {
+  const boxId = `info-box-${key}`;
+  const box = document.getElementById(boxId);
+  if (!box) return;
+  box.classList.add("hidden");
+}
+
+// ======= Final Report =======
+let currentCategory = "Preschool"; 
+
+const severityTables = {
+  "Preschool": [
+    { range:[0,8], percentile:"1-4", severity:"Very mild (خفيف جداً)" },
+    { range:[9,10], percentile:"5-11", severity:"Very mild (خفيف جداً)" },
+    { range:[11,12], percentile:"12-23", severity:"Mild (خفيف)" },
+    { range:[13,16], percentile:"24-40", severity:"Mild (خفيف)" },
+    { range:[17,23], percentile:"41-60", severity:"Moderate (متوسط)" },
+    { range:[24,26], percentile:"61-77", severity:"Moderate (متوسط)" },
+    { range:[27,28], percentile:"78-88", severity:"Severe (شديد)" },
+    { range:[29,31], percentile:"89-95", severity:"Severe (شديد)" },
+    { range:[32,Infinity], percentile:"96-99", severity:"Very severe (شديد جداً)" }
+  ],
+  "School Age": [
+    { range:[0,5], percentile:"0", severity:"Normal (طبيعي)" },
+    { range:[6,8], percentile:"1-4", severity:"Very mild (خفيف جداً)" },
+    { range:[9,10], percentile:"5-11", severity:"Very mild (خفيف جداً)" },
+    { range:[11,15], percentile:"12-23", severity:"Mild (خفيف)" },
+    { range:[16,20], percentile:"24-40", severity:"Mild (خفيف)" },
+    { range:[21,23], percentile:"41-60", severity:"Moderate (متوسط)" },
+    { range:[24,27], percentile:"61-77", severity:"Moderate (متوسط)" },
+    { range:[28,31], percentile:"78-88", severity:"Severe (شديد)" },
+    { range:[32,35], percentile:"89-95", severity:"Severe (شديد)" },
+    { range:[36,Infinity], percentile:"96-99", severity:"Very severe (شديد جداً)" }
+  ],
+  "Adult": [
+    { range:[0,9], percentile:"0", severity:"Normal (طبيعي)" },
+    { range:[10,12], percentile:"1-4", severity:"Very mild (خفيف جداً)" },
+    { range:[13,17], percentile:"5-11", severity:"Very mild (خفيف جداً)" },
+    { range:[18,20], percentile:"12-23", severity:"Mild (خفيف)" },
+    { range:[21,24], percentile:"24-40", severity:"Mild (خفيف)" },
+    { range:[25,27], percentile:"41-60", severity:"Moderate (متوسط)" },
+    { range:[28,31], percentile:"61-77", severity:"Moderate (متوسط)" },
+    { range:[32,34], percentile:"78-88", severity:"Severe (شديد)" },
+    { range:[35,36], percentile:"89-95", severity:"Severe (شديد)" },
+    { range:[37,Infinity], percentile:"96-99", severity:"Very severe (شديد جداً)" }
+  ]
+};
+
+function updateFinalReport() {
+  const category = currentCategory;
+  const frequency = window.combinedFrequencyScore || 0;
+  const duration = window.combinedDurationScore || 0;
+
+  let physicalScore = 0;
+  let physicalText = "";
+  for (const [cat, data] of Object.entries(physicalData || {})) {
+    physicalScore += data.score || 0;
+    if (data.types && data.types.length) physicalText += `- ${cat}: [${data.types.join("، ")}] (الدرجة: ${data.score})\n`;
+  }
+
+  const totalScore = frequency + duration + physicalScore;
+
+  let percentile = "غير محدد", severity = "غير محدد";
+  const table = severityTables[category];
+  if(table) {
+    for (let row of table) {
+      if (totalScore >= row.range[0] && totalScore <= (row.range[1]===Infinity?999:row.range[1])) {
+        percentile = row.percentile;
+        severity = row.severity;
+        break;
+      }
+    }
+  }
+
+  // بناء تفاصيل نصوص التكرار للملخص
+  let frequencyDetails = "";
+  if (window.latestResults && window.latestResults.length > 0) {
+    window.latestResults.forEach(res => {
+      frequencyDetails += `[ ${res.label} ]\n`;
+      frequencyDetails += `المقاطع: ${res.totalSyllables} | الكلمات: ${res.totalWords} | نسبة التكرار: ${res.frequencyPercent}%\n`;
+      frequencyDetails += `متوسط المدة: ${res.durationMean ? res.durationMean.toFixed(2) : 0} ثانية\n`;
+      frequencyDetails += `درجة التكرار: ${res.frequencyScore} | درجة المدة: ${res.durationScore}\n\n`;
+    });
+  } else {
+    frequencyDetails = "لم يتم إدخال نصوص.\n\n";
+  }
+
+  const reportContent = `----------------------------------------
+التقرير النهائي لتقييم التأتأة SSI-4
+----------------------------------------
+
+[ المعلومات التعريفية ]
+الاسم: ${document.getElementById("name")?.value || "غير مدخل"}
+الصف الدراسي: ${document.getElementById("grade")?.value || "غير مدخل"}
+تاريخ الميلاد: ${document.getElementById("dob")?.value || "غير مدخل"}  |  العمر: ${document.getElementById("age")?.value || "غير محسوب"}
+الفئة: ${category}
+الجنس: ${document.getElementById("gender")?.value || "غير محدد"}
+حالة القراءة: ${document.getElementById("reader")?.value || "غير محدد"}
+المدرسة: ${document.getElementById("school")?.value || "غير مدخل"}
+المقيّم: ${document.getElementById("examiner")?.value || "غير مدخل"}
+
+----------------------------------------
+[ تفاصيل التكرار والمدة ]
+${frequencyDetails.trim()}
+
+> إجمالي درجة التكرار المعتمدة = ${frequency}
+> إجمالي درجة المدة المعتمدة = ${duration}
+
+----------------------------------------
+[ المظاهر الجسدية المصاحبة ]
+${physicalText || "لا توجد مظاهر مسجلة."}
+> إجمالي درجة المظاهر الجسدية = ${physicalScore}
+
+----------------------------------------
+[ طبيعية الكلام ]
+مقياس طبيعية الكلام (1-9) = ${document.getElementById("naturalnessScale")?.value || ""}
+ملاحظات إضافية: ${document.getElementById("naturalnessNotes")?.value || "لا يوجد"}
+
+========================================
+[ النتيجة النهائية ]
+المجموع الكلي (Total Score) = ${totalScore}
+النسبة المئوية (Percentile) = ${percentile}
+شدة التلعثم (Severity)      = ${severity}
+========================================
+
+توقيع الأخصائي (SLP): _____________________
+`;
+  document.getElementById("report").value = reportContent;
+}
+
+// Auto-calculate on input
+document.getElementById("text1")?.addEventListener("input", calculateFrequencyDuration);
+document.getElementById("text2")?.addEventListener("input", calculateFrequencyDuration);
+
+// Input triggers for updating report info dynamically
+document.querySelectorAll('.info-grid input').forEach(input => {
+    input.addEventListener('input', updateFinalReport);
+});
+document.getElementById('naturalnessNotes')?.addEventListener('input', updateFinalReport);
+
+function downloadReport() {
+  const content = document.getElementById("report")?.value || "";
+  if (!content) return alert("التقرير فارغ!");
+  const blob = new Blob([content], {type:"text/plain;charset=utf-8"});
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "تقرير_تقييم_التأتأة_SSI4.txt";
+  link.click();
+}
+</script>
 </body>
 </html>

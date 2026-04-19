@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Stuttering Forms | Ahmad Ghanem SLP</title>
+  <title>Neuro | Ahmad Ghanem SLP</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Google Fonts -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&display=swap">
 
   <!-- Tab Icon -->
-  <link rel="icon" href="../images/logo.png" type="image/png">
+  <link rel="icon" href="images/logo.png" type="image/png">
 
   <style>
     body {
@@ -26,6 +26,8 @@
       background: #fcfdff;
       border-bottom: 1px solid #e3f1ff;
       padding: 0.45em 0;
+      position: relative;
+      z-index: 2;
     }
 
     .site-nav-bar a {
@@ -48,7 +50,6 @@
       margin-top: 2em;
       margin-bottom: 2.5em;
       text-align: center;
-      padding: 0 1em;
     }
 
     .subtitle {
@@ -63,8 +64,9 @@
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1.5em;
       max-width: 1200px;
-      margin: 0 auto 3em;
+      margin: 3em auto;
       padding: 0 1em;
+      align-items: stretch;
     }
 
     .form-card {
@@ -74,8 +76,8 @@
       text-align: center;
       background: #fcfdff;
       border-radius: 16px;
-      border: 1.8px solid #e3f1ff;
       box-shadow: 0 3px 14px #a4d4ff16;
+      border: 1.8px solid #e3f1ff;
       padding: 25px 18px;
       min-height: 280px;
       box-sizing: border-box;
@@ -88,6 +90,7 @@
     .form-card:hover {
       box-shadow: 0 8px 32px #43a6f830;
       border-color: #43a6f8;
+      z-index: 1;
     }
 
     .form-card img {
@@ -146,37 +149,65 @@
 <body>
 
   <nav class="site-nav-bar">
-    <a href="../../index.html">Home</a>
-    <a href="../../tools.html">Tools</a>
-    <a href="../../resources.html">Resources</a>
+    <a href="index.html">Home</a>
+    <a href="tools.html">Tools</a>
+    <a href="resources.html">Resources</a>
   </nav>
 
   <main>
     <div class="forms-header">
-      <h1>Stuttering Forms</h1>
+      <h1>Aphasia</h1>
       <div class="subtitle">All digital assessment and intake forms</div>
     </div>
 
     <div class="forms-list">
-      <a href="SSI4/index.html" target="_blank" rel="noopener" class="form-card">
-        <img src="../../images/stutter.gif" alt="SSI-4 icon">
-        <div class="form-card-title">SSI-4</div>
-        <div class="form-card-desc">Severity of Stuttering Index</div>
+      <a href="../../forms/AOS/AOS and disarthria/index.html" target="_blank" rel="noopener" class="form-card">
+        <img src="../../images/brain.gif" alt="Language forms icon">
+        <div class="form-card-title">NeuroSpeech</div>
+        <div class="form-card-desc">Acquired Neurogenic Speech Disorders Assessment</div>
       </a>
 
-      <a href="DAF/index.html" target="_blank" rel="noopener" class="form-card">
-        <img src="../../images/speed.gif" alt="Auditory Skills icon">
-        <div class="form-card-title">DAF</div>
-        <div class="form-card-desc">Delay Auditory Feedback</div>
+      <a href="forms/speech/index.html" target="_blank" rel="noopener" class="form-card">
+        <img src="images/speech.gif" alt="Speech forms icon">
+        <div class="form-card-title">Speech</div>
+        <div class="form-card-desc">Explore speech-related assessment.</div>
       </a>
 
-      <a href="Fluency Flow/index.html" target="_blank" rel="noopener" class="form-card">
-        <img src="../../images/morphology.gif" alt="Vocabulary icon">
-        <div class="form-card-title">Fluency Flow</div>
-        <div class="form-card-desc">shaping , modification and breathing</div>
+      <a href="forms/asd/index.html" target="_blank" rel="noopener" class="form-card">
+        <img src="images/ASD.gif" alt="ASD/Autism forms icon">
+        <div class="form-card-title">ASD</div>
+        <div class="form-card-desc">Assessment for autism spectrum.</div>
       </a>
 
-      <!-- Add more cards here inside this single container -->
+      <a href="forms/child-case-history/index.html" target="_blank" rel="noopener" class="form-card">
+        <img src="images/baby-smile.gif" alt="Child icon">
+        <div class="form-card-title">Child Case History</div>
+        <div class="form-card-desc">Basic developmental and family intake.</div>
+      </a>
+
+      <a href="forms/adult-case-history/index.html" target="_blank" rel="noopener" class="form-card">
+        <img src="images/adult.gif" alt="Adult icon">
+        <div class="form-card-title">Adult Case History</div>
+        <div class="form-card-desc">Basic intake for adults.</div>
+      </a>
+
+      <a href="forms/oral-motor-exam/index.html" target="_blank" rel="noopener" class="form-card">
+        <img src="images/oral.gif" alt="Oral Motor Exam icon">
+        <div class="form-card-title">Oral Motor Exam</div>
+        <div class="form-card-desc">Comprehensive oral motor evaluation.</div>
+      </a>
+
+      <a href="forms/voice/index.html" target="_blank" rel="noopener" class="form-card">
+        <img src="images/voice.gif" alt="Voice icon">
+        <div class="form-card-title">Voice Evaluation</div>
+        <div class="form-card-desc">Assessment for voice issues.</div>
+      </a>
+
+      <a href="forms/aphasia.html" target="_blank" rel="noopener" class="form-card">
+        <img src="images/aphasia.gif" alt="Aphasia icon">
+        <div class="form-card-title">Aphasia</div>
+        <div class="form-card-desc">Assessment for neurodevelopmental issues.</div>
+      </a>
     </div>
 
     <div class="about-contact">
@@ -185,5 +216,6 @@
       <a href="tel:+963988451245">+963 988 451 245</a>
     </div>
   </main>
+
 </body>
 </html>
