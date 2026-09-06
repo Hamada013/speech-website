@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Auditory Rehabilitation - Touch App</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'pastel-pink': '#ffd1dc',
+              'pastel-blue': '#aec6cf',
+              'pastel-green': '#b7e4c7',
+              'pastel-purple': '#cbaacb',
+              'pastel-text': '#5a5a5a'
+            }
+          }
+        }
+      }
+    </script>
+      
+    <style>
+      body { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        user-select: none; 
+        -webkit-user-select: none;
+        overscroll-behavior: none; 
+      }
+    </style>
+</head>
+<body class="bg-gray-50 text-pastel-text overflow-hidden h-[100dvh] flex flex-col">
+
+    <!-- Home Screen -->
+    <div id="home-screen" class="absolute inset-0 bg-white z-[60] flex flex-col items-center justify-between p-6 transition-all duration-300 overflow-y-auto">
+        <!-- Top bar with Tools button -->
+        <div class="w-full max-w-6xl flex items-center justify-between">
+            <a href="../tools.html" class="p-2 px-4 bg-gray-100 rounded-full text-pastel-text hover:bg-gray-200 transition flex items-center gap-2 font-bold text-xs md:text-sm cursor-pointer">
+                <i class="fas fa-tools"></i> Tools
+            </a>
+            <div></div>
+        </div>
+
+        <div class="w-full max-w-6xl flex flex-col items-center justify-center flex-1 my-auto">
+            <div class="flex items-center gap-3 md:gap-4 mb-6 md:mb-10">
+                <div class="flex items-center gap-2">
+                    <img src="images/logo.png" alt="Logo" class="h-12 w-12 md:h-16 md:w-16 object-contain rounded-full shadow-md">
+                </div>
+                <div class="h-12 w-12 md:h-16 md:w-16 bg-pastel-blue rounded-full shadow-md flex items-center justify-center">
+                    <i class="fas fa-headphones text-white text-xl md:text-3xl"></i>
+                </div>
+                <h1 class="font-black text-2xl md:text-4xl text-slate-700">Auditory Rehabilitation with Hamada</h1>
+            </div>
+
+            <!-- Main Mode Selection: Detection, Discrimination, Identification, & Memory -->
+            <div id="main-menu-view" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 w-full max-w-6xl px-2">
+                <button onclick="window.location.href='detection.html'" class="group flex flex-col items-center p-5 md:p-6 bg-pastel-purple bg-opacity-20 border-2 border-pastel-purple rounded-3xl hover:bg-opacity-40 transition hover:-translate-y-1 shadow-sm cursor-pointer">
+                    <i class="fas fa-volume-control-phone text-3xl md:text-5xl text-pastel-purple mb-4 group-hover:scale-110 transition"></i>
+                    <h3 class="font-bold text-base md:text-xl text-slate-700">Detection</h3>
+                    <p class="text-xs md:text-sm text-center text-slate-500 mt-2">Sound detection training tasks</p>
+                </button>
+
+                <button onclick="window.location.href='discrimination.html'" class="group flex flex-col items-center p-5 md:p-6 bg-pastel-pink bg-opacity-20 border-2 border-pastel-pink rounded-3xl hover:bg-opacity-40 transition hover:-translate-y-1 shadow-sm cursor-pointer">
+                    <i class="fas fa-ear-listen text-3xl md:text-5xl text-pastel-pink mb-4 group-hover:scale-110 transition"></i>
+                    <h3 class="font-bold text-base md:text-xl text-slate-700">Discrimination</h3>
+                    <p class="text-xs md:text-sm text-center text-slate-500 mt-2">Sound discrimination training tasks</p>
+                </button>
+
+                <button onclick="showIdentificationLevels()" class="group flex flex-col items-center p-5 md:p-6 bg-pastel-green bg-opacity-20 border-2 border-pastel-green rounded-3xl hover:bg-opacity-40 transition hover:-translate-y-1 shadow-sm cursor-pointer">
+                    <i class="fas fa-bullseye text-3xl md:text-5xl text-pastel-green mb-4 group-hover:scale-110 transition"></i>
+                    <h3 class="font-bold text-base md:text-xl text-slate-700">Identification</h3>
+                    <p class="text-xs md:text-sm text-center text-slate-500 mt-2">Levels 1, 2, and 3 auditory training</p>
+                </button>
+
+                <button onclick="window.location.href='memory.html'" class="group flex flex-col items-center p-5 md:p-6 bg-pastel-blue bg-opacity-20 border-2 border-pastel-blue rounded-3xl hover:bg-opacity-40 transition hover:-translate-y-1 shadow-sm cursor-pointer">
+                    <i class="fas fa-brain text-3xl md:text-5xl text-pastel-blue mb-4 group-hover:scale-110 transition"></i>
+                    <h3 class="font-bold text-base md:text-xl text-slate-700">Memory</h3>
+                    <p class="text-xs md:text-sm text-center text-slate-500 mt-2">Auditory memory training tasks</p>
+                </button>
+            </div>
+
+            <!-- Identification Levels View (Hidden Initially) -->
+            <div id="identification-levels-view" class="hidden flex-col items-center w-full max-w-4xl">
+                <div class="flex items-center justify-between w-full mb-4 px-2">
+                    <button onclick="showMainMenu()" class="p-2 px-3 bg-gray-100 rounded-full text-pastel-text hover:bg-gray-200 transition flex items-center gap-2 font-bold text-xs md:text-sm cursor-pointer">
+                        <i class="fas fa-arrow-left"></i> Back to Modes
+                    </button>
+                    <h2 class="font-bold text-lg md:text-xl text-slate-700">Select Identification Level</h2>
+                    <div class="w-16"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 w-full px-2">
+                    <button onclick="window.location.href='identification.html?level=1'" class="group flex flex-col items-center p-5 md:p-8 bg-pastel-pink bg-opacity-20 border-2 border-pastel-pink rounded-3xl hover:bg-opacity-40 transition hover:-translate-y-1 shadow-sm cursor-pointer">
+                        <i class="fas fa-shapes text-3xl md:text-5xl text-pastel-pink mb-3 group-hover:scale-110 transition"></i>
+                        <h3 class="font-bold text-base md:text-xl text-slate-700">Level 1</h3>
+                        <p class="text-xs md:text-sm text-center text-slate-500 mt-1">Phase A: Wide Contrast<br>(2-Choice Pairs)</p>
+                    </button>
+
+                    <button onclick="window.location.href='identification.html?level=2'" class="group flex flex-col items-center p-5 md:p-8 bg-pastel-green bg-opacity-20 border-2 border-pastel-green rounded-3xl hover:bg-opacity-40 transition hover:-translate-y-1 shadow-sm cursor-pointer">
+                        <i class="fas fa-layer-group text-3xl md:text-5xl text-pastel-green mb-3 group-hover:scale-110 transition"></i>
+                        <h3 class="font-bold text-base md:text-xl text-slate-700">Level 2</h3>
+                        <p class="text-xs md:text-sm text-center text-slate-500 mt-1">Phase B: Similar Sounds<br>(2-Choice Pairs)</p>
+                    </button>
+
+                    <button onclick="window.location.href='identification.html?level=3'" class="group flex flex-col items-center p-5 md:p-8 bg-pastel-purple bg-opacity-20 border-2 border-pastel-purple rounded-3xl hover:bg-opacity-40 transition hover:-translate-y-1 shadow-sm cursor-pointer">
+                        <i class="fas fa-cubes text-3xl md:text-5xl text-pastel-purple mb-3 group-hover:scale-110 transition"></i>
+                        <h3 class="font-bold text-base md:text-xl text-slate-700">Level 3</h3>
+                        <p class="text-xs md:text-sm text-center text-slate-500 mt-1">Phase C: Expanded Sets<br>(3 & 4-Choice)</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="w-full text-center text-[10px] md:text-xs text-gray-400 leading-relaxed uppercase tracking-wider py-2 shrink-0">
+            SPEECH AND LANGUAGE PATHOLOGY<br>
+            Ahmad Ghanem<br>
+            Latakia - Syria<br>
+            slp.ahmadghanem@gmail.com
+        </footer>
+    </div>
+
+    <script>
+        function showIdentificationLevels() {
+            document.getElementById('main-menu-view').classList.add('hidden');
+            document.getElementById('identification-levels-view').classList.remove('hidden');
+            document.getElementById('identification-levels-view').classList.add('flex');
+        }
+
+        function showMainMenu() {
+            document.getElementById('identification-levels-view').classList.add('hidden');
+            document.getElementById('identification-levels-view').classList.remove('flex');
+            document.getElementById('main-menu-view').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

@@ -1,14 +1,595 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-    <script type="module" crossorigin src="/assets/index-DcOsb1Dx.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-DYrBEGlt.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
-</html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ling Six - Sound Assessment</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
 
+    body {
+      background-color: #f6f8fc;
+      color: #1e293b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* HEADER */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25);
+    }
+
+    .logo-text h1 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.1;
+    }
+
+    .logo-text span {
+      font-size: 10px;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    /* MODE TOGGLE PILL */
+    .mode-toggle {
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: 30px;
+      display: flex;
+      gap: 4px;
+    }
+
+    .mode-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mode-btn.active {
+      background: #ffffff;
+      color: #4f46e5;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    /* TOOLBAR CONTROL BAR */
+    .toolbar {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 24px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    }
+
+    .toggle-segment {
+      background: #f1f5f9;
+      padding: 3px;
+      border-radius: 12px;
+      display: flex;
+      gap: 2px;
+    }
+
+    .segment-btn {
+      border: none;
+      background: transparent;
+      padding: 6px 14px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+    }
+
+    .segment-btn.active {
+      background: #ffffff;
+      color: #4f46e5;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    /* STEPPER COUNTER */
+    .stepper {
+      background: #f1f5f9;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      padding: 2px 8px;
+      gap: 12px;
+    }
+
+    .stepper-btn {
+      border: none;
+      background: transparent;
+      font-size: 16px;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+      padding: 4px 6px;
+    }
+
+    .stepper-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* TOOLBAR ACTIONS */
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: none;
+      background: #f1f5f9;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .icon-btn.primary {
+      background: #e0e7ff;
+      color: #4f46e5;
+    }
+
+    .icon-btn.primary:hover {
+      background: #c7d2fe;
+    }
+
+    /* CARD GRID */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .card {
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      border-radius: 32px;
+      padding: 32px 20px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.02);
+      user-select: none;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
+    }
+
+    .card.active {
+      border-color: #818cf8;
+      box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.2);
+    }
+
+    .icon-box {
+      width: 120px;
+      height: 120px;
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+      transition: filter 0.2s ease;
+    }
+
+    .icon-box img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .card-phoneme {
+      font-size: 11px;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .audio-badge {
+      position: absolute;
+      bottom: 16px;
+      right: 18px;
+      color: #6366f1;
+      display: none;
+    }
+
+    .card.active .audio-badge {
+      display: block;
+    }
+
+    /* HIDDEN VISUALS STATE */
+    .hide-visuals .icon-box img,
+    .hide-visuals .card-title,
+    .hide-visuals .card-phoneme {
+      filter: blur(12px);
+      opacity: 0.15;
+    }
+
+    /* ASSESSMENT FEEDBACK ANIMATION */
+    @keyframes correctPulse {
+      0% { border-color: #10b981; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+      70% { border-color: #10b981; box-shadow: 0 0 0 12px rgba(16, 185, 129, 0); }
+      100% { border-color: #e2e8f0; }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .card.correct {
+      animation: correctPulse 0.8s ease forwards;
+    }
+
+    .card.wrong {
+      animation: shake 0.4s ease forwards;
+      border-color: #f43f5e !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- HEADER -->
+    <header>
+      <div class="logo-container">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
+            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <h1>Ling Six</h1>
+          <span>SOUND ASSESSMENT</span>
+        </div>
+      </div>
+
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="practiceModeBtn" onclick="setMode('practice')">Practice</button>
+        <button class="mode-btn" id="assessmentModeBtn" onclick="setMode('assessment')">Assessment</button>
+      </div>
+    </header>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toggle-segment">
+        <button class="segment-btn active" id="btnA" onclick="setSegment('A')">A</button>
+        <button class="segment-btn" id="btnS" onclick="setSegment('S')">S</button>
+      </div>
+
+      <div class="stepper">
+        <button class="stepper-btn" onclick="updateCount(-1)">–</button>
+        <span class="stepper-value" id="cardCountDisplay">6</span>
+        <button class="stepper-btn" onclick="updateCount(1)">+</button>
+      </div>
+
+      <div class="toolbar-actions">
+        <!-- Hide/Show Visuals Toggle -->
+        <button class="icon-btn" id="hideToggleBtn" title="Toggle Visuals" onclick="toggleVisuals()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+          </svg>
+        </button>
+
+        <!-- Visual Eye Toggle -->
+        <button class="icon-btn" title="View Options" onclick="toggleVisuals()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+
+        <!-- Shuffle All Cards Button -->
+        <button class="icon-btn" title="Shuffle Cards" onclick="shuffleCards()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 3 21 3 21 8"></polyline>
+            <line x1="4" y1="20" x2="21" y2="3"></line>
+            <polyline points="21 16 21 21 16 21"></polyline>
+            <line x1="15" y1="15" x2="21" y2="21"></line>
+            <line x1="4" y1="4" x2="9" y2="9"></line>
+          </svg>
+        </button>
+
+        <!-- Assessment Trigger Sound Button -->
+        <button class="icon-btn" title="Play Random Assessment Sound" onclick="playAssessmentSound()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </button>
+
+        <!-- Microphone Button -->
+        <button class="icon-btn primary" title="Microphone Input" onclick="triggerMic()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN CARD GRID -->
+    <main class="grid" id="cardGrid"></main>
+  </div>
+
+  <script>
+    // BASE DATA DECK
+    let cardsData = [
+      {
+        id: 'icecream',
+        title: 'Ice Cream',
+        phoneme: '/M/',
+        color: '#2b7fff',
+        image: 'images/icecream.png',
+        sound: 'sounds/m.wav',
+        svgFallback: `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="m7 11 5 11 5-11"/><path d="M12 3a5 5 0 0 0-5 5c0 .7.1 1.4.4 2h9.2c.3-.6.4-1.3.4-2a5 5 0 0 0-5-5z"/></svg>`
+      },
+      {
+        id: 'train',
+        title: 'Train',
+        phoneme: '/U/',
+        color: '#6366f1',
+        image: 'images/train.png',
+        sound: 'sounds/u.wav',
+        svgFallback: `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/><path d="m8 19-3 3"/><path d="m16 19 3 3"/></svg>`
+      },
+      {
+        id: 'airplane',
+        title: 'Airplane',
+        phoneme: '/A/',
+        color: '#10b981',
+        image: 'images/airplane.png',
+        sound: 'sounds/a.wav',
+        svgFallback: `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3.5c-.5-.5-2.5 0-4 1.5L13.5 8.5 5.3 6.7c-.8-.2-1.6.1-2.1.7l-.6.6c-.5.5-.3 1.4.4 1.7l5.2 2.6-3.2 3.2-2.3-.6c-.4-.1-.8.1-1 .4l-.4.4c-.3.3-.2.8.2 1.1l2.5 1.9 1.9 2.5c.3.4.8.5 1.1.2l.4-.4c.3-.2.5-.6.4-1l-.6-2.3 3.2-3.2 2.6 5.2c.3.7 1.2.9 1.7.4l.6-.6c.6-.5.9-1.3.7-2.1z"/></svg>`
+      },
+      {
+        id: 'slide',
+        title: 'Slide',
+        phoneme: '/S/',
+        color: '#f59e0b',
+        image: 'images/slide.png',
+        sound: 'sounds/s.wav',
+        svgFallback: `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 20h16"/><path d="M6 20V4l10 12h4"/></svg>`
+      },
+      {
+        id: 'sleep',
+        title: 'Sleep',
+        phoneme: '/SH/',
+        color: '#f97316',
+        image: 'images/sleep.png',
+        sound: 'sounds/sh.wav',
+        svgFallback: `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`
+      },
+      {
+        id: 'snake',
+        title: 'Snake',
+        phoneme: '/I/',
+        color: '#f43f5e',
+        image: 'images/snake.png',
+        sound: 'sounds/i.wav',
+        svgFallback: `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 3c-3 0-5 2-5 5s2 5 5 5 5 2 5 5-2 5-5 5"/><circle cx="12" cy="5" r="0.5"/></svg>`
+      }
+    ];
+
+    // STATE VARIABLES
+    let currentMode = 'practice'; // 'practice' or 'assessment'
+    let activeCardId = 'airplane'; // default highlighted
+    let visibleCount = 6;
+    let isVisualsHidden = false;
+    let targetAssessmentSound = null;
+
+    // INITIAL RENDER
+    renderCards();
+
+    // RENDER FUNCTION
+    function renderCards() {
+      const grid = document.getElementById('cardGrid');
+      grid.innerHTML = '';
+
+      if (isVisualsHidden) {
+        grid.classList.add('hide-visuals');
+      } else {
+        grid.classList.remove('hide-visuals');
+      }
+
+      const activeList = cardsData.slice(0, visibleCount);
+
+      activeList.forEach((card) => {
+        const cardEl = document.createElement('div');
+        cardEl.className = `card ${card.id === activeCardId ? 'active' : ''}`;
+        cardEl.id = `card-${card.id}`;
+        cardEl.onclick = () => handleCardClick(card);
+
+        cardEl.innerHTML = `
+          <div class="icon-box" style="background-color: ${card.color};">
+            <img 
+              src="${card.image}" 
+              alt="${card.title}"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+            />
+            <div style="display:none;">${card.svgFallback}</div>
+          </div>
+          <div class="card-title">${card.title}</div>
+          <div class="card-phoneme">${card.phoneme}</div>
+          <div class="audio-badge">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+          </div>
+        `;
+
+        grid.appendChild(cardEl);
+      });
+    }
+
+    // INTERACTION HANDLERS
+    function handleCardClick(card) {
+      activeCardId = card.id;
+      renderCards();
+
+      if (currentMode === 'practice') {
+        playSound(card.sound);
+      } else if (currentMode === 'assessment') {
+        const cardEl = document.getElementById(`card-${card.id}`);
+        if (targetAssessmentSound && card.id === targetAssessmentSound.id) {
+          cardEl.classList.add('correct');
+          playSound(card.sound);
+          setTimeout(() => {
+            cardEl.classList.remove('correct');
+            targetAssessmentSound = null;
+          }, 1000);
+        } else {
+          cardEl.classList.add('wrong');
+          setTimeout(() => cardEl.classList.remove('wrong'), 500);
+        }
+      }
+    }
+
+    function playSound(soundPath) {
+      const audio = new Audio(soundPath);
+      audio.play().catch(() => {
+        console.log("Audio file missing or blocked at: " + soundPath);
+      });
+    }
+
+    // SHUFFLE FUNCTION
+    function shuffleCards() {
+      for (let i = cardsData.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [cardsData[i], cardsData[j]] = [cardsData[j], cardsData[i]];
+      }
+      renderCards();
+    }
+
+    // MODE TOGGLE
+    function setMode(mode) {
+      currentMode = mode;
+      document.getElementById('practiceModeBtn').classList.toggle('active', mode === 'practice');
+      document.getElementById('assessmentModeBtn').classList.toggle('active', mode === 'assessment');
+    }
+
+    // SEGMENT SWITCH (A/S)
+    function setSegment(segment) {
+      document.getElementById('btnA').classList.toggle('active', segment === 'A');
+      document.getElementById('btnS').classList.toggle('active', segment === 'S');
+    }
+
+    // STEPPER COUNTER
+    function updateCount(change) {
+      const newCount = visibleCount + change;
+      if (newCount >= 1 && newCount <= cardsData.length) {
+        visibleCount = newCount;
+        document.getElementById('cardCountDisplay').innerText = visibleCount;
+        renderCards();
+      }
+    }
+
+    // TOGGLE VISUALS (HIDE/SHOW)
+    function toggleVisuals() {
+      isVisualsHidden = !isVisualsHidden;
+      renderCards();
+    }
+
+    // ASSESSMENT TRIGGER SOUND
+    function playAssessmentSound() {
+      const activeList = cardsData.slice(0, visibleCount);
+      const randomIndex = Math.floor(Math.random() * activeList.length);
+      targetAssessmentSound = activeList[randomIndex];
+      playSound(targetAssessmentSound.sound);
+    }
+
+    // MIC TRIGGER
+    function triggerMic() {
+      alert("Microphone active - listening...");
+    }
+  </script>
+</body>
+</html>

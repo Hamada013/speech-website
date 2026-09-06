@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Auditory Detection - Touch App</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'pastel-pink': '#ffd1dc',
+              'pastel-blue': '#aec6cf',
+              'pastel-green': '#b7e4c7',
+              'pastel-purple': '#cbaacb',
+              'pastel-text': '#5a5a5a'
+            }
+          }
+        }
+      }
+    </script>
+      
+    <style>
+      body { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        user-select: none; 
+        -webkit-user-select: none;
+        overscroll-behavior: none; 
+      }
+      @keyframes popIn {
+        0% { transform: scale(0.3); opacity: 0; }
+        60% { transform: scale(1.2); }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    </style>
+</head>
+<body class="bg-gray-50 text-pastel-text overflow-hidden h-[100dvh] flex flex-col">
+    
+    <!-- Audio Elements -->
+    <audio id="sound-success" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=success-1-6297.mp3"></audio>
+    <audio id="sound-error" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_2e06746976.mp3?filename=negative_beeps-6008.mp3"></audio>
+    <audio id="global-manual-audio"></audio>
+
+    <!-- Giant Central Feedback Overlay (Green Tick / Red Cross) -->
+    <div id="central-feedback" class="fixed inset-0 flex items-center justify-center z-[100] hidden pointer-events-none bg-white bg-opacity-80 backdrop-blur-sm transition-all">
+        <i id="feedback-icon-big" class="text-[10rem] md:text-[18rem] drop-shadow-2xl"></i>
+    </div>
+
+    <!-- Header / Top Bar -->
+    <header id="game-header" class="hidden w-full p-3 md:p-4 flex items-center justify-between bg-white shadow-sm z-50 shrink-0">
+        <button onclick="returnToHome()" class="p-2 px-3 md:px-4 bg-gray-100 rounded-full text-pastel-text hover:bg-gray-200 transition flex items-center gap-2 font-bold text-xs md:text-base cursor-pointer">
+            <i class="fas fa-arrow-left"></i>
+            <span>Home</span>
+        </button>
+        
+        <div class="flex flex-col items-center">
+            <h2 id="detection-title" class="text-sm md:text-xl font-bold text-pastel-purple truncate">Detection Training</h2>
+            <div class="flex items-center gap-3 mt-0.5">
+                <span id="trial-counter" class="text-xs font-semibold text-slate-400">Trial 1 of 10</span>
+                <span id="star-counter" class="text-xs font-bold text-amber-500">⭐ 0 / 10</span>
+            </div>
+        </div>
+
+        <button onclick="nextDetectionTrial()" class="p-2 px-3 md:px-4 bg-pastel-purple/25 border border-pastel-purple/40 rounded-xl text-pastel-purple hover:bg-pastel-purple/35 transition flex items-center gap-2 font-bold text-xs md:text-base cursor-pointer">
+            <span>Skip</span>
+            <i class="fas fa-forward"></i>
+        </button>
+    </header>
+
+    <!-- Manual Header / Top Bar -->
+    <header id="manual-header" class="hidden w-full p-3 md:p-4 flex items-center justify-between bg-white shadow-sm z-50 shrink-0">
+        <button onclick="returnToHome()" class="p-2 px-3 md:px-4 bg-gray-100 rounded-full text-pastel-text hover:bg-gray-200 transition flex items-center gap-2 font-bold text-xs md:text-base cursor-pointer">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to Home</span>
+        </button>
+        <h2 class="text-sm md:text-xl font-bold text-pastel-purple truncate">Sound Manual Library (1 - 50)</h2>
+        <div class="w-16"></div>
+    </header>
+
+    <!-- Home Screen -->
+    <div id="home-screen" class="absolute inset-0 bg-white z-[60] flex flex-col items-center justify-between p-6 transition-all duration-300 overflow-y-auto">
+        <!-- Top navigation to index.html -->
+        <div class="w-full max-w-4xl flex justify-start pt-2">
+            <button onclick="window.location.href='index.html'" class="p-2 px-4 bg-gray-100 rounded-full text-pastel-text hover:bg-gray-200 transition flex items-center gap-2 font-bold text-xs md:text-sm cursor-pointer">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Main Menu</span>
+            </button>
+        </div>
+
+        <div class="w-full max-w-4xl flex flex-col items-center justify-center flex-1 my-auto">
+            <div class="flex items-center gap-3 md:gap-4 mb-6 md:mb-10">
+                <div class="h-12 w-12 md:h-16 md:w-16 bg-pastel-purple rounded-full shadow-md flex items-center justify-center">
+                    <i class="fas fa-volume-control-phone text-white text-xl md:text-3xl"></i>
+                </div>
+                <h1 class="font-black text-2xl md:text-4xl text-slate-700">Step 1: Sound Detection</h1>
+            </div>
+
+            <p class="text-center text-sm md:text-base text-slate-500 max-w-lg mb-6">
+                Test auditory awareness! Some trials play sounds and some are silence controls. Press the ear if you hear sound, or the cross if there is no sound. Complete 10 randomized trials to collect stars!
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl px-2 mb-4">
+                <button onclick="startDetectionMode('sudden')" class="group flex flex-col items-center p-5 md:p-6 bg-pastel-pink bg-opacity-20 border-2 border-pastel-pink rounded-3xl hover:bg-opacity-40 transition hover:-translate-y-1 shadow-sm cursor-pointer">
+                    <i class="fas fa-bolt text-3xl md:text-5xl text-pastel-pink mb-3 group-hover:scale-110 transition"></i>
+                    <h3 class="font-bold text-base md:text-lg text-slate-700">Sudden & Transient</h3>
+                    <p class="text-xs text-center text-slate-500 mt-1">25 Impulse / Short Duration Sounds</p>
+                </button>
+
+                <button onclick="startDetectionMode('continuous')" class="group flex flex-col items-center p-5 md:p-6 bg-pastel-green bg-opacity-20 border-2 border-pastel-green rounded-3xl hover:bg-opacity-40 transition hover:-translate-y-1 shadow-sm cursor-pointer">
+                    <i class="fas fa-wave-square text-3xl md:text-5xl text-pastel-green mb-3 group-hover:scale-110 transition"></i>
+                    <h3 class="font-bold text-base md:text-lg text-slate-700">Continuous Sounds</h3>
+                    <p class="text-xs text-center text-slate-500 mt-1">23 Steady State / Ongoing Sounds</p>
+                </button>
+            </div>
+
+            <!-- Manual Button -->
+            <button onclick="openManualScreen()" class="w-full max-w-2xl p-4 bg-pastel-purple/20 border-2 border-pastel-purple rounded-2xl text-pastel-purple hover:bg-pastel-purple/30 transition flex items-center justify-center gap-3 font-bold text-base shadow-sm cursor-pointer">
+                <i class="fas fa-book-open text-xl"></i>
+                <span>Manual Library (Browse All 1-50 Sounds)</span>
+            </button>
+        </div>
+
+        <footer class="w-full text-center text-[10px] md:text-xs text-gray-400 leading-relaxed uppercase tracking-wider py-2 shrink-0">
+            SPEECH AND LANGUAGE PATHOLOGY<br>
+            Ahmad Ghanem<br>
+            Latakia - Syria<br>
+            slp.ahmadghanem@gmail.com
+        </footer>
+    </div>
+
+    <!-- Game Area -->
+    <div id="game-area" class="hidden flex-1 flex-col items-center justify-between p-4 md:p-6 w-full max-w-4xl mx-auto overflow-hidden">
+        
+        <!-- Central Layout: Left Cross Button, Center Card, Right Ear Button -->
+        <div class="flex items-center justify-center my-auto w-full gap-4 md:gap-8">
+            
+            <!-- Left Button: Big Red Cross (No Sound / Not Heard) -->
+            <button onclick="recordResponse(false)" class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-red-50 border-2 border-red-200 rounded-3xl text-red-500 shadow-md hover:bg-red-100 active:scale-95 transition flex items-center justify-center cursor-pointer shrink-0">
+                <i class="fas fa-times text-4xl sm:text-5xl md:text-6xl"></i>
+            </button>
+
+            <!-- Current Sound Card Display (Non-clickable to play audio) -->
+            <div id="detection-card" class="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 bg-white rounded-3xl shadow-lg border-4 border-pastel-purple/40 flex flex-col items-center justify-center p-4 relative transition-all">
+                <img id="detection-img" src="" alt="" class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 object-contain pointer-events-none select-none drop-shadow-sm mb-2">
+                <span id="detection-name" class="font-bold text-sm md:text-base text-slate-700 text-center"></span>
+            </div>
+
+            <!-- Right Button: Ear with Green Tick (Heard Sound) -->
+            <button onclick="recordResponse(true)" class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-green-50 border-2 border-green-200 rounded-3xl text-green-600 shadow-md hover:bg-green-100 active:scale-95 transition flex items-center justify-center relative cursor-pointer shrink-0">
+                <div class="relative flex items-center justify-center">
+                    <i class="fas fa-ear-listen text-4xl sm:text-5xl md:text-6xl"></i>
+                    <i class="fas fa-check-circle text-lg sm:text-xl md:text-2xl text-green-600 absolute -bottom-1 -right-2 bg-white rounded-full"></i>
+                </div>
+            </button>
+
+        </div>
+      
+        <p class="text-[10px] md:text-xs text-gray-400 my-2 font-semibold tracking-wider uppercase text-center shrink-0">Press Ear (Right) if sound was heard or Cross (Left) if silent control</p>
+    </div>
+
+    <!-- Manual Scroller Screen -->
+    <div id="manual-screen" class="absolute inset-0 bg-gray-50 z-[70] hidden flex-col">
+        <!-- Manual Header is injected above -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-6 w-full max-w-6xl mx-auto">
+            <div class="flex items-center justify-between mb-6">
+                <!-- Back to Home Button added inside the manual view as requested -->
+                <button onclick="returnToHome()" class="p-2 px-4 bg-pastel-purple/20 text-pastel-purple hover:bg-pastel-purple/30 rounded-xl font-bold text-xs md:text-sm flex items-center gap-2 cursor-pointer transition">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </button>
+                <p class="text-xs md:text-sm text-slate-500 font-medium text-center flex-1">
+                    Tap any card or button below to play its sound file (1 through 50).
+                </p>
+            </div>
+            <div id="manual-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 pb-12">
+                <!-- Populated via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Completion Screen Overlay -->
+    <div id="completion-screen" class="fixed inset-0 bg-white z-[90] hidden flex-col items-center justify-center p-6 text-center">
+        <div class="h-20 w-20 bg-amber-100 rounded-full flex items-center justify-center text-amber-500 text-4xl mb-4 animate-bounce">
+            ⭐
+        </div>
+        <h2 class="text-2xl md:text-3xl font-black text-slate-700 mb-2">Session Complete!</h2>
+        <p id="final-score-text" class="text-slate-500 text-base mb-6">You earned 10 out of 10 stars!</p>
+        <button onclick="returnToHome()" class="p-3 px-8 bg-pastel-purple text-white font-bold rounded-2xl shadow-md hover:bg-opacity-90 transition cursor-pointer">
+            Back to Menu
+        </button>
+    </div>
+
+    <script>
+        const soundLibrary = {
+            1: { name: "غسالة" },
+            2: { name: "كاسة تنكسر" },
+            3: { name: "مكنسة قش" },
+            4: { name: "طيارة" },
+            5: { name: "منبه ساعة" },
+            6: { name: "بيبي يبكي" },
+            7: { name: "عصفور" },
+            8: { name: "زمور سيارة" },
+            9: { name: "زحمة سير" },
+            10: { name: "ساعة" },
+            11: { name: "بقرة" },
+            12: { name: "بطة" },
+            13: { name: "وزة" },
+            14: { name: "هلكوبتر" },
+            15: { name: "صوت إضافي" },
+            16: { name: "بيبي مبسوط" },
+            17: { name: "جرس" },
+            18: { name: "غراب" },
+            19: { name: "موتور" },
+            20: { name: "دوش حمام" },
+            21: { name: "موبايل" },
+            22: { name: "مي تواليت" },
+            23: { name: "صفارة شرطة" },
+            24: { name: "شاحنة صغيرة تمر" },
+            25: { name: "شخير رجل" },
+            26: { name: "ببغاء" },
+            27: { name: "سيارة شرطة" },
+            28: { name: "خاروف" },
+            29: { name: "سيارات بالمدينة" },
+            30: { name: "قطار" },
+            31: { name: "شاحنة تمر" },
+            32: { name: "قطة" },
+            33: { name: "كلاب" },
+            34: { name: "حمامة" },
+            35: { name: "سيارة اطفاء" },
+            36: { name: "بنت تصرخ" },
+            37: { name: "صوت إضافي" },
+            38: { name: "حصان" },
+            39: { name: "صب عصير" },
+            40: { name: "اسد" },
+            41: { name: "صيصان" },
+            42: { name: "ضجة عالم" },
+            43: { name: "سعال بنت" },
+            44: { name: "مطر" },
+            45: { name: "ديك" },
+            46: { name: "بوسة / قبلة" },
+            47: { name: "سيارة اسعاف" },
+            48: { name: "غلي ماء" },
+            49: { name: "باخرة" },
+            50: { name: "نهر جاري" }
+        };
+
+        const suddenSounds = [2, 5, 8, 4, 23, 6, 7, 17, 24, 21, 30, 36, 39, 16, 46, 43, 32, 33, 11, 12, 13, 28, 38, 40, 41];
+        const continuousSounds = [50, 20, 1, 3, 14, 10, 9, 29, 25, 42, 19, 31, 22, 27, 35, 47, 49, 44, 48, 45, 18, 26, 34];
+
+        let currentCategoryList = [];
+        let trialCount = 0;
+        let scoreStars = 0;
+        let currentTrialHasSound = true;
+        let currentSoundId = null;
+        let detectionAudio = new Audio();
+        let isAnswerLocked = false;
+
+        // Build Manual Grid on Load with explicit button elements
+        function initManualGrid() {
+            const gridEl = document.getElementById('manual-grid');
+            gridEl.innerHTML = '';
+            for (let i = 1; i <= 50; i++) {
+                const info = soundLibrary[i] || { name: `Sound ${i}` };
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.className = "bg-white rounded-2xl shadow-sm border-2 border-pastel-purple/30 p-3 flex flex-col items-center justify-between cursor-pointer hover:border-pastel-purple transition hover:scale-105 active:scale-95 w-full text-left";
+                card.onclick = () => playManualSound(i);
+                
+                card.innerHTML = `
+                    <div class="w-full flex justify-between items-center mb-1">
+                        <span class="text-[10px] font-bold bg-pastel-purple/20 text-pastel-purple px-2 py-0.5 rounded-full">#${i}</span>
+                        <span class="p-1.5 bg-pastel-purple/10 rounded-full text-pastel-purple hover:bg-pastel-purple hover:text-white transition flex items-center justify-center">
+                            <i class="fas fa-volume-high text-xs"></i>
+                        </span>
+                    </div>
+                    <img src="images/${i}.png" alt="" class="w-20 h-20 object-contain my-2 pointer-events-none select-none">
+                    <span class="font-bold text-xs text-slate-700 text-center truncate w-full">${info.name}</span>
+                `;
+                gridEl.appendChild(card);
+            }
+        }
+        initManualGrid();
+
+        function playManualSound(id) {
+            const manualAudio = document.getElementById('global-manual-audio');
+            manualAudio.src = `sounds/${id}.wav`;
+            manualAudio.currentTime = 0;
+            manualAudio.play().catch(e => console.error("Manual audio error:", e));
+        }
+
+        function openManualScreen() {
+            document.getElementById('home-screen').classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                document.getElementById('home-screen').classList.add('hidden');
+                document.getElementById('manual-header').classList.remove('hidden');
+                document.getElementById('manual-screen').classList.remove('hidden');
+                document.getElementById('manual-screen').classList.add('flex');
+            }, 300);
+        }
+
+        function startDetectionMode(categoryType) {
+            if (categoryType === 'sudden') {
+                currentCategoryList = [...suddenSounds].sort(() => Math.random() - 0.5);
+                document.getElementById('detection-title').innerText = 'Sudden & Transient Sounds';
+            } else {
+                currentCategoryList = [...continuousSounds].sort(() => Math.random() - 0.5);
+                document.getElementById('detection-title').innerText = 'Continuous Sounds';
+            }
+            
+            trialCount = 0;
+            scoreStars = 0;
+            isAnswerLocked = false;
+            
+            document.getElementById('home-screen').classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('completion-screen').classList.add('hidden');
+            document.getElementById('completion-screen').classList.remove('flex');
+            
+            setTimeout(() => {
+                document.getElementById('home-screen').classList.add('hidden');
+                document.getElementById('game-header').classList.remove('hidden');
+                document.getElementById('game-area').classList.remove('hidden');
+                document.getElementById('game-area').classList.add('flex');
+                
+                loadDetectionTrial();
+            }, 300);
+        }
+
+        function returnToHome() {
+            detectionAudio.pause();
+            document.getElementById('global-manual-audio').pause();
+            
+            document.getElementById('game-header').classList.add('hidden');
+            document.getElementById('game-area').classList.add('hidden');
+            document.getElementById('game-area').classList.remove('flex');
+            document.getElementById('manual-header').classList.add('hidden');
+            document.getElementById('manual-screen').classList.add('hidden');
+            document.getElementById('manual-screen').classList.remove('flex');
+            document.getElementById('completion-screen').classList.add('hidden');
+            document.getElementById('completion-screen').classList.remove('flex');
+            document.getElementById('home-screen').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('home-screen').classList.remove('opacity-0', 'pointer-events-none');
+            }, 50);
+        }
+
+        function loadDetectionTrial() {
+            if (trialCount >= 10) {
+                showCompletionScreen();
+                return;
+            }
+
+            isAnswerLocked = false;
+            
+            currentSoundId = currentCategoryList[trialCount % currentCategoryList.length];
+            const itemData = soundLibrary[currentSoundId] || { name: `Sound ${currentSoundId}` };
+
+            document.getElementById('trial-counter').innerText = `Trial ${trialCount + 1} of 10`;
+            document.getElementById('star-counter').innerText = `⭐ ${scoreStars} / 10`;
+            
+            const imgEl = document.getElementById('detection-img');
+            const nameEl = document.getElementById('detection-name');
+            
+            imgEl.src = `images/${currentSoundId}.png`;
+            nameEl.innerText = itemData.name;
+            
+            // Auto-randomize: 60% chance sound plays, 40% chance silence control
+            currentTrialHasSound = Math.random() < 0.6;
+            
+            detectionAudio.src = `sounds/${currentSoundId}.wav`;
+
+            if (currentTrialHasSound) {
+                detectionAudio.currentTime = 0;
+                detectionAudio.play().catch(e => console.error("Audio playback error:", e));
+            }
+        }
+
+        function recordResponse(userHeard) {
+            if (isAnswerLocked) return;
+            isAnswerLocked = true;
+
+            const isCorrect = (userHeard === currentTrialHasSound);
+            
+            const fbModal = document.getElementById('central-feedback');
+            const fbIcon = document.getElementById('feedback-icon-big');
+            
+            fbModal.classList.remove('hidden');
+
+            if (isCorrect) {
+                fbIcon.className = 'fas fa-check-circle text-green-500 animate-pop';
+                document.getElementById('sound-success').play().catch(e => {});
+                scoreStars++;
+                document.getElementById('star-counter').innerText = `⭐ ${scoreStars} / 10`;
+            } else {
+                fbIcon.className = 'fas fa-times-circle text-red-500 animate-pop';
+                document.getElementById('sound-error').play().catch(e => {});
+            }
+
+            setTimeout(() => {
+                fbModal.classList.add('hidden');
+                trialCount++;
+                loadDetectionTrial();
+            }, 900);
+        }
+
+        function nextDetectionTrial() {
+            if (isAnswerLocked) return;
+            trialCount++;
+            loadDetectionTrial();
+        }
+
+        function showCompletionScreen() {
+            document.getElementById('game-area').classList.add('hidden');
+            document.getElementById('game-area').classList.remove('flex');
+            document.getElementById('game-header').classList.add('hidden');
+            
+            document.getElementById('final-score-text').innerText = `You earned ${scoreStars} out of 10 stars!`;
+            const compScreen = document.getElementById('completion-screen');
+            compScreen.classList.remove('hidden');
+            compScreen.classList.add('flex');
+        }
+    </script>
+</body>
+</html>

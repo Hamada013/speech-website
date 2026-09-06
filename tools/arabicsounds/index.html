@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arabic Sounds with Hamada</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            babyBlue: '#E0F2FE',
+            babyBlueDark: '#BAE6FD',
+            babyBlueText: '#0369A1',
+            babyGreen: '#DCFCE7',
+            babyGreenDark: '#BBF7D0',
+            babyGreenText: '#15803D',
+            babyYellow: '#FEF9C3',
+            babyYellowDark: '#FEF08A',
+            babyYellowText: '#A16207',
+            babyPink: '#FFE4E6',
+            babyPinkDark: '#FECDD3',
+            babyPinkText: '#BE123C',
+            babyPurple: '#F3E8FF',
+            babyPurpleDark: '#E9D5FF',
+            babyPurpleText: '#6B21A8',
+            pastelBg: '#FAFAF9'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background-color: #FAFAF9;
+    }
+    .card-square {
+      aspect-ratio: 1 / 1;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .modal-pop {
+      animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between text-gray-700 select-none bg-pastelBg">
+
+  <header class="bg-white/80 backdrop-blur-md border-b border-sky-100 sticky top-0 z-30">
+    <div class="max-w-4xl mx-auto px-4 py-2.5 flex items-center justify-between">
+      <div class="flex items-center space-x-3 space-x-reverse">
+        <img 
+          src="images/logo.png" 
+          alt="Logo" 
+          class="w-9 h-9 object-contain rounded-full bg-sky-50 p-1 border border-sky-100"
+          onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-9 h-9 rounded-full bg-sky-100 flex items-center justify-center font-bold text-sky-600 text-lg\'>H</div>';"
+        />
+        <h1 class="text-base md:text-lg font-bold tracking-wide text-sky-800 uppercase dir-ltr font-sans">
+          arabic sounds with hamada
+        </h1>
+      </div>
+      <button 
+        id="homeBtn" 
+        onclick="navigateTo('home')" 
+        class="p-2 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-600 transition-colors focus:outline-none"
+        title="الصفحة الرئيسية"
+      >
+        <i class="fa-solid fa-house text-base"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-4xl w-full mx-auto p-4 flex-grow flex flex-col justify-center">
+
+    <section id="page-home" class="view-page flex flex-col items-center justify-center py-6 space-y-6">
+      <div class="text-center mb-2">
+        <h2 class="text-2xl md:text-3xl font-black text-sky-900 mb-1">أهلاً بك في تطبيق الأصوات العربية</h2>
+        <p class="text-gray-500 text-xs md:text-sm">اختر القسم للبدء في التمارين العلاجية التفاعلية</p>
+      </div>
+
+      <div class="w-full max-w-sm space-y-3.5">
+        <button 
+          onclick="navigateTo('level-select')" 
+          class="w-full py-3.5 px-5 bg-babyBlue hover:bg-babyBlueDark text-babyBlueText font-bold text-lg rounded-2xl border border-sky-200 shadow-sm transition-all flex items-center justify-between active:scale-95"
+        >
+          <span>اختيار المستوى</span>
+          <i class="fa-solid fa-layer-group text-sky-500"></i>
+        </button>
+
+        <button 
+          onclick="navigateTo('sound-select')" 
+          class="w-full py-3.5 px-5 bg-babyGreen hover:bg-babyGreenDark text-babyGreenText font-bold text-lg rounded-2xl border border-emerald-200 shadow-sm transition-all flex items-center justify-between active:scale-95"
+        >
+          <span>اختيار الأصوات</span>
+          <i class="fa-solid fa-waveform text-emerald-500"></i>
+        </button>
+
+        <a 
+          href="memory.html" 
+          class="w-full py-3.5 px-5 bg-babyPurple hover:bg-babyPurpleDark text-babyPurpleText font-bold text-lg rounded-2xl border border-purple-200 shadow-sm transition-all flex items-center justify-between block text-right active:scale-95"
+        >
+          <span>ألعاب المطابقة والذاكرة</span>
+          <i class="fa-solid fa-gamepad text-purple-500"></i>
+        </a>
+      </div>
+    </section>
+
+    <section id="page-level-select" class="view-page hidden py-4 space-y-5">
+      <div class="text-center">
+        <h2 class="text-xl md:text-2xl font-bold text-gray-800">اختر مستوى الصعوبة</h2>
+        <p class="text-xs text-gray-400 mt-0.5">اختر المستوى لعرض الثنائيات الصغرى والتقابلية</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
+        <button 
+          onclick="openLevelModal('easy')" 
+          class="p-5 bg-babyGreen border border-emerald-200 hover:bg-babyGreenDark text-babyGreenText rounded-2xl font-black text-xl shadow-sm transition-all text-center flex flex-col items-center justify-center space-y-1.5 active:scale-95"
+        >
+          <i class="fa-solid fa-seedling text-2xl text-emerald-500"></i>
+          <span>سهل</span>
+          <span class="text-[11px] font-normal text-emerald-700">المستوى الأول</span>
+        </button>
+
+        <button 
+          onclick="openLevelModal('medium')" 
+          class="p-5 bg-babyYellow border border-amber-200 hover:bg-babyYellowDark text-babyYellowText rounded-2xl font-black text-xl shadow-sm transition-all text-center flex flex-col items-center justify-center space-y-1.5 active:scale-95"
+        >
+          <i class="fa-solid fa-bolt text-2xl text-amber-500"></i>
+          <span>متوسط</span>
+          <span class="text-[11px] font-normal text-amber-700">المستوى الثاني</span>
+        </button>
+
+        <button 
+          onclick="openLevelModal('hard')" 
+          class="p-5 bg-babyPink border border-rose-200 hover:bg-babyPinkDark text-babyPinkText rounded-2xl font-black text-xl shadow-sm transition-all text-center flex flex-col items-center justify-center space-y-1.5 active:scale-95"
+        >
+          <i class="fa-solid fa-fire text-2xl text-rose-400"></i>
+          <span>صعب</span>
+          <span class="text-[11px] font-normal text-rose-700">المستوى الثالث</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="page-sound-select" class="view-page hidden py-4 space-y-4">
+      <div class="text-center">
+        <h2 class="text-xl md:text-2xl font-bold text-gray-800">اختيار الأصوات</h2>
+        <p class="text-xs text-gray-500 mt-0.5">انقر على <span class="font-bold text-sky-600">صوتين اثنين</span> للتدرب عليهما في بطاقات العرض</p>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-2 text-[11px] font-semibold">
+        <div class="flex items-center space-x-1 space-x-reverse px-2.5 py-1 rounded-full bg-babyBlue border border-sky-200 text-sky-800">
+          <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
+          <span>منخفض التردد (250–1000 Hz)</span>
+        </div>
+        <div class="flex items-center space-x-1 space-x-reverse px-2.5 py-1 rounded-full bg-babyGreen border border-emerald-200 text-emerald-800">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+          <span>متوسط التردد (1000–3000 Hz)</span>
+        </div>
+        <div class="flex items-center space-x-1 space-x-reverse px-2.5 py-1 rounded-full bg-babyYellow border border-amber-200 text-amber-800">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+          <span>عالٍ التردد (3000–8000+ Hz)</span>
+        </div>
+      </div>
+
+      <div id="soundGrid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-7 gap-2.5 pt-1">
+        </div>
+
+      <div class="pt-2 flex justify-center">
+        <button 
+          id="startCustomPracticeBtn" 
+          disabled 
+          onclick="startPracticeFromSelectedSounds()" 
+          class="w-full max-w-xs py-3 px-6 bg-gray-200 text-gray-400 cursor-not-allowed font-bold rounded-2xl text-sm shadow-sm transition-all flex items-center justify-center space-x-2 space-x-reverse"
+        >
+          <i class="fa-solid fa-play"></i>
+          <span id="startCustomBtnText">اختر صوتين للبدء (0/2)</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="page-practice" class="view-page hidden py-3 space-y-3">
+      <div class="flex items-center justify-between bg-white p-2.5 rounded-2xl border border-sky-100 shadow-sm">
+        <button 
+          onclick="goBackFromPractice()" 
+          class="px-3 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium rounded-xl text-xs flex items-center space-x-1 space-x-reverse transition-colors"
+        >
+          <i class="fa-solid fa-arrow-right"></i>
+          <span>رجوع</span>
+        </button>
+
+        <div class="flex items-center space-x-2 space-x-reverse">
+          <button 
+            id="shuffleBtn" 
+            onclick="shuffleCards()" 
+            class="px-3.5 py-1.5 bg-babyYellow hover:bg-babyYellowDark text-babyYellowText font-bold rounded-xl text-xs border border-amber-200 flex items-center space-x-1 space-x-reverse active:scale-95 transition-all"
+          >
+            <i class="fa-solid fa-shuffle"></i>
+            <span>تبديل المكان</span>
+          </button>
+
+          <button 
+            id="testBtn" 
+            onclick="toggleTestMode()" 
+            class="px-3.5 py-1.5 bg-babyBlue hover:bg-babyBlueDark text-babyBlueText font-bold rounded-xl text-xs border border-sky-200 flex items-center space-x-1 space-x-reverse active:scale-95 transition-all"
+          >
+            <i class="fa-solid fa-vial"></i>
+            <span id="testBtnText">وضع الاختبار</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="testStatusBar" class="hidden bg-sky-50 border border-sky-200 rounded-2xl p-2.5 flex items-center justify-between text-sky-900 text-xs">
+        <div class="flex items-center space-x-2 space-x-reverse">
+          <span class="font-bold">الاختبار مستمر:</span>
+          <span>المحاولة <span id="trialCounter" class="font-bold text-sky-600">1</span> / 10</span>
+        </div>
+        <button 
+          onclick="playTestSound()" 
+          class="px-2.5 py-1 bg-sky-600 text-white font-bold rounded-lg hover:bg-sky-700 flex items-center space-x-1 space-x-reverse"
+        >
+          <i class="fa-solid fa-volume-high"></i>
+          <span>إعادة الصوت</span>
+        </button>
+      </div>
+
+      <div id="cardsGrid" class="grid grid-cols-2 gap-3 md:gap-5 max-w-lg mx-auto w-full pt-2">
+        <div 
+          id="cardSlot0" 
+          onclick="handleCardClick(0)" 
+          class="card-square bg-white border-2 border-sky-200 rounded-3xl shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col items-center justify-between p-3.5 relative active:scale-95"
+        >
+          <div class="absolute top-2.5 left-2.5 bg-sky-50 text-sky-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-sky-100">
+            <i class="fa-solid fa-volume-high"></i>
+          </div>
+          <div id="cardImgContainer0" class="w-full flex-grow flex items-center justify-center overflow-hidden">
+            </div>
+          <span id="cardLabel0" class="text-3xl md:text-4xl font-black text-gray-800 mt-1"></span>
+        </div>
+
+        <div 
+          id="cardSlot1" 
+          onclick="handleCardClick(1)" 
+          class="card-square bg-white border-2 border-sky-200 rounded-3xl shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col items-center justify-between p-3.5 relative active:scale-95"
+        >
+          <div class="absolute top-2.5 left-2.5 bg-sky-50 text-sky-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-sky-100">
+            <i class="fa-solid fa-volume-high"></i>
+          </div>
+          <div id="cardImgContainer1" class="w-full flex-grow flex items-center justify-center overflow-hidden">
+            </div>
+          <span id="cardLabel1" class="text-3xl md:text-4xl font-black text-gray-800 mt-1"></span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="levelModal" class="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl p-5 shadow-xl modal-pop flex flex-col space-y-3 max-h-[80vh]">
+      <div class="flex items-center justify-between border-b pb-2">
+        <h3 id="modalTitle" class="text-lg font-bold text-gray-800"></h3>
+        <button onclick="closeLevelModal()" class="text-gray-400 hover:text-gray-600 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      <div id="modalPairsList" class="grid grid-cols-2 gap-2.5 overflow-y-auto p-1">
+        </div>
+    </div>
+  </div>
+
+  <div id="feedbackOverlay" class="fixed inset-0 pointer-events-none z-50 hidden flex items-center justify-center">
+    <div id="feedbackBox" class="modal-pop p-5 rounded-3xl flex items-center justify-center shadow-xl bg-white/95 border-2">
+      </div>
+  </div>
+
+  <div id="resultModal" class="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-xs rounded-3xl p-5 shadow-xl modal-pop text-center space-y-3">
+      <div class="text-4xl text-sky-500">
+        <i class="fa-solid fa-trophy"></i>
+      </div>
+      <h3 class="text-xl font-bold text-gray-800">نتيجة الاختبار</h3>
+      <div class="text-sm text-gray-600">
+        لقد أتممت الاختبار بنجاح!<br />
+        النتيجة: <span id="scoreText" class="font-bold text-sky-600 text-xl"></span> / 10
+      </div>
+      <button 
+        onclick="closeResultModal()" 
+        class="w-full py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl shadow-sm text-sm"
+      >
+        حسناً
+      </button>
+    </div>
+  </div>
+
+  <footer class="mt-auto py-2 px-4 text-center text-[11px] text-gray-400 border-t border-sky-100/60 bg-pastelBg space-y-0.5">
+    <div class="font-semibold text-gray-500 tracking-wider">SPEECH AND LANGUAGE PATHOLOGY</div>
+    <div class="flex flex-wrap items-center justify-center gap-x-2 text-[10px] text-gray-400">
+      <span>Ahmad Ghanem</span>
+      <span>•</span>
+      <span>Latakia - Syria</span>
+      <span>•</span>
+      <a href="mailto:slp.ahmadghanem@gmail.com" class="hover:text-sky-600 underline">slp.ahmadghanem@gmail.com</a>
+    </div>
+  </footer>
+
+  <script>
+    // Asset mapping index for Arabic letters
+    const LETTER_MAP = {
+      'ا': 1,  'ب': 2,  'ت': 3,  'ث': 4,  'ج': 5,  'ح': 6,  'خ': 7,
+      'د': 8,  'ذ': 9,  'ر': 10, 'ز': 11, 'س': 12, 'ش': 13, 'ص': 14,
+      'ض': 15, 'ط': 16, 'ظ': 17, 'ع': 18, 'غ': 19, 'ف': 20, 'ق': 21,
+      'ك': 22, 'ل': 23, 'م': 24, 'ن': 25, 'ه': 26, 'و': 27, 'ي': 28,
+      'ء': 29
+    };
+
+    // Levels mapping
+    const LEVELS_DATA = {
+      easy: {
+        title: 'المستوى الأول (سهل)',
+        pairs: [
+          ['ا', 'و'], ['ا', 'ي'], ['و', 'ي'], ['ب', 'س'],
+          ['م', 'ش'], ['ر', 'ت'], ['ل', 'ف']
+        ]
+      },
+      medium: {
+        title: 'المستوى الثاني (متوسط)',
+        pairs: [
+          ['ب', 'م'], ['ت', 'د'], ['ث', 'ذ'], ['س', 'ز'],
+          ['ك', 'ق'], ['خ', 'غ'], ['ح', 'ه'], ['ج', 'ش']
+        ]
+      },
+      hard: {
+        title: 'المستوى الثالث (صعب)',
+        pairs: [
+          ['ط', 'ت'], ['ض', 'د'], ['ص', 'س'], ['ظ', 'ذ'],
+          ['س', 'ش'], ['خ', 'ح'], ['ع', 'ء']
+        ]
+      }
+    };
+
+    // Sound Frequencies data mapping
+    const FREQUENCY_DATA = [
+      { letter: 'ب', freq: 'low' }, { letter: 'م', freq: 'low' }, { letter: 'و', freq: 'low' },
+      { letter: 'ع', freq: 'low' }, { letter: 'ء', freq: 'low' }, { letter: 'ا', freq: 'low' }, { letter: 'ي', freq: 'low' },
+
+      { letter: 'ن', freq: 'medium' }, { letter: 'ر', freq: 'medium' }, { letter: 'ل', freq: 'medium' },
+      { letter: 'د', freq: 'medium' }, { letter: 'ض', freq: 'medium' }, { letter: 'ز', freq: 'medium' },
+      { letter: 'ذ', freq: 'medium' }, { letter: 'ظ', freq: 'medium' }, { letter: 'ج', freq: 'medium' }, { letter: 'ق', freq: 'medium' },
+
+      { letter: 'ك', freq: 'high' }, { letter: 'ت', freq: 'high' }, { letter: 'ط', freq: 'high' },
+      { letter: 'ف', freq: 'high' }, { letter: 'ث', freq: 'high' }, { letter: 'خ', freq: 'high' },
+      { letter: 'غ', freq: 'high' }, { letter: 'ح', freq: 'high' }, { letter: 'ه', freq: 'high' },
+      { letter: 'س', freq: 'high' }, { letter: 'ص', freq: 'high' }, { letter: 'ش', freq: 'high' }
+    ];
+
+    // Navigation & State
+    let previousPage = 'home';
+    let currentPair = ['ب', 'م'];
+    let cardOrder = [0, 1];
+    let selectedSounds = []; // User selected 2 sounds
+    let isTestMode = false;
+    let currentTrial = 0;
+    let targetCardIndex = null;
+    let score = 0;
+    let isWaitingForInput = false;
+
+    function navigateTo(pageId) {
+      const active = document.querySelector('.view-page:not(.hidden)');
+      if (active) {
+        previousPage = active.id.replace('page-', '');
+      }
+
+      document.querySelectorAll('.view-page').forEach(page => page.classList.add('hidden'));
+      const target = document.getElementById(`page-${pageId}`);
+      if (target) {
+        target.classList.remove('hidden');
+      }
+      if (pageId !== 'practice' && isTestMode) {
+        exitTestMode();
+      }
+      window.scrollTo(0, 0);
+    }
+
+    function goBackFromPractice() {
+      if (previousPage === 'sound-select') {
+        navigateTo('sound-select');
+      } else {
+        navigateTo('level-select');
+      }
+    }
+
+    // Modal Control
+    function openLevelModal(levelKey) {
+      const level = LEVELS_DATA[levelKey];
+      if (!level) return;
+
+      document.getElementById('modalTitle').textContent = level.title;
+      const container = document.getElementById('modalPairsList');
+      container.innerHTML = '';
+
+      level.pairs.forEach(pair => {
+        const btn = document.createElement('button');
+        btn.className = 'p-2.5 bg-sky-50/80 hover:bg-sky-100 border border-sky-100 rounded-xl font-bold text-lg text-sky-900 flex items-center justify-center space-x-2 space-x-reverse transition-all active:scale-95';
+        btn.innerHTML = `<span>${pair[0]}</span> <span class="text-sky-300">-</span> <span>${pair[1]}</span>`;
+        btn.onclick = () => {
+          closeLevelModal();
+          startPractice(pair);
+        };
+        container.appendChild(btn);
+      });
+
+      document.getElementById('levelModal').classList.remove('hidden');
+    }
+
+    function closeLevelModal() {
+      document.getElementById('levelModal').classList.add('hidden');
+    }
+
+    // Sound Selection logic (Choose 2 sounds)
+    function toggleSoundSelection(letter) {
+      playAudioForLetter(letter);
+
+      const index = selectedSounds.indexOf(letter);
+      if (index > -1) {
+        selectedSounds.splice(index, 1);
+      } else {
+        if (selectedSounds.length < 2) {
+          selectedSounds.push(letter);
+        } else {
+          selectedSounds.shift();
+          selectedSounds.push(letter);
+        }
+      }
+
+      renderSoundSelectionGrid();
+      updateStartPracticeBar();
+    }
+
+    function updateStartPracticeBar() {
+      const btn = document.getElementById('startCustomPracticeBtn');
+      const btnText = document.getElementById('startCustomBtnText');
+
+      if (selectedSounds.length === 2) {
+        btn.disabled = false;
+        btn.className = 'w-full max-w-xs py-3 px-6 bg-babyGreen hover:bg-babyGreenDark text-babyGreenText border border-emerald-300 font-bold rounded-2xl text-sm shadow-sm transition-all flex items-center justify-center space-x-2 space-x-reverse cursor-pointer active:scale-95';
+        btnText.textContent = `التدرب على الصوتين (${selectedSounds[0]} - ${selectedSounds[1]})`;
+      } else {
+        btn.disabled = true;
+        btn.className = 'w-full max-w-xs py-3 px-6 bg-gray-100 text-gray-400 cursor-not-allowed font-bold rounded-2xl text-sm transition-all flex items-center justify-center space-x-2 space-x-reverse';
+        btnText.textContent = `اختر صوتين للبدء (${selectedSounds.length}/2)`;
+      }
+    }
+
+    function startPracticeFromSelectedSounds() {
+      if (selectedSounds.length === 2) {
+        startPractice([selectedSounds[0], selectedSounds[1]]);
+      }
+    }
+
+    // Practice View Setup
+    function startPractice(pair) {
+      currentPair = [...pair];
+      cardOrder = [0, 1];
+      exitTestMode();
+      updatePracticeCards();
+      navigateTo('practice');
+    }
+
+    // Safe & robust card refresh function
+    function updatePracticeCards() {
+      [0, 1].forEach(slotIdx => {
+        const letter = currentPair[cardOrder[slotIdx]];
+        const soundIndex = LETTER_MAP[letter] || 1;
+
+        const labelElem = document.getElementById(`cardLabel${slotIdx}`);
+        const containerElem = document.getElementById(`cardImgContainer${slotIdx}`);
+
+        if (labelElem) {
+          labelElem.textContent = letter;
+        }
+
+        if (containerElem) {
+          containerElem.innerHTML = `
+            <img 
+              id="cardImg${slotIdx}" 
+              src="images/${soundIndex}.png" 
+              alt="${letter}" 
+              class="max-h-full max-w-full object-contain"
+              onerror="handleImgError(this, '${letter}')" 
+            />
+          `;
+        }
+      });
+    }
+
+    function handleImgError(imgElem, letter) {
+      const parent = imgElem.parentElement;
+      if (parent) {
+        parent.innerHTML = `<div class="text-5xl md:text-6xl font-black text-sky-400 flex items-center justify-center w-full h-full">${letter}</div>`;
+      }
+    }
+
+    // Audio Playback
+    function playAudioForLetter(letter) {
+      const soundIndex = LETTER_MAP[letter] || 1;
+      const audio = new Audio(`sounds/${soundIndex}.wav`);
+      audio.play().catch(err => {
+        console.warn(`Audio missing for sound: sounds/${soundIndex}.wav`, err);
+      });
+      return audio;
+    }
+
+    // Card Interaction
+    function handleCardClick(slotIndex) {
+      const clickedLetter = currentPair[cardOrder[slotIndex]];
+
+      if (isTestMode) {
+        if (!isWaitingForInput) return;
+
+        if (slotIndex === targetCardIndex) {
+          score++;
+          showFeedback(true);
+        } else {
+          showFeedback(false);
+        }
+
+        isWaitingForInput = false;
+        setTimeout(() => {
+          advanceTestTrial();
+        }, 1100);
+
+      } else {
+        playAudioForLetter(clickedLetter);
+      }
+    }
+
+    function shuffleCards() {
+      cardOrder.reverse();
+      updatePracticeCards();
+    }
+
+    // Test Mode logic
+    function toggleTestMode() {
+      if (isTestMode) {
+        exitTestMode();
+      } else {
+        startTestMode();
+      }
+    }
+
+    function startTestMode() {
+      isTestMode = true;
+      currentTrial = 0;
+      score = 0;
+      document.getElementById('testBtnText').textContent = 'إنهاء الاختبار';
+      document.getElementById('testBtn').className = 'px-3.5 py-1.5 bg-babyPink hover:bg-babyPinkDark text-babyPinkText font-bold rounded-xl text-xs border border-rose-200 flex items-center space-x-1 space-x-reverse active:scale-95 transition-all';
+      document.getElementById('testStatusBar').classList.remove('hidden');
+
+      advanceTestTrial();
+    }
+
+    function exitTestMode() {
+      isTestMode = false;
+      isWaitingForInput = false;
+      document.getElementById('testBtnText').textContent = 'وضع الاختبار';
+      document.getElementById('testBtn').className = 'px-3.5 py-1.5 bg-babyBlue hover:bg-babyBlueDark text-babyBlueText font-bold rounded-xl text-xs border border-sky-200 flex items-center space-x-1 space-x-reverse active:scale-95 transition-all';
+      document.getElementById('testStatusBar').classList.add('hidden');
+    }
+
+    function advanceTestTrial() {
+      if (currentTrial >= 10) {
+        finishTest();
+        return;
+      }
+
+      currentTrial++;
+      document.getElementById('trialCounter').textContent = currentTrial;
+
+      if (currentTrial > 1 && (currentTrial - 1) % 3 === 0) {
+        shuffleCards();
+      }
+
+      targetCardIndex = Math.floor(Math.random() * 2);
+      isWaitingForInput = true;
+
+      setTimeout(() => {
+        playTestSound();
+      }, 300);
+    }
+
+    function playTestSound() {
+      if (targetCardIndex !== null) {
+        const targetLetter = currentPair[cardOrder[targetCardIndex]];
+        playAudioForLetter(targetLetter);
+      }
+    }
+
+    function showFeedback(isCorrect) {
+      const overlay = document.getElementById('feedbackOverlay');
+      const box = document.getElementById('feedbackBox');
+
+      if (isCorrect) {
+        box.className = 'modal-pop p-5 rounded-3xl flex items-center justify-center shadow-lg bg-emerald-50 border-2 border-emerald-300 text-emerald-500';
+        box.innerHTML = '<i class="fa-solid fa-circle-check text-6xl md:text-7xl"></i>';
+      } else {
+        box.className = 'modal-pop p-5 rounded-3xl flex items-center justify-center shadow-lg bg-rose-50 border-2 border-rose-300 text-rose-500';
+        box.innerHTML = '<i class="fa-solid fa-circle-xmark text-6xl md:text-7xl"></i>';
+      }
+
+      overlay.classList.remove('hidden');
+      setTimeout(() => {
+        overlay.classList.add('hidden');
+      }, 900);
+    }
+
+    function finishTest() {
+      const finalScore = score;
+      exitTestMode();
+      document.getElementById('scoreText').textContent = finalScore;
+      document.getElementById('resultModal').classList.remove('hidden');
+    }
+
+    function closeResultModal() {
+      document.getElementById('resultModal').classList.add('hidden');
+    }
+
+    // Render Sound Selection Grid
+    function renderSoundSelectionGrid() {
+      const grid = document.getElementById('soundGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      FREQUENCY_DATA.forEach(item => {
+        const isSelected = selectedSounds.includes(item.letter);
+        const btn = document.createElement('button');
+
+        let baseColor = '';
+        if (item.freq === 'low') {
+          baseColor = 'bg-babyBlue border-sky-200 text-sky-900 hover:bg-sky-200';
+        } else if (item.freq === 'medium') {
+          baseColor = 'bg-babyGreen border-emerald-200 text-emerald-900 hover:bg-emerald-200';
+        } else {
+          baseColor = 'bg-babyYellow border-amber-200 text-amber-900 hover:bg-amber-200';
+        }
+
+        let selectedStyles = isSelected 
+          ? 'ring-4 ring-sky-400 border-sky-500 scale-105 shadow-md font-black' 
+          : 'border';
+
+        btn.className = `p-3.5 rounded-2xl font-bold text-2xl shadow-sm transition-all active:scale-95 flex flex-col items-center justify-center relative ${baseColor} ${selectedStyles}`;
+        
+        btn.innerHTML = `
+          <span>${item.letter}</span>
+          ${isSelected ? '<span class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-sky-500 text-white rounded-full text-[10px] flex items-center justify-center shadow"><i class="fa-solid fa-check"></i></span>' : ''}
+        `;
+
+        btn.onclick = () => toggleSoundSelection(item.letter);
+        grid.appendChild(btn);
+      });
+    }
+
+    // Initialize Page Application
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSoundSelectionGrid();
+      updatePracticeCards();
+    });
+  </script>
+</body>
+</html>
+

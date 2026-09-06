@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sound Identification - Touch App</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'pastel-pink': '#ffd1dc',
+              'pastel-blue': '#aec6cf',
+              'pastel-green': '#b7e4c7',
+              'pastel-purple': '#cbaacb',
+              'pastel-text': '#5a5a5a'
+            }
+          }
+        }
+      }
+    </script>
+      
+    <style>
+      body { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        user-select: none; 
+        -webkit-user-select: none;
+        overscroll-behavior: none; 
+      }
+      .glow-drop {
+        box-shadow: 0 0 35px rgba(174, 198, 207, 1);
+        border-color: #7ab2bf !important;
+        background-color: #e3f0f5;
+        transform: scale(1.05);
+      }
+      .touch-card {
+        touch-action: none; 
+        z-index: 10;
+        transition: box-shadow 0.2s;
+        cursor: grab;
+      }
+      .touch-card:active {
+        cursor: grabbing;
+      }
+      .touch-card.dragging {
+        position: fixed !important;
+        z-index: 9999 !important;
+        transition: none !important;
+        opacity: 0.98;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        transform: scale(1.1);
+        pointer-events: none;
+      }
+      @keyframes popIn {
+        0% { transform: scale(0.3); opacity: 0; }
+        60% { transform: scale(1.2); }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+      .hide-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-pastel-text overflow-hidden h-[100dvh] flex flex-col">
+    
+    <!-- Success Audio -->
+    <audio id="sound-success" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=success-1-6297.mp3"></audio>
+
+    <!-- Giant Central Feedback Overlay -->
+    <div id="central-feedback" class="fixed inset-0 flex items-center justify-center z-[100] hidden pointer-events-none bg-white bg-opacity-80 backdrop-blur-sm transition-all">
+        <i id="feedback-icon-big" class="text-[10rem] md:text-[18rem] drop-shadow-2xl"></i>
+    </div>
+
+    <!-- Trial Selection Modal Window (Opened by Book Button) -->
+    <div id="trial-modal" class="fixed inset-0 z-[120] flex items-center justify-center bg-black/40 backdrop-blur-xs hidden p-4" onclick="closeTrialModal(event)">
+        <div class="bg-white rounded-3xl p-5 md:p-6 shadow-xl max-w-xl w-full max-h-[80vh] flex flex-col animate-pop" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
+                <h3 id="modal-title" class="font-black text-lg text-slate-700">Select Trial / Set</h3>
+                <button onclick="toggleTrialModal(false)" class="p-2 text-gray-400 hover:text-slate-600 rounded-full transition cursor-pointer">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <!-- Scrollable Image/Button Grid -->
+            <div id="trial-modal-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-y-auto pr-1 hide-scrollbar max-h-[60vh]">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Header / Top Bar -->
+    <header id="game-header" class="hidden w-full p-2.5 md:p-4 flex flex-col gap-2 bg-white shadow-sm z-50 shrink-0">
+        <div class="flex items-center justify-between w-full gap-2">
+            <button onclick="returnToHome()" class="p-2 px-3 md:px-4 bg-gray-100 rounded-full text-pastel-text hover:bg-gray-200 transition flex items-center gap-2 font-bold text-xs md:text-base shrink-0 cursor-pointer">
+                <i class="fas fa-arrow-left"></i>
+                <span class="hidden md:inline">Home</span>
+            </button>
+            
+            <!-- Level Title & Book Button Selector -->
+            <div class="flex flex-col items-center flex-1 max-w-[220px] md:max-w-xs">
+                <h2 id="level-title" class="text-sm md:text-xl font-bold text-pastel-blue mb-0.5 truncate">Level Active</h2>
+            </div>
+            
+            <!-- Right Controls: Book Button & Practice Mode Toggle -->
+            <div class="flex items-center gap-2 shrink-0">
+                <button onclick="toggleTrialModal(true)" class="p-2 px-3 bg-pastel-blue/20 border-2 border-pastel-blue/40 rounded-xl text-slate-700 hover:bg-pastel-blue/30 transition flex items-center gap-1.5 font-bold text-xs md:text-base cursor-pointer" title="Select Trial">
+                    <i class="fas fa-book text-pastel-blue"></i>
+                </button>
+                <button id="practice-btn" onclick="togglePracticeMode()" class="p-2 px-3 md:px-4 bg-gray-100 rounded-xl text-pastel-text flex items-center gap-2 font-bold transition-colors text-xs md:text-base cursor-pointer">
+                    <i class="fas fa-lock"></i>
+                    <span class="hidden md:inline">Practice (10x)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 10 Star Progress Bar -->
+        <div id="progress-container" class="hidden w-full items-center justify-center gap-1 md:gap-2 pt-1 border-t border-gray-100 overflow-x-auto py-1">
+            <i class="star-icon far fa-star text-yellow-400 text-lg md:text-2xl transition-all duration-300"></i>
+            <i class="star-icon far fa-star text-yellow-400 text-lg md:text-2xl transition-all duration-300"></i>
+            <i class="star-icon far fa-star text-yellow-400 text-lg md:text-2xl transition-all duration-300"></i>
+            <i class="star-icon far fa-star text-yellow-400 text-lg md:text-2xl transition-all duration-300"></i>
+            <i class="star-icon far fa-star text-yellow-400 text-lg md:text-2xl transition-all duration-300"></i>
+            <i class="star-icon far fa-star text-yellow-400 text-lg md:text-2xl transition-all duration-300"></i>
+            <i class="star-icon far fa-star text-yellow-400 text-lg md:text-2xl transition-all duration-300"></i>
+            <i class="star-icon far fa-star text-yellow-400 text-lg md:text-2xl transition-all duration-300"></i>
+            <i class="star-icon far fa-star text-yellow-400 text-lg md:text-2xl transition-all duration-300"></i>
+            <i class="star-icon far fa-star text-yellow-400 text-lg md:text-2xl transition-all duration-300"></i>
+        </div>
+    </header>
+
+    <!-- Home Screen (3 Buttons as requested) -->
+    <div id="home-screen" class="absolute inset-0 bg-white z-[60] flex flex-col items-center justify-between p-6 transition-all duration-300 overflow-y-auto">
+        <!-- Top bar with main index link button -->
+        <div class="w-full max-w-5xl flex items-center justify-between">
+            <a href="index.html" class="p-2 px-4 bg-gray-100 rounded-full text-pastel-text hover:bg-gray-200 transition flex items-center gap-2 font-bold text-xs md:text-sm cursor-pointer">
+                <i class="fas fa-arrow-left"></i> Main Menu
+            </a>
+            <div></div>
+        </div>
+
+        <div class="w-full max-w-5xl flex flex-col items-center justify-center flex-1 my-auto">
+            <div class="flex items-center gap-3 md:gap-4 mb-6 md:mb-10">
+                <div class="h-12 w-12 md:h-16 md:w-16 bg-pastel-blue rounded-full shadow-md flex items-center justify-center">
+                    <i class="fas fa-bullseye text-white text-xl md:text-3xl"></i>
+                </div>
+                <h1 class="font-black text-2xl md:text-4xl text-slate-700">Sound Identification</h1>
+            </div>
+
+            <!-- Identification Modes Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 w-full max-w-4xl px-2">
+                <button onclick="startLevel(1)" class="group flex flex-col items-center p-5 md:p-8 bg-pastel-pink bg-opacity-20 border-2 border-pastel-pink rounded-3xl hover:bg-opacity-40 transition hover:-translate-y-1 shadow-sm cursor-pointer">
+                    <i class="fas fa-globe text-3xl md:text-5xl text-pastel-pink mb-3 group-hover:scale-110 transition"></i>
+                    <h3 class="font-bold text-base md:text-xl text-slate-700">Open-Set</h3>
+                    <p class="text-xs md:text-sm text-center text-slate-500 mt-1">Full Sound Library<br>(1 to 50)</p>
+                </button>
+
+                <button onclick="startLevel(2)" class="group flex flex-col items-center p-5 md:p-8 bg-pastel-green bg-opacity-20 border-2 border-pastel-green rounded-3xl hover:bg-opacity-40 transition hover:-translate-y-1 shadow-sm cursor-pointer">
+                    <i class="fas fa-layer-group text-3xl md:text-5xl text-pastel-green mb-3 group-hover:scale-110 transition"></i>
+                    <h3 class="font-bold text-base md:text-xl text-slate-700">2-Choices</h3>
+                    <p class="text-xs md:text-sm text-center text-slate-500 mt-1">Controlled Pairs<br>(Wide & Similar)</p>
+                </button>
+
+                <button onclick="startLevel(3)" class="group flex flex-col items-center p-5 md:p-8 bg-pastel-purple bg-opacity-20 border-2 border-pastel-purple rounded-3xl hover:bg-opacity-40 transition hover:-translate-y-1 shadow-sm cursor-pointer">
+                    <i class="fas fa-cubes text-3xl md:text-5xl text-pastel-purple mb-3 group-hover:scale-110 transition"></i>
+                    <h3 class="font-bold text-base md:text-xl text-slate-700">Close-Set</h3>
+                    <p class="text-xs md:text-sm text-center text-slate-500 mt-1">Expanded Sets<br>(3 & 4 Options)</p>
+                </button>
+            </div>
+        </div>
+
+        <footer class="w-full text-center text-[10px] md:text-xs text-gray-400 leading-relaxed uppercase tracking-wider py-2 shrink-0">
+            SPEECH AND LANGUAGE PATHOLOGY<br>
+            Ahmad Ghanem<br>
+            Latakia - Syria<br>
+            slp.ahmadghanem@gmail.com
+        </footer>
+    </div>
+
+    <!-- Game Area -->
+    <div id="game-area" class="hidden flex-1 flex-col items-center justify-between p-2 md:p-4 w-full max-w-6xl mx-auto overflow-hidden">
+        
+        <!-- Target Drop Zone -->
+        <div class="flex-1 flex items-center justify-center w-full my-auto">
+            <div id="drop-zone" class="w-28 h-28 sm:w-36 sm:h-36 md:w-48 md:h-48 border-4 border-dashed border-pastel-blue rounded-3xl bg-white shadow-sm flex items-center justify-center relative transition-all duration-200">
+                <button onclick="playMysterySound()" class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-pastel-blue rounded-full text-white shadow-xl hover:scale-105 active:scale-95 transition flex items-center justify-center z-10 cursor-pointer">
+                    <i class="fas fa-volume-high text-2xl sm:text-3xl md:text-4xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Draggable Cards Container -->
+        <div id="cards-container" class="w-full flex flex-wrap items-center justify-center gap-2 sm:gap-4 md:gap-6 my-2 p-1 overflow-y-auto max-h-[35vh] hide-scrollbar"></div>
+      
+        <p class="text-[9px] md:text-xs text-gray-400 my-1 font-semibold tracking-wider uppercase shrink-0">Tap card to hear • Drag to center</p>
+    </div>
+
+    <script>
+        const soundLibrary = {
+            1: "غسالة", 2: "كاسة تنكسر", 3: "مكنسة قش", 4: "طيارة", 5: "منبه ساعة",
+            6: "بيبي يبكي", 7: "عصفور", 8: "زمور سيارة", 9: "زحمة سير", 10: "ساعة",
+            11: "بقرة", 12: "بطة", 13: "وزة", 14: "هلكوبتر", 15: "فرشاية اسنان",
+            16: "بيبي مبسوط", 17: "جرس", 18: "غراب", 19: "موتور", 20: "دوش حمام",
+            21: "موبايل", 22: "مي تواليت", 23: "صفارة شرطة", 24: "شاحنة صغيرة تمر", 25: "شخير رجل",
+            26: "ببغاء", 27: "سيارة شرطة", 28: "خاروف", 29: "سيارات بالمدينة", 30: "قطار",
+            31: "شاحنة تمر", 32: "قطة", 33: "كلاب", 34: "حمامة", 35: "سيارة اطفاء",
+            36: "بنت تصرخ", 37: "ماعز", 38: "حصان", 39: "صب عصير", 40: "اسد",
+            41: "صيصان", 42: "ضجة عالم", 43: "سعال بنت", 44: "مطر", 45: "ديك",
+            46: "بوسة / قبلة", 47: "سيارة اسعاف", 48: "غلي ماء", 49: "باخرة", 50: "نهر جاري"
+        };
+
+        const levelsData = {
+            1: [], // Open-set handled dynamically via full library
+            2: [[1, 17], [2, 20], [3, 21], [4, 22], [5, 24], [6, 25], [7, 29], [8, 30], [9, 31], [10, 36], [14, 39], [15, 42], [16, 19], [11, 37], [12, 13], [28, 38], [32, 40], [33, 41], [34, 45], [26, 18], [23, 27], [35, 47], [49, 50], [44, 48], [46, 43]],
+            3: [[11, 12, 28], [32, 33, 40], [27, 35, 47], [1, 3, 5], [44, 50, 48], [4, 30, 14, 8], [6, 36, 25, 43], [7, 34, 45, 18], [2, 21, 15, 22]]
+        };
+
+        let currentLevel = 1;
+        let currentTargetId = null;
+        let currentSetIndex = 0;
+        let targetAudio = new Audio();
+        let cardAudio = new Audio();
+        targetAudio.preload = 'auto';
+        cardAudio.preload = 'auto';
+        
+        let isPracticeMode = false;
+        let practiceProgress = 0;
+
+        // Helper to stop all playing audio immediately when transitioning rounds
+        function stopAllAudio() {
+            targetAudio.pause();
+            targetAudio.currentTime = 0;
+            cardAudio.pause();
+            cardAudio.currentTime = 0;
+        }
+
+        function startLevel(levelNum) {
+            stopAllAudio();
+            currentLevel = levelNum;
+            currentSetIndex = 0;
+
+            buildTrialModalGrid();
+
+            document.getElementById('home-screen').classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                document.getElementById('home-screen').classList.add('hidden');
+                document.getElementById('game-header').classList.remove('hidden');
+                document.getElementById('game-area').classList.remove('hidden');
+                document.getElementById('game-area').classList.add('flex');
+                
+                const titles = { 1: 'Open-Set (1-50)', 2: '2-Choices Training', 3: 'Close-Set Training' };
+                document.getElementById('level-title').innerText = titles[levelNum];
+                
+                loadRound();
+            }, 300);
+        }
+
+        function returnToHome() {
+            stopAllAudio();
+            isPracticeMode = false;
+            practiceProgress = 0;
+            updateStarsUI();
+            document.getElementById('practice-btn').classList.remove('bg-pastel-blue', 'text-white');
+            document.getElementById('progress-container').classList.add('hidden');
+            document.getElementById('progress-container').classList.remove('flex');
+            
+            document.getElementById('game-header').classList.add('hidden');
+            document.getElementById('game-area').classList.add('hidden');
+            document.getElementById('game-area').classList.remove('flex');
+            document.getElementById('home-screen').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('home-screen').classList.remove('opacity-0', 'pointer-events-none');
+            }, 50);
+        }
+
+        function toggleTrialModal(show) {
+            const modal = document.getElementById('trial-modal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function closeTrialModal(event) {
+            if (event.target.id === 'trial-modal') {
+                toggleTrialModal(false);
+            }
+        }
+
+        function buildTrialModalGrid() {
+            const gridContainer = document.getElementById('trial-modal-grid');
+            gridContainer.innerHTML = '';
+            
+            if (currentLevel === 1) {
+                document.getElementById('modal-title').innerText = 'Select Sound (1-50)';
+                for (let i = 1; i <= 50; i++) {
+                    const btn = document.createElement('button');
+                    btn.className = `flex flex-col items-center p-3 rounded-2xl border-2 transition cursor-pointer bg-white hover:border-pastel-blue shadow-sm ${currentTargetId === i ? 'border-pastel-blue bg-pastel-blue/10 ring-2 ring-pastel-blue/30' : 'border-gray-100'}`;
+                    btn.onclick = () => {
+                        stopAllAudio();
+                        currentTargetId = i;
+                        toggleTrialModal(false);
+                        setupOpenSetRoundWithTarget(currentTargetId);
+                    };
+                    
+                    btn.innerHTML = `
+                        <div class="w-12 h-12 bg-gray-50 rounded-xl p-1 border border-gray-100 flex items-center justify-center mb-2">
+                            <img src="images/${i}.png" alt="Sound ${i}" class="w-full h-full object-contain pointer-events-none">
+                        </div>
+                        <span class="text-xs font-bold text-slate-700">Sound ${i}</span>
+                        <span class="text-[10px] text-gray-400 truncate max-w-full">${soundLibrary[i]}</span>
+                    `;
+                    gridContainer.appendChild(btn);
+                }
+            } else {
+                document.getElementById('modal-title').innerText = `Select Set (${currentLevel === 2 ? '2-Choices' : 'Close-Set'})`;
+                const levelSets = levelsData[currentLevel];
+                levelSets.forEach((set, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = `flex flex-col items-center p-3 rounded-2xl border-2 transition cursor-pointer bg-white hover:border-pastel-blue shadow-sm ${currentSetIndex === idx ? 'border-pastel-blue bg-pastel-blue/10 ring-2 ring-pastel-blue/30' : 'border-gray-100'}`;
+                    btn.onclick = () => {
+                        stopAllAudio();
+                        currentSetIndex = idx;
+                        practiceProgress = 0;
+                        updateStarsUI();
+                        toggleTrialModal(false);
+                        loadRound(true);
+                    };
+                    
+                    let imagesHtml = set.slice(0, 4).map(id => `
+                        <div class="w-9 h-9 bg-gray-50 rounded-lg p-0.5 border border-gray-100 flex items-center justify-center">
+                            <img src="images/${id}.png" alt="Item" class="w-full h-full object-contain pointer-events-none">
+                        </div>
+                    `).join('');
+                    
+                    btn.innerHTML = `
+                        <div class="grid grid-cols-2 gap-1 mb-2">
+                            ${imagesHtml}
+                        </div>
+                        <span class="text-xs font-bold text-slate-700">Set ${idx + 1}</span>
+                        <span class="text-[10px] text-gray-400 truncate max-w-full">${set.length} Options</span>
+                    `;
+                    gridContainer.appendChild(btn);
+                });
+            }
+        }
+
+        function togglePracticeMode() {
+            isPracticeMode = !isPracticeMode;
+            const btn = document.getElementById('practice-btn');
+            const progContainer = document.getElementById('progress-container');
+            
+            if (isPracticeMode) {
+                btn.classList.add('bg-pastel-blue', 'text-white');
+                progContainer.classList.remove('hidden');
+                progContainer.classList.add('flex');
+                practiceProgress = 0;
+                updateStarsUI();
+                loadRound(true); 
+            } else {
+                btn.classList.remove('bg-pastel-blue', 'text-white');
+                progContainer.classList.add('hidden');
+                progContainer.classList.remove('flex');
+            }
+        }
+
+        function updateStarsUI() {
+            const stars = document.querySelectorAll('.star-icon');
+            stars.forEach((star, idx) => {
+                if (idx < practiceProgress) {
+                    star.classList.replace('far', 'fas');
+                    star.classList.add('scale-125');
+                } else {
+                    star.classList.replace('fas', 'far');
+                    star.classList.remove('scale-125');
+                }
+            });
+        }
+
+        function loadRound(forceCurrentSet = false) {
+            stopAllAudio(); // Stop any leftover audio from the previous round before loading the new one
+
+            if (currentLevel === 1) {
+                if (!forceCurrentSet || !currentTargetId) {
+                    currentTargetId = Math.floor(Math.random() * 50) + 1;
+                }
+                setupOpenSetRoundWithTarget(currentTargetId);
+                return;
+            }
+
+            const levelSets = levelsData[currentLevel];
+            
+            if (!forceCurrentSet && !isPracticeMode) {
+                currentSetIndex = Math.floor(Math.random() * levelSets.length);
+            }
+            const activeSet = levelSets[currentSetIndex];
+            
+            currentTargetId = activeSet[Math.floor(Math.random() * activeSet.length)];
+            targetAudio.src = `sounds/${currentTargetId}.wav`;
+            
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+            const displayCards = [...activeSet].sort(() => Math.random() - 0.5);
+            
+            displayCards.forEach((id) => {
+                const card = document.createElement('div');
+                card.id = `card-${id}`;
+                card.className = 'touch-card w-28 h-28 sm:w-36 sm:h-36 md:w-48 md:h-48 bg-white rounded-3xl shadow border-4 border-transparent flex items-center justify-center p-2 md:p-3 relative shrink-0';
+                
+                card.innerHTML = `<img src="images/${id}.png" alt="${soundLibrary[id]}" class="w-full h-full object-contain pointer-events-none select-none drop-shadow-sm">`;
+                
+                attachPointerDrag(card, id);
+                container.appendChild(card);
+            });
+
+            playMysterySound();
+            buildTrialModalGrid();
+        }
+
+        function setupOpenSetRoundWithTarget(targetId) {
+            stopAllAudio(); // Stop any leftover audio
+            currentTargetId = targetId;
+            targetAudio.src = `sounds/${currentTargetId}.wav`;
+
+            let options = [currentTargetId];
+            while (options.length < 4) {
+                let randId = Math.floor(Math.random() * 50) + 1;
+                if (!options.includes(randId)) {
+                    options.push(randId);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+
+            options.forEach(id => {
+                const card = document.createElement('div');
+                card.id = `card-${id}`;
+                card.className = 'touch-card w-28 h-28 sm:w-36 sm:h-36 md:w-48 md:h-48 bg-white rounded-3xl shadow border-4 border-transparent flex items-center justify-center p-2 md:p-3 relative shrink-0';
+                
+                card.innerHTML = `<img src="images/${id}.png" alt="${soundLibrary[id]}" class="w-full h-full object-contain pointer-events-none select-none drop-shadow-sm">`;
+                
+                attachPointerDrag(card, id);
+                container.appendChild(card);
+            });
+
+            playMysterySound();
+            buildTrialModalGrid();
+        }
+
+        function attachPointerDrag(card, id) {
+            let startX, startY;
+            let initialRect;
+            let isDragging = false;
+            let hasMoved = false;
+
+            card.addEventListener('pointerdown', (e) => {
+                card.setPointerCapture(e.pointerId);
+                startX = e.clientX;
+                startY = e.clientY;
+                initialRect = card.getBoundingClientRect();
+                isDragging = false;
+                hasMoved = false;
+            });
+
+            card.addEventListener('pointermove', (e) => {
+                if (!card.hasPointerCapture(e.pointerId)) return;
+                
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                
+                if (!isDragging && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+                    isDragging = true;
+                    hasMoved = true;
+                    
+                    card.style.left = initialRect.left + 'px';
+                    card.style.top = initialRect.top + 'px';
+                    card.classList.add('dragging');
+                }
+                
+                if (isDragging) {
+                    card.style.left = (initialRect.left + dx) + 'px';
+                    card.style.top = (initialRect.top + dy) + 'px';
+                    checkHoverDropZone(e.clientX, e.clientY);
+                }
+            });
+
+            card.addEventListener('pointerup', (e) => {
+                if (!card.hasPointerCapture(e.pointerId)) return;
+                card.releasePointerCapture(e.pointerId);
+                
+                if (isDragging) {
+                    const dropped = checkHoverDropZone(e.clientX, e.clientY, true);
+                    if (dropped) {
+                        handleDropValidation(id);
+                    }
+                } else if (!hasMoved) {
+                    playCardSound(id);
+                }
+                
+                card.classList.remove('dragging');
+                card.style.position = '';
+                card.style.left = '';
+                card.style.top = '';
+                
+                const dropZone = document.getElementById('drop-zone');
+                dropZone.classList.remove('glow-drop');
+                
+                isDragging = false;
+            });
+        }
+
+        function checkHoverDropZone(x, y, isFinalDrop = false) {
+            const dropZone = document.getElementById('drop-zone');
+            const rect = dropZone.getBoundingClientRect();
+            const margin = 25;
+            
+            const isInside = (x >= rect.left - margin && x <= rect.right + margin && 
+                            y >= rect.top - margin && y <= rect.bottom + margin);
+            
+            if (isInside) {
+                if (!isFinalDrop) {
+                    dropZone.classList.add('glow-drop');
+                }
+                return true;
+            } else {
+                if (!isFinalDrop) {
+                    dropZone.classList.remove('glow-drop');
+                }
+                return false;
+            }
+        }
+
+        function handleDropValidation(draggedId) {
+            const fbModal = document.getElementById('central-feedback');
+            const fbIcon = document.getElementById('feedback-icon-big');
+            
+            fbModal.classList.remove('hidden');
+            
+            if (draggedId === currentTargetId) {
+                fbIcon.className = 'fas fa-check-circle text-green-500 animate-pop';
+                
+                // Stop ongoing sounds immediately when correct answer is achieved
+                stopAllAudio();
+                document.getElementById('sound-success').currentTime = 0;
+                document.getElementById('sound-success').play().catch(e => console.log(e));
+                
+                if (isPracticeMode) {
+                    practiceProgress++;
+                    updateStarsUI();
+                    
+                    if (practiceProgress >= 10) {
+                        setTimeout(() => {
+                            practiceProgress = 0;
+                            updateStarsUI();
+                            loadRound(false);
+                        }, 1200);
+                    } else {
+                        setTimeout(() => loadRound(false), 1200);
+                    }
+                } else {
+                    setTimeout(() => loadRound(false), 1200);
+                }
+                
+            } else {
+                fbIcon.className = 'fas fa-times-circle text-red-500 animate-pop';
+            }
+            
+            setTimeout(() => { 
+                fbModal.classList.add('hidden'); 
+            }, 1000);
+        }
+
+        function playMysterySound() { 
+            cardAudio.pause(); // Stop card audio if playing
+            targetAudio.currentTime = 0;
+            targetAudio.play().catch(e => console.error(e)); 
+        }
+        
+        function playCardSound(id) { 
+            targetAudio.pause(); // Stop mystery audio if playing
+            cardAudio.src = `sounds/${id}.wav`;
+            cardAudio.currentTime = 0;
+            cardAudio.play().catch(e => console.error(e)); 
+        }
+    </script>
+</body>
+</html>

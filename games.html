@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en" id="html-root">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Games | Ahmad Ghanem SLP</title>
+    <link rel="icon" href="images/logo.png" type="image/png">
+    
+    <!-- Fonts: Inter (English) and Noto Sans Arabic (Arabic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        arabic: ['Noto Sans Arabic', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Smooth transitions for layout changes */
+        body, .tool-card {
+            transition: all 0.3s ease-in-out;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans transition-all duration-300">
+
+    <!-- NAVIGATION -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-2">
+                    <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                        AG
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-slate-800">Ahmad Ghanem <span class="text-primary-600">SLP</span></span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-6 rtl:space-x-reverse">
+                    <a href="index.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_home">Home</a>
+                    <a href="tools/tools.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_tools">Tools</a>
+                    <a href="forms.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_forms">Forms</a>
+                    <a href="#" class="text-primary-700 bg-primary-50 px-3 py-2 rounded-md text-sm font-bold" data-i18n="nav_resources">Resources</a>
+                    
+                    <!-- Language Switcher Button -->
+                    <button onclick="toggleLanguage()" class="flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-300 text-sm font-medium hover:bg-slate-50 hover:border-primary-500 transition-colors ml-4 rtl:mr-4">
+                        <span id="lang-icon">🌐</span>
+                        <span id="lang-text">العربية</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-4" data-i18n="header_title">
+                Speech Therapy Games
+            </h1>
+            <p class="max-w-2xl mx-auto text-lg text-slate-500" data-i18n="header_subtitle">
+                Interactive games and engaging activities sorted by therapy fields.
+            </p>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+        
+        <!-- SEARCH BAR -->
+        <div class="max-w-xl mx-auto mb-12 relative">
+            <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none">
+                <svg class="w-5 h-5 text-slate-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                </svg>
+            </div>
+            <input type="text" id="search-input" class="block w-full p-4 ps-12 text-slate-900 border border-slate-300 rounded-full bg-white focus:ring-primary-500 focus:border-primary-500 outline-none transition-all shadow-sm" placeholder="Search games..." data-i18n-placeholder="search_placeholder">
+        </div>
+
+        <div id="fields-container" class="space-y-12">
+
+            <!-- 1. ARTICULATION & PHONOLOGY -->
+            <section class="field-section">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 pb-2 border-b border-slate-200 text-center md:text-left rtl:text-right" data-i18n="section_articulation">Articulation & Phonology</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <a href="games/articulation-bingo/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                        <img src="images/speech.gif" alt="Articulation Bingo" class="w-16 h-16 mx-auto mb-4 object-contain">
+                        <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_articulation_bingo_title">Articulation Bingo</h3>
+                        <p class="text-sm text-slate-500" data-i18n="card_articulation_bingo_desc">Practice speech sounds while playing bingo.</p>
+                    </a>
+                    <a href="games/minimal-pairs/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                        <img src="images/phonics.gif" alt="Minimal Pairs Quest" class="w-16 h-16 mx-auto mb-4 object-contain">
+                        <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_minimal_pairs_title">Minimal Pairs Quest</h3>
+                        <p class="text-sm text-slate-500" data-i18n="card_minimal_pairs_desc">Distinguish sound contrasts through gaming.</p>
+                    </a>
+                    <a href="games/sound-spinner/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                        <img src="images/other.gif" alt="Sound Hunt Spinner" class="w-16 h-16 mx-auto mb-4 object-contain">
+                        <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_sound_spinner_title">Sound Hunt Spinner</h3>
+                        <p class="text-sm text-slate-500" data-i18n="card_sound_spinner_desc">Spin to find words containing target phonemes.</p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- 2. LANGUAGE ACTIVITIES -->
+            <section class="field-section">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 pb-2 border-b border-slate-200 text-center md:text-left rtl:text-right" data-i18n="section_language">Language Activities</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <a href="games/memory-match/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                        <img src="images/language.gif" alt="Memory Match" class="w-16 h-16 mx-auto mb-4 object-contain">
+                        <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_memory_match_title">Memory Match</h3>
+                        <p class="text-sm text-slate-500" data-i18n="card_memory_match_desc">Boost vocabulary and working memory.</p>
+                    </a>
+                    <a href="games/category-sorting/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                        <img src="images/sheets.gif" alt="Category Sorting" class="w-16 h-16 mx-auto mb-4 object-contain">
+                        <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_category_sorting_title">Category Sorting</h3>
+                        <p class="text-sm text-slate-500" data-i18n="card_category_sorting_desc">Group items by semantic categories.</p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- 3. FLUENCY & STUTTERING -->
+            <section class="field-section">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 pb-2 border-b border-slate-200 text-center md:text-left rtl:text-right" data-i18n="section_fluency">Fluency & Stuttering</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <a href="games/fluencyportal.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                        <img src="images/stutter.gif" alt="Fluency Pace Racing" class="w-16 h-16 mx-auto mb-4 object-contain">
+                        <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_fluency_race_title">Fluency Pace Racing</h3>
+                        <p class="text-sm text-slate-500" data-i18n="card_fluency_race_desc">Control speech rate with pacing games.</p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- 4. VOICE EXERCISES -->
+            <section class="field-section">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 pb-2 border-b border-slate-200 text-center md:text-left rtl:text-right" data-i18n="section_voice">Voice Exercises</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <a href="games/voice-pitch/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                        <img src="images/voice.gif" alt="Voice Pitch Adventure" class="w-16 h-16 mx-auto mb-4 object-contain">
+                        <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_voice_pitch_title">Voice Pitch Adventure</h3>
+                        <p class="text-sm text-slate-500" data-i18n="card_voice_pitch_desc">Control pitch and loudness interactively.</p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- 5. SOCIAL SKILLS -->
+            <section class="field-section">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 pb-2 border-b border-slate-200 text-center md:text-left rtl:text-right" data-i18n="section_social">Social Skills</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <a href="games/social-quest/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                        <img src="images/social.gif" alt="Social Scenario Quest" class="w-16 h-16 mx-auto mb-4 object-contain">
+                        <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_social_quest_title">Social Scenario Quest</h3>
+                        <p class="text-sm text-slate-500" data-i18n="card_social_quest_desc">Practice pragmatic choices and problem solving.</p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- 6. ORAL MOTOR -->
+            <section class="field-section">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 pb-2 border-b border-slate-200 text-center md:text-left rtl:text-right" data-i18n="section_oral">Oral Motor</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <a href="games/oral-gym/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                        <img src="images/oral.gif" alt="Oral Motor Gym" class="w-16 h-16 mx-auto mb-4 object-contain">
+                        <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_oral_gym_title">Oral Motor Gym</h3>
+                        <p class="text-sm text-slate-500" data-i18n="card_oral_gym_desc">Fun mimicry games for muscle control.</p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- 7. AAC BOARDS -->
+            <section class="field-section">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 pb-2 border-b border-slate-200 text-center md:text-left rtl:text-right" data-i18n="section_aac">AAC Boards</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <a href="games/aac-builder/index.html" target="_blank" rel="noopener" class="tool-card block bg-white rounded-xl border border-slate-200 p-6 text-center hover:border-primary-400">
+                        <img src="images/aac.gif" alt="AAC Sentence Builder" class="w-16 h-16 mx-auto mb-4 object-contain">
+                        <h3 class="text-lg font-bold text-slate-800 mb-1" data-i18n="card_aac_builder_title">AAC Sentence Builder</h3>
+                        <p class="text-sm text-slate-500" data-i18n="card_aac_builder_desc">Construct interactive sentences visually.</p>
+                    </a>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- No Results Found Message -->
+        <div id="no-results" class="hidden text-center py-16">
+            <p class="text-slate-500 text-lg" data-i18n="no_results">No games found matching your search.</p>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mb-4">
+                <strong data-i18n="footer_questions">Questions?</strong>
+                <a href="mailto:slp.ahmadghanem@gmail.com" class="text-primary-600 hover:text-primary-800 ml-2">slp.ahmadghanem@gmail.com</a>
+                <span class="mx-2 text-slate-300">|</span>
+                <a href="tel:+963988451245" class="text-primary-600 hover:text-primary-800" dir="ltr">+963 988 451 245</a>
+            </div>
+            <div class="text-slate-400 text-sm">
+                &copy; 2024 Ahmad Ghanem SLP. <span data-i18n="footer_rights">All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LOGIC: SEARCH & TRANSLATIONS -->
+    <script>
+        // Search Functionality across sections
+        document.getElementById('search-input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const sections = document.querySelectorAll('.field-section');
+            let totalVisibleCards = 0;
+
+            sections.forEach(section => {
+                const cards = section.querySelectorAll('.tool-card');
+                let sectionHasVisibleCard = false;
+
+                cards.forEach(card => {
+                    const title = card.querySelector('h3').textContent.toLowerCase();
+                    const desc = card.querySelector('p').textContent.toLowerCase();
+
+                    if (title.includes(searchTerm) || desc.includes(searchTerm)) {
+                        card.classList.remove('hidden');
+                        sectionHasVisibleCard = true;
+                        totalVisibleCards++;
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+
+                // Hide entire category section if no cards match
+                if (sectionHasVisibleCard) {
+                    section.classList.remove('hidden');
+                } else {
+                    section.classList.add('hidden');
+                }
+            });
+
+            // Show/hide 'No results' message
+            const noResultsEl = document.getElementById('no-results');
+            if (totalVisibleCards === 0) {
+                noResultsEl.classList.remove('hidden');
+            } else {
+                noResultsEl.classList.add('hidden');
+            }
+        });
+
+        // Translation Dictionary
+        const translations = {
+            en: {
+                nav_home: "Home",
+                nav_tools: "Tools",
+                nav_forms: "Forms",
+                nav_resources: "Resources",
+                header_title: "Speech Therapy Games",
+                header_subtitle: "Interactive games and engaging activities sorted by therapy fields.",
+                search_placeholder: "Search games...",
+                no_results: "No games found matching your search.",
+                
+                section_articulation: "Articulation & Phonology",
+                section_language: "Language Activities",
+                section_fluency: "Fluency & Stuttering",
+                section_voice: "Voice Exercises",
+                section_social: "Social Skills",
+                section_oral: "Oral Motor",
+                section_aac: "AAC Boards",
+
+                card_articulation_bingo_title: "Articulation Bingo",
+                card_articulation_bingo_desc: "Practice speech sounds while playing bingo.",
+                card_minimal_pairs_title: "Minimal Pairs Quest",
+                card_minimal_pairs_desc: "Distinguish sound contrasts through gaming.",
+                card_sound_spinner_title: "Sound Hunt Spinner",
+                card_sound_spinner_desc: "Spin to find words containing target phonemes.",
+                
+                card_memory_match_title: "Memory Match",
+                card_memory_match_desc: "Boost vocabulary and working memory.",
+                card_category_sorting_title: "Category Sorting",
+                card_category_sorting_desc: "Group items by semantic categories.",
+                
+                card_fluency_race_title: "Fluency Pace Racing",
+                card_fluency_race_desc: "Control speech rate with pacing games.",
+                
+                card_voice_pitch_title: "Voice Pitch Adventure",
+                card_voice_pitch_desc: "Control pitch and loudness interactively.",
+                
+                card_social_quest_title: "Social Scenario Quest",
+                card_social_quest_desc: "Practice pragmatic choices and problem solving.",
+                
+                card_oral_gym_title: "Oral Motor Gym",
+                card_oral_gym_desc: "Fun mimicry games for muscle control.",
+                
+                card_aac_builder_title: "AAC Sentence Builder",
+                card_aac_builder_desc: "Construct interactive sentences visually.",
+                
+                footer_questions: "Questions?",
+                footer_rights: "All rights reserved."
+            },
+            ar: {
+                nav_home: "الرئيسية",
+                nav_tools: "الأدوات",
+                nav_forms: "النماذج",
+                nav_resources: "المصادر",
+                header_title: "ألعاب التخاطب",
+                header_subtitle: "ألعاب تفاعلية وأنشطة ممتعة مرتبة حسب مجالات العلاج.",
+                search_placeholder: "ابحث عن الألعاب...",
+                no_results: "لم يتم العثور على ألعاب تطابق بحثك.",
+                
+                section_articulation: "النطق وعلم الأصوات",
+                section_language: "الأنشطة اللغوية",
+                section_fluency: "الطلاقة والتأتأة",
+                section_voice: "تمارين الصوت",
+                section_social: "المهارات الاجتماعية",
+                section_oral: "الحركية الفموية",
+                section_aac: "لوحات التواصل البديل (AAC)",
+
+                card_articulation_bingo_title: "بينغو النطق",
+                card_articulation_bingo_desc: "تدرب على أصوات الكلام أثناء لعب البينغو.",
+                card_minimal_pairs_title: "مهمة الأزواج المتشابهة",
+                card_minimal_pairs_desc: "التمييز بين تباينات الأصوات من خلال اللعب.",
+                card_sound_spinner_title: "قرص البحث الصوتي",
+                card_sound_spinner_desc: "قم بالتدوير للعثور على كلمات تحتوي على الأصوات المستهدفة.",
+                
+                card_memory_match_title: "مطابقة الذاكرة",
+                card_memory_match_desc: "تعزيز المفردات والذاكرة العاملة.",
+                card_category_sorting_title: "فرز الفئات",
+                card_category_sorting_desc: "تجميع العناصر حسب الفئات الدلالية.",
+                
+                card_fluency_race_title: "سباق إيقاع الطلاقة",
+                card_fluency_race_desc: "التحكم في سرعة الكلام بألعاب الإيقاع.",
+                
+                card_voice_pitch_title: "مغامرة طبقة الصوت",
+                card_voice_pitch_desc: "التحكم في طبقة الصوت وشدته تفاعلياً.",
+                
+                card_social_quest_title: "مهمة المواقف الاجتماعية",
+                card_social_quest_desc: "ممارسة الخيارات البراغماتية وحل المشكلات.",
+                
+                card_oral_gym_title: "نادي الحركية الفموية",
+                card_oral_gym_desc: "ألعاب محاكاة ممتعة للتحكم بالعضلات.",
+                
+                card_aac_builder_title: "باني الجمل للتواصل البديل",
+                card_aac_builder_desc: "بناء جمل تفاعلية بصرياً.",
+                
+                footer_questions: "لديك أسئلة؟",
+                footer_rights: "جميع الحقوق محفوظة."
+            }
+        };
+
+        let currentLang = 'en';
+
+        function toggleLanguage() {
+            // Toggle state
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            const isArabic = currentLang === 'ar';
+            
+            // 1. Update HTML direction and font family
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', isArabic ? 'rtl' : 'ltr');
+            
+            const body = document.body;
+            if (isArabic) {
+                body.classList.remove('font-sans');
+                body.classList.add('font-arabic');
+            } else {
+                body.classList.remove('font-arabic');
+                body.classList.add('font-sans');
+            }
+
+            // 2. Update Button Text
+            const btnText = document.getElementById('lang-text');
+            btnText.textContent = isArabic ? 'English' : 'العربية';
+
+            // 3. Update All Text Content
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    el.textContent = translations[currentLang][key];
+                }
+            });
+
+            // 4. Update Placeholders
+            const placeholders = document.querySelectorAll('[data-i18n-placeholder]');
+            placeholders.forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[currentLang][key]) {
+                    el.setAttribute('placeholder', translations[currentLang][key]);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pediatric Stuttering Assessment | تقييم التأتأة للأطفال</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'arabic': ['Cairo', 'sans-serif'],
+                        'english': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        babyblue: {
+                            50: '#f0f8ff',
+                            100: '#e0f0fe',
+                            200: '#bae2fd',
+                            300: '#7dc8fc',
+                            400: '#36aef8',
+                            500: '#0c93eb',
+                            600: '#0074c9',
+                            700: '#015c9e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Language Toggle Logic */
+        html[lang="ar"] .en-text { display: none !important; }
+        html[lang="en"] .ar-text { display: none !important; }
+        
+        html[lang="ar"] { font-family: 'Cairo', sans-serif; }
+        html[lang="en"] { font-family: 'Inter', sans-serif; }
+
+        /* Custom Input Styling */
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #bae2fd;
+            background-color: #f0f8ff;
+            color: #1e293b;
+            transition: all 0.2s ease-in-out;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #36aef8;
+            box-shadow: 0 0 0 3px rgba(54, 174, 248, 0.2);
+            background-color: #ffffff;
+        }
+        
+        .form-checkbox {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #0c93eb;
+            border-color: #bae2fd;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+
+        .form-radio {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #0c93eb;
+            border-color: #bae2fd;
+            cursor: pointer;
+        }
+
+        .section-card {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e0f0fe;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            color: #015c9e;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e0f0fe;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-babyblue-50 text-slate-700 min-h-screen">
+
+    <header class="bg-white shadow-sm border-b border-babyblue-100 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-babyblue-100 text-babyblue-600 rounded-full flex items-center justify-center font-bold text-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                </div>
+                <h1 class="text-xl font-bold text-babyblue-700">
+                    <span class="ar-text">تقييم التأتأة السريري للأطفال</span>
+                    <span class="en-text">Pediatric Stuttering Assessment</span>
+                </h1>
+            </div>
+            <button onclick="toggleLanguage()" class="px-4 py-2 rounded-full bg-babyblue-50 text-babyblue-700 hover:bg-babyblue-100 border border-babyblue-200 transition font-semibold text-sm flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                </svg>
+                <span class="ar-text">English</span>
+                <span class="en-text">العربية</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        <form id="assessmentForm">
+
+            <section class="section-card">
+                <h2 class="section-title">
+                    <span class="ar-text">I. معلومات المريض العامة</span>
+                    <span class="en-text">I. General Patient Information</span>
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">اسم العميل</span><span class="en-text">Client Name</span>
+                        </label>
+                        <input type="text" id="gen_name" class="form-input">
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">تاريخ الميلاد / العمر</span><span class="en-text">Date of Birth / Age</span>
+                        </label>
+                        <input type="text" id="gen_dob" class="form-input">
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">الجنس</span><span class="en-text">Gender</span>
+                        </label>
+                        <input type="text" id="gen_gender" class="form-input">
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">تاريخ التقييم</span><span class="en-text">Date of Assessment</span>
+                        </label>
+                        <input type="date" id="gen_date" class="form-input">
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">المقيم الأساسي (أخصائي النطق)</span><span class="en-text">Primary Evaluator (SLP)</span>
+                        </label>
+                        <input type="text" id="gen_evaluator" class="form-input">
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">المصدر الأساسي للمعلومات</span><span class="en-text">Primary Informant(s)</span>
+                        </label>
+                        <input type="text" id="gen_informant" class="form-input" placeholder="Parents / Teachers">
+                    </div>
+                    <div class="md:col-span-2 lg:col-span-3">
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">سبب الإحالة</span><span class="en-text">Reason for Referral</span>
+                        </label>
+                        <textarea id="gen_referral" rows="2" class="form-input"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-card">
+                <h2 class="section-title">
+                    <span class="ar-text">II. التاريخ الطبي وتطور الحالة</span>
+                    <span class="en-text">II. Case History & Developmental Background</span>
+                </h2>
+                
+                <h3 class="font-bold text-babyblue-600 mb-4 mt-6">
+                    <span class="ar-text">1. التاريخ الطبي والنمائي</span><span class="en-text">1. Medical & Developmental History</span>
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">الحمل والولادة (طبيعي أم مبكر؟ مضاعفات؟)</span><span class="en-text">Pregnancy & Birth (Full-term/Preterm? Complications?)</span>
+                        </label>
+                        <input type="text" id="hist_birth" class="form-input">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block mb-2 font-semibold">
+                                <span class="ar-text">عمر الجلوس</span><span class="en-text">Age of Sitting</span>
+                            </label>
+                            <input type="text" id="hist_sit" class="form-input">
+                        </div>
+                        <div>
+                            <label class="block mb-2 font-semibold">
+                                <span class="ar-text">عمر المشي</span><span class="en-text">Age of Walking</span>
+                            </label>
+                            <input type="text" id="hist_walk" class="form-input">
+                        </div>
+                        <div>
+                            <label class="block mb-2 font-semibold">
+                                <span class="ar-text">الكلمات الأولى</span><span class="en-text">First Words</span>
+                            </label>
+                            <input type="text" id="hist_words" class="form-input">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">الحالة الصحية العامة (التهابات أذن، أمراض مزمنة)</span><span class="en-text">General Health (Ear infections, chronic illnesses)</span>
+                        </label>
+                        <input type="text" id="hist_health" class="form-input">
+                    </div>
+                </div>
+
+                <h3 class="font-bold text-babyblue-600 mb-4 mt-8">
+                    <span class="ar-text">2. تاريخ العائلة</span><span class="en-text">2. Family History</span>
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-6">
+                        <span class="font-semibold"><span class="ar-text">تاريخ عائلي للتأتأة؟</span><span class="en-text">Family history of stuttering?</span></span>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="fam_stutter" value="Yes" class="form-radio">
+                            <span class="ar-text">نعم</span><span class="en-text">Yes</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="fam_stutter" value="No" class="form-radio">
+                            <span class="ar-text">لا</span><span class="en-text">No</span>
+                        </label>
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">حالة التعافي لأفراد العائلة (تعافي طبيعي أم مستمر؟)</span><span class="en-text">Recovery status of family members?</span>
+                        </label>
+                        <input type="text" id="fam_recovery" class="form-input">
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">اضطرابات نطق/لغة أخرى في العائلة؟</span><span class="en-text">History of other Speech/Language Disorders?</span>
+                        </label>
+                        <input type="text" id="fam_other" class="form-input">
+                    </div>
+                </div>
+
+                <h3 class="font-bold text-babyblue-600 mb-4 mt-8">
+                    <span class="ar-text">3. بداية وتطور التأتأة</span><span class="en-text">3. Onset & Progression</span>
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">عمر بداية التأتأة</span><span class="en-text">Age of Onset</span>
+                        </label>
+                        <input type="text" id="onset_age" class="form-input">
+                    </div>
+                    <div class="flex items-center gap-6">
+                        <span class="font-semibold"><span class="ar-text">طريقة البداية:</span><span class="en-text">Mode of Onset:</span></span>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="onset_mode" value="Sudden" class="form-radio">
+                            <span class="ar-text">مفاجئة (أيام/أسابيع)</span><span class="en-text">Sudden (days/weeks)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="onset_mode" value="Gradual" class="form-radio">
+                            <span class="ar-text">تدريجية (أشهر)</span><span class="en-text">Gradual (months)</span>
+                        </label>
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">التطور عبر الزمن (هل تغيرت الأعراض؟)</span><span class="en-text">Progression Over Time (have disfluencies evolved?)</span>
+                        </label>
+                        <textarea id="onset_progression" rows="2" class="form-input"></textarea>
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">تقلبات الطلاقة (مواقف يكون فيها الطفل طلقاً تماماً)</span><span class="en-text">Fluency Fluctuations (contexts where completely fluent)</span>
+                        </label>
+                        <textarea id="onset_fluctuation" rows="2" class="form-input"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-card">
+                <h2 class="section-title">
+                    <span class="ar-text">III. الملف الشخصي للنطق واللغة</span>
+                    <span class="en-text">III. Speech & Language Profile</span>
+                </h2>
+                
+                <h3 class="font-bold text-babyblue-600 mb-4 mt-4">
+                    <span class="ar-text">1. سلوكيات التأتأة الأساسية</span><span class="en-text">1. Core Stuttering Behaviors</span>
+                </h3>
+                <p class="text-sm text-slate-500 mb-4">
+                    <span class="ar-text">وصف وتكرار كل سلوك خلال التقييم.</span>
+                    <span class="en-text">Describe and note frequency/severity.</span>
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-1 font-semibold text-sm">
+                            <span class="ar-text">تكرار الصوت / المقطع</span><span class="en-text">Sound / Syllable Repetitions</span>
+                        </label>
+                        <input type="text" id="core_syllable" class="form-input" placeholder="e.g., B-b-b-ball">
+                    </div>
+                    <div>
+                        <label class="block mb-1 font-semibold text-sm">
+                            <span class="ar-text">تكرار الكلمة</span><span class="en-text">Word Repetitions</span>
+                        </label>
+                        <input type="text" id="core_word" class="form-input" placeholder="e.g., He-he-he went">
+                    </div>
+                    <div>
+                        <label class="block mb-1 font-semibold text-sm">
+                            <span class="ar-text">تكرار الجملة/العبارة</span><span class="en-text">Phrase Repetitions</span>
+                        </label>
+                        <input type="text" id="core_phrase" class="form-input" placeholder="e.g., I want to-I want to">
+                    </div>
+                    <div>
+                        <label class="block mb-1 font-semibold text-sm">
+                            <span class="ar-text">إطالة الصوت</span><span class="en-text">Sound Prolongations</span>
+                        </label>
+                        <input type="text" id="core_prolong" class="form-input" placeholder="e.g., Mmmmmm-milk">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block mb-1 font-semibold text-sm">
+                            <span class="ar-text">الحبسات (توقف صامت أو مسموع)</span><span class="en-text">Blocks (Silent or Audible)</span>
+                        </label>
+                        <input type="text" id="core_blocks" class="form-input" placeholder="e.g., -----dog">
+                    </div>
+                </div>
+
+                <h3 class="font-bold text-babyblue-600 mb-4 mt-8">
+                    <span class="ar-text">2. السلوكيات الثانوية / المصاحبة</span><span class="en-text">2. Secondary / Concomitant Behaviors</span>
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label class="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-transparent hover:bg-babyblue-50 transition">
+                        <input type="checkbox" id="sec_face" class="form-checkbox mt-1">
+                        <div>
+                            <span class="font-semibold block"><span class="ar-text">التوتر الوجهي</span><span class="en-text">Facial Tension</span></span>
+                            <span class="text-xs text-slate-500"><span class="ar-text">رمش العين، تقطيب الحاجبين، شد الفك</span><span class="en-text">Eye blinking, brow furrowing, jaw tightening</span></span>
+                        </div>
+                    </label>
+                    <label class="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-transparent hover:bg-babyblue-50 transition">
+                        <input type="checkbox" id="sec_body" class="form-checkbox mt-1">
+                        <div>
+                            <span class="font-semibold block"><span class="ar-text">حركات الرأس/الجسم</span><span class="en-text">Head / Body Movements</span></span>
+                            <span class="text-xs text-slate-500"><span class="ar-text">إيماء الرأس، النقر بالقدم، شد قبضة اليد</span><span class="en-text">Head nodding, body rocking, fist clenching</span></span>
+                        </div>
+                    </label>
+                    <label class="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-transparent hover:bg-babyblue-50 transition">
+                        <input type="checkbox" id="sec_breath" class="form-checkbox mt-1">
+                        <div>
+                            <span class="font-semibold block"><span class="ar-text">أنماط التنفس</span><span class="en-text">Respiratory Patterns</span></span>
+                            <span class="text-xs text-slate-500"><span class="ar-text">حبس الأنفاس، تنفس غير منتظم</span><span class="en-text">Breath holding, irregular breathing</span></span>
+                        </div>
+                    </label>
+                    <label class="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-transparent hover:bg-babyblue-50 transition">
+                        <input type="checkbox" id="sec_avoid" class="form-checkbox mt-1">
+                        <div>
+                            <span class="font-semibold block"><span class="ar-text">سلوكيات التجنب والهروب</span><span class="en-text">Avoidance & Escape</span></span>
+                            <span class="text-xs text-slate-500"><span class="ar-text">تغيير الكلمات، استخدام أصوات حشو (آآ، إمم)</span><span class="en-text">Word substitutions, interjections (um, uh)</span></span>
+                        </div>
+                    </label>
+                </div>
+
+                <h3 class="font-bold text-babyblue-600 mb-4 mt-8">
+                    <span class="ar-text">3. معدل النطق والوضوح العام</span><span class="en-text">3. Speech Rate & Intelligibility</span>
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-6">
+                        <span class="font-semibold"><span class="ar-text">معدل التحدث:</span><span class="en-text">Speaking Rate:</span></span>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="rate_speech" value="Slow" class="form-radio">
+                            <span class="ar-text">بطيء</span><span class="en-text">Slow</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="rate_speech" value="Normal" class="form-radio">
+                            <span class="ar-text">طبيعي</span><span class="en-text">Normal</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="rate_speech" value="Rapid" class="form-radio">
+                            <span class="ar-text">سريع</span><span class="en-text">Rapid</span>
+                        </label>
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">اللفظ والأصوات (هل توجد أخطاء نطقية غير التأتأة؟)</span><span class="en-text">Articulation & Phonology (Sound errors independent of stuttering?)</span>
+                        </label>
+                        <input type="text" id="prof_articulation" class="form-input">
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">المهارات اللغوية (اللغة الاستقبالية والتعبيرية)</span><span class="en-text">Language Skills (Receptive & Expressive)</span>
+                        </label>
+                        <input type="text" id="prof_language" class="form-input">
+                    </div>
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <section class="section-card mb-0">
+                    <h2 class="section-title">
+                        <span class="ar-text">IV. التفاعلات العاطفية والمعرفية</span>
+                        <span class="en-text">IV. Affective & Cognitive Reactions</span>
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block mb-2 font-semibold">
+                                <span class="ar-text">وعي الطفل بالتأتأة (علامات إحباط؟)</span><span class="en-text">Child's Awareness (Frustration?)</span>
+                            </label>
+                            <textarea id="aff_awareness" rows="2" class="form-input"></textarea>
+                        </div>
+                        <div>
+                            <label class="block mb-2 font-semibold">
+                                <span class="ar-text">رد فعل الطفل عند التلعثم (يغضب، يصمت؟)</span><span class="en-text">Reaction to Disfluency (Stops talking, gets angry?)</span>
+                            </label>
+                            <textarea id="aff_reaction" rows="2" class="form-input"></textarea>
+                        </div>
+                        <div>
+                            <label class="block mb-2 font-semibold">
+                                <span class="ar-text">المواقف والقلق تجاه التواصل</span><span class="en-text">Communication Attitudes & Anxiety</span>
+                            </label>
+                            <textarea id="aff_anxiety" rows="2" class="form-input"></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section-card mb-0">
+                    <h2 class="section-title">
+                        <span class="ar-text">V. العوامل البيئية والشخصية</span>
+                        <span class="en-text">V. Environmental Factors</span>
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block mb-2 font-semibold">
+                                <span class="ar-text">ردود فعل الوالدين/الأسرة تجاه التأتأة</span><span class="en-text">Parental/Caregiver Reactions</span>
+                            </label>
+                            <textarea id="env_parents" rows="2" class="form-input"></textarea>
+                        </div>
+                        <div>
+                            <label class="block mb-2 font-semibold">
+                                <span class="ar-text">وتيرة وبيئة المنزل (سريعة، تنافسية؟)</span><span class="en-text">Home Environment Pace (Fast-paced?)</span>
+                            </label>
+                            <textarea id="env_home" rows="2" class="form-input"></textarea>
+                        </div>
+                        <div>
+                            <label class="block mb-2 font-semibold">
+                                <span class="ar-text">البيئة المدرسية والاجتماعية (تنمر، مشاركة بالصف)</span><span class="en-text">School & Social (Teasing, class participation)</span>
+                            </label>
+                            <textarea id="env_school" rows="2" class="form-input"></textarea>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <section class="section-card">
+                <h2 class="section-title">
+                    <span class="ar-text">VI. ملخص التقييم والانطباع السريري</span>
+                    <span class="en-text">VI. Assessment Summary & Impressions</span>
+                </h2>
+                <div class="space-y-6">
+                    <div>
+                        <span class="block mb-3 font-semibold text-lg"><span class="ar-text">التشخيص:</span><span class="en-text">Diagnosis:</span></span>
+                        <div class="flex flex-col gap-2">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="diag_type" value="Developmental Stuttering" class="form-radio">
+                                <span class="ar-text">تأتأة نمائية (Developmental Stuttering)</span><span class="en-text">Developmental Stuttering</span>
+                            </label>
+                            <div class="ps-8 flex items-center gap-4 mb-2">
+                                <span class="text-sm text-slate-500"><span class="ar-text">الشدة:</span><span class="en-text">Severity:</span></span>
+                                <label><input type="radio" name="diag_severity" value="Mild" class="form-radio align-middle"> <span class="text-sm"><span class="ar-text">بسيطة</span><span class="en-text">Mild</span></span></label>
+                                <label><input type="radio" name="diag_severity" value="Moderate" class="form-radio align-middle"> <span class="text-sm"><span class="ar-text">متوسطة</span><span class="en-text">Moderate</span></span></label>
+                                <label><input type="radio" name="diag_severity" value="Severe" class="form-radio align-middle"> <span class="text-sm"><span class="ar-text">شديدة</span><span class="en-text">Severe</span></span></label>
+                            </div>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="diag_type" value="Normal Disfluencies" class="form-radio">
+                                <span class="ar-text">عدم طلاقة طبيعية (مراقبة وتطمين)</span><span class="en-text">Normal Typical Disfluencies</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="diag_type" value="Other" class="form-radio">
+                                <span class="ar-text">اضطراب طلاقة آخر / سرعة الكلام (Cluttering)</span><span class="en-text">Other Fluency Disorder / Cluttering</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <hr class="border-babyblue-100">
+
+                    <div>
+                        <span class="block mb-3 font-semibold"><span class="ar-text">عوامل الخطر (مؤشرات استمرار التأتأة):</span><span class="en-text">Risk Factors Checklist (Predictors of Persistence):</span></span>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <label class="flex items-center gap-2"><input type="checkbox" id="risk_fam" class="form-checkbox"> <span class="ar-text">تاريخ عائلي للتأتأة المستمرة</span><span class="en-text">Family history of persistent stuttering</span></label>
+                            <label class="flex items-center gap-2"><input type="checkbox" id="risk_male" class="form-checkbox"> <span class="ar-text">الجنس: ذكر</span><span class="en-text">Male gender</span></label>
+                            <label class="flex items-center gap-2"><input type="checkbox" id="risk_age" class="form-checkbox"> <span class="ar-text">عمر البداية أكبر من 3.5 سنوات</span><span class="en-text">Age of onset > 3.5 years</span></label>
+                            <label class="flex items-center gap-2"><input type="checkbox" id="risk_dur" class="form-checkbox"> <span class="ar-text">المدة أطول من 6-12 شهراً</span><span class="en-text">Stuttering persists > 6–12 months</span></label>
+                            <label class="flex items-center gap-2"><input type="checkbox" id="risk_blocks" class="form-checkbox"> <span class="ar-text">وجود إطالات صوتية أو حبسات</span><span class="en-text">Presence of prolongations or blocks</span></label>
+                            <label class="flex items-center gap-2"><input type="checkbox" id="risk_other" class="form-checkbox"> <span class="ar-text">اضطرابات نطق/لغة مصاحبة</span><span class="en-text">Concomitant speech-language impairments</span></label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-card">
+                <h2 class="section-title">
+                    <span class="ar-text">VII. التوصيات والخطة العلاجية</span>
+                    <span class="en-text">VII. Recommendations & Treatment Plan</span>
+                </h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">النهج العلاجي المختار (مباشر، غير مباشر، استراتيجيات محددة):</span><span class="en-text">Therapeutic Approach Selection:</span>
+                        </label>
+                        <textarea id="plan_approach" rows="3" class="form-input" placeholder="e.g., Indirect therapy focusing on parent education and modifying home environment..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block mb-2 font-semibold">
+                            <span class="ar-text">البرنامج المنزلي والدعم المدرسي:</span><span class="en-text">Home Program & School Support:</span>
+                        </label>
+                        <textarea id="plan_home" rows="3" class="form-input"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label class="block mb-2 font-semibold">
+                                <span class="ar-text">خطة المتابعة (مثال: بعد 3 أشهر):</span><span class="en-text">Follow-Up Schedule:</span>
+                            </label>
+                            <input type="text" id="plan_followup" class="form-input">
+                        </div>
+                        <div>
+                            <label class="block mb-2 font-semibold">
+                                <span class="ar-text">توقيع الأخصائي:</span><span class="en-text">Clinician Signature / Name:</span>
+                            </label>
+                            <input type="text" id="plan_sign" class="form-input">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="text-center mt-8 mb-16">
+                <button type="button" onclick="downloadReport()" class="inline-flex items-center gap-3 bg-babyblue-500 hover:bg-babyblue-600 text-white font-bold text-lg py-4 px-10 rounded-full shadow-lg transition-transform transform hover:scale-105">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    <span class="ar-text">تحميل التقرير الكامل (.txt)</span>
+                    <span class="en-text">Download Full Report (.txt)</span>
+                </button>
+            </div>
+
+        </form>
+    </main>
+
+    <script>
+        // Language Toggle Function
+        function toggleLanguage() {
+            const htmlTag = document.documentElement;
+            if (htmlTag.lang === "ar") {
+                htmlTag.lang = "en";
+                htmlTag.dir = "ltr";
+            } else {
+                htmlTag.lang = "ar";
+                htmlTag.dir = "rtl";
+            }
+        }
+
+        // Helper function to get input values safely
+        function getVal(id) {
+            return document.getElementById(id) ? (document.getElementById(id).value || "N/A") : "N/A";
+        }
+
+        function getRadioVal(name) {
+            const ele = document.querySelector(`input[name="${name}"]:checked`);
+            return ele ? ele.value : "N/A";
+        }
+
+        function getCheckVal(id) {
+            return document.getElementById(id) && document.getElementById(id).checked ? "Yes" : "No";
+        }
+
+        // Report Generation and Download Function
+        function downloadReport() {
+            const lang = document.documentElement.lang;
+            const isAr = lang === 'ar';
+
+            let report = "";
+            
+            // Generate Titles based on Language
+            const t = {
+                title: isAr ? "تقرير تقييم التأتأة للأطفال" : "PEDIATRIC STUTTERING CLINICAL ASSESSMENT REPORT",
+                sec1: isAr ? "\n\n=== I. معلومات المريض العامة ===" : "\n\n=== I. GENERAL PATIENT INFORMATION ===",
+                name: isAr ? "اسم العميل: " : "Client Name: ",
+                dob: isAr ? "العمر/الولادة: " : "DOB / Age: ",
+                gender: isAr ? "الجنس: " : "Gender: ",
+                date: isAr ? "تاريخ التقييم: " : "Date of Assessment: ",
+                eval: isAr ? "المقيم: " : "Evaluator: ",
+                info: isAr ? "المصدر: " : "Informant: ",
+                ref: isAr ? "سبب الإحالة: " : "Reason for Referral: ",
+
+                sec2: isAr ? "\n\n=== II. التاريخ الطبي وتطور الحالة ===" : "\n\n=== II. CASE HISTORY & DEVELOPMENT ===",
+                birth: isAr ? "الحمل والولادة: " : "Pregnancy/Birth: ",
+                sit: isAr ? "الجلوس: " : "Sitting: ",
+                walk: isAr ? "المشي: " : "Walking: ",
+                words: isAr ? "الكلمات الأولى: " : "First Words: ",
+                health: isAr ? "الصحة العامة: " : "General Health: ",
+                famStut: isAr ? "تاريخ العائلة مع التأتأة: " : "Family Stuttering Hx: ",
+                famRec: isAr ? "حالة التعافي: " : "Recovery Status: ",
+                famOth: isAr ? "اضطرابات أخرى بالعائلة: " : "Other Family Disorders: ",
+                onAge: isAr ? "عمر البداية: " : "Age of Onset: ",
+                onMode: isAr ? "طريقة البداية: " : "Mode of Onset: ",
+                onProg: isAr ? "تطور الحالة: " : "Progression: ",
+                onFluc: isAr ? "تقلبات الطلاقة: " : "Fluctuations: ",
+
+                sec3: isAr ? "\n\n=== III. الملف الشخصي للنطق واللغة ===" : "\n\n=== III. SPEECH & LANGUAGE PROFILE ===",
+                coreSyl: isAr ? "تكرار الصوت/المقطع: " : "Syllable Reps: ",
+                coreWord: isAr ? "تكرار الكلمة: " : "Word Reps: ",
+                corePhr: isAr ? "تكرار العبارة: " : "Phrase Reps: ",
+                corePro: isAr ? "إطالة الصوت: " : "Prolongations: ",
+                coreBlo: isAr ? "الحبسات: " : "Blocks: ",
+                secFace: isAr ? "توتر وجهي: " : "Facial Tension: ",
+                secBody: isAr ? "حركات جسم: " : "Body Movements: ",
+                secBre: isAr ? "أنماط تنفس: " : "Breath Patterns: ",
+                secAvo: isAr ? "سلوكيات تجنب: " : "Avoidance: ",
+                rateSp: isAr ? "معدل النطق: " : "Speech Rate: ",
+                art: isAr ? "اللفظ: " : "Articulation: ",
+                lang: isAr ? "اللغة: " : "Language Skills: ",
+
+                sec4: isAr ? "\n\n=== IV. التفاعلات العاطفية والمعرفية ===" : "\n\n=== IV. AFFECTIVE & COGNITIVE ===",
+                aware: isAr ? "وعي الطفل: " : "Child's Awareness: ",
+                react: isAr ? "رد الفعل: " : "Reactions: ",
+                anx: isAr ? "القلق: " : "Anxiety: ",
+
+                sec5: isAr ? "\n\n=== V. العوامل البيئية ===" : "\n\n=== V. ENVIRONMENTAL FACTORS ===",
+                par: isAr ? "ردود الوالدين: " : "Parent Reactions: ",
+                home: isAr ? "بيئة المنزل: " : "Home Environment: ",
+                sch: isAr ? "البيئة المدرسية: " : "School Environment: ",
+
+                sec6: isAr ? "\n\n=== VI. الملخص والتشخيص ===" : "\n\n=== VI. SUMMARY & DIAGNOSIS ===",
+                diag: isAr ? "التشخيص: " : "Diagnosis: ",
+                sev: isAr ? "الشدة: " : "Severity: ",
+                riskTitle: isAr ? "\nعوامل الخطر الموجودة:" : "\nPresent Risk Factors:",
+                rFam: isAr ? "- تاريخ عائلي" : "- Family history",
+                rMale: isAr ? "- ذكر" : "- Male",
+                rAge: isAr ? "- البداية بعد 3.5 سنة" : "- Onset > 3.5 yrs",
+                rDur: isAr ? "- المدة أطول من 6 أشهر" : "- Duration > 6 mos",
+                rBlo: isAr ? "- وجود حبسات" : "- Blocks present",
+                rOth: isAr ? "- اضطرابات مصاحبة" : "- Concomitant disorders",
+
+                sec7: isAr ? "\n\n=== VII. التوصيات ===" : "\n\n=== VII. RECOMMENDATIONS ===",
+                app: isAr ? "النهج العلاجي: " : "Therapy Approach: ",
+                homPlan: isAr ? "البرنامج المنزلي: " : "Home Plan: ",
+                fol: isAr ? "المتابعة: " : "Follow-up: ",
+                sig: isAr ? "توقيع الأخصائي: " : "Clinician Signature: "
+            };
+
+            // Build Report String
+            report += t.title;
+            report += "\n=============================================";
+            
+            report += t.sec1;
+            report += "\n" + t.name + getVal('gen_name');
+            report += "\n" + t.dob + getVal('gen_dob');
+            report += "\n" + t.gender + getVal('gen_gender');
+            report += "\n" + t.date + getVal('gen_date');
+            report += "\n" + t.eval + getVal('gen_evaluator');
+            report += "\n" + t.info + getVal('gen_informant');
+            report += "\n" + t.ref + getVal('gen_referral');
+
+            report += t.sec2;
+            report += "\n" + t.birth + getVal('hist_birth');
+            report += "\n" + t.sit + getVal('hist_sit') + " | " + t.walk + getVal('hist_walk') + " | " + t.words + getVal('hist_words');
+            report += "\n" + t.health + getVal('hist_health');
+            report += "\n" + t.famStut + getRadioVal('fam_stutter');
+            report += "\n" + t.famRec + getVal('fam_recovery');
+            report += "\n" + t.famOth + getVal('fam_other');
+            report += "\n" + t.onAge + getVal('onset_age');
+            report += "\n" + t.onMode + getRadioVal('onset_mode');
+            report += "\n" + t.onProg + getVal('onset_progression');
+            report += "\n" + t.onFluc + getVal('onset_fluctuation');
+
+            report += t.sec3;
+            report += "\n" + t.coreSyl + getVal('core_syllable');
+            report += "\n" + t.coreWord + getVal('core_word');
+            report += "\n" + t.corePhr + getVal('core_phrase');
+            report += "\n" + t.corePro + getVal('core_prolong');
+            report += "\n" + t.coreBlo + getVal('core_blocks');
+            report += "\n" + t.secFace + getCheckVal('sec_face');
+            report += "\n" + t.secBody + getCheckVal('sec_body');
+            report += "\n" + t.secBre + getCheckVal('sec_breath');
+            report += "\n" + t.secAvo + getCheckVal('sec_avoid');
+            report += "\n" + t.rateSp + getRadioVal('rate_speech');
+            report += "\n" + t.art + getVal('prof_articulation');
+            report += "\n" + t.lang + getVal('prof_language');
+
+            report += t.sec4;
+            report += "\n" + t.aware + getVal('aff_awareness');
+            report += "\n" + t.react + getVal('aff_reaction');
+            report += "\n" + t.anx + getVal('aff_anxiety');
+
+            report += t.sec5;
+            report += "\n" + t.par + getVal('env_parents');
+            report += "\n" + t.home + getVal('env_home');
+            report += "\n" + t.sch + getVal('env_school');
+
+            report += t.sec6;
+            report += "\n" + t.diag + getRadioVal('diag_type');
+            if(getRadioVal('diag_type') === 'Developmental Stuttering' || getRadioVal('diag_type') === 'تأتأة نمائية (Developmental Stuttering)') {
+                report += "\n" + t.sev + getRadioVal('diag_severity');
+            }
+            report += t.riskTitle;
+            if(getCheckVal('risk_fam') === 'Yes') report += "\n" + t.rFam;
+            if(getCheckVal('risk_male') === 'Yes') report += "\n" + t.rMale;
+            if(getCheckVal('risk_age') === 'Yes') report += "\n" + t.rAge;
+            if(getCheckVal('risk_dur') === 'Yes') report += "\n" + t.rDur;
+            if(getCheckVal('risk_blocks') === 'Yes') report += "\n" + t.rBlo;
+            if(getCheckVal('risk_other') === 'Yes') report += "\n" + t.rOth;
+
+            report += t.sec7;
+            report += "\n" + t.app + getVal('plan_approach');
+            report += "\n" + t.homPlan + getVal('plan_home');
+            report += "\n" + t.fol + getVal('plan_followup');
+            report += "\n" + t.sig + getVal('plan_sign');
+
+            // Add Timestamp
+            report += "\n\n=============================================";
+            report += "\nGenerated on: " + new Date().toLocaleString();
+
+            // Create Blob and Download
+            const blob = new Blob([report], { type: "text/plain;charset=utf-8" });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            
+            // File Name Formatting
+            let clientName = getVal('gen_name').trim().replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_");
+            if(clientName === "" || clientName === "N_A") clientName = "Client";
+            a.href = url;
+            a.download = `Stuttering_Assessment_${clientName}.txt`;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

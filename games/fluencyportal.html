@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en" id="html-root">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fluency Games | Ahmad Ghanem SLP</title>
+    <!-- Fallback icon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗣️</text></svg>" type="image/svg+xml">
+    
+    <!-- Fonts: Inter (English) and Noto Sans Arabic (Arabic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        arabic: ['Noto Sans Arabic', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        },
+                        game: {
+                            easy: '#10b981', // emerald
+                            light: '#0ea5e9', // sky
+                            turtle: '#8b5cf6', // violet
+                            stretch: '#f59e0b', // amber
+                            pause: '#ef4444', // red
+                            cancel: '#ec4899', // pink
+                            pull: '#14b8a6', // teal
+                            prep: '#f97316'  // orange
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Smooth transitions for layout changes */
+        body, .tool-card, .icon-container {
+            transition: all 0.3s ease-in-out;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .tool-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: #3b82f6;
+        }
+        
+        .tool-card:hover .icon-container {
+            transform: scale(1.1) rotate(5deg);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans transition-all duration-300">
+
+    <!-- NAVIGATION -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-2">
+                    <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-md">
+                        AG
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-slate-800">Ahmad Ghanem <span class="text-primary-600">SLP</span></span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-6 rtl:space-x-reverse">
+                    <a href="index.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_home">Home</a>
+                    <a href="tools/tools.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_tools">Tools</a>
+                    <a href="forms.html" class="text-slate-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors" data-i18n="nav_forms">Forms</a>
+                    <!-- Active state for games/resources -->
+                    <a href="#" class="text-primary-700 bg-primary-50 px-3 py-2 rounded-md text-sm font-bold shadow-sm" data-i18n="nav_games">Games</a>
+                    
+                    <!-- Language Switcher Button -->
+                    <button onclick="toggleLanguage()" class="flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-300 text-sm font-medium hover:bg-slate-50 hover:border-primary-500 hover:text-primary-600 transition-colors ml-4 rtl:mr-4 shadow-sm">
+                        <span id="lang-icon">🌐</span>
+                        <span id="lang-text">العربية</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="bg-gradient-to-b from-white to-slate-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 text-center">
+            <div class="inline-flex items-center justify-center p-3 bg-primary-100 rounded-full mb-4 text-3xl">
+                🎮
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4" data-i18n="header_title">
+                Fluency Games
+            </h1>
+            <p class="max-w-2xl mx-auto text-lg text-slate-500 leading-relaxed" data-i18n="header_subtitle">
+                Select an interactive game to practice fluency shaping and stuttering modification strategies.
+            </p>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+        
+        <div class="flex justify-between items-end mb-8">
+            <h2 class="text-2xl font-bold text-slate-800 text-center md:text-left rtl:text-right" data-i18n="section_categories">Available Games</h2>
+        </div>
+        
+        <!-- Games Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+            <!-- Game 1: Easy Onsets -->
+            <a href="pace-race.html" class="tool-card block bg-white rounded-2xl border border-slate-200 p-6 text-center group cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
+                <div class="icon-container w-20 h-20 mx-auto mb-5 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-4xl shadow-inner">
+                    🍃
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2" data-i18n="game_easy_onsets_title">pace race</h3>
+                <p class="text-sm text-slate-500 line-clamp-2" data-i18n="game_easy_onsets_desc">race car with speech and normal speed.</p>
+                <div class="mt-4 inline-flex items-center text-sm font-semibold text-emerald-600 group-hover:text-emerald-700">
+                    <span data-i18n="btn_play">Play Game</span> <span class="ml-1 rtl:mr-1 rtl:ml-0 rtl:rotate-180">→</span>
+                </div>
+            </a>
+
+            <!-- Game 2: Light Contacts -->
+            <a href="games/light-contacts.html" class="tool-card block bg-white rounded-2xl border border-slate-200 p-6 text-center group cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-sky-500"></div>
+                <div class="icon-container w-20 h-20 mx-auto mb-5 bg-sky-100 text-sky-600 rounded-2xl flex items-center justify-center text-4xl shadow-inner">
+                    🪶
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2" data-i18n="game_light_contacts_title">Light Contacts</h3>
+                <p class="text-sm text-slate-500 line-clamp-2" data-i18n="game_light_contacts_desc">Touch articulators softly to prevent hard blocks.</p>
+                <div class="mt-4 inline-flex items-center text-sm font-semibold text-sky-600 group-hover:text-sky-700">
+                    <span data-i18n="btn_play">Play Game</span> <span class="ml-1 rtl:mr-1 rtl:ml-0 rtl:rotate-180">→</span>
+                </div>
+            </a>
+
+            <!-- Game 3: Turtle Speech -->
+            <a href="turtle-speech.html" class="tool-card block bg-white rounded-2xl border border-slate-200 p-6 text-center group cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-violet-500"></div>
+                <div class="icon-container w-20 h-20 mx-auto mb-5 bg-violet-100 text-violet-600 rounded-2xl flex items-center justify-center text-4xl shadow-inner">
+                    🐢
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2" data-i18n="game_turtle_speech_title">Turtle Speech</h3>
+                <p class="text-sm text-slate-500 line-clamp-2" data-i18n="game_turtle_speech_desc">Speak at a comfortable, slow, and relaxed pace.</p>
+                <div class="mt-4 inline-flex items-center text-sm font-semibold text-violet-600 group-hover:text-violet-700">
+                    <span data-i18n="btn_play">Play Game</span> <span class="ml-1 rtl:mr-1 rtl:ml-0 rtl:rotate-180">→</span>
+                </div>
+            </a>
+
+            <!-- Game 4: Stretchy Speech -->
+            <a href="games/stretchy-speech.html" class="tool-card block bg-white rounded-2xl border border-slate-200 p-6 text-center group cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-amber-500"></div>
+                <div class="icon-container w-20 h-20 mx-auto mb-5 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-4xl shadow-inner">
+                    〰️
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2" data-i18n="game_stretchy_speech_title">Stretchy Speech</h3>
+                <p class="text-sm text-slate-500 line-clamp-2" data-i18n="game_stretchy_speech_desc">Prolong the vowels to maintain continuous voicing.</p>
+                <div class="mt-4 inline-flex items-center text-sm font-semibold text-amber-600 group-hover:text-amber-700">
+                    <span data-i18n="btn_play">Play Game</span> <span class="ml-1 rtl:mr-1 rtl:ml-0 rtl:rotate-180">→</span>
+                </div>
+            </a>
+
+            <!-- Game 5: Pausing & Phrasing -->
+            <a href="games/pausing.html" class="tool-card block bg-white rounded-2xl border border-slate-200 p-6 text-center group cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
+                <div class="icon-container w-20 h-20 mx-auto mb-5 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center text-4xl shadow-inner">
+                    ⏸️
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2" data-i18n="game_pausing_title">Pausing & Phrasing</h3>
+                <p class="text-sm text-slate-500 line-clamp-2" data-i18n="game_pausing_desc">Chunk words together and take natural breaks.</p>
+                <div class="mt-4 inline-flex items-center text-sm font-semibold text-red-600 group-hover:text-red-700">
+                    <span data-i18n="btn_play">Play Game</span> <span class="ml-1 rtl:mr-1 rtl:ml-0 rtl:rotate-180">→</span>
+                </div>
+            </a>
+
+            <!-- Game 6: Cancellation -->
+            <a href="games/cancellation.html" class="tool-card block bg-white rounded-2xl border border-slate-200 p-6 text-center group cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-pink-500"></div>
+                <div class="icon-container w-20 h-20 mx-auto mb-5 bg-pink-100 text-pink-600 rounded-2xl flex items-center justify-center text-4xl shadow-inner">
+                    ⏪
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2" data-i18n="game_cancellation_title">Cancellation</h3>
+                <p class="text-sm text-slate-500 line-clamp-2" data-i18n="game_cancellation_desc">Stop after a stutter, pause, and try the word again easily.</p>
+                <div class="mt-4 inline-flex items-center text-sm font-semibold text-pink-600 group-hover:text-pink-700">
+                    <span data-i18n="btn_play">Play Game</span> <span class="ml-1 rtl:mr-1 rtl:ml-0 rtl:rotate-180">→</span>
+                </div>
+            </a>
+
+            <!-- Game 7: Pull-Outs -->
+            <a href="games/pull-outs.html" class="tool-card block bg-white rounded-2xl border border-slate-200 p-6 text-center group cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-teal-500"></div>
+                <div class="icon-container w-20 h-20 mx-auto mb-5 bg-teal-100 text-teal-600 rounded-2xl flex items-center justify-center text-4xl shadow-inner">
+                    🛝
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2" data-i18n="game_pullouts_title">Pull-Outs</h3>
+                <p class="text-sm text-slate-500 line-clamp-2" data-i18n="game_pullouts_desc">Catch yourself stuttering and smoothly slide out of it.</p>
+                <div class="mt-4 inline-flex items-center text-sm font-semibold text-teal-600 group-hover:text-teal-700">
+                    <span data-i18n="btn_play">Play Game</span> <span class="ml-1 rtl:mr-1 rtl:ml-0 rtl:rotate-180">→</span>
+                </div>
+            </a>
+
+            <!-- Game 8: Preparatory Sets -->
+            <a href="games/prep-sets.html" class="tool-card block bg-white rounded-2xl border border-slate-200 p-6 text-center group cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-orange-500"></div>
+                <div class="icon-container w-20 h-20 mx-auto mb-5 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center text-4xl shadow-inner">
+                    🎯
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2" data-i18n="game_prepsets_title">Preparatory Sets</h3>
+                <p class="text-sm text-slate-500 line-clamp-2" data-i18n="game_prepsets_desc">Anticipate a stutter and prepare to ease into it.</p>
+                <div class="mt-4 inline-flex items-center text-sm font-semibold text-orange-600 group-hover:text-orange-700">
+                    <span data-i18n="btn_play">Play Game</span> <span class="ml-1 rtl:mr-1 rtl:ml-0 rtl:rotate-180">→</span>
+                </div>
+            </a>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mb-4">
+                <strong data-i18n="footer_questions">Questions?</strong>
+                <a href="mailto:slp.ahmadghanem@gmail.com" class="text-primary-600 hover:text-primary-800 ml-2 transition-colors">slp.ahmadghanem@gmail.com</a>
+                <span class="mx-2 text-slate-300">|</span>
+                <a href="tel:+963988451245" class="text-primary-600 hover:text-primary-800 transition-colors" dir="ltr">+963 988 451 245</a>
+            </div>
+            <div class="text-slate-400 text-sm">
+                &copy; 2024 Ahmad Ghanem SLP. <span data-i18n="footer_rights">All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LANGUAGE SWITCHER LOGIC -->
+    <script>
+        // Translation Dictionary tailored for Fluency Games
+        const translations = {
+            en: {
+                nav_home: "Home",
+                nav_tools: "Tools",
+                nav_forms: "Forms",
+                nav_games: "Games",
+                
+                header_title: "Fluency Games",
+                header_subtitle: "Select an interactive game to practice fluency shaping and stuttering modification strategies.",
+                section_categories: "Available Games",
+                
+                game_easy_onsets_title: "Easy Onsets",
+                game_easy_onsets_desc: "Gently start voicing to ease into words without tension.",
+                
+                game_light_contacts_title: "Light Contacts",
+                game_light_contacts_desc: "Touch articulators softly to prevent hard blocks.",
+                
+                game_turtle_speech_title: "Turtle Speech",
+                game_turtle_speech_desc: "Speak at a comfortable, slow, and relaxed pace.",
+                
+                game_stretchy_speech_title: "Stretchy Speech",
+                game_stretchy_speech_desc: "Prolong the vowels to maintain continuous voicing.",
+                
+                game_pausing_title: "Pausing & Phrasing",
+                game_pausing_desc: "Chunk words together and take natural breaks.",
+                
+                game_cancellation_title: "Cancellation",
+                game_cancellation_desc: "Stop after a stutter, pause, and try the word again easily.",
+                
+                game_pullouts_title: "Pull-Outs",
+                game_pullouts_desc: "Catch yourself stuttering and smoothly slide out of it.",
+                
+                game_prepsets_title: "Preparatory Sets",
+                game_prepsets_desc: "Anticipate a stutter and prepare to ease into it.",
+                
+                btn_play: "Play Game",
+                footer_questions: "Questions?",
+                footer_rights: "All rights reserved."
+            },
+            ar: {
+                nav_home: "الرئيسية",
+                nav_tools: "الأدوات",
+                nav_forms: "النماذج",
+                nav_games: "الألعاب",
+                
+                header_title: "ألعاب الطلاقة",
+                header_subtitle: "اختر لعبة تفاعلية للتدريب على استراتيجيات تشكيل الطلاقة وتعديل التأتأة.",
+                section_categories: "الألعاب المتاحة",
+                
+                game_easy_onsets_title: "البدايات السهلة",
+                game_easy_onsets_desc: "ابدأ التصويت بلطف للدخول في الكلمات دون شد.",
+                
+                game_light_contacts_title: "التلامس الخفيف",
+                game_light_contacts_desc: "تلامس أعضاء النطق بخفة لمنع الانحباس القوي.",
+                
+                game_turtle_speech_title: "كلام السلحفاة",
+                game_turtle_speech_desc: "تحدث بإيقاع مريح، بطيء ومسترخٍ.",
+                
+                game_stretchy_speech_title: "الكلام الممدود",
+                game_stretchy_speech_desc: "إطالة حروف العلة للحفاظ على استمرارية التصويت.",
+                
+                game_pausing_title: "الوقفات وتقسيم العبارات",
+                game_pausing_desc: "تجميع الكلمات في مقاطع وأخذ وقفات طبيعية.",
+                
+                game_cancellation_title: "الإلغاء",
+                game_cancellation_desc: "توقف بعد التأتأة، خذ وقفة، ثم حاول نطق الكلمة بسهولة.",
+                
+                game_pullouts_title: "الانسحاب (الانزلاق)",
+                game_pullouts_desc: "لاحظ التأتأة أثناء حدوثها وانزلق منها بمرونة.",
+                
+                game_prepsets_title: "الاستعداد التمهيدي",
+                game_prepsets_desc: "توقع حدوث التأتأة واستعد للدخول فيها بمرونة.",
+                
+                btn_play: "العب الآن",
+                footer_questions: "لديك أسئلة؟",
+                footer_rights: "جميع الحقوق محفوظة."
+            }
+        };
+
+        let currentLang = 'en';
+
+        function toggleLanguage() {
+            // Toggle state
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            const isArabic = currentLang === 'ar';
+            
+            // 1. Update HTML direction and font family
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('dir', isArabic ? 'rtl' : 'ltr');
+            
+            const body = document.body;
+            if (isArabic) {
+                body.classList.remove('font-sans');
+                body.classList.add('font-arabic');
+            } else {
+                body.classList.remove('font-arabic');
+                body.classList.add('font-sans');
+            }
+
+            // 2. Update Button Text
+            const btnText = document.getElementById('lang-text');
+            btnText.textContent = isArabic ? 'English' : 'العربية';
+
+            // 3. Update All Text Content
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    el.textContent = translations[currentLang][key];
+                }
+            });
+        }
+    </script>
+</body>
+</html>

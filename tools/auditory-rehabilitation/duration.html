@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Auditory Discrimination - Long vs Short</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'pastel-blue': '#aec6cf',
+              'pastel-text': '#5a5a5a'
+            }
+          }
+        }
+      }
+    </script>
+      
+    <style>
+      body { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        user-select: none; 
+        -webkit-user-select: none;
+        overscroll-behavior: none; 
+      }
+      @keyframes popIn {
+        0% { transform: scale(0.3); opacity: 0; }
+        60% { transform: scale(1.2); }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+      .hide-scrollbar::-webkit-scrollbar { width: 6px; }
+      .hide-scrollbar::-webkit-scrollbar-thumb { background: #aec6cf; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-pastel-text overflow-hidden h-[100dvh] flex flex-col">
+    
+    <audio id="sound-success" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=success-1-6297.mp3" preload="auto"></audio>
+
+    <div id="central-feedback" class="fixed inset-0 flex items-center justify-center z-[100] hidden pointer-events-none bg-white bg-opacity-80 backdrop-blur-sm transition-all">
+        <i id="feedback-icon-big" class="text-[10rem] md:text-[18rem] drop-shadow-2xl"></i>
+    </div>
+
+    <div id="sound-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[110] hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-4xl h-[85vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-pop">
+            <div class="p-4 px-6 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+                <div class="flex items-center gap-3">
+                    <h3 class="font-bold text-lg text-slate-700">Sound Library (1-50)</h3>
+                    <span class="text-xs bg-pastel-blue/20 text-slate-600 font-semibold px-3 py-1 rounded-full hidden sm:inline">Select sound & duration</span>
+                </div>
+                <button onclick="toggleSoundModal(false)" class="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-slate-600 transition cursor-pointer">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-4 md:p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 hide-scrollbar" id="modal-grid">
+                </div>
+        </div>
+    </div>
+
+    <header id="game-header" class="w-full p-3 md:p-4 flex items-center justify-between bg-white shadow-sm z-50 shrink-0">
+        <button onclick="window.location.href='index.html'" class="p-2 px-3 md:px-4 bg-gray-100 rounded-full text-pastel-text hover:bg-gray-200 transition flex items-center gap-2 font-bold text-xs md:text-base shrink-0 cursor-pointer">
+            <i class="fas fa-arrow-left"></i>
+            <span class="hidden md:inline">Home</span>
+        </button>
+        
+        <h2 id="header-title" class="text-sm md:text-lg font-bold text-pastel-blue">Duration: Long vs Short</h2>
+        
+        <div class="flex items-center gap-2 shrink-0">
+            <button id="free-mode-toggle-btn" onclick="toggleFreeMode()" class="p-2 px-3 md:px-4 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-full transition flex items-center gap-2 font-bold text-xs md:text-sm cursor-pointer hidden">
+                <i class="fas fa-book-open"></i>
+                <span id="free-mode-toggle-txt">Free Mode</span>
+            </button>
+            <button id="view-toggle-btn" onclick="toggleWorkspaceView()" class="p-2 px-3 md:px-4 bg-red-100 hover:bg-red-200 text-red-600 rounded-full transition flex items-center gap-2 font-bold text-xs md:text-sm cursor-pointer">
+                <i class="fas fa-sliders-h"></i>
+                <span id="view-toggle-txt">Short vs Long</span>
+            </button>
+            <button onclick="toggleSoundModal(true)" class="p-2 px-3 md:px-4 bg-pastel-blue/20 hover:bg-pastel-blue/30 text-slate-700 rounded-full transition flex items-center gap-2 font-bold text-xs md:text-sm cursor-pointer">
+                <i class="fas fa-th-large"></i>
+                <span>Library</span>
+            </button>
+        </div>
+    </header>
+
+    <div id="game-view" class="flex-1 flex flex-col items-center justify-center p-2 md:p-4 w-full max-w-5xl mx-auto overflow-hidden">
+        <div class="flex items-center justify-between w-full my-auto gap-3 px-1">
+            
+            <button onclick="handleAnswer('short')" class="group flex items-center justify-center p-4 bg-transparent border-2 border-transparent hover:border-red-200 rounded-3xl active:scale-95 transition cursor-pointer w-40 sm:w-56 md:w-64 h-40 sm:h-48 shrink-0">
+                <div class="w-20 sm:w-28 md:w-32 h-6 sm:h-8 bg-red-500 rounded-xl shadow-md group-hover:scale-105 transition"></div>
+            </button>
+
+            <div class="flex-1 flex flex-col items-center justify-center max-w-[260px] sm:max-w-[320px] w-full">
+                <div class="bg-white p-4 md:p-6 rounded-3xl shadow-sm border-2 border-gray-100 flex flex-col items-center justify-center w-full aspect-square relative">
+                    <span id="sound-label-text" class="text-xs sm:text-sm font-bold text-slate-700 text-center truncate max-w-[220px] mb-3">Sound Name</span>
+                    <div onclick="playTrialSound()" id="audio-card-box" class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-gray-50 rounded-2xl p-3 border-2 border-gray-100 hover:border-pastel-blue transition-all cursor-pointer shadow-sm flex items-center justify-center relative">
+                        <img id="hint-img" src="" alt="Sound Visual" class="w-full h-full object-contain pointer-events-none">
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="handleAnswer('long')" class="group flex items-center justify-center p-4 bg-transparent border-2 border-transparent hover:border-red-200 rounded-3xl active:scale-95 transition cursor-pointer w-72 sm:w-[380px] md:w-[440px] h-40 sm:h-48 shrink-0">
+                <div class="w-[240px] sm:w-[336px] md:w-[384px] h-6 sm:h-8 bg-red-500 rounded-xl shadow-md group-hover:scale-105 transition"></div>
+            </button>
+
+        </div>
+        <p class="text-[10px] sm:text-xs text-gray-400 mt-4 font-semibold tracking-wider uppercase shrink-0">Click image to listen • Choose Short or Long</p>
+    </div>
+
+    <div id="workspace-view" class="flex-1 flex flex-col items-center justify-between p-4 md:p-6 w-full max-w-5xl mx-auto overflow-y-auto hidden hide-scrollbar">
+        
+        <div class="w-full flex items-center justify-between bg-white p-3 px-5 rounded-2xl shadow-sm border border-gray-100 mb-4 shrink-0">
+            <div class="flex items-center gap-3">
+                <span id="ws-sound-num" class="bg-pastel-blue/20 text-slate-700 font-bold text-xs px-3 py-1 rounded-full">Sound #1</span>
+                <span id="ws-sound-name" class="font-bold text-sm text-slate-700">Sound Name</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="changeWorkspaceSound(-1)" class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-slate-600 flex items-center justify-center transition cursor-pointer">
+                    <i class="fas fa-chevron-left text-xs"></i>
+                </button>
+                <button onclick="changeWorkspaceSound(1)" class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-slate-600 flex items-center justify-center transition cursor-pointer">
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="cards-container" class="w-full grid grid-cols-1 md:grid-cols-2 gap-6 my-auto">
+            </div>
+
+        <div id="audio-quiz-btn-container" class="w-full flex flex-col items-center justify-center mt-4 shrink-0">
+            <button onclick="startWorkspaceQuiz()" class="w-16 h-16 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg transition flex items-center justify-center cursor-pointer active:scale-95">
+                <i class="fas fa-volume-high text-2xl"></i>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const soundLibrary = {
+            1: "غسالة", 2: "كاسة تنكسر", 3: "مكنسة قش", 4: "طيارة", 5: "منبه ساعة",
+            6: "بيبي يبكي", 7: "عصفور", 8: "زمور سيارة", 9: "زحمة سير", 10: "ساعة",
+            11: "بقرة", 12: "بطة", 13: "وزة", 14: "هلكوبتر", 15: "فرشاية اسنان",
+            16: "بيبي مبسوط", 17: "جرس", 18: "غراب", 19: "موتور", 20: "دوش حمام",
+            21: "موبايل", 22: "مي تواليت", 23: "صفارة شرطة", 24: "شاحنة صغيرة تمر", 25: "شخير رجل",
+            26: "ببغاء", 27: "سيارة شرطة", 28: "خاروف", 29: "سيارات بالمدينة", 30: "قطار",
+            31: "شاحنة تمر", 32: "قطة", 33: "كلاب", 34: "حمامة", 35: "سيارة اطفاء",
+            36: "بنت تصرخ", 37: "ماعز", 38: "حصان", 39: "صب عصير", 40: "اسد",
+            41: "صيصان", 42: "ضجة عالم", 43: "سعال بنت", 44: "مطر", 45: "ديك",
+            46: "بوسة / قبلة", 47: "سيارة اسعاف", 48: "غلي ماء", 49: "باخرة", 50: "نهر جاري"
+        };
+
+        let durationTrials = [];
+        for (let i = 1; i <= 50; i++) {
+            durationTrials.push({ sound: i, type: 'short' });
+            durationTrials.push({ sound: i, type: 'long' });
+        }
+
+        let currentTrial = null;
+        let trialAudio = new Audio();
+        trialAudio.preload = 'auto';
+
+        // Workspace state
+        let isWorkspaceActive = false;
+        let isFreeMode = false;
+        let wsSoundId = 1;
+        let wsAudio = new Audio();
+        wsAudio.preload = 'auto';
+        let wsQuizActive = null; 
+        let wsLeftType = 'short'; 
+
+        function initDurationApp() {
+            buildModalGrid();
+            loadRandomTrial(false);
+            updateWorkspaceUI();
+        }
+
+        function buildModalGrid() {
+            const grid = document.getElementById('modal-grid');
+            grid.innerHTML = '';
+            
+            for (let i = 1; i <= 50; i++) {
+                const soundName = soundLibrary[i] || `Sound ${i}`;
+                const card = document.createElement('div');
+                card.className = 'bg-gray-50 border-2 border-gray-100 hover:border-pastel-blue rounded-2xl p-3 flex flex-col items-center justify-between gap-2 shadow-sm transition';
+                
+                card.innerHTML = `
+                    <span class="text-[11px] font-bold text-slate-600 truncate w-full text-center">${i}. ${soundName}</span>
+                    <div class="w-20 h-20 bg-white rounded-xl p-2 border border-gray-100 flex items-center justify-center shadow-inner">
+                        <img src="images/${i}.png" alt="${soundName}" class="w-full h-full object-contain pointer-events-none">
+                    </div>
+                    <div class="flex items-center gap-1.5 w-full mt-1">
+                        <button onclick="selectSpecificTrial(${i}, 'short')" class="flex-1 py-1 px-1 bg-red-100 hover:bg-red-200 text-red-600 font-bold text-[10px] rounded-lg transition text-center cursor-pointer">Short</button>
+                        <button onclick="selectSpecificTrial(${i}, 'long')" class="flex-1 py-1 px-1 bg-red-500 hover:bg-red-600 text-white font-bold text-[10px] rounded-lg transition text-center cursor-pointer">Long</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
+        }
+
+        function toggleSoundModal(show) {
+            const modal = document.getElementById('sound-modal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function toggleFreeMode() {
+            isFreeMode = !isFreeMode;
+            const freeModeTxt = document.getElementById('free-mode-toggle-txt');
+            const freeModeBtn = document.getElementById('free-mode-toggle-btn');
+            const audioQuizBtnContainer = document.getElementById('audio-quiz-btn-container');
+
+            if (isFreeMode) {
+                freeModeTxt.innerText = "Quiz Mode";
+                freeModeBtn.className = "p-2 px-3 md:px-4 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-full transition flex items-center gap-2 font-bold text-xs md:text-sm cursor-pointer";
+                audioQuizBtnContainer.classList.add('hidden');
+                wsQuizActive = null;
+            } else {
+                freeModeTxt.innerText = "Free Mode";
+                freeModeBtn.className = "p-2 px-3 md:px-4 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-full transition flex items-center gap-2 font-bold text-xs md:text-sm cursor-pointer";
+                audioQuizBtnContainer.classList.remove('hidden');
+            }
+        }
+
+        function toggleWorkspaceView() {
+            isWorkspaceActive = !isWorkspaceActive;
+            const gameView = document.getElementById('game-view');
+            const wsView = document.getElementById('workspace-view');
+            const toggleTxt = document.getElementById('view-toggle-txt');
+            const headerTitle = document.getElementById('header-title');
+            const freeModeBtn = document.getElementById('free-mode-toggle-btn');
+
+            if (isWorkspaceActive) {
+                gameView.classList.add('hidden');
+                wsView.classList.remove('hidden');
+                toggleTxt.innerText = "Game Mode";
+                headerTitle.innerText = "Short vs Long Workspace";
+                freeModeBtn.classList.remove('hidden'); // Show free mode / quiz mode toggle button
+                trialAudio.pause();
+                updateWorkspaceUI();
+            } else {
+                wsView.classList.add('hidden');
+                gameView.classList.remove('hidden');
+                toggleTxt.innerText = "Short vs Long";
+                headerTitle.innerText = "Duration: Long vs Short";
+                freeModeBtn.classList.add('hidden'); // Hide free mode toggle button
+                wsAudio.pause();
+                loadRandomTrial(false);
+            }
+        }
+
+        function updateWorkspaceUI() {
+            document.getElementById('ws-sound-num').innerText = `Sound #${wsSoundId}`;
+            document.getElementById('ws-sound-name').innerText = soundLibrary[wsSoundId];
+            
+            wsLeftType = Math.random() < 0.5 ? 'short' : 'long';
+            const wsRightType = wsLeftType === 'short' ? 'long' : 'short';
+
+            const container = document.getElementById('cards-container');
+            container.innerHTML = `
+                <div class="bg-white p-6 rounded-3xl shadow-sm border-2 border-gray-100 flex flex-col items-center justify-center gap-4 relative">
+                    <div onclick="handleWorkspaceCardClick('${wsLeftType}')" class="w-36 h-36 sm:w-44 sm:h-44 bg-gray-50 rounded-2xl p-4 border-2 border-gray-100 hover:border-red-300 transition cursor-pointer shadow-inner flex items-center justify-center relative">
+                        <img src="images/${wsSoundId}.png" alt="Sound" class="w-full h-full object-contain pointer-events-none">
+                    </div>
+                    <div class="w-full max-w-[280px] flex flex-col gap-1.5">
+                        <div class="flex justify-between text-[11px] font-bold text-slate-500">
+                            <span>Progress</span>
+                            <span id="ws-${wsLeftType}-timer">0.0s</span>
+                        </div>
+                        <div class="w-full h-3.5 bg-gray-100 rounded-full overflow-hidden border border-gray-200 relative">
+                            <div id="prog-${wsLeftType}-ws" class="absolute top-0 left-0 h-full bg-red-500 w-0 transition-all duration-75"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-sm border-2 border-gray-100 flex flex-col items-center justify-center gap-4 relative">
+                    <div onclick="handleWorkspaceCardClick('${wsRightType}')" class="w-36 h-36 sm:w-44 sm:h-44 bg-gray-50 rounded-2xl p-4 border-2 border-gray-100 hover:border-red-300 transition cursor-pointer shadow-inner flex items-center justify-center relative">
+                        <img src="images/${wsSoundId}.png" alt="Sound" class="w-full h-full object-contain pointer-events-none">
+                    </div>
+                    <div class="w-full max-w-[280px] flex flex-col gap-1.5">
+                        <div class="flex justify-between text-[11px] font-bold text-slate-500">
+                            <span>Progress</span>
+                            <span id="ws-${wsRightType}-timer">0.0s</span>
+                        </div>
+                        <div class="w-full h-3.5 bg-gray-100 rounded-full overflow-hidden border border-gray-200 relative">
+                            <div id="prog-${wsRightType}-ws" class="absolute top-0 left-0 h-full bg-red-500 w-0 transition-all duration-75"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            wsQuizActive = null;
+        }
+
+        function changeWorkspaceSound(direction) {
+            wsSoundId += direction;
+            if (wsSoundId > 50) wsSoundId = 1;
+            if (wsSoundId < 1) wsSoundId = 50;
+            wsAudio.pause();
+            updateWorkspaceUI();
+        }
+
+        async function playWorkspaceSound(type, isOnlySound = false) {
+            wsAudio.pause();
+            wsAudio.currentTime = 0;
+
+            wsAudio = new Audio(`sounds/${type}/${wsSoundId}.wav`);
+            const progBar = document.getElementById(`prog-${type}-ws`);
+            const timerEl = document.getElementById(`ws-${type}-timer`);
+            const otherType = type === 'short' ? 'long' : 'short';
+            const otherProgBar = document.getElementById(`prog-${otherType}-ws`);
+            const otherTimerEl = document.getElementById(`ws-${otherType}-timer`);
+
+            if (otherProgBar) otherProgBar.style.width = '0%';
+            if (otherTimerEl) otherTimerEl.innerText = '0.0s';
+
+            if (!isOnlySound) {
+                wsAudio.ontimeupdate = () => {
+                    if (wsAudio.duration) {
+                        const pct = (wsAudio.currentTime / wsAudio.duration) * 100;
+                        if (progBar) progBar.style.width = `${pct}%`;
+                        if (timerEl) timerEl.innerText = `${wsAudio.currentTime.toFixed(1)}s`;
+                    }
+                };
+
+                wsAudio.onended = () => {
+                    if (progBar) progBar.style.width = '100%';
+                };
+            } else {
+                wsAudio.ontimeupdate = null;
+                wsAudio.onended = null;
+            }
+
+            try {
+                await wsAudio.play();
+            } catch (e) {
+                console.log("Workspace audio playback error:", e);
+            }
+        }
+
+        function startWorkspaceQuiz() {
+            if (isFreeMode) return;
+            const types = ['short', 'long'];
+            const chosenType = types[Math.floor(Math.random() * types.length)];
+            wsQuizActive = { sound: wsSoundId, type: chosenType };
+            
+            // Play audio ONLY (no progress bar animation triggered for the test button playback)
+            playWorkspaceSound(chosenType, true);
+        }
+
+        function handleWorkspaceCardClick(clickedType) {
+            if (isFreeMode) {
+                // In free mode, clicking the card plays sound WITH progress bar
+                playWorkspaceSound(clickedType, false);
+                return;
+            }
+
+            // In quiz mode, clicking the card plays sound WITH progress bar and checks answer if test is active
+            playWorkspaceSound(clickedType, false);
+
+            if (wsQuizActive) {
+                const fbModal = document.getElementById('central-feedback');
+                const fbIcon = document.getElementById('feedback-icon-big');
+                fbModal.classList.remove('hidden');
+
+                if (clickedType === wsQuizActive.type) {
+                    fbIcon.className = 'fas fa-check-circle text-green-500 animate-pop';
+                    const successAudio = document.getElementById('sound-success');
+                    successAudio.currentTime = 0;
+                    successAudio.play().catch(e => console.log(e));
+
+                    setTimeout(() => {
+                        fbModal.classList.add('hidden');
+                        wsQuizActive = null;
+                        wsSoundId++;
+                        if (wsSoundId > 50) wsSoundId = 1;
+                        updateWorkspaceUI();
+                        startWorkspaceQuiz();
+                    }, 1200);
+                } else {
+                    fbIcon.className = 'fas fa-times-circle text-red-500 animate-pop';
+                    setTimeout(() => {
+                        fbModal.classList.add('hidden');
+                    }, 1000);
+                }
+            }
+        }
+
+        function selectSpecificTrial(soundId, type) {
+            currentTrial = { sound: soundId, type: type };
+            if (isWorkspaceActive) {
+                toggleWorkspaceView();
+            }
+            applyTrialToUI(true);
+            toggleSoundModal(false);
+        }
+
+        function loadRandomTrial(autoPlay = true) {
+            const randomIndex = Math.floor(Math.random() * durationTrials.length);
+            currentTrial = durationTrials[randomIndex];
+            applyTrialToUI(autoPlay);
+        }
+
+        function applyTrialToUI(autoPlay = true) {
+            trialAudio.pause();
+            trialAudio.currentTime = 0;
+
+            trialAudio.src = `sounds/${currentTrial.type}/${currentTrial.sound}.wav`;
+            document.getElementById('sound-label-text').innerText = `${currentTrial.sound}. ${soundLibrary[currentTrial.sound]}`;
+            document.getElementById('hint-img').src = `images/${currentTrial.sound}.png`;
+            
+            const cardBox = document.getElementById('audio-card-box');
+            cardBox.classList.remove('border-pastel-blue', 'scale-95');
+
+            if (autoPlay) {
+                playTrialSound();
+            }
+        }
+
+        async function playTrialSound() {
+            try {
+                trialAudio.pause();
+                trialAudio.currentTime = 0;
+                
+                const cardBox = document.getElementById('audio-card-box');
+                cardBox.classList.add('border-pastel-blue', 'scale-95');
+                
+                await trialAudio.play();
+                
+                trialAudio.onended = () => {
+                    cardBox.classList.remove('border-pastel-blue', 'scale-95');
+                };
+            } catch (e) {
+                console.log("Audio playback prevented or interrupted:", e);
+                const cardBox = document.getElementById('audio-card-box');
+                cardBox.classList.remove('border-pastel-blue', 'scale-95');
+            }
+        }
+
+        function handleAnswer(userChoice) {
+            const fbModal = document.getElementById('central-feedback');
+            const fbIcon = document.getElementById('feedback-icon-big');
+            
+            fbModal.classList.remove('hidden');
+            
+            if (userChoice === currentTrial.type) {
+                fbIcon.className = 'fas fa-check-circle text-green-500 animate-pop';
+                
+                const successAudio = document.getElementById('sound-success');
+                successAudio.currentTime = 0;
+                successAudio.play().catch(e => console.log(e));
+
+                setTimeout(() => {
+                    fbModal.classList.add('hidden');
+                    loadRandomTrial(true);
+                }, 1200);
+            } else {
+                fbIcon.className = 'fas fa-times-circle text-red-500 animate-pop';
+                setTimeout(() => { 
+                    fbModal.classList.add('hidden'); 
+                }, 1000);
+            }
+        }
+
+        window.onload = initDurationApp;
+    </script>
+</body>
+</html>

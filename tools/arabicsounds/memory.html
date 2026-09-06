@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>الألعاب التفاعلية - Arabic Sounds with Hamada</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            babyBlue: '#E0F2FE',
+            babyBlueDark: '#BAE6FD',
+            babyBlueText: '#0369A1',
+            babyGreen: '#DCFCE7',
+            babyGreenDark: '#BBF7D0',
+            babyGreenText: '#15803D',
+            babyYellow: '#FEF9C3',
+            babyYellowDark: '#FEF08A',
+            babyYellowText: '#A16207',
+            babyPink: '#FFE4E6',
+            babyPinkDark: '#FECDD3',
+            babyPinkText: '#BE123C',
+            babyPurple: '#F3E8FF',
+            babyPurpleDark: '#E9D5FF',
+            babyPurpleText: '#6B21A8',
+            pastelBg: '#FAFAF9'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background-color: #FAFAF9;
+    }
+    .card-square { aspect-ratio: 1 / 1; }
+    
+    /* 3D Card Flip Animation */
+    .perspective-1000 { perspective: 1000px; }
+    .transform-style-3d { transform-style: preserve-3d; }
+    .backface-hidden { backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+
+    @keyframes popIn {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .modal-pop {
+      animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between text-gray-700 select-none bg-pastelBg">
+
+  <header class="bg-white/80 backdrop-blur-md border-b border-sky-100 sticky top-0 z-30">
+    <div class="max-w-4xl mx-auto px-4 py-2.5 flex items-center justify-between">
+      <div class="flex items-center space-x-3 space-x-reverse">
+        <img 
+          src="images/logo.png" 
+          alt="Logo" 
+          class="w-9 h-9 object-contain rounded-full bg-sky-50 p-1 border border-sky-100"
+          onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-9 h-9 rounded-full bg-sky-100 flex items-center justify-center font-bold text-sky-600 text-lg\'>H</div>';"
+        />
+        <h1 class="text-base md:text-lg font-bold tracking-wide text-sky-800 uppercase dir-ltr font-sans">
+          arabic sounds with hamada
+        </h1>
+      </div>
+      <a 
+        href="index.html" 
+        class="p-2 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-600 transition-colors"
+        title="الصفحة الرئيسية"
+      >
+        <i class="fa-solid fa-house text-base"></i>
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-3xl w-full mx-auto p-4 flex-grow flex flex-col justify-start space-y-4">
+
+    <div class="flex items-center justify-center p-1.5 bg-white rounded-2xl border border-sky-100 shadow-sm max-w-md mx-auto w-full">
+      <button 
+        id="tab-memory" 
+        onclick="switchGame('memory')" 
+        class="flex-1 py-2 px-3 rounded-xl font-bold text-xs md:text-sm transition-all flex items-center justify-center space-x-1.5 space-x-reverse bg-babyPurple text-babyPurpleText shadow-sm"
+      >
+        <i class="fa-solid fa-brain"></i>
+        <span>الذاكرة والمطابقة</span>
+      </button>
+
+      <button 
+        id="tab-drag" 
+        onclick="switchGame('drag')" 
+        class="flex-1 py-2 px-3 rounded-xl font-bold text-xs md:text-sm transition-all flex items-center justify-center space-x-1.5 space-x-reverse text-gray-500 hover:text-sky-600"
+      >
+        <i class="fa-solid fa-hand-pointer"></i>
+        <span>المطابقة والسحب</span>
+      </button>
+    </div>
+
+    <section id="game-memory-view" class="space-y-4">
+      <div class="flex items-center justify-between bg-white p-3 rounded-2xl border border-purple-100 shadow-sm">
+        <div>
+          <h2 class="text-base md:text-lg font-black text-purple-900">لعبة الذاكرة والمطابقة</h2>
+          <p class="text-[11px] text-gray-400">اقلب البطاقات واعثر على الصور المتطابقة</p>
+        </div>
+        <button 
+          onclick="initMemoryGame()" 
+          class="px-3 py-1.5 bg-babyPurple hover:bg-babyPurpleDark text-babyPurpleText font-bold text-xs rounded-xl border border-purple-200 flex items-center space-x-1 space-x-reverse active:scale-95 transition-all"
+        >
+          <i class="fa-solid fa-rotate-right"></i>
+          <span>إعادة اللعب</span>
+        </button>
+      </div>
+
+      <div id="memoryGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-2.5 md:gap-3.5 max-w-lg mx-auto w-full pt-1">
+        </div>
+    </section>
+
+    <section id="game-drag-view" class="hidden space-y-4">
+      <div class="flex items-center justify-between bg-white p-3 rounded-2xl border border-sky-100 shadow-sm">
+        <div>
+          <h2 class="text-base md:text-lg font-black text-sky-900">لعبة المطابقة والسحب</h2>
+          <p class="text-[11px] text-gray-400">اسحب أو انقر على البطاقة العلوية لمطابقتها بالشكل الصحيح</p>
+        </div>
+        <button 
+          onclick="initDragGame()" 
+          class="px-3 py-1.5 bg-babyBlue hover:bg-babyBlueDark text-babyBlueText font-bold text-xs rounded-xl border border-sky-200 flex items-center space-x-1 space-x-reverse active:scale-95 transition-all"
+        >
+          <i class="fa-solid fa-arrow-rotate-right"></i>
+          <span>جولة جديدة</span>
+        </button>
+      </div>
+
+      <div class="flex flex-col items-center justify-center space-y-2 py-2">
+        <span class="text-xs font-bold text-sky-700 bg-sky-50 px-3 py-1 rounded-full border border-sky-100">
+          البطاقة المستهدفة
+        </span>
+
+        <div 
+          id="targetCard" 
+          draggable="true" 
+          onclick="handleTargetCardClick()" 
+          class="w-32 h-32 md:w-36 md:h-36 bg-white border-4 border-dashed border-sky-300 rounded-3xl shadow-sm flex flex-col items-center justify-between p-3 cursor-grab active:cursor-grabbing hover:border-sky-400 active:scale-95 transition-all relative"
+        >
+          <div class="absolute top-2 left-2 bg-sky-50 text-sky-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-sky-100">
+            <i class="fa-solid fa-volume-high"></i>
+          </div>
+          <div class="w-full flex-grow flex items-center justify-center overflow-hidden">
+            <img id="targetImg" src="" alt="Target" class="max-h-full max-w-full object-contain pointer-events-none" onerror="handleGameImgError(this)" />
+          </div>
+          <span id="targetLabel" class="text-2xl font-black text-gray-800 pointer-events-none"></span>
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <p class="text-center text-xs font-bold text-gray-500 mb-2">اختر أو اسحب نحو الخيار المطابق:</p>
+        <div id="dragOptionsGrid" class="grid grid-cols-3 gap-2.5 md:gap-4 max-w-md mx-auto w-full">
+          </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="feedbackOverlay" class="fixed inset-0 pointer-events-none z-50 hidden flex items-center justify-center">
+    <div id="feedbackBox" class="modal-pop p-5 rounded-3xl flex items-center justify-center shadow-lg bg-white/95 border-2">
+      </div>
+  </div>
+
+  <footer class="mt-auto py-2 px-4 text-center text-[11px] text-gray-400 border-t border-sky-100/60 bg-pastelBg space-y-0.5">
+    <div class="font-semibold text-gray-500 tracking-wider">SPEECH AND LANGUAGE PATHOLOGY</div>
+    <div class="flex flex-wrap items-center justify-center gap-x-2 text-[10px] text-gray-400">
+      <span>Ahmad Ghanem</span>
+      <span>•</span>
+      <span>Latakia - Syria</span>
+      <span>•</span>
+      <a href="mailto:slp.ahmadghanem@gmail.com" class="hover:text-sky-600 underline">slp.ahmadghanem@gmail.com</a>
+    </div>
+  </footer>
+
+  <script>
+    // Asset Mapping
+    const LETTER_MAP = {
+      'ا': 1,  'ب': 2,  'ت': 3,  'ث': 4,  'ج': 5,  'ح': 6,  'خ': 7,
+      'د': 8,  'ذ': 9,  'ر': 10, 'ز': 11, 'س': 12, 'ش': 13, 'ص': 14,
+      'ض': 15, 'ط': 16, 'ظ': 17, 'ع': 18, 'غ': 19, 'ف': 20, 'ق': 21,
+      'ك': 22, 'ل': 23, 'م': 24, 'ن': 25, 'ه': 26, 'و': 27, 'ي': 28,
+      'ء': 29
+    };
+
+    const ALL_LETTERS = Object.keys(LETTER_MAP);
+
+    // Audio Playback with Web Audio API Fallback Tone
+    function playAudioForLetter(letter) {
+      const soundIndex = LETTER_MAP[letter] || 1;
+      const audio = new Audio(`sounds/${soundIndex}.wav`);
+      audio.play().catch(() => {
+        playFallbackBeep(300 + soundIndex * 15, 0.15);
+      });
+      return audio;
+    }
+
+    function playSuccessCue() {
+      playFallbackBeep(523.25, 0.1);
+      setTimeout(() => playFallbackBeep(659.25, 0.15), 100);
+      setTimeout(() => playFallbackBeep(783.99, 0.25), 200);
+    }
+
+    function playErrorCue() {
+      playFallbackBeep(220, 0.15);
+      setTimeout(() => playFallbackBeep(180, 0.2), 120);
+    }
+
+    function playFallbackBeep(freq, duration) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {
+        // Fallback suppressed if audio context disallowed
+      }
+    }
+
+    function handleGameImgError(imgElem) {
+      const parent = imgElem.parentElement;
+      const letter = imgElem.dataset.letter || 'ص';
+      parent.innerHTML = `<div class="text-4xl font-black text-sky-400 flex items-center justify-center w-full h-full">${letter}</div>`;
+    }
+
+    function showFeedback(isCorrect) {
+      const overlay = document.getElementById('feedbackOverlay');
+      const box = document.getElementById('feedbackBox');
+
+      if (isCorrect) {
+        box.className = 'modal-pop p-5 rounded-3xl flex items-center justify-center shadow-lg bg-emerald-50 border-2 border-emerald-300 text-emerald-500';
+        box.innerHTML = '<i class="fa-solid fa-circle-check text-6xl md:text-7xl"></i>';
+        playSuccessCue();
+      } else {
+        box.className = 'modal-pop p-5 rounded-3xl flex items-center justify-center shadow-lg bg-rose-50 border-2 border-rose-300 text-rose-500';
+        box.innerHTML = '<i class="fa-solid fa-circle-xmark text-6xl md:text-7xl"></i>';
+        playErrorCue();
+      }
+
+      overlay.classList.remove('hidden');
+      setTimeout(() => {
+        overlay.classList.add('hidden');
+      }, 900);
+    }
+
+    // Switch Games
+    function switchGame(gameType) {
+      const memView = document.getElementById('game-memory-view');
+      const dragView = document.getElementById('game-drag-view');
+      const tabMem = document.getElementById('tab-memory');
+      const tabDrag = document.getElementById('tab-drag');
+
+      if (gameType === 'memory') {
+        memView.classList.remove('hidden');
+        dragView.classList.add('hidden');
+        tabMem.className = 'flex-1 py-2 px-3 rounded-xl font-bold text-xs md:text-sm transition-all flex items-center justify-center space-x-1.5 space-x-reverse bg-babyPurple text-babyPurpleText shadow-sm';
+        tabDrag.className = 'flex-1 py-2 px-3 rounded-xl font-bold text-xs md:text-sm transition-all flex items-center justify-center space-x-1.5 space-x-reverse text-gray-500 hover:text-sky-600';
+      } else {
+        memView.classList.add('hidden');
+        dragView.classList.remove('hidden');
+        tabDrag.className = 'flex-1 py-2 px-3 rounded-xl font-bold text-xs md:text-sm transition-all flex items-center justify-center space-x-1.5 space-x-reverse bg-babyBlue text-babyBlueText shadow-sm';
+        tabMem.className = 'flex-1 py-2 px-3 rounded-xl font-bold text-xs md:text-sm transition-all flex items-center justify-center space-x-1.5 space-x-reverse text-gray-500 hover:text-purple-600';
+      }
+    }
+
+    // ==========================================
+    // GAME 1: MEMORY & MATCHING GAME LOGIC
+    // ==========================================
+    let memoryCards = [];
+    let flippedCards = [];
+    let matchedPairs = 0;
+    let memoryLock = false;
+
+    function initMemoryGame() {
+      const grid = document.getElementById('memoryGrid');
+      grid.innerHTML = '';
+      flippedCards = [];
+      matchedPairs = 0;
+      memoryLock = false;
+
+      // Select 6 random distinct letters
+      const shuffled = [...ALL_LETTERS].sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 6);
+
+      // Duplicate to create pairs (12 cards)
+      const deck = [...selected, ...selected].sort(() => 0.5 - Math.random());
+
+      memoryCards = deck.map((letter, idx) => ({
+        id: idx,
+        letter: letter,
+        isFlipped: false,
+        isMatched: false
+      }));
+
+      memoryCards.forEach((card, index) => {
+        const cardElem = document.createElement('div');
+        cardElem.className = 'card-square perspective-1000 cursor-pointer';
+        cardElem.id = `mem-card-${index}`;
+
+        const imgIdx = LETTER_MAP[card.letter] || 1;
+
+        cardElem.innerHTML = `
+          <div id="mem-card-inner-${index}" class="w-full h-full relative transform-style-3d transition-transform duration-300">
+            <div class="absolute inset-0 bg-babyPurple border-2 border-purple-200 rounded-2xl flex flex-col items-center justify-center shadow-sm backface-hidden">
+              <i class="fa-solid fa-puzzle-piece text-purple-300 text-3xl"></i>
+            </div>
+            <div class="absolute inset-0 bg-white border-2 border-purple-300 rounded-2xl flex flex-col items-center justify-between p-2 shadow-sm backface-hidden rotate-y-180">
+              <div class="w-full flex-grow flex items-center justify-center overflow-hidden">
+                <img src="images/${imgIdx}.png" data-letter="${card.letter}" class="max-h-full max-w-full object-contain pointer-events-none" onerror="handleGameImgError(this)" />
+              </div>
+              <span class="text-xl md:text-2xl font-black text-gray-800 mt-0.5">${card.letter}</span>
+            </div>
+          </div>
+        `;
+
+        cardElem.onclick = () => handleMemoryCardClick(index);
+        grid.appendChild(cardElem);
+      });
+    }
+
+    function handleMemoryCardClick(index) {
+      if (memoryLock) return;
+      const card = memoryCards[index];
+      if (card.isFlipped || card.isMatched) return;
+
+      // Flip card
+      card.isFlipped = true;
+      document.getElementById(`mem-card-inner-${index}`).classList.add('rotate-y-180');
+      playAudioForLetter(card.letter);
+
+      flippedCards.push({ index, letter: card.letter });
+
+      if (flippedCards.length === 2) {
+        memoryLock = true;
+        const [first, second] = flippedCards;
+
+        if (first.letter === second.letter) {
+          // Match
+          memoryCards[first.index].isMatched = true;
+          memoryCards[second.index].isMatched = true;
+          matchedPairs++;
+
+          setTimeout(() => {
+            showFeedback(true);
+            flippedCards = [];
+            memoryLock = false;
+
+            if (matchedPairs === 6) {
+              setTimeout(() => {
+                alert('ممتاز! أتممت لعبة الذاكرة بنجاح 🎉');
+              }, 600);
+            }
+          }, 400);
+
+        } else {
+          // Not a match
+          setTimeout(() => {
+            showFeedback(false);
+            document.getElementById(`mem-card-inner-${first.index}`).classList.remove('rotate-y-180');
+            document.getElementById(`mem-card-inner-${second.index}`).classList.remove('rotate-y-180');
+            memoryCards[first.index].isFlipped = false;
+            memoryCards[second.index].isFlipped = false;
+            flippedCards = [];
+            memoryLock = false;
+          }, 1000);
+        }
+      }
+    }
+
+    // ==========================================
+    // GAME 2: TARGET MATCH & DRAG GAME LOGIC
+    // ==========================================
+    let targetLetter = '';
+    let dragOptions = [];
+    let isSelectedForTapMatch = false;
+
+    function initDragGame() {
+      isSelectedForTapMatch = false;
+      const shuffled = [...ALL_LETTERS].sort(() => 0.5 - Math.random());
+      targetLetter = shuffled[0];
+
+      const distractors = shuffled.slice(1, 3);
+      dragOptions = [targetLetter, ...distractors].sort(() => 0.5 - Math.random());
+
+      // Update Target Card Visuals
+      const targetImgIdx = LETTER_MAP[targetLetter] || 1;
+      const targetImg = document.getElementById('targetImg');
+      targetImg.src = `images/${targetImgIdx}.png`;
+      targetImg.dataset.letter = targetLetter;
+      document.getElementById('targetLabel').textContent = targetLetter;
+
+      // Reset Target container border styling
+      const targetCard = document.getElementById('targetCard');
+      targetCard.className = 'w-32 h-32 md:w-36 md:h-36 bg-white border-4 border-dashed border-sky-300 rounded-3xl shadow-sm flex flex-col items-center justify-between p-3 cursor-grab active:cursor-grabbing hover:border-sky-400 active:scale-95 transition-all relative';
+
+      // Setup HTML5 Drag on Target Card
+      targetCard.ondragstart = (e) => {
+        e.dataTransfer.setData('text/plain', targetLetter);
+        playAudioForLetter(targetLetter);
+      };
+
+      // Render Options Grid
+      const optionsGrid = document.getElementById('dragOptionsGrid');
+      optionsGrid.innerHTML = '';
+
+      dragOptions.forEach((letter) => {
+        const optionElem = document.createElement('div');
+        const imgIdx = LETTER_MAP[letter] || 1;
+
+        optionElem.className = 'card-square bg-white border-2 border-sky-200 rounded-3xl shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col items-center justify-between p-3 relative active:scale-95';
+        
+        optionElem.innerHTML = `
+          <div class="absolute top-2 left-2 bg-sky-50 text-sky-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-sky-100">
+            <i class="fa-solid fa-volume-high"></i>
+          </div>
+          <div class="w-full flex-grow flex items-center justify-center overflow-hidden">
+            <img src="images/${imgIdx}.png" data-letter="${letter}" class="max-h-full max-w-full object-contain pointer-events-none" onerror="handleGameImgError(this)" />
+          </div>
+          <span class="text-2xl font-black text-gray-800 pointer-events-none mt-1">${letter}</span>
+        `;
+
+        // Tap option action
+        optionElem.onclick = () => handleOptionSelect(letter);
+
+        // HTML5 Drag and Drop Handlers
+        optionElem.ondragover = (e) => {
+          e.preventDefault();
+          optionElem.classList.add('border-sky-500', 'bg-sky-50');
+        };
+
+        optionElem.ondragleave = () => {
+          optionElem.classList.remove('border-sky-500', 'bg-sky-50');
+        };
+
+        optionElem.ondrop = (e) => {
+          e.preventDefault();
+          optionElem.classList.remove('border-sky-500', 'bg-sky-50');
+          const draggedLetter = e.dataTransfer.getData('text/plain');
+          checkDragMatch(draggedLetter, letter);
+        };
+
+        optionsGrid.appendChild(optionElem);
+      });
+    }
+
+    function handleTargetCardClick() {
+      playAudioForLetter(targetLetter);
+      isSelectedForTapMatch = !isSelectedForTapMatch;
+      const targetCard = document.getElementById('targetCard');
+
+      if (isSelectedForTapMatch) {
+        targetCard.classList.replace('border-sky-300', 'border-sky-500');
+        targetCard.classList.add('ring-4', 'ring-sky-200');
+      } else {
+        targetCard.classList.replace('border-sky-500', 'border-sky-300');
+        targetCard.classList.remove('ring-4', 'ring-sky-200');
+      }
+    }
+
+    function handleOptionSelect(selectedLetter) {
+      playAudioForLetter(selectedLetter);
+      checkDragMatch(targetLetter, selectedLetter);
+    }
+
+    function checkDragMatch(targetVal, chosenVal) {
+      if (chosenVal === targetVal) {
+        showFeedback(true);
+        setTimeout(() => {
+          initDragGame();
+        }, 1100);
+      } else {
+        showFeedback(false);
+      }
+    }
+
+    // Initialize Minigames on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      initMemoryGame();
+      initDragGame();
+    });
+  </script>
+</body>
+</html>

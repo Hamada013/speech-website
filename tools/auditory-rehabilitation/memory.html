@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Auditory Memory - Touch App</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'pastel-pink': '#ffd1dc',
+              'pastel-blue': '#aec6cf',
+              'pastel-green': '#b7e4c7',
+              'pastel-purple': '#cbaacb',
+              'pastel-text': '#5a5a5a'
+            }
+          }
+        }
+      }
+    </script>
+      
+    <style>
+      body { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        user-select: none; 
+        -webkit-user-select: none;
+        overscroll-behavior: none; 
+      }
+      .perspective-1000 {
+        perspective: 1000px;
+      }
+      .transform-style-3d {
+        transform-style: preserve-3d;
+      }
+      .backface-hidden {
+        backface-visibility: hidden;
+      }
+      .rotate-y-180 {
+        transform: rotateY(180deg);
+      }
+      @keyframes popIn {
+        0% { transform: scale(0.3); opacity: 0; }
+        60% { transform: scale(1.2); }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    </style>
+</head>
+<body class="bg-gray-50 text-pastel-text overflow-hidden h-[100dvh] flex flex-col">
+    
+    <!-- Success Audio -->
+    <audio id="sound-success" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=success-1-6297.mp3"></audio>
+
+    <!-- Giant Central Feedback Overlay for Matches / Completion -->
+    <div id="central-feedback" class="fixed inset-0 flex items-center justify-center z-[100] hidden pointer-events-none bg-white bg-opacity-70 backdrop-blur-sm transition-all">
+        <i id="feedback-icon-big" class="text-[8rem] md:text-[14rem] drop-shadow-2xl"></i>
+    </div>
+
+    <!-- Grid Size Selection Modal Popup -->
+    <div id="size-modal" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/40 backdrop-blur-xs hidden p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 shadow-xl max-w-sm w-full flex flex-col items-center animate-pop">
+            <h2 class="font-black text-xl text-slate-700 mb-6 text-center">Select Number of Cards</h2>
+            <div class="grid grid-cols-2 gap-4 w-full">
+                <button onclick="selectGridSize(4)" class="py-4 bg-pastel-pink/30 border-2 border-pastel-pink rounded-2xl text-slate-700 font-bold text-xl hover:bg-pastel-pink/50 transition cursor-pointer shadow-sm">4</button>
+                <button onclick="selectGridSize(6)" class="py-4 bg-pastel-green/30 border-2 border-pastel-green rounded-2xl text-slate-700 font-bold text-xl hover:bg-pastel-green/50 transition cursor-pointer shadow-sm">6</button>
+                <button onclick="selectGridSize(9)" class="py-4 bg-pastel-purple/30 border-2 border-pastel-purple rounded-2xl text-slate-700 font-bold text-xl hover:bg-pastel-purple/50 transition cursor-pointer shadow-sm">9</button>
+                <button onclick="selectGridSize(12)" class="py-4 bg-pastel-blue/30 border-2 border-pastel-blue rounded-2xl text-slate-700 font-bold text-xl hover:bg-pastel-blue/50 transition cursor-pointer shadow-sm">12</button>
+            </div>
+            <button onclick="toggleSizeModal(false)" class="mt-6 text-xs text-gray-400 font-bold uppercase tracking-wider hover:text-slate-600 transition cursor-pointer">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Header / Top Bar -->
+    <header class="w-full p-3 md:p-4 flex items-center justify-between bg-white shadow-sm z-50 shrink-0">
+        <a href="index.html" class="p-2 px-3 md:px-4 bg-gray-100 rounded-full text-pastel-text hover:bg-gray-200 transition flex items-center gap-2 font-bold text-xs md:text-base cursor-pointer">
+            <i class="fas fa-arrow-left"></i>
+            <span class="hidden md:inline">Home</span>
+        </a>
+        
+        <div class="flex items-center gap-2">
+            <div class="h-10 w-10 bg-pastel-blue rounded-full flex items-center justify-center text-white shadow-sm">
+                <i class="fas fa-brain text-lg"></i>
+            </div>
+            <h1 class="font-black text-base md:text-xl text-slate-700">Auditory Memory</h1>
+        </div>
+        
+        <!-- Grid Size Button Icon -->
+        <button onclick="toggleSizeModal(true)" class="p-2.5 px-3 md:px-4 bg-pastel-blue/10 border-2 border-pastel-blue/40 rounded-xl text-slate-700 font-bold text-xs md:text-sm hover:border-pastel-blue transition flex items-center gap-2 cursor-pointer shadow-sm">
+            <i class="fas fa-th text-pastel-blue"></i>
+            <span id="current-size-label" class="hidden sm:inline">9 Cards</span>
+        </button>
+    </header>
+
+    <!-- Game Area -->
+    <main class="flex-1 flex flex-col items-center justify-center p-3 md:p-6 w-full max-w-4xl mx-auto overflow-hidden">
+        <div id="memory-grid" class="grid gap-3 md:gap-4 w-full h-full max-h-[75vh] items-center justify-center transition-all duration-300">
+            <!-- Cards populated dynamically -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center text-[10px] md:text-xs text-gray-400 leading-relaxed uppercase tracking-wider py-2 shrink-0">
+        SPEECH AND LANGUAGE PATHOLOGY • AHMAD GHANEM • LATAKIA - سوريا
+    </footer>
+
+    <script>
+        const soundLibrary = {
+            1: "غسالة", 2: "كاسة تنكسر", 3: "مكنسة قش", 4: "طيارة", 5: "منبه ساعة",
+            6: "بيبي يبكي", 7: "عصفور", 8: "زمور سيارة", 9: "زحمة سير", 10: "ساعة",
+            11: "بقرة", 12: "بطة", 13: "وزة", 14: "هلكوبتر", 15: "فرشاية اسنان",
+            16: "بيبي مبسوط", 17: "جرس", 18: "غراب", 19: "موتور", 20: "دوش حمام",
+            21: "موبايل", 22: "مي تواليت", 23: "صفارة شرطة", 24: "شاحنة صغيرة تمر", 25: "شخير رجل",
+            26: "ببغاء", 27: "سيارة شرطة", 28: "خاروف", 29: "سيارات بالمدينة", 30: "قطار",
+            31: "شاحنة تمر", 32: "قطة", 33: "كلاب", 34: "حمامة", 35: "سيارة اطفاء",
+            36: "بنت تصرخ", 37: "ماعز", 38: "حصان", 39: "صب عصير", 40: "اسد",
+            41: "صيصان", 42: "ضجة عالم", 43: "سعال بنت", 44: "مطر", 45: "ديك",
+            46: "بوسة / قبلة", 47: "سيارة اسعاف", 48: "غلي ماء", 49: "باخرة", 50: "نهر جاري"
+        };
+
+        let currentAudio = new Audio();
+        currentAudio.preload = 'auto';
+
+        let totalCardsCount = 9;
+        let firstCard = null;
+        let secondCard = null;
+        let isLocked = false;
+        let matchesFound = 0;
+
+        function toggleSizeModal(show) {
+            const modal = document.getElementById('size-modal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function selectGridSize(size) {
+            totalCardsCount = size;
+            document.getElementById('current-size-label').innerText = `${size} Cards`;
+            toggleSizeModal(false);
+            initGame();
+        }
+
+        function initGame() {
+            currentAudio.pause();
+            firstCard = null;
+            secondCard = null;
+            isLocked = false;
+            matchesFound = 0;
+
+            const grid = document.getElementById('memory-grid');
+            grid.innerHTML = '';
+
+            let pairsNeeded;
+            let hasSolo = false;
+            let soloId = null;
+
+            if (totalCardsCount === 9) {
+                // For 9 cards: 4 pairs (8 cards) + 1 unique solo card that auto-matches or behaves specially, OR let's make 9 cards total where 4 pairs have matches and 1 card is a special single item or we can make 9 cards by having 4 pairs (8 matching cards) plus 1 neutral icon card? Or even better, 4 pairs = 8 matching cards, plus 1 wildcard sound card? Wait! In a memory match game, every card needs a pair. If someone asks for 9 cards, an odd number cannot form complete pairs unless one card has no match or we include 4 pairs (8 cards) plus 1 bonus target. To make it fully functional and show exactly 9 cards in a 3x3 grid, let's pick 4 pairs (8 cards) and 1 distinct solo card that plays its sound when tapped, or make 4 pairs + 1 wildcard. Let's make 4 pairs (8 cards) + 1 sound card that plays its sound when tapped as a bonus/free item!
+                pairsNeeded = 4;
+                hasSolo = true;
+            } else {
+                pairsNeeded = totalCardsCount / 2;
+            }
+
+            // Layout structures depending on count (using proper responsive grid configurations centered nicely)
+            if (totalCardsCount === 4) {
+                grid.className = "grid grid-cols-2 grid-rows-2 gap-3 md:gap-4 w-full h-full max-h-[70vh] max-w-[420px] items-center justify-center justify-items-center mx-auto";
+            } else if (totalCardsCount === 6) {
+                grid.className = "grid grid-cols-3 grid-rows-2 gap-3 md:gap-4 w-full h-full max-h-[70vh] max-w-[560px] items-center justify-center justify-items-center mx-auto";
+            } else if (totalCardsCount === 9) {
+                grid.className = "grid grid-cols-3 grid-rows-3 gap-3 md:gap-4 w-full h-full max-h-[75vh] max-w-[560px] items-center justify-center justify-items-center mx-auto";
+            } else if (totalCardsCount === 12) {
+                grid.className = "grid grid-cols-4 grid-rows-3 gap-3 md:gap-4 w-full h-full max-h-[75vh] max-w-[700px] items-center justify-center justify-items-center mx-auto";
+            }
+
+            let selectedIds = [];
+            while (selectedIds.length < pairsNeeded) {
+                let randId = Math.floor(Math.random() * 50) + 1;
+                if (!selectedIds.includes(randId)) {
+                    selectedIds.push(randId);
+                }
+            }
+
+            let gameItems = [...selectedIds, ...selectedIds];
+
+            if (hasSolo) {
+                while (true) {
+                    let randId = Math.floor(Math.random() * 50) + 1;
+                    if (!selectedIds.includes(randId)) {
+                        soloId = randId;
+                        break;
+                    }
+                }
+                gameItems.push(soloId);
+            }
+
+            gameItems.sort(() => Math.random() - 0.5);
+            const actualCardsCount = gameItems.length;
+
+            gameItems.forEach((id, index) => {
+                const card = document.createElement('div');
+                card.className = "perspective-1000 w-full h-full max-w-[130px] max-h-[130px] aspect-square cursor-pointer";
+                card.dataset.id = id;
+                const isSoloCard = hasSolo && (id === soloId);
+                if (isSoloCard) {
+                    card.dataset.solo = "true";
+                }
+
+                card.innerHTML = `
+                    <div class="relative w-full h-full duration-300 transform-style-3d card-inner rounded-3xl shadow-sm">
+                        <!-- Front (Hidden / Question Mark) -->
+                        <div class="absolute inset-0 w-full h-full bg-white border-2 border-pastel-blue/40 rounded-3xl flex items-center justify-center backface-hidden shadow-inner hover:border-pastel-blue transition">
+                            <i class="fas fa-question text-pastel-blue text-2xl md:text-3xl"></i>
+                        </div>
+                        <!-- Back (Revealed Image) -->
+                        <div class="absolute inset-0 w-full h-full bg-white border-4 border-pastel-blue rounded-3xl flex items-center justify-center backface-hidden rotate-y-180 p-2 shadow-md">
+                            <img src="images/${id}.png" alt="${soundLibrary[id]}" class="w-full h-full object-contain pointer-events-none select-none">
+                        </div>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => handleCardClick(card, id, actualCardsCount, isSoloCard));
+                grid.appendChild(card);
+            });
+        }
+
+        function handleCardClick(card, id, totalTarget, isSoloCard) {
+            if (isLocked) return;
+            if (card === firstCard) return;
+            if (card.classList.contains('matched')) return;
+
+            // Flip card
+            const inner = card.querySelector('.card-inner');
+            inner.style.transform = 'rotateY(180deg)';
+
+            // Play sound immediately, interrupting previous sound
+            currentAudio.pause();
+            currentAudio.src = `sounds/${id}.wav`;
+            currentAudio.currentTime = 0;
+            currentAudio.play().catch(e => console.log(e));
+
+            // Handle solo card special behavior (auto-matches instantly after playing sound)
+            if (isSoloCard) {
+                isLocked = true;
+                card.classList.add('matched');
+                matchesFound += 1; // counts as 1 towards completion, or we adjust target
+                
+                setTimeout(() => {
+                    isLocked = false;
+                    if (matchesFound === totalTarget) {
+                        triggerCelebration();
+                    }
+                }, 800);
+                return;
+            }
+
+            if (!firstCard) {
+                firstCard = { card, id };
+                return;
+            }
+
+            secondCard = { card, id };
+            isLocked = true;
+
+            if (firstCard.id === secondCard.id) {
+                // Match success
+                firstCard.card.classList.add('matched');
+                secondCard.card.classList.add('matched');
+                
+                matchesFound += 2;
+                resetTurn();
+
+                if (matchesFound === totalTarget) {
+                    triggerCelebration();
+                }
+            } else {
+                // No match, flip back after a brief pause
+                setTimeout(() => {
+                    firstCard.card.querySelector('.card-inner').style.transform = 'rotateY(0deg)';
+                    secondCard.card.querySelector('.card-inner').style.transform = 'rotateY(0deg)';
+                    resetTurn();
+                }, 1000);
+            }
+        }
+
+        function triggerCelebration() {
+            setTimeout(() => {
+                const fbModal = document.getElementById('central-feedback');
+                const fbIcon = document.getElementById('feedback-icon-big');
+                fbIcon.className = 'fas fa-trophy text-yellow-400 animate-pop';
+                fbModal.classList.remove('hidden');
+                document.getElementById('sound-success').play().catch(e => console.log(e));
+
+                setTimeout(() => {
+                    fbModal.classList.add('hidden');
+                    initGame(); // Automatically start a new shuffled grid set
+                }, 2200);
+            }, 400);
+        }
+
+        function resetTurn() {
+            firstCard = null;
+            secondCard = null;
+            isLocked = false;
+        }
+
+        // Initialize game on load
+        window.addEventListener('DOMContentLoaded', () => {
+            initGame();
+        });
+    </script>
+</body>
+</html>

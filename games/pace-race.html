@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency Pace Racing - سباق إيقاع الطلاقة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #4F46E5; /* Indigo-600 */
+            --secondary: #10B981; /* Emerald-500 */
+            --bg-color: #F3F4F6; /* Gray-100 */
+            --track-bg: #E5E7EB; /* Gray-200 */
+            --text-main: #1F2937; /* Gray-800 */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow: hidden; /* Prevent scrolling */
+            touch-action: manipulation; /* Better touch handling */
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(243, 244, 246, 0.95);
+            z-index: 10;
+            transition: opacity 0.3s ease;
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        #race-area {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            padding: 20px 10px;
+            background: repeating-linear-gradient(
+                90deg,
+                #374151,
+                #374151 40px,
+                #4B5563 40px,
+                #4B5563 80px
+            );
+            border-top: 5px solid #111827;
+            border-bottom: 5px solid #111827;
+            overflow: hidden;
+            direction: ltr; /* Keeps track movement consistent */
+        }
+
+        .track-lane {
+            position: relative;
+            height: 60px;
+            border-bottom: 2px dashed rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+        }
+        
+        .track-lane:last-child {
+            border-bottom: none;
+        }
+
+        .car {
+            position: absolute;
+            left: 0; /* Start at left */
+            width: 80px;
+            height: 40px;
+            transition: left 0.1s linear; /* Smooth movement */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
+            z-index: 5;
+        }
+
+        .finish-line {
+            position: absolute;
+            right: 10%;
+            top: 0;
+            bottom: 0;
+            width: 20px;
+            background: repeating-conic-gradient(#000 0% 25%, #fff 0% 50%) 50% / 20px 20px;
+            z-index: 1;
+        }
+
+        #reading-area {
+            height: 30vh;
+            background-color: white;
+            border-top: 4px solid var(--primary);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+        }
+
+        #word-display {
+            font-size: 2.3rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+            min-height: 4rem;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        /* The visual metronome/pacer */
+        #pacer-bar-container {
+            width: 80%;
+            max-width: 500px;
+            height: 20px;
+            background-color: var(--track-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        #pacer-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--secondary);
+            border-radius: 10px;
+            transition: width 0.1s linear;
+        }
+        
+        /* Highlight for current word */
+        .active-word {
+            color: var(--primary);
+            transform: scale(1.1);
+            transition: all 0.2s ease;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #4338CA;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        .settings-panel {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 90%;
+            width: 440px;
+        }
+
+        .setting-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #4B5563;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary);
+        }
+
+        #controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        /* Particle effects for finish */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 50%;
+            z-index: 20;
+        }
+        
+        #hud {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            background: rgba(255,255,255,0.92);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .lang-select {
+            background: #EEF2FF;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+            border-radius: 12px;
+            padding: 4px 10px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .difficulty-btn {
+            background: white;
+            color: var(--text-main);
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .difficulty-btn:hover {
+            border-color: var(--primary);
+            background-color: #F3F4F6;
+        }
+
+        .difficulty-btn.active {
+            border-color: var(--primary);
+            background-color: #EEF2FF;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+        }
+
+        .icon-card {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 14px;
+            border-radius: 16px;
+            background: #F9FAFB;
+            border: 2px solid #E5E7EB;
+            min-width: 75px;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .icon-card .icon-symbol {
+            font-size: 2.6rem;
+            line-height: 1.1;
+        }
+
+        .icon-card .icon-label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #4B5563;
+            margin-top: 4px;
+        }
+
+        .icon-card.active-word {
+            transform: scale(1.2) translateY(-4px);
+            background: #EEF2FF;
+            border-color: var(--primary);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.25);
+        }
+
+        .icon-card.active-word .icon-label {
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    
+    <!-- HUD -->
+    <div id="hud">
+        <div class="flex items-center gap-2 md:gap-4">
+            <span id="score-display">النقاط: 0</span>
+            <span id="level-display">المستوى: 1</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button id="btn-mode-toggle" class="flex items-center gap-1 bg-indigo-50 text-indigo-700 border border-indigo-300 px-3 py-1 rounded-xl text-xs sm:text-sm font-bold hover:bg-indigo-100 transition shadow-sm" title="تبديل وضع الرموز للأطفال">
+                <span id="mode-icon">🖼️</span>
+                <span id="mode-label">رموز</span>
+            </button>
+            <select id="lang-select" class="lang-select" aria-label="Language Selector">
+                <option value="ar" selected>🇸🇦 العربيّة</option>
+                <option value="en">🇺🇸 English</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="race-area">
+        <div class="finish-line"></div>
+        <div class="track-lane">
+            <div id="player-car" class="car">🏎️</div>
+        </div>
+        <div class="track-lane">
+            <div id="pacer-car" class="car">🚓</div>
+        </div>
+    </div>
+
+    <div id="reading-area">
+        <div id="pacer-bar-container">
+            <div id="pacer-bar"></div>
+        </div>
+        <div id="word-display">جاهز للسباق؟</div>
+        
+        <div id="controls">
+            <button id="btn-tap" class="btn btn-primary" style="display: none;">اضغط للكلمة التالية</button>
+            <button id="btn-pause" class="btn bg-gray-500 text-white" style="display: none;">إيقاف مؤقت</button>
+        </div>
+    </div>
+
+    <div id="start-screen" class="screen">
+        <div class="settings-panel text-center">
+            <h1 id="ui-title" class="text-3xl font-bold mb-2 text-indigo-600">سباق إيقاع الطلاقة</h1>
+            <p id="ui-subtitle" class="text-gray-600 mb-6">تحكّم برتم كلامك لتفوز بالسباق!</p>
+            
+            <div class="setting-group text-start">
+                <label id="ui-target-wpm-label" for="target-wpm">معدل الكلام المستهدف (كلمة في الدقيقة)</label>
+                <div class="flex items-center gap-4">
+                    <input type="range" id="target-wpm" min="40" max="150" value="80" step="5">
+                    <span id="wpm-value" class="font-bold w-12 text-center">80</span>
+                </div>
+                <p id="ui-wpm-note" class="text-xs text-gray-500 mt-1">المعدلات الأبطأ تساعد في بناء التحكم بالطلاقة.</p>
+            </div>
+
+            <div class="setting-group text-start">
+                <label id="ui-difficulty-label" class="block mb-2 font-semibold text-gray-700">صعوبة سيارة الإيقاع المنافسة</label>
+                <div id="difficulty-btn-group" class="grid grid-cols-3 gap-2">
+                    <button type="button" class="difficulty-btn p-3 text-center flex flex-col items-center justify-center transition" data-val="easy">
+                        <span class="text-2xl mb-1">🐢</span>
+                        <span id="opt-easy" class="text-xs font-bold">سهل</span>
+                    </button>
+                    <button type="button" class="difficulty-btn active p-3 text-center flex flex-col items-center justify-center transition" data-val="normal">
+                        <span class="text-2xl mb-1">🏎️</span>
+                        <span id="opt-normal" class="text-xs font-bold">عادي</span>
+                    </button>
+                    <button type="button" class="difficulty-btn p-3 text-center flex flex-col items-center justify-center transition" data-val="hard">
+                        <span class="text-2xl mb-1">⚡</span>
+                        <span id="opt-hard" class="text-xs font-bold">صعب</span>
+                    </button>
+                </div>
+            </div>
+
+            <button id="btn-start" class="btn btn-success w-full mt-4">ابدأ المحرك</button>
+        </div>
+    </div>
+
+    <div id="end-screen" class="screen hidden">
+        <div class="settings-panel text-center">
+            <h2 id="result-title" class="text-3xl font-bold mb-4"></h2>
+            <p id="result-message" class="text-xl mb-6"></p>
+            
+            <div class="grid grid-cols-2 gap-4 mb-6 text-start">
+                <div class="bg-gray-100 p-3 rounded">
+                    <span id="ui-label-target" class="block text-sm text-gray-500">المعدل المستهدف</span>
+                    <strong id="stat-target" class="text-lg">80 كلمة/د</strong>
+                </div>
+                <div class="bg-gray-100 p-3 rounded">
+                    <span id="ui-label-actual" class="block text-sm text-gray-500">معدلك الحالي</span>
+                    <strong id="stat-actual" class="text-lg">0 كلمة/د</strong>
+                </div>
+            </div>
+
+            <button id="btn-next-level" class="btn btn-primary w-full mb-3">السباق التالي</button>
+            <button id="btn-menu" class="btn bg-gray-300 text-gray-800 w-full">العودة للقائمة</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- Sentences Database (Arabic Default & English) ---
+    const sentencesDatabase = {
+        ar: [
+            ["الشَّمْسُ", "شَارِقَةٌ", "وَالْجَوُّ", "جَمِيلٌ", "الْيَوْمَ."],
+            ["أَقْرَأُ", "كِتَابًا", "مُفِيدًا", "بِهُدُوءٍ", "وَإِتْقَانٍ."],
+            ["التَّنَفُّسُ", "الْعَمِيقُ", "يُسَاعِدُنِي", "عَلَى", "الْكَلاَمِ", "بِطَلاَقَةٍ."],
+            ["أَتَكَلَّمُ", "بِبُطْءٍ", "وَبِوُضُوحٍ", "مَعَ", "أَصْدِقَائِي."],
+            ["التَّدْرِيبُ", "الْيَوْمِيُّ", "يَجْعَلُ", "صَوْتِي", "وَاضِحًا", "وَمُرْتَاحًا."],
+            ["أَبْدَأُ", "الْجُمْلَةَ", "بِلَمْسَةٍ", "صَوْتِيَّةٍ", "سَهْلَةٍ."],
+            ["نَشْرَبُ", "الْمَاءَ", "الصَّافِيَ", "كُلَّ", "صَبَاحٍ."],
+            ["السَّفِينَةُ", "تَبْحَرُ", "بِبُطْءٍ", "فِي", "الْبَحْرِ."],
+            ["الْقِرَاءَةُ", "بِإِيقَاعٍ", "مُنْتَظَمٍ", "تُعْطِينِي", "الثِّقَةَ."],
+            ["أَنَا", "أَتَحَكَّمُ", "فِي", "سُرْعَةِ", "كَلاَمِي", "بِنَجَاحٍ."]
+        ],
+        en: [
+            ["The", "sun", "is", "shining", "brightly", "today."],
+            ["I", "like", "to", "read", "books", "in", "the", "park."],
+            ["We", "are", "going", "to", "the", "store", "now."],
+            ["My", "favorite", "color", "is", "blue", "like", "the", "sky."],
+            ["Please", "pass", "the", "salt", "and", "pepper", "shaker."],
+            ["The", "quick", "brown", "fox", "jumps", "over", "the", "dog."],
+            ["She", "sells", "sea", "shells", "by", "the", "sea", "shore."],
+            ["A", "good", "friend", "is", "hard", "to", "find", "these", "days."],
+            ["Let's", "take", "a", "slow", "deep", "breath", "together."],
+            ["Speaking", "smoothly", "takes", "time", "and", "practice."]
+        ]
+    };
+
+    const iconDatabase = {
+        ar: [
+            [
+                { symbol: "☀️", label: "شَمْس" },
+                { symbol: "🌴", label: "نَخْلَة" },
+                { symbol: "🌊", label: "بَحْر" },
+                { symbol: "🏖️", label: "شَاطِئ" }
+            ],
+            [
+                { symbol: "📖", label: "كِتَاب" },
+                { symbol: "👓", label: "نَظَّارَة" },
+                { symbol: "🧘‍♂️", label: "هُدُوء" },
+                { symbol: "💡", label: "فِكْرَة" }
+            ],
+            [
+                { symbol: "🌬️", label: "تَنَفُّس" },
+                { symbol: "🫁", label: "رِئَة" },
+                { symbol: "🗣️", label: "كَلاَم" },
+                { symbol: "✨", label: "طَلاَقَة" }
+            ],
+            [
+                { symbol: "🚶‍♂️", label: "مَشْي" },
+                { symbol: "🛑", label: "تَوَقُّف" },
+                { symbol: "🗣️", label: "حَدِيث" },
+                { symbol: "🤝", label: "صَدِيق" }
+            ],
+            [
+                { symbol: "⏰", label: "وَقْت" },
+                { symbol: "🗣️", label: "نُطْق" },
+                { symbol: "👂", label: "سَمَع" },
+                { symbol: "🎯", label: "هَدَف" }
+            ],
+            [
+                { symbol: "🏃‍♂️", label: "رَكْض" },
+                { symbol: "⚽", label: "كُرَة" },
+                { symbol: "🥅", label: "هَدَف" },
+                { symbol: "🏆", label: "فَوْز" }
+            ],
+            [
+                { symbol: "🚀", label: "صَارُوخ" },
+                { symbol: "🌟", label: "نَجْمَة" },
+                { symbol: "🌙", label: "قَمَر" },
+                { symbol: "🪐", label: "كَوْكَب" }
+            ],
+            [
+                { symbol: "🐝", label: "نَحْلَة" },
+                { symbol: "🌸", label: "زَهْرَة" },
+                { symbol: "🍯", label: "عَسَل" },
+                { symbol: "😋", label: "لَذِيذ" }
+            ],
+            [
+                { symbol: "🎨", label: "أَلْوَان" },
+                { symbol: "🖌️", label: "فُرْشَاة" },
+                { symbol: "🖼️", label: "لَوْحَة" },
+                { symbol: "✨", label: "إِبْدَاع" }
+            ],
+            [
+                { symbol: "🍎", label: "تُفَّاحَة" },
+                { symbol: "🥛", label: "حَلِيب" },
+                { symbol: "🥪", label: "شَطِيرَة" },
+                { symbol: "😋", label: "أَكْل" }
+            ]
+        ],
+        en: [
+            [
+                { symbol: "☀️", label: "Sun" },
+                { symbol: "🌴", label: "Tree" },
+                { symbol: "🌊", label: "Sea" },
+                { symbol: "🏖️", label: "Beach" }
+            ],
+            [
+                { symbol: "📖", label: "Book" },
+                { symbol: "👓", label: "Glasses" },
+                { symbol: "🧘‍♂️", label: "Calm" },
+                { symbol: "💡", label: "Idea" }
+            ],
+            [
+                { symbol: "🌬️", label: "Breathe" },
+                { symbol: "🫁", label: "Lungs" },
+                { symbol: "🗣️", label: "Speak" },
+                { symbol: "✨", label: "Smooth" }
+            ],
+            [
+                { symbol: "🚶‍♂️", label: "Walk" },
+                { symbol: "🛑", label: "Stop" },
+                { symbol: "🗣️", label: "Talk" },
+                { symbol: "🤝", label: "Friend" }
+            ],
+            [
+                { symbol: "⏰", label: "Time" },
+                { symbol: "🗣️", label: "Voice" },
+                { symbol: "👂", label: "Listen" },
+                { symbol: "🎯", label: "Target" }
+            ],
+            [
+                { symbol: "🏃‍♂️", label: "Run" },
+                { symbol: "⚽", label: "Ball" },
+                { symbol: "🥅", label: "Goal" },
+                { symbol: "🏆", label: "Win" }
+            ],
+            [
+                { symbol: "🚀", label: "Rocket" },
+                { symbol: "🌟", label: "Star" },
+                { symbol: "🌙", label: "Moon" },
+                { symbol: "🪐", label: "Planet" }
+            ],
+            [
+                { symbol: "🐝", label: "Bee" },
+                { symbol: "🌸", label: "Flower" },
+                { symbol: "🍯", label: "Honey" },
+                { symbol: "😋", label: "Yummy" }
+            ],
+            [
+                { symbol: "🎨", label: "Paint" },
+                { symbol: "🖌️", label: "Brush" },
+                { symbol: "🖼️", label: "Art" },
+                { symbol: "✨", label: "Star" }
+            ],
+            [
+                { symbol: "🍎", label: "Apple" },
+                { symbol: "🥛", label: "Milk" },
+                { symbol: "🥪", label: "Snack" },
+                { symbol: "😋", label: "Eat" }
+            ]
+        ]
+    };
+
+    // UI Translations
+    const i18n = {
+        ar: {
+            appTitle: "سباق إيقاع الطلاقة",
+            subtitle: "تحكّم برتم كلامك لتفوز بالسباق!",
+            targetWpmLabel: "معدل الكلام المستهدف (كلمة في الدقيقة)",
+            wpmNote: "المعدلات الأبطأ تساعد في بناء التحكم بالطلاقة.",
+            difficultyLabel: "صعوبة سيارة الإيقاع المنافسة",
+            optEasy: "سهل",
+            optNormal: "عادي",
+            optHard: "صعب",
+            btnStart: "ابدأ المحرك",
+            btnNextLevel: "السباق التالي",
+            btnMenu: "العودة للقائمة",
+            btnTap: "اضغط للكلمة التالية",
+            btnPause: "إيقاف مؤقت",
+            btnResume: "استئناف",
+            score: "النقاط",
+            level: "المستوى",
+            readyText: "جاهز للسباق؟",
+            startingIn: "يبدأ خلال",
+            labelTarget: "المعدل المستهدف",
+            labelActual: "معدلك الحالي",
+            wpmUnit: "كلمة/د",
+            getReady: "استعد...",
+            paused: "موقوف مؤقتاً",
+            tooFastTitle: "سريع جداً! 🏎️💨",
+            tooFastMsg: "لقد سبقت سيارة الإيقاع، لكنك تحدثت بسرعة كبيرة. حاول التمهل للتحكم بطاقتك.",
+            tooSlowTitle: "بطيء جداً! 🐢",
+            tooSlowMsg: "تفوق عليك المنافس هذه المرة. حاول الحفاظ على إيقاع منتظم.",
+            perfectTitle: "إيقاع ممتاز! 🏆",
+            perfectMsg: "ممتاز! لقد تحكمت بمعدل كلامك بشكل مثالي وفزت بالسباق!",
+            speedIncreased: "تم زيادة السرعة قليلاً!",
+            modeText: "نصوص",
+            modeIcon: "رموز"
+        },
+        en: {
+            appTitle: "Fluency Pace Racing",
+            subtitle: "Control your speech rate to win the race!",
+            targetWpmLabel: "Target Speech Rate (Words Per Minute)",
+            wpmNote: "Slower rates help build fluency control.",
+            difficultyLabel: "Pacer Car Difficulty",
+            optEasy: "Easy",
+            optNormal: "Normal",
+            optHard: "Hard",
+            btnStart: "Start Engine",
+            btnNextLevel: "Next Race",
+            btnMenu: "Back to Menu",
+            btnTap: "Tap Next Word",
+            btnPause: "Pause",
+            btnResume: "Resume",
+            score: "Score",
+            level: "Level",
+            readyText: "Ready to race?",
+            startingIn: "Starting in",
+            labelTarget: "Target Rate",
+            labelActual: "Your Rate",
+            wpmUnit: "WPM",
+            getReady: "Get Ready...",
+            paused: "Paused",
+            tooFastTitle: "Too Fast! 🏎️💨",
+            tooFastMsg: "You beat the pacer, but spoke too quickly. Try to slow down and control your pace to win.",
+            tooSlowTitle: "Too Slow! 🐢",
+            tooSlowMsg: "The pacer beat you this time. Try to keep up a steady rhythm.",
+            perfectTitle: "Perfect Pace! 🏆",
+            perfectMsg: "Excellent! You controlled your rate perfectly and won the race!",
+            speedIncreased: "Speed increased slightly!",
+            modeText: "Text",
+            modeIcon: "Icons"
+        }
+    };
+
+    // --- State Variables ---
+    let gameState = {
+        lang: 'ar', // Arabic default
+        mode: 'text', // 'text' or 'icon' (for non-readers)
+        isPlaying: false,
+        isPaused: false,
+        currentSentenceIndex: 0,
+        currentWordIndex: 0,
+        words: [],
+        targetWPM: 80,
+        actualWPM: 0,
+        startTime: 0,
+        endTime: 0,
+        score: 0,
+        level: 1,
+        difficulty: 'normal',
+        
+        // Positions (percentage 0-100)
+        playerPos: 0,
+        pacerPos: 0,
+        
+        // Timing logic
+        msPerWord: 0,
+        lastWordTime: 0,
+        animationFrameId: null,
+        pacerStartTime: 0
+    };
+
+    // --- DOM Elements ---
+    const els = {
+        langSelect: document.getElementById('lang-select'),
+        btnModeToggle: document.getElementById('btn-mode-toggle'),
+        modeIcon: document.getElementById('mode-icon'),
+        modeLabel: document.getElementById('mode-label'),
+        startScreen: document.getElementById('start-screen'),
+        endScreen: document.getElementById('end-screen'),
+        btnStart: document.getElementById('btn-start'),
+        btnNextLevel: document.getElementById('btn-next-level'),
+        btnMenu: document.getElementById('btn-menu'),
+        btnTap: document.getElementById('btn-tap'),
+        btnPause: document.getElementById('btn-pause'),
+        
+        targetWpmInput: document.getElementById('target-wpm'),
+        wpmValueDisplay: document.getElementById('wpm-value'),
+        
+        wordDisplay: document.getElementById('word-display'),
+        pacerBar: document.getElementById('pacer-bar'),
+        
+        playerCar: document.getElementById('player-car'),
+        pacerCar: document.getElementById('pacer-car'),
+        finishLine: document.querySelector('.finish-line'),
+        
+        scoreDisplay: document.getElementById('score-display'),
+        levelDisplay: document.getElementById('level-display'),
+        
+        resultTitle: document.getElementById('result-title'),
+        resultMessage: document.getElementById('result-message'),
+        statTarget: document.getElementById('stat-target'),
+        statActual: document.getElementById('stat-actual'),
+
+        // UI text labels
+        uiTitle: document.getElementById('ui-title'),
+        uiSubtitle: document.getElementById('ui-subtitle'),
+        uiTargetWpmLabel: document.getElementById('ui-target-wpm-label'),
+        uiWpmNote: document.getElementById('ui-wpm-note'),
+        uiDifficultyLabel: document.getElementById('ui-difficulty-label'),
+        optEasy: document.getElementById('opt-easy'),
+        optNormal: document.getElementById('opt-normal'),
+        optHard: document.getElementById('opt-hard'),
+        uiLabelTarget: document.getElementById('ui-label-target'),
+        uiLabelActual: document.getElementById('ui-label-actual')
+    };
+
+    // Constant for finish line position (percentage)
+    const FINISH_LINE_POS = 90; 
+
+    
+    // Language switch listener
+    els.langSelect.addEventListener('change', (e) => {
+        setLanguage(e.target.value);
+    });
+
+    els.btnModeToggle.addEventListener('click', () => {
+        gameState.mode = gameState.mode === 'text' ? 'icon' : 'text';
+        updateModeUI();
+        if (!gameState.isPlaying) {
+            els.wordDisplay.textContent = i18n[gameState.lang].readyText;
+        } else {
+            prepareRace();
+        }
+    });
+
+    function updateModeUI() {
+        const t = i18n[gameState.lang];
+        if (gameState.mode === 'icon') {
+            els.modeIcon.textContent = '🔤';
+            els.modeLabel.textContent = t.modeText;
+        } else {
+            els.modeIcon.textContent = '🖼️';
+            els.modeLabel.textContent = t.modeIcon;
+        }
+    }
+
+    // Difficulty Icon Buttons selection logic
+    document.querySelectorAll('.difficulty-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            gameState.difficulty = btn.getAttribute('data-val');
+        });
+    });
+
+    function setLanguage(lang) {
+        gameState.lang = lang;
+        document.documentElement.lang = lang;
+        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+        const t = i18n[lang];
+
+        // Update Static Text Elements
+        els.uiTitle.textContent = t.appTitle;
+        els.uiSubtitle.textContent = t.subtitle;
+        els.uiTargetWpmLabel.textContent = t.targetWpmLabel;
+        els.uiWpmNote.textContent = t.wpmNote;
+        els.uiDifficultyLabel.textContent = t.difficultyLabel;
+        els.optEasy.textContent = t.optEasy;
+        els.optNormal.textContent = t.optNormal;
+        els.optHard.textContent = t.optHard;
+        els.btnStart.textContent = t.btnStart;
+        els.btnNextLevel.textContent = t.btnNextLevel;
+        els.btnMenu.textContent = t.btnMenu;
+        els.btnTap.textContent = t.btnTap;
+        els.btnPause.textContent = gameState.isPaused ? t.btnResume : t.btnPause;
+        els.uiLabelTarget.textContent = t.labelTarget;
+        els.uiLabelActual.textContent = t.labelActual;
+
+        updateModeUI();
+        updateHUD();
+
+        // If not playing, reset word display text
+        if (!gameState.isPlaying) {
+            els.wordDisplay.textContent = t.readyText;
+        } else {
+            renderWords();
+            highlightCurrentWord();
+        }
+    }
+
+    // --- JavaScript - Event Listeners setup ---
+    
+    // Update WPM display smoothly
+    els.targetWpmInput.addEventListener('input', (e) => {
+        els.wpmValueDisplay.textContent = e.target.value;
+    });
+
+    els.btnStart.addEventListener('click', startGame);
+    els.btnNextLevel.addEventListener('click', nextLevel);
+    els.btnMenu.addEventListener('click', showMenu);
+    
+    // Core interaction: Tapping to next word
+    els.btnTap.addEventListener('click', advanceWord);
+    els.btnTap.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Prevent double firing on touch
+        advanceWord();
+    });
+
+    // Keyboard support (Spacebar)
+    window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && gameState.isPlaying && !gameState.isPaused) {
+            e.preventDefault();
+            advanceWord();
+        }
+    });
+
+    els.btnPause.addEventListener('click', togglePause);
+
+    // Initial setup with Arabic default
+    setLanguage('ar');
+
+    function startGame() {
+        // Setup initial state from UI
+        gameState.targetWPM = parseInt(els.targetWpmInput.value);
+        gameState.msPerWord = (60 / gameState.targetWPM) * 1000;
+        
+        gameState.score = 0;
+        gameState.level = 1;
+        gameState.currentSentenceIndex = 0;
+        
+        updateHUD();
+        
+        // Hide menu, start race prep
+        els.startScreen.classList.add('hidden');
+        els.btnTap.style.display = 'block';
+        els.btnPause.style.display = 'block';
+        
+        prepareRace();
+    }
+
+    function showMenu() {
+        els.endScreen.classList.add('hidden');
+        els.startScreen.classList.remove('hidden');
+        els.btnTap.style.display = 'none';
+        els.btnPause.style.display = 'none';
+        resetCars();
+        els.wordDisplay.innerHTML = i18n[gameState.lang].readyText;
+        els.pacerBar.style.width = "0%";
+    }
+
+    function nextLevel() {
+        gameState.level++;
+        const currentDatabase = gameState.mode === 'icon' ? iconDatabase : sentencesDatabase;
+        const currentSentenceSet = currentDatabase[gameState.lang];
+        gameState.currentSentenceIndex = (gameState.currentSentenceIndex + 1) % currentSentenceSet.length;
+        
+        // Slightly increase difficulty/target WPM as levels progress, up to a cap
+        if (gameState.level % 3 === 0 && gameState.targetWPM < 130) {
+             gameState.targetWPM += 5;
+             gameState.msPerWord = (60 / gameState.targetWPM) * 1000;
+             showNotification(i18n[gameState.lang].speedIncreased);
+        }
+
+        updateHUD();
+        els.endScreen.classList.add('hidden');
+        prepareRace();
+    }
+
+    // --- STREAMING_CHUNK:Race Logic & Sentence/Icon Selection ---
+    function prepareRace() {
+        resetCars();
+        const currentDatabase = gameState.mode === 'icon' ? iconDatabase : sentencesDatabase;
+        const currentSentenceSet = currentDatabase[gameState.lang];
+        gameState.words = currentSentenceSet[gameState.currentSentenceIndex % currentSentenceSet.length];
+        gameState.currentWordIndex = 0;
+        
+        // Calculate total race time expected based on target WPM
+        const totalExpectedSeconds = (gameState.words.length / gameState.targetWPM) * 60;
+        
+        // Adjust pacer speed based on difficulty
+        let pacerModifier = 1.0;
+        if (gameState.difficulty === 'easy') pacerModifier = 1.1; // Takes 10% longer
+        if (gameState.difficulty === 'hard') pacerModifier = 0.95; // Takes 5% less time
+        
+        gameState.pacerTotalTime = (totalExpectedSeconds * pacerModifier) * 1000;
+
+        renderWords();
+        
+        // Countdown
+        const t = i18n[gameState.lang];
+        gameState.isPlaying = false;
+        els.btnTap.disabled = true;
+        els.btnTap.textContent = t.getReady;
+        els.btnTap.classList.replace('btn-primary', 'bg-gray-400');
+        
+        let count = 3;
+        els.wordDisplay.innerHTML = `<span class="text-4xl text-indigo-600">${t.startingIn} ${count}...</span>`;
+        
+        const countInt = setInterval(() => {
+            count--;
+            if (count > 0) {
+                els.wordDisplay.innerHTML = `<span class="text-4xl text-indigo-600">${t.startingIn} ${count}...</span>`;
+            } else {
+                clearInterval(countInt);
+                startRace();
+            }
+        }, 1000);
+    }
+
+    function resetCars() {
+        gameState.playerPos = 0;
+        gameState.pacerPos = 0;
+        updateCarPositions();
+    }
+
+    // --- Core Gameplay Loop ---
+    function startRace() {
+        const t = i18n[gameState.lang];
+        gameState.isPlaying = true;
+        gameState.isPaused = false;
+        els.btnTap.disabled = false;
+        els.btnTap.textContent = t.btnTap;
+        els.btnTap.classList.replace('bg-gray-400', 'btn-primary');
+        
+        renderWords();
+        highlightCurrentWord();
+        
+        gameState.startTime = Date.now();
+        gameState.lastWordTime = Date.now();
+        gameState.pacerStartTime = Date.now();
+        
+        // Start animation loop for pacer car and visual metronome
+        if (gameState.animationFrameId) cancelAnimationFrame(gameState.animationFrameId);
+        gameLoop();
+    }
+
+    function togglePause() {
+        if (!gameState.isPlaying) return;
+        
+        const t = i18n[gameState.lang];
+        gameState.isPaused = !gameState.isPaused;
+        
+        if (gameState.isPaused) {
+            els.btnPause.textContent = t.btnResume;
+            els.btnTap.disabled = true;
+            cancelAnimationFrame(gameState.animationFrameId);
+            els.wordDisplay.innerHTML = `<span class="text-2xl text-gray-500">${t.paused}</span>`;
+        } else {
+            els.btnPause.textContent = t.btnPause;
+            els.btnTap.disabled = false;
+            
+            // Adjust timing to account for pause duration
+            const now = Date.now();
+            gameState.pacerStartTime += (now - gameState.pauseTime);
+            gameState.lastWordTime += (now - gameState.pauseTime);
+            gameState.startTime += (now - gameState.pauseTime);
+            
+            renderWords();
+            highlightCurrentWord();
+            gameLoop();
+        }
+        
+        if(gameState.isPaused) {
+            gameState.pauseTime = Date.now();
+        }
+    }
+
+    function advanceWord() {
+        if (!gameState.isPlaying || gameState.isPaused) return;
+
+        // Calculate timing for pacing feedback
+        const now = Date.now();
+        const timeSpent = now - gameState.lastWordTime;
+        
+        if (timeSpent < gameState.msPerWord * 0.5) {
+            flashWarning();
+        }
+
+        gameState.lastWordTime = now;
+        gameState.currentWordIndex++;
+
+        gameState.playerPos = (gameState.currentWordIndex / gameState.words.length) * FINISH_LINE_POS;
+        
+        els.pacerBar.style.transition = 'none';
+        els.pacerBar.style.width = '0%';
+        void els.pacerBar.offsetWidth;
+        els.pacerBar.style.transition = 'width 0.1s linear';
+
+        if (gameState.currentWordIndex >= gameState.words.length) {
+            finishRace();
+            return;
+        }
+
+        highlightCurrentWord();
+    }
+
+    function renderWords() {
+        if (gameState.mode === 'icon') {
+            let html = gameState.words.map((item, index) => {
+                const symbol = typeof item === 'string' ? item : item.symbol;
+                const label = typeof item === 'object' && item.label ? item.label : '';
+                return `
+                    <div id="word-${index}" class="icon-card transition-all duration-200">
+                        <span class="icon-symbol">${symbol}</span>
+                        ${label ? `<span class="icon-label">${label}</span>` : ''}
+                    </div>
+                `;
+            }).join("");
+            els.wordDisplay.innerHTML = `<div class="flex flex-wrap justify-center items-center gap-2 sm:gap-3">${html}</div>`;
+        } else {
+            let html = gameState.words.map((word, index) => {
+                return `<span id="word-${index}" class="inline-block mx-1 transition-all duration-200">${word}</span>`;
+            }).join(" ");
+            els.wordDisplay.innerHTML = html;
+        }
+    }
+
+    function highlightCurrentWord() {
+        for (let i = 0; i < gameState.words.length; i++) {
+            const w = document.getElementById(`word-${i}`);
+            if (w) {
+                w.classList.remove('active-word', 'opacity-30', 'scale-95');
+                if (i < gameState.currentWordIndex) {
+                    w.classList.add('opacity-30', 'scale-95');
+                }
+            }
+        }
+        
+        const currentW = document.getElementById(`word-${gameState.currentWordIndex}`);
+        if (currentW) currentW.classList.add('active-word');
+    }
+
+    function updateCarPositions() {
+        const safePlayerPos = Math.min(gameState.playerPos, FINISH_LINE_POS + 5);
+        const safePacerPos = Math.min(gameState.pacerPos, FINISH_LINE_POS + 5);
+        
+        els.playerCar.style.left = `${safePlayerPos}%`;
+        els.pacerCar.style.left = `${safePacerPos}%`;
+    }
+
+    function gameLoop() {
+        if (!gameState.isPlaying || gameState.isPaused) return;
+
+        const now = Date.now();
+        
+        const elapsedSinceStart = now - gameState.pacerStartTime;
+        const pacerProgress = Math.min(elapsedSinceStart / gameState.pacerTotalTime, 1);
+        gameState.pacerPos = pacerProgress * FINISH_LINE_POS;
+
+        const timeSinceLastWord = now - gameState.lastWordTime;
+        const wordProgress = Math.min((timeSinceLastWord / gameState.msPerWord) * 100, 100);
+        
+        if (wordProgress < 50) {
+            els.pacerBar.style.backgroundColor = 'var(--secondary)';
+        } else if (wordProgress < 100) {
+            els.pacerBar.style.backgroundColor = '#F59E0B';
+        } else {
+             els.pacerBar.style.backgroundColor = '#EF4444';
+        }
+
+        els.pacerBar.style.width = `${wordProgress}%`;
+        
+        updateCarPositions();
+
+        if (gameState.pacerPos >= FINISH_LINE_POS && gameState.currentWordIndex < gameState.words.length) {
+            if(!gameState.pacerFinished) {
+                gameState.pacerFinished = true;
+            }
+        }
+
+        gameState.animationFrameId = requestAnimationFrame(gameLoop);
+    }
+
+    // --- STREAMING_CHUNK:HUD and Game Completion Logic ---
+    function updateHUD() {
+        const t = i18n[gameState.lang];
+        els.scoreDisplay.textContent = `${t.score}: ${gameState.score}`;
+        els.levelDisplay.textContent = `${t.level}: ${gameState.level}`;
+    }
+
+    function finishRace() {
+        gameState.isPlaying = false;
+        gameState.endTime = Date.now();
+        cancelAnimationFrame(gameState.animationFrameId);
+
+        const totalTimeMinutes = (gameState.endTime - gameState.startTime) / 60000;
+        gameState.actualWPM = Math.round(gameState.words.length / totalTimeMinutes);
+
+        const t = i18n[gameState.lang];
+
+        els.statTarget.textContent = `${gameState.targetWPM} ${t.wpmUnit}`;
+        els.statActual.textContent = `${gameState.actualWPM} ${t.wpmUnit}`;
+
+        // Speech rate evaluation logic
+        const wpmDiff = gameState.actualWPM - gameState.targetWPM;
+        
+        if (wpmDiff > 25) {
+            // Rushed ahead too fast
+            els.resultTitle.textContent = t.tooFastTitle;
+            els.resultMessage.textContent = t.tooFastMsg;
+        } else if (gameState.pacerPos >= FINISH_LINE_POS && gameState.playerPos < FINISH_LINE_POS) {
+            // Player too slow
+            els.resultTitle.textContent = t.tooSlowTitle;
+            els.resultMessage.textContent = t.tooSlowMsg;
+        } else {
+            // Controlled pace success
+            els.resultTitle.textContent = t.perfectTitle;
+            els.resultMessage.textContent = t.perfectMsg;
+            gameState.score += 100 + (gameState.level * 10);
+            updateHUD();
+            createConfetti();
+        }
+
+        els.endScreen.classList.remove('hidden');
+    }
+
+    function flashWarning() {
+        const overlay = document.createElement('div');
+        overlay.style.position = 'absolute';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
+        overlay.style.pointerEvents = 'none';
+        overlay.style.zIndex = '50';
+        overlay.style.transition = 'opacity 0.2s ease-out';
+        
+        document.getElementById('game-container').appendChild(overlay);
+        
+        setTimeout(() => {
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.remove(), 200);
+        }, 100);
+    }
+
+    function createConfetti() {
+        const colors = ['#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#EC4899'];
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            const size = Math.random() * 10 + 5;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            particle.style.left = `${80 + Math.random() * 20}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            
+            document.getElementById('race-area').appendChild(particle);
+            
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 100 + 50;
+            const tx = Math.cos(angle) * velocity;
+            const ty = Math.sin(angle) * velocity;
+            
+            particle.animate([
+                { transform: 'translate(0,0) scale(1)', opacity: 1 },
+                { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
+            ], {
+                duration: 1000 + Math.random() * 1000,
+                easing: 'cubic-bezier(0, .9, .57, 1)'
+            }).onfinish = () => particle.remove();
+        }
+    }
+    
+    function showNotification(msg) {
+        const notif = document.createElement('div');
+        notif.textContent = msg;
+        notif.style.position = 'absolute';
+        notif.style.top = '60px';
+        notif.style.left = '50%';
+        notif.style.transform = 'translateX(-50%)';
+        notif.style.backgroundColor = 'var(--primary)';
+        notif.style.color = 'white';
+        notif.style.padding = '8px 16px';
+        notif.style.borderRadius = '20px';
+        notif.style.zIndex = '100';
+        notif.style.fontWeight = 'bold';
+        notif.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+        notif.style.opacity = '0';
+        notif.style.transition = 'opacity 0.3s, transform 0.3s';
+        
+        document.body.appendChild(notif);
+        
+        requestAnimationFrame(() => {
+            notif.style.opacity = '1';
+            notif.style.transform = 'translateX(-50%) translateY(10px)';
+        });
+        
+        setTimeout(() => {
+            notif.style.opacity = '0';
+            notif.style.transform = 'translateX(-50%) translateY(-10px)';
+            setTimeout(() => notif.remove(), 300);
+        }, 2000);
+    }
+
+</script>
+
+</body>
+</html>
