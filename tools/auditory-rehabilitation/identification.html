@@ -92,25 +92,36 @@
 
     <!-- Header / Top Bar -->
     <header id="game-header" class="hidden w-full p-2.5 md:p-4 flex flex-col gap-2 bg-white shadow-sm z-50 shrink-0">
-        <div class="flex items-center justify-between w-full gap-2">
-            <button onclick="returnToHome()" class="p-2 px-3 md:px-4 bg-gray-100 rounded-full text-pastel-text hover:bg-gray-200 transition flex items-center gap-2 font-bold text-xs md:text-base shrink-0 cursor-pointer">
-                <i class="fas fa-arrow-left"></i>
-                <span class="hidden md:inline">Home</span>
-            </button>
+        <!-- Mobile-optimized layout: Stacks controls vertically on small screens, row on desktop -->
+        <div class="flex flex-col md:flex-row items-center justify-between w-full gap-2">
             
-            <!-- Level Title & Book Button Selector -->
-            <div class="flex flex-col items-center flex-1 max-w-[220px] md:max-w-xs">
-                <h2 id="level-title" class="text-sm md:text-xl font-bold text-pastel-blue mb-0.5 truncate">Level Active</h2>
+            <!-- Top row on mobile: Home button and Level Title -->
+            <div class="flex items-center justify-between w-full md:w-auto gap-2">
+                <button onclick="returnToHome()" class="p-2 px-3 md:px-4 bg-gray-100 rounded-full text-pastel-text hover:bg-gray-200 transition flex items-center gap-2 font-bold text-xs md:text-base shrink-0 cursor-pointer">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Home</span>
+                </button>
+                
+                <!-- Level Title (Centered on mobile top row, fits neatly) -->
+                <div class="flex flex-col items-center flex-1 md:hidden">
+                    <h2 id="level-title-mobile" class="text-xs font-bold text-pastel-blue truncate">Level Active</h2>
+                </div>
             </div>
             
-            <!-- Right Controls: Book Button & Practice Mode Toggle -->
-            <div class="flex items-center gap-2 shrink-0">
-                <button onclick="toggleTrialModal(true)" class="p-2 px-3 bg-pastel-blue/20 border-2 border-pastel-blue/40 rounded-xl text-slate-700 hover:bg-pastel-blue/30 transition flex items-center gap-1.5 font-bold text-xs md:text-base cursor-pointer" title="Select Trial">
+            <!-- Level Title (Desktop view) -->
+            <div class="hidden md:flex flex-col items-center flex-1 max-w-xs">
+                <h2 id="level-title" class="text-xl font-bold text-pastel-blue mb-0.5 truncate">Level Active</h2>
+            </div>
+            
+            <!-- Bottom row on mobile / Right controls on desktop: Book Button & Practice Mode Toggle -->
+            <div class="flex items-center justify-center gap-2 w-full md:w-auto shrink-0">
+                <button onclick="toggleTrialModal(true)" class="flex-1 md:flex-initial p-2 px-3 bg-pastel-blue/25 border-2 border-pastel-blue/40 rounded-xl text-slate-700 hover:bg-pastel-blue/30 transition flex items-center justify-center gap-1.5 font-bold text-xs md:text-base cursor-pointer">
                     <i class="fas fa-book text-pastel-blue"></i>
+                    <span class="inline md:hidden">Select Trial</span>
                 </button>
-                <button id="practice-btn" onclick="togglePracticeMode()" class="p-2 px-3 md:px-4 bg-gray-100 rounded-xl text-pastel-text flex items-center gap-2 font-bold transition-colors text-xs md:text-base cursor-pointer">
+                <button id="practice-btn" onclick="togglePracticeMode()" class="flex-1 md:flex-initial p-2 px-3 md:px-4 bg-gray-100 rounded-xl text-pastel-text flex items-center justify-center gap-2 font-bold transition-colors text-xs md:text-base cursor-pointer">
                     <i class="fas fa-lock"></i>
-                    <span class="hidden md:inline">Practice (10x)</span>
+                    <span>Practice (10x)</span>
                 </button>
             </div>
         </div>
@@ -227,7 +238,6 @@
         let isPracticeMode = false;
         let practiceProgress = 0;
 
-        // Helper to stop all playing audio immediately when transitioning rounds
         function stopAllAudio() {
             targetAudio.pause();
             targetAudio.currentTime = 0;
@@ -251,6 +261,7 @@
                 
                 const titles = { 1: 'Open-Set (1-50)', 2: '2-Choices Training', 3: 'Close-Set Training' };
                 document.getElementById('level-title').innerText = titles[levelNum];
+                document.getElementById('level-title-mobile').innerText = titles[levelNum];
                 
                 loadRound();
             }, 300);
@@ -380,7 +391,7 @@
         }
 
         function loadRound(forceCurrentSet = false) {
-            stopAllAudio(); // Stop any leftover audio from the previous round before loading the new one
+            stopAllAudio();
 
             if (currentLevel === 1) {
                 if (!forceCurrentSet || !currentTargetId) {
@@ -420,7 +431,7 @@
         }
 
         function setupOpenSetRoundWithTarget(targetId) {
-            stopAllAudio(); // Stop any leftover audio
+            stopAllAudio();
             currentTargetId = targetId;
             targetAudio.src = `sounds/${currentTargetId}.wav`;
 
@@ -543,7 +554,6 @@
             if (draggedId === currentTargetId) {
                 fbIcon.className = 'fas fa-check-circle text-green-500 animate-pop';
                 
-                // Stop ongoing sounds immediately when correct answer is achieved
                 stopAllAudio();
                 document.getElementById('sound-success').currentTime = 0;
                 document.getElementById('sound-success').play().catch(e => console.log(e));
@@ -575,13 +585,13 @@
         }
 
         function playMysterySound() { 
-            cardAudio.pause(); // Stop card audio if playing
+            cardAudio.pause();
             targetAudio.currentTime = 0;
             targetAudio.play().catch(e => console.error(e)); 
         }
         
         function playCardSound(id) { 
-            targetAudio.pause(); // Stop mystery audio if playing
+            targetAudio.pause();
             cardAudio.src = `sounds/${id}.wav`;
             cardAudio.currentTime = 0;
             cardAudio.play().catch(e => console.error(e)); 
