@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Arabic Sounds with Hamada</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Arabic Sounds with Hamada - أصوات لينغ والأصوات الكلامية</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script>
@@ -37,6 +37,7 @@
     body {
       font-family: 'Tajawal', sans-serif;
       background-color: #FAFAF9;
+      touch-action: manipulation;
     }
     .card-square {
       aspect-ratio: 1 / 1;
@@ -113,36 +114,36 @@
 
     <section id="page-level-select" class="view-page hidden py-4 space-y-5">
       <div class="text-center">
-        <h2 class="text-xl md:text-2xl font-bold text-gray-800">اختر مستوى الصعوبة</h2>
-        <p class="text-xs text-gray-400 mt-0.5">اختر المستوى لعرض الثنائيات الصغرى والتقابلية</p>
+        <h2 class="text-xl md:text-2xl font-bold text-gray-800">اختر تصنيف الأصوات والمستوى</h2>
+        <p class="text-xs text-gray-400 mt-0.5">اختر الفئة لعرض الثنائيات والتقابلات السمعية والنطقية بدقة</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 max-w-2xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 max-w-2xl mx-auto">
         <button 
-          onclick="openLevelModal('easy')" 
+          onclick="openLingCategoryModal()" 
+          class="p-5 bg-babyBlue border border-sky-200 hover:bg-babyBlueDark text-babyBlueText rounded-2xl font-black text-xl shadow-sm transition-all text-center flex flex-col items-center justify-center space-y-1.5 active:scale-95"
+        >
+          <i class="fa-solid fa-ear-listen text-2xl text-sky-500"></i>
+          <span>أصوات لينغ (Ling Sounds)</span>
+          <span class="text-[11px] font-normal text-sky-700">متفاوتة، منخفضة وعالية التردد</span>
+        </button>
+
+        <button 
+          onclick="openSpeechLevelModal('level1')" 
           class="p-5 bg-babyGreen border border-emerald-200 hover:bg-babyGreenDark text-babyGreenText rounded-2xl font-black text-xl shadow-sm transition-all text-center flex flex-col items-center justify-center space-y-1.5 active:scale-95"
         >
-          <i class="fa-solid fa-seedling text-2xl text-emerald-500"></i>
-          <span>سهل</span>
-          <span class="text-[11px] font-normal text-emerald-700">المستوى الأول</span>
+          <i class="fa-solid fa-comments text-2xl text-emerald-500"></i>
+          <span>أصوات كلامية - مستوى ١</span>
+          <span class="text-[11px] font-normal text-emerald-700">التقابلات والتدريبات الأساسية</span>
         </button>
 
         <button 
-          onclick="openLevelModal('medium')" 
-          class="p-5 bg-babyYellow border border-amber-200 hover:bg-babyYellowDark text-babyYellowText rounded-2xl font-black text-xl shadow-sm transition-all text-center flex flex-col items-center justify-center space-y-1.5 active:scale-95"
+          onclick="openSpeechLevelModal('level2')" 
+          class="p-5 md:col-span-2 bg-babyYellow border border-amber-200 hover:bg-babyYellowDark text-babyYellowText rounded-2xl font-black text-xl shadow-sm transition-all text-center flex flex-col items-center justify-center space-y-1.5 active:scale-95"
         >
-          <i class="fa-solid fa-bolt text-2xl text-amber-500"></i>
-          <span>متوسط</span>
-          <span class="text-[11px] font-normal text-amber-700">المستوى الثاني</span>
-        </button>
-
-        <button 
-          onclick="openLevelModal('hard')" 
-          class="p-5 bg-babyPink border border-rose-200 hover:bg-babyPinkDark text-babyPinkText rounded-2xl font-black text-xl shadow-sm transition-all text-center flex flex-col items-center justify-center space-y-1.5 active:scale-95"
-        >
-          <i class="fa-solid fa-fire text-2xl text-rose-400"></i>
-          <span>صعب</span>
-          <span class="text-[11px] font-normal text-rose-700">المستوى الثالث</span>
+          <i class="fa-solid fa-layer-group text-2xl text-amber-500"></i>
+          <span>أصوات كلامية - المستوى ٢</span>
+          <span class="text-[11px] font-normal text-amber-700">المخارج الصوتية والتقابلات المتقدمة (Labiodentals, Interdentals, Alveodentals, Palatals, Uvulars, Pharyngeals & Speech Banana)</span>
         </button>
       </div>
     </section>
@@ -151,21 +152,6 @@
       <div class="text-center">
         <h2 class="text-xl md:text-2xl font-bold text-gray-800">اختيار الأصوات</h2>
         <p class="text-xs text-gray-500 mt-0.5">انقر على <span class="font-bold text-sky-600">صوتين اثنين</span> للتدرب عليهما في بطاقات العرض</p>
-      </div>
-
-      <div class="flex flex-wrap items-center justify-center gap-2 text-[11px] font-semibold">
-        <div class="flex items-center space-x-1 space-x-reverse px-2.5 py-1 rounded-full bg-babyBlue border border-sky-200 text-sky-800">
-          <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
-          <span>منخفض التردد (250–1000 Hz)</span>
-        </div>
-        <div class="flex items-center space-x-1 space-x-reverse px-2.5 py-1 rounded-full bg-babyGreen border border-emerald-200 text-emerald-800">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-          <span>متوسط التردد (1000–3000 Hz)</span>
-        </div>
-        <div class="flex items-center space-x-1 space-x-reverse px-2.5 py-1 rounded-full bg-babyYellow border border-amber-200 text-amber-800">
-          <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-          <span>عالٍ التردد (3000–8000+ Hz)</span>
-        </div>
       </div>
 
       <div id="soundGrid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-7 gap-2.5 pt-1">
@@ -261,14 +247,14 @@
   </main>
 
   <div id="levelModal" class="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-md rounded-3xl p-5 shadow-xl modal-pop flex flex-col space-y-3 max-h-[80vh]">
+    <div class="bg-white w-full max-w-md rounded-3xl p-5 shadow-xl modal-pop flex flex-col space-y-3 max-h-[85vh]">
       <div class="flex items-center justify-between border-b pb-2">
         <h3 id="modalTitle" class="text-lg font-bold text-gray-800"></h3>
         <button onclick="closeLevelModal()" class="text-gray-400 hover:text-gray-600 p-1">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
-      <div id="modalPairsList" class="grid grid-cols-2 gap-2.5 overflow-y-auto p-1">
+      <div id="modalPairsList" class="flex flex-col space-y-2.5 overflow-y-auto p-1">
         </div>
     </div>
   </div>
@@ -309,60 +295,158 @@
   </footer>
 
   <script>
-    // Asset mapping index for Arabic letters
+    // Updated Letter Mapping incorporating s', t', d', z', th', h', kh, g, q, w, j
     const LETTER_MAP = {
-      'ا': 1,  'ب': 2,  'ت': 3,  'ث': 4,  'ج': 5,  'ح': 6,  'خ': 7,
+      'ا': 1,  'ب': 2,  'ت': 3,  'ث': 4,  'ج': 5, 'ح': 6,  'خ': 7,
       'د': 8,  'ذ': 9,  'ر': 10, 'ز': 11, 'س': 12, 'ش': 13, 'ص': 14,
       'ض': 15, 'ط': 16, 'ظ': 17, 'ع': 18, 'غ': 19, 'ف': 20, 'ق': 21,
       'ك': 22, 'ل': 23, 'م': 24, 'ن': 25, 'ه': 26, 'و': 27, 'ي': 28,
-      'ء': 29
+      'ء': 29, 'ف': 20, 'ث': 4, 'ذ': 9, 'ظ': 17, 'ط': 16, 'ض': 15, 'ص': 14, 'ح': 6, 'w': 30, 'j': 31
     };
 
-    // Levels mapping
-    const LEVELS_DATA = {
-      easy: {
-        title: 'المستوى الأول (سهل)',
+    // Ling Sounds Data Structure as requested
+    const LING_CATEGORIES = [
+      {
+        title: 'أصوات لينغ - متفاوتة التردد',
         pairs: [
-          ['ا', 'و'], ['ا', 'ي'], ['و', 'ي'], ['ب', 'س'],
-          ['م', 'ش'], ['ر', 'ت'], ['ل', 'ف']
+          ['م', 'س'],
+          ['م', 'ش'],
+          ['ا', 'س'],
+          ['و', 'س'],
+          ['ي', 'س']
         ]
       },
-      medium: {
-        title: 'المستوى الثاني (متوسط)',
+      {
+        title: 'أصوات لينغ - منخفضة التردد',
         pairs: [
-          ['ب', 'م'], ['ت', 'د'], ['ث', 'ذ'], ['س', 'ز'],
-          ['ك', 'ق'], ['خ', 'غ'], ['ح', 'ه'], ['ج', 'ش']
+          ['ا', 'م'],
+          ['و', 'م'],
+          ['ا', 'و'],
+          ['ي', 'و'],
+          ['ي', 'ا'],
+          ['م', 'ي']
         ]
       },
-      hard: {
-        title: 'المستوى الثالث (صعب)',
+      {
+        title: 'أصوات لينغ - عالية التردد',
         pairs: [
-          ['ط', 'ت'], ['ض', 'د'], ['ص', 'س'], ['ظ', 'ذ'],
-          ['س', 'ش'], ['خ', 'ح'], ['ع', 'ء']
+          ['ش', 'س']
         ]
       }
+    ];
+// Speech Levels Data Structure with fully updated level 1 and level 2 mappings (Converted to Arabic letters/symbols)
+    const SPEECH_LEVELS = {
+      level1: {
+        title: 'أصوات كلامية - مستوى ١',
+        pairs: [
+          ['م', 'ث'],
+          ['ن', 'ص'],
+          ['د', 'س'],
+          ['ي', 'ف'],
+          ['ر', 'س'],
+          ['و', 'ث'],
+          ['ت', 'م'],
+          ['و', 'ف'],
+          ['ر', 'ث'],
+          ['ب', 'س'],
+          ['ج', 'م'],
+          ['م', 'ف']
+        ]
+      },
+      level2: [
+        {
+          category: 'الشفوية الاسنانية (Labiodentals)',
+          pairs: [
+            ['ب', 'م'],
+            ['ب', 'و'],
+            ['م', 'و'],
+            ['ف', 'ف']
+          ]
+        },
+        {
+          category: 'الأسنانية بين الشفاه (Interdentals)',
+          pairs: [
+            ['ذ', 'ث'],
+            ['ظ', 'ث']
+          ]
+        },
+        {
+          category: 'اللثوية (Alveodentals)',
+          pairs: [
+            ['ر', 'د'],
+            ['ط', 'ت'],
+            ['ض', 'د'],
+            ['ض', 'ط'],
+            ['ز', 'س'],
+            ['ص', 'س'],
+            ['ر', 'ل'],
+            ['ل', 'ن'],
+            ['ر', 'ن']
+          ]
+        },
+        {
+          category: 'الحنكية (Palatals)',
+          pairs: [
+            ['ش', 'ي'],
+            ['ج', 'ش']
+          ]
+        },
+        {
+          category: 'الللهوية (Uvulars)',
+          pairs: [
+            ['ق', 'غ'],
+            ['خ', 'ق'],
+            ['خ', 'غ']
+          ]
+        },
+        {
+          category: 'الحلقية (Pharyngeals)',
+          pairs: [
+            ['ح', 'ء']
+          ]
+        },
+        {
+          category: 'أصوات متشابهة غير متوافقة (Similar non-cognate)',
+          pairs: [
+            ['ه', 'ح'],
+            ['ق', 'ك']
+          ]
+        },
+        {
+          category: 'تشابه موزة الكلام (Speech banana similar)',
+          pairs: [
+            ['ب', 'ن'],
+            ['د', 'ب'],
+            ['د', 'ن'],
+            ['م', 'ن'],
+            ['ج', 'ش'],
+            ['ك', 'ت'],
+            ['ث', 'ف'],
+            ['س', 'ف']
+          ]
+        }
+      ]
     };
 
-    // Sound Frequencies data mapping
+    // Sound Frequencies data mapping for sound select tab including custom symbols
     const FREQUENCY_DATA = [
       { letter: 'ب', freq: 'low' }, { letter: 'م', freq: 'low' }, { letter: 'و', freq: 'low' },
       { letter: 'ع', freq: 'low' }, { letter: 'ء', freq: 'low' }, { letter: 'ا', freq: 'low' }, { letter: 'ي', freq: 'low' },
-
       { letter: 'ن', freq: 'medium' }, { letter: 'ر', freq: 'medium' }, { letter: 'ل', freq: 'medium' },
       { letter: 'د', freq: 'medium' }, { letter: 'ض', freq: 'medium' }, { letter: 'ز', freq: 'medium' },
       { letter: 'ذ', freq: 'medium' }, { letter: 'ظ', freq: 'medium' }, { letter: 'ج', freq: 'medium' }, { letter: 'ق', freq: 'medium' },
-
       { letter: 'ك', freq: 'high' }, { letter: 'ت', freq: 'high' }, { letter: 'ط', freq: 'high' },
       { letter: 'ف', freq: 'high' }, { letter: 'ث', freq: 'high' }, { letter: 'خ', freq: 'high' },
       { letter: 'غ', freq: 'high' }, { letter: 'ح', freq: 'high' }, { letter: 'ه', freq: 'high' },
-      { letter: 'س', freq: 'high' }, { letter: 'ص', freq: 'high' }, { letter: 'ش', freq: 'high' }
+      { letter: 'س', freq: 'high' }, { letter: 'ص', freq: 'high' }, { letter: 'ش', freq: 'high' },
+      { letter: 'w', freq: 'low' }, { letter: 'j', freq: 'medium' }
     ];
 
     // Navigation & State
     let previousPage = 'home';
     let currentPair = ['ب', 'م'];
     let cardOrder = [0, 1];
-    let selectedSounds = []; // User selected 2 sounds
+    let selectedSounds = [];
     let isTestMode = false;
     let currentTrial = 0;
     let targetCardIndex = null;
@@ -394,25 +478,70 @@
       }
     }
 
-    // Modal Control
-    function openLevelModal(levelKey) {
-      const level = LEVELS_DATA[levelKey];
-      if (!level) return;
-
-      document.getElementById('modalTitle').textContent = level.title;
+    // Modal Control for Ling Sounds
+    function openLingCategoryModal() {
+      document.getElementById('modalTitle').textContent = 'أصوات لينغ (Ling Sounds)';
       const container = document.getElementById('modalPairsList');
       container.innerHTML = '';
 
-      level.pairs.forEach(pair => {
-        const btn = document.createElement('button');
-        btn.className = 'p-2.5 bg-sky-50/80 hover:bg-sky-100 border border-sky-100 rounded-xl font-bold text-lg text-sky-900 flex items-center justify-center space-x-2 space-x-reverse transition-all active:scale-95';
-        btn.innerHTML = `<span>${pair[0]}</span> <span class="text-sky-300">-</span> <span>${pair[1]}</span>`;
-        btn.onclick = () => {
-          closeLevelModal();
-          startPractice(pair);
-        };
-        container.appendChild(btn);
+      LING_CATEGORIES.forEach(cat => {
+        const catHeader = document.createElement('div');
+        catHeader.className = 'font-bold text-xs text-sky-800 bg-sky-50 p-2 rounded-xl mt-2 mb-1';
+        catHeader.textContent = cat.title;
+        container.appendChild(catHeader);
+
+        cat.pairs.forEach(pair => {
+          const btn = document.createElement('button');
+          btn.className = 'p-2.5 bg-white hover:bg-sky-50 border border-sky-100 rounded-xl font-bold text-base text-sky-900 flex items-center justify-center space-x-2 space-x-reverse transition-all active:scale-95 shadow-sm';
+          btn.innerHTML = `<span>${pair[0]}</span> <span class="text-sky-300">-</span> <span>${pair[1]}</span>`;
+          btn.onclick = () => {
+            closeLevelModal();
+            startPractice(pair);
+          };
+          container.appendChild(btn);
+        });
       });
+
+      document.getElementById('levelModal').classList.remove('hidden');
+    }
+
+    // Modal Control for Speech Levels (Level 1 or Level 2)
+    function openSpeechLevelModal(levelKey) {
+      const container = document.getElementById('modalPairsList');
+      container.innerHTML = '';
+
+      if (levelKey === 'level1') {
+        document.getElementById('modalTitle').textContent = 'أصوات كلامية - مستوى ١';
+        SPEECH_LEVELS.level1.pairs.forEach(pair => {
+          const btn = document.createElement('button');
+          btn.className = 'p-2.5 bg-white hover:bg-emerald-50 border border-emerald-100 rounded-xl font-bold text-base text-emerald-900 flex items-center justify-center space-x-2 space-x-reverse transition-all active:scale-95 shadow-sm';
+          btn.innerHTML = `<span>${pair[0]}</span> <span class="text-emerald-300">-</span> <span>${pair[1]}</span>`;
+          btn.onclick = () => {
+            closeLevelModal();
+            startPractice(pair);
+          };
+          container.appendChild(btn);
+        });
+      } else if (levelKey === 'level2') {
+        document.getElementById('modalTitle').textContent = 'أصوات كلامية - المستوى ٢';
+        SPEECH_LEVELS.level2.forEach(group => {
+          const groupHeader = document.createElement('div');
+          groupHeader.className = 'font-bold text-xs text-amber-800 bg-amber-50 p-2 rounded-xl mt-2 mb-1';
+          groupHeader.textContent = group.category;
+          container.appendChild(groupHeader);
+
+          group.pairs.forEach(pair => {
+            const btn = document.createElement('button');
+            btn.className = 'p-2.5 bg-white hover:bg-amber-50 border border-amber-100 rounded-xl font-bold text-base text-amber-900 flex items-center justify-center space-x-2 space-x-reverse transition-all active:scale-95 shadow-sm';
+            btn.innerHTML = `<span>${pair[0]}</span> <span class="text-amber-300">-</span> <span>${pair[1]}</span>`;
+            btn.onclick = () => {
+              closeLevelModal();
+              startPractice(pair);
+            };
+            container.appendChild(btn);
+          });
+        });
+      }
 
       document.getElementById('levelModal').classList.remove('hidden');
     }
@@ -471,7 +600,6 @@
       navigateTo('practice');
     }
 
-    // Safe & robust card refresh function
     function updatePracticeCards() {
       [0, 1].forEach(slotIdx => {
         const letter = currentPair[cardOrder[slotIdx]];
@@ -485,10 +613,15 @@
         }
 
         if (containerElem) {
+          let imgFilename = soundIndex;
+          if (letter === 'u') imgFilename = 'u';
+          else if (letter === 'ee') imgFilename = 'i';
+          else if (letter === 'ah') imgFilename = 'u';
+
           containerElem.innerHTML = `
             <img 
               id="cardImg${slotIdx}" 
-              src="images/${soundIndex}.png" 
+              src="images/${imgFilename}.png" 
               alt="${letter}" 
               class="max-h-full max-w-full object-contain"
               onerror="handleImgError(this, '${letter}')" 
@@ -501,11 +634,11 @@
     function handleImgError(imgElem, letter) {
       const parent = imgElem.parentElement;
       if (parent) {
-        parent.innerHTML = `<div class="text-5xl md:text-6xl font-black text-sky-400 flex items-center justify-center w-full h-full">${letter}</div>`;
+        parent.innerHTML = `<div class="text-3xl md:text-5xl font-black text-sky-400 flex items-center justify-center w-full h-full">${letter}</div>`;
       }
     }
 
-    // Audio Playback
+    // Audio Playback with support for custom mapped indices
     function playAudioForLetter(letter) {
       const soundIndex = LETTER_MAP[letter] || 1;
       const audio = new Audio(`sounds/${soundIndex}.wav`);
@@ -652,7 +785,7 @@
           ? 'ring-4 ring-sky-400 border-sky-500 scale-105 shadow-md font-black' 
           : 'border';
 
-        btn.className = `p-3.5 rounded-2xl font-bold text-2xl shadow-sm transition-all active:scale-95 flex flex-col items-center justify-center relative ${baseColor} ${selectedStyles}`;
+        btn.className = `p-3.5 rounded-2xl font-bold text-xl shadow-sm transition-all active:scale-95 flex flex-col items-center justify-center relative ${baseColor} ${selectedStyles}`;
         
         btn.innerHTML = `
           <span>${item.letter}</span>
@@ -664,7 +797,6 @@
       });
     }
 
-    // Initialize Page Application
     window.addEventListener('DOMContentLoaded', () => {
       renderSoundSelectionGrid();
       updatePracticeCards();
@@ -672,4 +804,3 @@
   </script>
 </body>
 </html>
-

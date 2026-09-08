@@ -3,33 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Auditory Discrimination - Same / Different</title>
+    <title>Auditory Discrimination Hub</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              'pastel-pink': '#ffd1dc',
-              'pastel-blue': '#aec6cf',
-              'pastel-green': '#b7e4c7',
-              'pastel-purple': '#cbaacb',
-              'pastel-text': '#5a5a5a'
-            }
-          }
-        }
-      }
-    </script>
-      
     <style>
       body { 
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         user-select: none; 
         -webkit-user-select: none;
-        overscroll-behavior: none; 
+        overscroll-behavior: none;
+        background-color: #fafafa;
       }
       @keyframes popIn {
         0% { transform: scale(0.3); opacity: 0; }
@@ -38,183 +23,182 @@
       }
       .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
       .hide-scrollbar::-webkit-scrollbar { display: none; }
+      
+      /* Styling matched to previous design */
+      .text-header-title { color: #9bbcc7; }
+      .bg-red-btn { background-color: #ef4444; }
+      .bg-red-btn-hover { background-color: #dc2626; }
+      .bg-red-light { background-color: #fee2e2; }
+      .text-red-dark { color: #dc2626; }
+      .bg-gray-light { background-color: #f1f5f9; }
     </style>
 </head>
-<body class="bg-gray-50 text-pastel-text overflow-hidden h-[100dvh] flex flex-col">
-    
+<body class="text-slate-700 h-[100dvh] flex flex-col justify-between overflow-hidden">
+
     <!-- Success Audio -->
     <audio id="sound-success" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=success-1-6297.mp3"></audio>
 
     <!-- Giant Central Feedback Overlay -->
-    <div id="central-feedback" class="fixed inset-0 flex items-center justify-center z-[100] hidden pointer-events-none bg-white bg-opacity-80 backdrop-blur-sm transition-all">
+    <div id="central-feedback" class="fixed inset-0 flex items-center justify-center z-[200] hidden pointer-events-none bg-white/80 backdrop-blur-sm transition-all">
         <i id="feedback-icon-big" class="text-[7rem] drop-shadow-2xl"></i>
     </div>
 
-    <!-- Trial Selection Modal -->
-    <div id="trial-modal" class="fixed inset-0 z-[120] flex items-center justify-center bg-black/40 backdrop-blur-xs hidden p-4" onclick="closeTrialModal(event)">
-        <div class="bg-white rounded-3xl p-5 shadow-xl max-w-lg w-full max-h-[85vh] flex flex-col animate-pop" onclick="event.stopPropagation()">
+    <!-- Catalog / Trial Selection Modal -->
+    <div id="trial-modal" class="fixed inset-0 z-[150] flex items-center justify-center bg-black/40 backdrop-blur-xs hidden p-4" onclick="closeTrialModal(event)">
+        <div class="bg-white rounded-3xl p-5 shadow-2xl max-w-lg w-full max-h-[85vh] flex flex-col animate-pop" onclick="event.stopPropagation()">
             <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
-                <h3 class="font-black text-lg text-slate-700">Select Trial</h3>
-                <button onclick="toggleTrialModal(false)" class="p-2 text-gray-400 hover:text-slate-600 rounded-full transition cursor-pointer">
-                    <i class="fas fa-times text-lg"></i>
+                <h3 id="modal-title" class="font-black text-lg text-slate-700">Select Trial</h3>
+                <button onclick="toggleTrialModal(false)" class="p-2 text-gray-400 hover:text-slate-600 rounded-full transition cursor-pointer w-8 h-8 flex items-center justify-center bg-gray-100">
+                    <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
-            <!-- Scrollable Image/Button Grid -->
             <div id="trial-modal-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-y-auto pr-1 hide-scrollbar max-h-[60vh]">
-                <!-- Populated dynamically via JS -->
+                <!-- Dynamically Populated -->
             </div>
         </div>
     </div>
 
-    <!-- Compact Header / Top Bar -->
-    <header id="game-header" class="hidden w-full px-4 py-3 flex items-center justify-between bg-white shadow-sm z-50 shrink-0">
-        <button onclick="returnToHome()" class="w-10 h-10 bg-gray-100 rounded-full text-pastel-text hover:bg-gray-200 transition flex items-center justify-center font-bold text-sm shrink-0 cursor-pointer" title="Home">
-            <i class="fas fa-arrow-left"></i>
-        </button>
-        
-        <!-- Phase Title -->
-        <div class="flex flex-col items-center flex-1 mx-3 overflow-hidden">
-            <h2 id="level-title" class="text-base sm:text-lg font-bold text-slate-700 mb-0 text-center truncate w-full">Discrimination</h2>
-        </div>
-        
-        <!-- Right Header Controls: Audio Play Button, Book Button & Visual Help Toggle -->
-        <div class="flex items-center gap-2 shrink-0">
-            <button onclick="playTrialSequence()" id="header-play-btn" class="px-3 h-10 bg-pastel-pink text-white rounded-xl shadow-xs hover:scale-105 active:scale-95 transition flex items-center justify-center gap-1.5 cursor-pointer text-sm font-bold" title="Play Full Sequence">
-                <i class="fas fa-volume-high text-sm"></i>
-                <span class="hidden sm:inline">Play All</span>
-            </button>
-            <button onclick="toggleTrialModal(true)" class="w-10 h-10 bg-pastel-pink/20 border border-pastel-pink/40 rounded-xl text-slate-700 hover:bg-pastel-pink/30 transition flex items-center justify-center cursor-pointer" title="Select Trial">
-                <i class="fas fa-book text-pastel-pink text-sm"></i>
-            </button>
-            <button id="help-toggle-btn" onclick="toggleVisualHelp()" class="px-3 h-10 bg-gray-100 rounded-xl text-pastel-text flex items-center justify-center gap-1.5 font-bold transition-colors text-sm cursor-pointer" title="Toggle Visual Support">
-                <i class="fas fa-eye text-xs"></i>
-                <span>Help</span>
-            </button>
-        </div>
-    </header>
-
-    <!-- Home / Menu Screen -->
-    <div id="home-screen" class="absolute inset-0 bg-white z-[60] flex flex-col items-center justify-between p-4 transition-all duration-300 overflow-y-auto hide-scrollbar">
-        <div class="w-full max-w-md flex flex-col items-center justify-center my-auto py-4">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="h-14 w-14 bg-pastel-pink rounded-2xl shadow-sm flex items-center justify-center shrink-0">
-                    <i class="fas fa-ear-listen text-white text-2xl"></i>
-                </div>
-                <h1 class="font-black text-2xl text-slate-700 text-center">Sound Discrimination</h1>
+    <!-- ==================== VIEW 1: HOME SCREEN ==================== -->
+    <div id="home-screen" class="absolute inset-0 bg-white z-[100] flex flex-col justify-between p-6 overflow-y-auto hide-scrollbar">
+        <div class="w-full max-w-md mx-auto flex flex-col items-center justify-center my-auto py-6">
+            <div class="w-20 h-20 bg-red-light text-red-dark rounded-3xl flex items-center justify-center mb-6 shadow-sm border border-red-100">
+                <i class="fas fa-ear-listen text-4xl"></i>
             </div>
+            <h1 class="font-black text-2xl md:text-3xl text-slate-800 text-center mb-2">Auditory Discrimination</h1>
+            <p class="text-slate-500 text-sm text-center mb-8 font-medium">Select a training category to begin</p>
 
-            <!-- Mode Selection View -->
-            <div id="main-menu-view" class="flex flex-col gap-3.5 w-full">
-                <button onclick="startPhase('A')" class="group flex items-center p-4 bg-pastel-pink bg-opacity-20 border-2 border-pastel-pink rounded-2xl hover:bg-opacity-40 transition shadow-xs cursor-pointer w-full text-left">
-                    <div class="h-12 w-12 bg-pastel-pink/30 rounded-xl flex items-center justify-center mr-4 shrink-0">
-                        <i class="fas fa-shapes text-xl text-pastel-pink"></i>
-                    </div>
+            <div class="flex flex-col gap-4 w-full">
+                <!-- Level 1 -->
+                <button onclick="switchView('level1')" class="group flex items-center p-4 bg-white border-2 border-gray-100 rounded-2xl hover:border-red-300 hover:bg-red-50/30 transition shadow-sm cursor-pointer w-full text-left relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-red-500"></div>
+                    <div class="h-12 w-12 bg-red-light text-red-dark rounded-xl flex items-center justify-center mr-4 shrink-0 font-bold">1</div>
                     <div class="flex-1 min-w-0">
-                        <h3 class="font-bold text-base text-slate-700">Phase A</h3>
-                        <p class="text-xs text-slate-500 truncate">Dissimilar Sounds (Same / Different)</p>
+                        <h3 class="font-bold text-base text-slate-800">Level 1</h3>
+                        <p class="text-xs text-slate-500 truncate">أصوات متباينة غير متشابهة</p>
                     </div>
                 </button>
 
-                <button onclick="startPhase('B')" class="group flex items-center p-4 bg-pastel-green bg-opacity-20 border-2 border-pastel-green rounded-2xl hover:bg-opacity-40 transition shadow-xs cursor-pointer w-full text-left">
-                    <div class="h-12 w-12 bg-pastel-green/30 rounded-xl flex items-center justify-center mr-4 shrink-0">
-                        <i class="fas fa-layer-group text-xl text-pastel-green"></i>
-                    </div>
+                <!-- Level 2 -->
+                <button onclick="switchView('level2')" class="group flex items-center p-4 bg-white border-2 border-gray-100 rounded-2xl hover:border-red-300 hover:bg-red-50/30 transition shadow-sm cursor-pointer w-full text-left relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-red-500"></div>
+                    <div class="h-12 w-12 bg-red-light text-red-dark rounded-xl flex items-center justify-center mr-4 shrink-0 font-bold">2</div>
                     <div class="flex-1 min-w-0">
-                        <h3 class="font-bold text-base text-slate-700">Phase B</h3>
-                        <p class="text-xs text-slate-500 truncate">Similar Sounds (Same / Different)</p>
+                        <h3 class="font-bold text-base text-slate-800">Level 2</h3>
+                        <p class="text-xs text-slate-500 truncate">أصوات متشابهة سمعياً</p>
                     </div>
                 </button>
 
-                <button onclick="window.location.href='duration.html'" class="group flex items-center p-4 bg-pastel-blue bg-opacity-20 border-2 border-pastel-blue rounded-2xl hover:bg-opacity-40 transition shadow-xs cursor-pointer w-full text-left">
-                    <div class="h-12 w-12 bg-pastel-blue/30 rounded-xl flex items-center justify-center mr-4 shrink-0">
-                        <i class="fas fa-clock text-xl text-pastel-blue"></i>
-                    </div>
+                <!-- Duration -->
+                <button onclick="switchView('duration')" class="group flex items-center p-4 bg-white border-2 border-gray-100 rounded-2xl hover:border-red-300 hover:bg-red-50/30 transition shadow-sm cursor-pointer w-full text-left relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-red-500"></div>
+                    <div class="h-12 w-12 bg-red-light text-red-dark rounded-xl flex items-center justify-center mr-4 shrink-0 font-bold"><i class="fas fa-clock text-lg"></i></div>
                     <div class="flex-1 min-w-0">
-                        <h3 class="font-bold text-base text-slate-700">Long vs Short</h3>
-                        <p class="text-xs text-slate-500 truncate">Duration Training</p>
+                        <h3 class="font-bold text-base text-slate-800">Duration</h3>
+                        <p class="text-xs text-slate-500 truncate">Long vs Short Training</p>
                     </div>
-                </button>
-            </div>
-            
-            <div class="mt-6">
-                <button onclick="window.location.href='index.html'" class="p-3 px-6 bg-gray-100 rounded-full text-slate-600 font-bold hover:bg-gray-200 transition flex items-center gap-2 text-sm shadow-xs cursor-pointer">
-                    <i class="fas fa-arrow-left text-xs"></i> Return to Identification App
                 </button>
             </div>
         </div>
 
-        <footer class="w-full text-center text-xs text-gray-400 leading-tight uppercase tracking-wider py-2 shrink-0">
+        <footer class="w-full text-center text-[10px] text-gray-400 font-bold uppercase tracking-widest py-2 shrink-0">
             SPEECH AND LANGUAGE PATHOLOGY • AHMAD GHANEM
         </footer>
     </div>
 
-    <!-- Game Area - Streamlined with just bars (one 5 times the size of the other) and no cards -->
-    <div id="game-area" class="hidden flex-1 flex-col justify-between p-3 sm:p-4 w-full max-w-lg mx-auto overflow-hidden">
-        
-        <!-- Center Area: Just Bars (Sound 1 vs Sound 2 with proportional phone-screen-safe scaling) -->
-        <div class="flex-1 flex flex-col items-center justify-center w-full gap-4 sm:gap-6 my-auto">
-            
-            <div class="flex items-center justify-center gap-6 sm:gap-8 w-full">
-                <!-- Sound 1 Bar Container -->
-                <div class="flex flex-col items-center cursor-pointer group" onclick="playSingleSound(1)">
-                    <div id="audio-btn-1" class="w-14 h-14 sm:w-16 sm:h-16 bg-pastel-blue rounded-2xl flex items-center justify-center text-white shadow-sm group-hover:scale-105 active:scale-95 transition mb-2 sm:mb-3">
-                        <i id="icon-1" class="fas fa-volume-high text-lg sm:text-xl"></i>
-                    </div>
-                    <span class="text-[11px] sm:text-xs font-bold text-gray-400 uppercase mb-1.5 sm:mb-2">Sound 1</span>
-                    <!-- Bar 1: Standard height -->
-                    <div id="duration-bar-1" class="w-7 sm:w-8 h-10 sm:h-12 bg-pastel-blue rounded-2xl transition-all duration-300 shadow-xs"></div>
-                </div>
-
-                <div class="text-gray-300 text-base sm:text-lg font-black mt-6 sm:mt-8">VS</div>
-
-                <!-- Sound 2 Bar Container (Safe height scaling for mobile screen fit) -->
-                <div class="flex flex-col items-center cursor-pointer group" onclick="playSingleSound(2)">
-                    <div id="audio-btn-2" class="w-14 h-14 sm:w-16 sm:h-16 bg-pastel-pink rounded-2xl flex items-center justify-center text-white shadow-sm group-hover:scale-105 active:scale-95 transition mb-2 sm:mb-3">
-                        <i id="icon-2" class="fas fa-volume-high text-lg sm:text-xl"></i>
-                    </div>
-                    <span class="text-[11px] sm:text-xs font-bold text-gray-400 uppercase mb-1.5 sm:mb-2">Sound 2</span>
-                    <!-- Bar 2: Scaled safely to avoid vertical overflow on mobile screens -->
-                    <div id="duration-bar-2" class="w-7 sm:w-8 h-36 sm:h-44 bg-pastel-pink rounded-2xl transition-all duration-300 shadow-xs"></div>
-                </div>
+    <!-- ==================== VIEW 2: LEVEL 1 & 2 WORKPLACE ==================== -->
+    <div id="game-view-standard" class="hidden flex-1 flex-col justify-between w-full max-w-lg mx-auto overflow-hidden">
+        <!-- Header -->
+        <header class="w-full px-4 py-3 flex items-center justify-between bg-white shadow-sm z-50 shrink-0 border-b border-gray-100">
+            <button onclick="returnToHome()" class="w-10 h-10 bg-gray-100 rounded-full text-slate-600 hover:bg-gray-200 transition flex items-center justify-center font-bold text-sm shrink-0 cursor-pointer" title="Home">
+                <i class="fas fa-home"></i>
+            </button>
+            <div class="flex flex-col items-center flex-1 mx-2 overflow-hidden">
+                <h2 id="standard-header-title" class="text-sm sm:text-base font-black text-header-title truncate w-full text-center">Level 1</h2>
             </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button onclick="playTargetSound()" class="w-10 h-10 bg-red-light text-red-dark rounded-xl hover:bg-red-200 transition flex items-center justify-center font-bold text-sm cursor-pointer shadow-xs" title="Play Sound">
+                    <i class="fas fa-volume-high"></i>
+                </button>
+                <button onclick="toggleTrialModal(true)" class="w-10 h-10 bg-gray-light text-slate-700 rounded-xl hover:bg-gray-200 transition flex items-center justify-center font-bold text-sm cursor-pointer shadow-xs" title="Catalog / Library">
+                    <i class="fas fa-th-large"></i>
+                </button>
+                <button id="test-btn-standard" onclick="triggerTestMode()" class="px-3 h-10 bg-red-light text-red-dark rounded-xl hover:bg-red-200 transition flex items-center justify-center font-bold text-xs cursor-pointer shadow-xs gap-1" title="Test Mode (10 Trials)">
+                    <i class="fas fa-bolt"></i>
+                    <span id="test-counter-badge" class="hidden">0/10</span>
+                </button>
+            </div>
+        </header>
 
-            <!-- Visual Help Hints (Hidden by default) -->
-            <div id="visual-hints" class="hidden items-center justify-center gap-3 pt-2 sm:pt-3 border-t border-gray-100 w-full">
-                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gray-50 rounded-2xl p-1.5 border border-gray-200 flex items-center justify-center shrink-0">
-                    <img id="hint-img-1" src="" alt="Sound A" class="w-full h-full object-contain pointer-events-none">
+        <!-- Two 1x1 Card Slots Workplace -->
+        <div class="flex-1 flex flex-col items-center justify-center p-4 w-full gap-4 my-auto">
+            <div class="grid grid-cols-2 gap-4 w-full max-w-sm">
+                <!-- Card Slot A -->
+                <div onclick="handleCardSelection('A')" class="bg-white rounded-3xl p-4 shadow-sm border-2 border-gray-100 hover:border-red-300 flex flex-col items-center justify-center cursor-pointer transition-transform active:scale-95 group">
+                    <div class="w-32 h-32 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center p-2 mb-2 relative overflow-hidden">
+                        <img id="slot-img-A" src="" alt="Sound A" class="w-full h-full object-contain pointer-events-none group-hover:scale-105 transition-transform">
+                    </div>
+                    <span id="slot-label-A" class="text-xs font-bold text-slate-600 truncate max-w-full" dir="rtl">...</span>
                 </div>
-                <i class="fas fa-arrow-right text-gray-300 text-xs"></i>
-                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gray-50 rounded-2xl p-1.5 border border-gray-200 flex items-center justify-center shrink-0">
-                    <img id="hint-img-2" src="" alt="Sound B" class="w-full h-full object-contain pointer-events-none">
+
+                <!-- Card Slot B -->
+                <div onclick="handleCardSelection('B')" class="bg-white rounded-3xl p-4 shadow-sm border-2 border-gray-100 hover:border-red-300 flex flex-col items-center justify-center cursor-pointer transition-transform active:scale-95 group">
+                    <div class="w-32 h-32 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center p-2 mb-2 relative overflow-hidden">
+                        <img id="slot-img-B" src="" alt="Sound B" class="w-full h-full object-contain pointer-events-none group-hover:scale-105 transition-transform">
+                    </div>
+                    <span id="slot-label-B" class="text-xs font-bold text-slate-600 truncate max-w-full" dir="rtl">...</span>
                 </div>
             </div>
         </div>
 
-        <!-- Bottom: Same / Different Selection Choices -->
-        <div class="grid grid-cols-2 gap-3 w-full shrink-0 mb-1 sm:mb-2">
-            <!-- Identical Button -->
-            <button onclick="handleAnswer('identical')" class="group flex flex-col items-center justify-center p-3 sm:p-3.5 bg-pastel-green bg-opacity-30 border-2 border-pastel-green rounded-2xl hover:bg-opacity-50 active:scale-95 transition shadow-xs cursor-pointer">
-                <div class="flex items-center justify-center gap-1.5 mb-1 sm:mb-1.5">
-                    <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-red-500 rounded-full shadow-xs"></div>
-                    <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-red-500 rounded-full shadow-xs"></div>
-                </div>
-                <span class="font-bold text-sm sm:text-base text-slate-700">Same</span>
-            </button>
+        <p class="text-[10px] sm:text-xs text-gray-400 font-bold tracking-widest uppercase text-center shrink-0 pb-4">
+            Listen to the sound • Choose the correct card
+        </p>
+    </div>
 
-            <!-- Different Button -->
-            <button onclick="handleAnswer('different')" class="group flex flex-col items-center justify-center p-3 sm:p-3.5 bg-pastel-pink bg-opacity-30 border-2 border-pastel-pink rounded-2xl hover:bg-opacity-50 active:scale-95 transition shadow-xs cursor-pointer">
-                <div class="flex items-center justify-center gap-1.5 mb-1 sm:mb-1.5">
-                    <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-red-500 rounded-full shadow-xs"></div>
-                    <div class="w-0 h-0 border-x-[5px] sm:border-x-[6px] border-x-transparent border-b-[10px] sm:border-b-[12px] border-b-blue-500 drop-shadow-xs"></div>
-                </div>
-                <span class="font-bold text-sm sm:text-base text-slate-700">Different</span>
+    <!-- ==================== VIEW 3: DURATION WORKPLACE ==================== -->
+    <div id="game-view-duration" class="hidden flex-1 flex-col justify-between w-full max-w-md mx-auto overflow-hidden">
+        <!-- Header -->
+        <header class="w-full px-4 py-3 flex items-center justify-between bg-white shadow-sm z-50 shrink-0 border-b border-gray-100">
+            <button onclick="returnToHome()" class="w-10 h-10 bg-gray-100 rounded-full text-slate-600 hover:bg-gray-200 transition flex items-center justify-center font-bold text-sm shrink-0 cursor-pointer" title="Home">
+                <i class="fas fa-home"></i>
             </button>
+            <div class="flex flex-col items-center flex-1 mx-2 overflow-hidden">
+                <h2 class="text-sm sm:text-base font-black text-header-title truncate w-full text-center">Duration Training</h2>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button onclick="playDurationSound()" class="w-10 h-10 bg-red-light text-red-dark rounded-xl hover:bg-red-200 transition flex items-center justify-center font-bold text-sm cursor-pointer shadow-xs" title="Play Sound">
+                    <i class="fas fa-volume-high"></i>
+                </button>
+                <button onclick="toggleTrialModal(true)" class="w-10 h-10 bg-gray-light text-slate-700 rounded-xl hover:bg-gray-200 transition flex items-center justify-center font-bold text-sm cursor-pointer shadow-xs" title="Catalog / Library">
+                    <i class="fas fa-th-large"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Duration Workplace: Vertical Bars & Centered Single Card -->
+        <div class="flex-1 flex flex-col items-center justify-between py-2 px-4 w-full my-auto relative">
+            <!-- Top Short Bar -->
+            <button onclick="handleDurationAnswer('short')" class="w-24 sm:w-28 h-7 sm:h-9 bg-red-btn rounded-full shadow-md hover:bg-red-btn-hover active:scale-95 transition-transform cursor-pointer shrink-0" title="Short Sound"></button>
+
+            <!-- Center Single Card -->
+            <div onclick="playDurationSound()" class="bg-white rounded-[2rem] p-4 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 flex flex-col items-center justify-center cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform z-10 mx-auto w-56 sm:w-64 my-auto">
+                <h3 id="dur-item-title" class="text-base sm:text-lg font-bold text-slate-800 mb-2 sm:mb-3 text-center" dir="rtl">...</h3>
+                <div class="w-32 h-32 sm:w-40 sm:h-40 bg-[#f8fafc] rounded-2xl border-[3px] border-gray-50 flex items-center justify-center p-2 relative group overflow-hidden">
+                    <img id="dur-card-img" src="" alt="Sound Item" class="w-full h-full object-contain pointer-events-none group-hover:scale-105 transition-transform">
+                </div>
+            </div>
+
+            <!-- Bottom Long Bar -->
+            <button onclick="handleDurationAnswer('long')" class="w-[85%] sm:w-[360px] max-w-md h-10 sm:h-12 bg-red-btn rounded-full shadow-md hover:bg-red-btn-hover active:scale-95 transition-transform cursor-pointer shrink-0" title="Long Sound"></button>
         </div>
 
-        <p class="text-[11px] sm:text-xs text-gray-400 font-semibold tracking-wider uppercase text-center shrink-0">Listen carefully • Choose Same or Different</p>
+        <p class="text-[9px] sm:text-xs text-gray-400 font-bold tracking-[0.15em] uppercase text-center shrink-0 pb-3 px-4">
+            Click image to listen • Choose short or long
+        </p>
     </div>
 
     <script>
+        // Sound Library Mapping (1 to 50)
         const soundLibrary = {
             1: "غسالة", 2: "كاسة تنكسر", 3: "مكنسة قش", 4: "طيارة", 5: "منبه ساعة",
             6: "بيبي يبكي", 7: "عصفور", 8: "زمور سيارة", 9: "زحمة سير", 10: "ساعة",
@@ -228,102 +212,216 @@
             46: "بوسة / قبلة", 47: "سيارة اسعاف", 48: "غلي ماء", 49: "باخرة", 50: "نهر جاري"
         };
 
-        const discriminationPhases = {
-            'A': [
-                { id: 1, soundA: 1, soundB: 17, type: 'different', desc: 'غسالة ➔ جرس' },
-                { id: 2, soundA: 1, soundB: 1, type: 'identical', desc: 'غسالة ➔ غسالة' },
-                { id: 3, soundA: 2, soundB: 20, type: 'different', desc: 'كاسة تنكسر ➔ دوش حمام' },
-                { id: 4, soundA: 2, soundB: 2, type: 'identical', desc: 'كاسة تنكسر ➔ كاسة تنكسر' },
-                { id: 5, soundA: 3, soundB: 21, type: 'different', desc: 'مكنسة قش ➔ موبايل' },
-                { id: 6, soundA: 21, soundB: 21, type: 'identical', desc: 'موبايل ➔ موبايل' },
-                { id: 7, soundA: 4, soundB: 22, type: 'different', desc: 'طيارة ➔ مي تواليت' },
-                { id: 8, soundA: 4, soundB: 4, type: 'identical', desc: 'طيارة ➔ طيارة' },
-                { id: 9, soundA: 5, soundB: 24, type: 'different', desc: 'منبه ساعة ➔ شاحنة صغيرة تمر' },
-                { id: 10, soundA: 5, soundB: 5, type: 'identical', desc: 'منبه ساعة ➔ منبه ساعة' },
-                { id: 11, soundA: 6, soundB: 25, type: 'different', desc: 'بيبي يبكي ➔ شخير رجل' },
-                { id: 12, soundA: 6, soundB: 6, type: 'identical', desc: 'بيبي يبكي ➔ بيبي يبكي' },
-                { id: 13, soundA: 7, soundB: 29, type: 'different', desc: 'عصفور ➔ سيارات بالمدينة' },
-                { id: 14, soundA: 7, soundB: 7, type: 'identical', desc: 'عصفور ➔ عصفور' },
-                { id: 15, soundA: 8, soundB: 30, type: 'different', desc: 'زمور سيارة ➔ قطار' },
-                { id: 16, soundA: 30, soundB: 30, type: 'identical', desc: 'قطار ➔ قطار' },
-                { id: 17, soundA: 9, soundB: 31, type: 'different', desc: 'زحمة سير ➔ شاحنة تمر' },
-                { id: 18, soundA: 9, soundB: 9, type: 'identical', desc: 'زحمة سير ➔ زحمة سير' },
-                { id: 19, soundA: 10, soundB: 36, type: 'different', desc: 'ساعة ➔ بنت تصرخ' },
-                { id: 20, soundA: 10, soundB: 10, type: 'identical', desc: 'ساعة ➔ ساعة' },
-                { id: 21, soundA: 14, soundB: 39, type: 'different', desc: 'هلكوبتر ➔ صب عصير' },
-                { id: 22, soundA: 39, soundB: 39, type: 'identical', desc: 'صب عصير ➔ صب عصير' },
-                { id: 23, soundA: 15, soundB: 42, type: 'different', desc: 'فرشاية اسنان ➔ ضجة عالم' },
-                { id: 24, soundA: 15, soundB: 15, type: 'identical', desc: 'فرشاية اسنان ➔ فرشاية اسنان' },
-                { id: 25, soundA: 16, soundB: 19, type: 'different', desc: 'بيبي مبسوط ➔ موتور' },
-                { id: 26, soundA: 19, soundB: 19, type: 'identical', desc: 'موتور ➔ موتور' }
-            ],
-            'B': [
-                { id: 1, soundA: 11, soundB: 37, type: 'different', desc: 'بقرة ➔ ماعز' },
-                { id: 2, soundA: 11, soundB: 11, type: 'identical', desc: 'بقرة ➔ بقرة' },
-                { id: 3, soundA: 12, soundB: 13, type: 'different', desc: 'بطة ➔ وزة' },
-                { id: 4, soundA: 13, soundB: 13, type: 'identical', desc: 'وزة ➔ وزة' },
-                { id: 5, soundA: 28, soundB: 38, type: 'different', desc: 'خاروف ➔ حصان' },
-                { id: 6, soundA: 28, soundB: 28, type: 'identical', desc: 'خاروف ➔ خاروف' },
-                { id: 7, soundA: 32, soundB: 40, type: 'different', desc: 'قطة ➔ اسد' },
-                { id: 8, soundA: 32, soundB: 32, type: 'identical', desc: 'قطة ➔ قطة' },
-                { id: 9, soundA: 33, soundB: 41, type: 'different', desc: 'كلاب ➔ صيصان' },
-                { id: 10, soundA: 41, soundB: 41, type: 'identical', desc: 'صيصان ➔ صيصان' },
-                { id: 11, soundA: 34, soundB: 45, type: 'different', desc: 'حمامة ➔ ديك' },
-                { id: 12, soundA: 34, soundB: 34, type: 'identical', desc: 'حمامة ➔ حمامة' },
-                { id: 13, soundA: 26, soundB: 18, type: 'different', desc: 'ببغاء ➔ غراب' },
-                { id: 14, soundA: 26, soundB: 26, type: 'identical', desc: 'ببغاء ➔ ببغاء' },
-                { id: 15, soundA: 23, soundB: 27, type: 'different', desc: 'صفارة شرطة ➔ سيارة شرطة' },
-                { id: 16, soundA: 27, soundB: 27, type: 'identical', desc: 'سيارة شرطة ➔ سيارة شرطة' },
-                { id: 17, soundA: 35, soundB: 47, type: 'different', desc: 'سيارة اطفاء ➔ سيارة اسعاف' },
-                { id: 18, soundA: 47, soundB: 47, type: 'identical', desc: 'سيارة اسعاف ➔ سيارة اسعاف' },
-                { id: 19, soundA: 49, soundB: 50, type: 'different', desc: 'باخرة ➔ نهر جاري' },
-                { id: 20, soundA: 49, soundB: 49, type: 'identical', desc: 'باخرة ➔ باخرة' },
-                { id: 21, soundA: 44, soundB: 48, type: 'different', desc: 'مطر ➔ غلي ماء' },
-                { id: 22, soundA: 44, soundB: 44, type: 'identical', desc: 'مطر ➔ مطر' },
-                { id: 23, soundA: 46, soundB: 43, type: 'different', desc: 'بوسة / قبلة ➔ سعال بنت' },
-                { id: 24, soundA: 46, soundB: 46, type: 'identical', desc: 'بوسة / قبلة ➔ بوسة / قبلة' }
-            ]
-        };
+        // Level 1 Trials: أصوات متباينة غير متشابهة
+        const level1Trials = [
+            { id: 1, soundA: 1, soundB: 17, target: 'A' },   // غسالة <-> جرس
+            { id: 2, soundA: 2, soundB: 20, target: 'A' },   // كاسة تنكسر <-> دوش حمام
+            { id: 3, soundA: 3, soundB: 21, target: 'A' },   // مكنسة قش <-> موبايل
+            { id: 4, soundA: 4, soundB: 22, target: 'A' },   // طيارة <-> مي تواليت
+            { id: 5, soundA: 5, soundB: 24, target: 'A' },   // منبه ساعة <-> شاحنة صغيرة تمر
+            { id: 6, soundA: 6, soundB: 25, target: 'A' },   // بيبي يبكي <-> شخير رجل
+            { id: 7, soundA: 7, soundB: 29, target: 'A' },   // عصفور <-> سيارات بالمدينة
+            { id: 8, soundA: 8, soundB: 30, target: 'A' },   // زمور سيارة <-> قطار
+            { id: 9, soundA: 9, soundB: 31, target: 'A' },   // زحمة سير <-> شاحنة تمر
+            { id: 10, soundA: 10, soundB: 36, target: 'A' }, // ساعة <-> بنت تصرخ
+            { id: 11, soundA: 14, soundB: 39, target: 'A' }, // هلكوبتر <-> صب عصير
+            { id: 12, soundA: 44, soundB: 48, target: 'A' }, // مطر <-> غلي ماء
+            { id: 13, soundA: 15, soundB: 42, target: 'A' }, // فرشاية اسنان <-> ضجة عالم
+            { id: 14, soundA: 46, soundB: 43, target: 'A' }, // بوسة / قبلة <-> سعال بنت
+            { id: 15, soundA: 16, soundB: 19, target: 'A' }  // بيبي مبسوط <-> موتور
+        ];
 
-        let currentPhase = 'A';
+        // Level 2 Trials: أصوات متشابهة سمعياً
+        const level2Trials = [
+            { id: 1, soundA: 11, soundB: 37, target: 'A' },  // بقرة <-> ماعز
+            { id: 2, soundA: 12, soundB: 13, target: 'A' },  // بطة <-> وزة
+            { id: 3, soundA: 28, soundB: 38, target: 'A' },  // خاروف <-> حصان
+            { id: 4, soundA: 32, soundB: 40, target: 'A' },  // قطة <-> اسد
+            { id: 5, soundA: 33, soundB: 41, target: 'A' },  // كلاب <-> صيصان
+            { id: 6, soundA: 34, soundB: 45, target: 'A' },  // حمامة <-> ديك
+            { id: 7, soundA: 26, soundB: 18, target: 'A' },  // ببغاء <-> غراب
+            { id: 8, soundA: 23, soundB: 27, target: 'A' },  // صفارة شرطة <-> سيارة شرطة
+            { id: 9, soundA: 35, soundB: 47, target: 'A' },  // سيارة اطفاء <-> سيارة اسعاف
+            { id: 10, soundA: 49, soundB: 50, target: 'A' } // باخرة <-> نهر جاري
+        ];
+
+        // Duration Trials: All 50 sounds randomly assigned as 'short' or 'long'
+        const durationTypes = ['short', 'long'];
+        const durationTrials = [];
+        for (let i = 1; i <= 50; i++) {
+            // Pseudo-random assignment per sound index based on stable logic or Math.random
+            const assignedType = (i * 7) % 2 === 0 ? 'short' : 'long';
+            durationTrials.push({ id: i, sound: i, type: assignedType });
+        }
+
+        let currentMode = 'home';
         let currentIndex = 0;
         let currentTrial = null;
-        let audioA = new Audio();
-        let audioB = new Audio();
-        let isPlayingSequence = false;
-        let isVisualHelpActive = false;
+        let activeAudio = new Audio();
 
-        function startPhase(phase) {
-            currentPhase = phase;
-            currentIndex = 0;
+        // Test Mode State for Level 1 & 2
+        let isTestModeActive = false;
+        let testQueue = [];
+        let testIndex = 0;
+        let lockedPair = null;
+
+        function switchView(mode) {
+            currentMode = mode;
+            isTestModeActive = false;
+            document.getElementById('home-screen').classList.add('hidden');
+            document.getElementById('game-view-standard').classList.add('hidden');
+            document.getElementById('game-view-duration').classList.add('hidden');
             
-            buildTrialModalGrid();
+            document.getElementById('test-btn-standard').classList.remove('hidden');
+            document.getElementById('test-counter-badge').classList.add('hidden');
 
-            document.getElementById('home-screen').classList.add('opacity-0', 'pointer-events-none');
-            setTimeout(() => {
-                document.getElementById('home-screen').classList.add('hidden');
-                document.getElementById('game-header').classList.remove('hidden');
-                document.getElementById('game-area').classList.remove('hidden');
-                document.getElementById('game-area').classList.add('flex');
-                
-                const titles = { 'A': 'Phase A: Dissimilar Sounds', 'B': 'Phase B: Similar Sounds' };
-                document.getElementById('level-title').innerText = titles[phase];
-                
-                loadTrial();
-            }, 300);
+            if (mode === 'home') {
+                document.getElementById('home-screen').classList.remove('hidden');
+            } else if (mode === 'level1' || mode === 'level2') {
+                document.getElementById('game-view-standard').classList.remove('hidden');
+                document.getElementById('game-view-standard').classList.add('flex');
+                document.getElementById('standard-header-title').innerText = mode === 'level1' ? 'Level 1: أصوات متباينة غير متشابهة' : 'Level 2: أصوات متشابهة سمعياً';
+                currentIndex = 0;
+                loadStandardTrial();
+            } else if (mode === 'duration') {
+                document.getElementById('game-view-duration').classList.remove('hidden');
+                document.getElementById('game-view-duration').classList.add('flex');
+                currentIndex = 0;
+                loadDurationTrial();
+            }
         }
 
         function returnToHome() {
-            audioA.pause();
-            audioB.pause();
+            activeAudio.pause();
+            switchView('home');
+        }
+
+        function getActiveTrialsList() {
+            return currentMode === 'level1' ? level1Trials : level2Trials;
+        }
+
+        function loadStandardTrial(forceIdx = null) {
+            const list = getActiveTrialsList();
+            if (forceIdx !== null) currentIndex = forceIdx;
             
-            document.getElementById('game-header').classList.add('hidden');
-            document.getElementById('game-area').classList.add('hidden');
-            document.getElementById('game-area').classList.remove('flex');
-            document.getElementById('home-screen').classList.remove('hidden');
-            setTimeout(() => {
-                document.getElementById('home-screen').classList.remove('opacity-0', 'pointer-events-none');
-            }, 50);
+            if (!isTestModeActive) {
+                currentTrial = list[currentIndex];
+            } else {
+                currentTrial = testQueue[testIndex];
+            }
+
+            document.getElementById('slot-img-A').src = `images/${currentTrial.soundA}.png`;
+            document.getElementById('slot-img-B').src = `images/${currentTrial.soundB}.png`;
+            document.getElementById('slot-label-A').innerText = `${currentTrial.soundA}. ${soundLibrary[currentTrial.soundA] || ''}`;
+            document.getElementById('slot-label-B').innerText = `${currentTrial.soundB}. ${soundLibrary[currentTrial.soundB] || ''}`;
+
+            buildTrialModalGrid();
+            playTargetSound();
+        }
+
+        function playTargetSound() {
+            if (!currentTrial) return;
+            const targetSoundId = currentTrial.target === 'A' ? currentTrial.soundA : currentTrial.soundB;
+            activeAudio.src = `sounds/${targetSoundId}.wav`;
+            activeAudio.currentTime = 0;
+            activeAudio.play().catch(e => console.log("Audio play blocked/missing:", e));
+        }
+
+        function handleCardSelection(selectedChoice) {
+            const fbModal = document.getElementById('central-feedback');
+            const fbIcon = document.getElementById('feedback-icon-big');
+            fbModal.classList.remove('hidden');
+
+            const isCorrect = selectedChoice === currentTrial.target;
+
+            if (isCorrect) {
+                fbIcon.className = 'fas fa-check-circle text-green-500 animate-pop';
+                document.getElementById('sound-success').play().catch(e => {});
+                
+                setTimeout(() => {
+                    fbModal.classList.add('hidden');
+                    if (isTestModeActive) {
+                        testIndex++;
+                        if (testIndex >= testQueue.length) {
+                            alert("Test Completed Successfully!");
+                            isTestModeActive = false;
+                            document.getElementById('test-counter-badge').classList.add('hidden');
+                            loadStandardTrial(0);
+                        } else {
+                            document.getElementById('test-counter-badge').innerText = `${testIndex + 1}/10`;
+                            loadStandardTrial();
+                        }
+                    } else {
+                        currentIndex = (currentIndex + 1) % getActiveTrialsList().length;
+                        loadStandardTrial();
+                    }
+                }, 900);
+            } else {
+                fbIcon.className = 'fas fa-times-circle text-red-500 animate-pop';
+                setTimeout(() => {
+                    fbModal.classList.add('hidden');
+                }, 900);
+            }
+        }
+
+        function triggerTestMode() {
+            lockedPair = { soundA: currentTrial.soundA, soundB: currentTrial.soundB };
+            testQueue = [];
+            for (let i = 0; i < 10; i++) {
+                const target = Math.random() < 0.5 ? 'A' : 'B';
+                testQueue.push({
+                    soundA: lockedPair.soundA,
+                    soundB: lockedPair.soundB,
+                    target: target
+                });
+            }
+            isTestModeActive = true;
+            testIndex = 0;
+            document.getElementById('test-counter-badge').classList.remove('hidden');
+            document.getElementById('test-counter-badge').innerText = `1/10`;
+            loadStandardTrial();
+        }
+
+        function loadDurationTrial(forceIdx = null) {
+            if (forceIdx !== null) currentIndex = forceIdx;
+            currentTrial = durationTrials[currentIndex];
+
+            const subfolder = currentTrial.type; // 'long' or 'short'
+            activeAudio.src = `sounds/${subfolder}/${currentTrial.sound}.wav`;
+
+            document.getElementById('dur-card-img').src = `images/${currentTrial.sound}.png`;
+            document.getElementById('dur-item-title').innerText = `${currentTrial.sound}. ${soundLibrary[currentTrial.sound] || ''}`;
+
+            buildTrialModalGrid();
+            playDurationSound();
+        }
+
+        function playDurationSound() {
+            activeAudio.currentTime = 0;
+            activeAudio.play().catch(e => console.log("Duration audio play blocked/missing:", e));
+        }
+
+        function handleDurationAnswer(choiceType) {
+            const fbModal = document.getElementById('central-feedback');
+            const fbIcon = document.getElementById('feedback-icon-big');
+            fbModal.classList.remove('hidden');
+
+            const isCorrect = choiceType === currentTrial.type;
+
+            if (isCorrect) {
+                fbIcon.className = 'fas fa-check-circle text-green-500 animate-pop';
+                document.getElementById('sound-success').play().catch(e => {});
+                setTimeout(() => {
+                    fbModal.classList.add('hidden');
+                    currentIndex = (currentIndex + 1) % durationTrials.length;
+                    loadDurationTrial();
+                }, 900);
+            } else {
+                fbIcon.className = 'fas fa-times-circle text-red-500 animate-pop';
+                setTimeout(() => {
+                    fbModal.classList.add('hidden');
+                }, 900);
+            }
         }
 
         function toggleTrialModal(show) {
@@ -335,191 +433,46 @@
             }
         }
 
+        function closeTrialModal(e) {
+            toggleTrialModal(false);
+        }
+
         function buildTrialModalGrid() {
             const gridContainer = document.getElementById('trial-modal-grid');
             gridContainer.innerHTML = '';
             
-            const phaseTrials = discriminationPhases[currentPhase];
-            phaseTrials.forEach((trial, idx) => {
-                const btn = document.createElement('button');
-                btn.className = `flex flex-col items-center p-3 rounded-2xl border transition cursor-pointer bg-white hover:border-pastel-pink shadow-xs ${currentIndex === idx ? 'border-pastel-pink bg-pastel-pink/10 ring-1 ring-pastel-pink/30' : 'border-gray-100'}`;
-                btn.onclick = () => selectTrialFromModal(idx);
-                
-                btn.innerHTML = `
-                    <div class="flex items-center justify-center gap-1.5 mb-2">
-                        <div class="w-10 h-10 bg-gray-50 rounded-xl p-1 border border-gray-100 flex items-center justify-center">
-                            <img src="images/${trial.soundA}.png" alt="Sound A" class="w-full h-full object-contain pointer-events-none">
+            if (currentMode === 'duration') {
+                document.getElementById('modal-title').innerText = "Duration Catalog (50 Trials)";
+                durationTrials.forEach((trial, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = `flex flex-col items-center p-3 rounded-2xl border transition cursor-pointer bg-gray-50 hover:border-red-300 shadow-sm ${currentIndex === idx ? 'border-red-400 bg-red-50 ring-2 ring-red-100' : 'border-gray-200'}`;
+                    btn.onclick = () => { currentIndex = idx; toggleTrialModal(false); loadDurationTrial(); };
+                    btn.innerHTML = `
+                        <div class="w-12 h-12 bg-white rounded-xl p-1 border border-gray-100 flex items-center justify-center mb-1 shadow-xs">
+                            <img src="images/${trial.sound}.png" class="w-full h-full object-contain pointer-events-none">
                         </div>
-                        <i class="fas fa-arrow-right text-gray-300 text-xs"></i>
-                        <div class="w-10 h-10 bg-gray-50 rounded-xl p-1 border border-gray-100 flex items-center justify-center">
-                            <img src="images/${trial.soundB}.png" alt="Sound B" class="w-full h-full object-contain pointer-events-none">
+                        <span class="text-xs font-bold text-slate-700">Trial ${idx + 1}</span>
+                        <span class="text-[9px] text-gray-400 uppercase font-bold">${trial.type}</span>
+                    `;
+                    gridContainer.appendChild(btn);
+                });
+            } else {
+                document.getElementById('modal-title').innerText = currentMode === 'level1' ? "Level 1 Catalog" : "Level 2 Catalog";
+                const list = getActiveTrialsList();
+                list.forEach((trial, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = `flex flex-col items-center p-3 rounded-2xl border transition cursor-pointer bg-gray-50 hover:border-red-300 shadow-sm ${currentIndex === idx && !isTestModeActive ? 'border-red-400 bg-red-50 ring-2 ring-red-100' : 'border-gray-200'}`;
+                    btn.onclick = () => { isTestModeActive = false; document.getElementById('test-counter-badge').classList.add('hidden'); currentIndex = idx; toggleTrialModal(false); loadStandardTrial(); };
+                    btn.innerHTML = `
+                        <div class="flex items-center gap-1 mb-1">
+                            <div class="w-8 h-8 bg-white rounded-lg p-0.5 border flex items-center justify-center"><img src="images/${trial.soundA}.png" class="w-full h-full object-contain"></div>
+                            <div class="w-8 h-8 bg-white rounded-lg p-0.5 border flex items-center justify-center"><img src="images/${trial.soundB}.png" class="w-full h-full object-contain"></div>
                         </div>
-                    </div>
-                    <span class="text-xs font-bold text-slate-700">Trial ${idx + 1}</span>
-                    <span class="text-[10px] text-gray-400 truncate max-w-full font-medium">${trial.desc}</span>
-                `;
-                gridContainer.appendChild(btn);
-            });
-        }
-
-        function selectTrialFromModal(idx) {
-            currentIndex = idx;
-            toggleTrialModal(false);
-            loadTrial(true);
-        }
-
-        function toggleVisualHelp() {
-            isVisualHelpActive = !isVisualHelpActive;
-            const helpBtn = document.getElementById('help-toggle-btn');
-            const visualHints = document.getElementById('visual-hints');
-            
-            if (isVisualHelpActive) {
-                helpBtn.classList.add('bg-pastel-pink', 'text-white');
-                visualHints.classList.remove('hidden');
-                visualHints.classList.add('flex');
-            } else {
-                helpBtn.classList.remove('bg-pastel-pink', 'text-white');
-                visualHints.classList.remove('flex');
-                visualHints.classList.add('hidden');
-            }
-        }
-
-        function updateDurationBars() {
-            updateSingleDurationBar(1, audioA.duration || 2.0);
-            updateSingleDurationBar(2, audioB.duration || 2.0);
-        }
-
-        function updateSingleDurationBar(soundNum, duration) {
-            const bar = document.getElementById(`duration-bar-${soundNum}`);
-            const isLong = duration > 2.2 || (soundNum % 2 === 0);
-            
-            if (isLong) {
-                bar.className = 'w-7 sm:w-8 h-36 sm:h-44 bg-pastel-pink rounded-2xl transition-all duration-300 shadow-xs';
-            } else {
-                bar.className = 'w-7 sm:w-8 h-10 sm:h-12 bg-pastel-blue rounded-2xl transition-all duration-300 shadow-xs';
-            }
-        }
-
-        function loadTrial(forceIndex = false) {
-            const phaseTrials = discriminationPhases[currentPhase];
-            
-            if (!forceIndex) {
-                currentIndex = Math.floor(Math.random() * phaseTrials.length);
-            }
-            
-            currentTrial = phaseTrials[currentIndex];
-            
-            audioA.src = `sounds/${currentTrial.soundA}.wav`;
-            audioB.src = `sounds/${currentTrial.soundB}.wav`;
-            
-            audioA.onloadedmetadata = () => updateSingleDurationBar(1, audioA.duration);
-            audioB.onloadedmetadata = () => updateSingleDurationBar(2, audioB.duration);
-            
-            updateDurationBars();
-
-            document.getElementById('hint-img-1').src = `images/${currentTrial.soundA}.png`;
-            document.getElementById('hint-img-2').src = `images/${currentTrial.soundB}.png`;
-            
-            buildTrialModalGrid();
-            
-            document.getElementById('audio-btn-1').classList.remove('ring-4', 'ring-red-300', 'scale-105');
-            document.getElementById('audio-btn-2').classList.remove('ring-4', 'ring-red-300', 'scale-105');
-        }
-
-        async function playSingleSound(soundNumber) {
-            if (isPlayingSequence) return;
-            
-            const btn = document.getElementById('audio-btn-' + soundNumber);
-            const icon = document.getElementById('icon-' + soundNumber);
-            const targetAudio = soundNumber === 1 ? audioA : audioB;
-            
-            btn.classList.add('ring-4', 'ring-red-300', 'scale-105');
-            icon.className = 'fas fa-volume-low text-lg sm:text-xl animate-pulse';
-            
-            targetAudio.currentTime = 0;
-            try {
-                await targetAudio.play();
-                await new Promise((resolve) => {
-                    targetAudio.onended = resolve;
+                        <span class="text-xs font-bold text-slate-700">Trial ${idx + 1}</span>
+                    `;
+                    gridContainer.appendChild(btn);
                 });
-            } catch (e) {
-                console.log(e);
-            } finally {
-                btn.classList.remove('ring-4', 'ring-red-300', 'scale-105');
-                icon.className = 'fas fa-volume-high text-lg sm:text-xl';
             }
-        }
-
-        async function playTrialSequence() {
-            if (isPlayingSequence) return;
-            isPlayingSequence = true;
-            
-            const btn1 = document.getElementById('audio-btn-1');
-            const btn2 = document.getElementById('audio-btn-2');
-            const icon1 = document.getElementById('icon-1');
-            const icon2 = document.getElementById('icon-2');
-            const headerPlayBtn = document.getElementById('header-play-btn');
-            
-            headerPlayBtn.classList.add('opacity-50', 'pointer-events-none');
-            
-            try {
-                btn1.classList.add('ring-4', 'ring-red-300', 'scale-105');
-                icon1.className = 'fas fa-volume-low text-lg sm:text-xl animate-pulse';
-                
-                audioA.currentTime = 0;
-                await audioA.play();
-                
-                await new Promise((resolve) => {
-                    audioA.onended = resolve;
-                });
-                
-                btn1.classList.remove('ring-4', 'ring-red-300', 'scale-105');
-                icon1.className = 'fas fa-volume-high text-lg sm:text-xl';
-                
-                await new Promise(resolve => setTimeout(resolve, 600));
-                
-                btn2.classList.add('ring-4', 'ring-red-300', 'scale-105');
-                icon2.className = 'fas fa-volume-low text-lg sm:text-xl animate-pulse';
-                
-                audioB.currentTime = 0;
-                await audioB.play();
-                
-                await new Promise((resolve) => {
-                    audioB.onended = resolve;
-                });
-                
-                btn2.classList.remove('ring-4', 'ring-red-300', 'scale-105');
-                icon2.className = 'fas fa-volume-high text-lg sm:text-xl';
-                
-            } catch (e) {
-                console.log(e);
-            } finally {
-                btn1.classList.remove('ring-4', 'ring-red-300', 'scale-105');
-                btn2.classList.remove('ring-4', 'ring-red-300', 'scale-105');
-                icon1.className = 'fas fa-volume-high text-lg sm:text-xl';
-                icon2.className = 'fas fa-volume-high text-lg sm:text-xl';
-                headerPlayBtn.classList.remove('opacity-50', 'pointer-events-none');
-                isPlayingSequence = false;
-            }
-        }
-
-        function handleAnswer(userChoice) {
-            const fbModal = document.getElementById('central-feedback');
-            const fbIcon = document.getElementById('feedback-icon-big');
-            
-            fbModal.classList.remove('hidden');
-            
-            if (userChoice === currentTrial.type) {
-                fbIcon.className = 'fas fa-check-circle text-green-500 animate-pop';
-                document.getElementById('sound-success').play().catch(e => console.log(e));
-                setTimeout(() => loadTrial(false), 1000);
-            } else {
-                fbIcon.className = 'fas fa-times-circle text-red-500 animate-pop';
-            }
-            
-            setTimeout(() => { 
-                fbModal.classList.add('hidden'); 
-            }, 900);
         }
     </script>
 </body>
