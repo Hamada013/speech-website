@@ -37,7 +37,7 @@
     body {
       font-family: 'Tajawal', sans-serif;
       background-color: #FAFAF9;
-      touch-action: manipulation;
+      touch-action: manipulation; /* Optimizes tap delays on mobile */
     }
     .card-square { aspect-ratio: 1 / 1; }
     
@@ -57,20 +57,24 @@
     #dragGhost {
       position: fixed;
       pointer-events: none;
-      z-index: 1000;
+      z-index: 9999;
       transform: translate(-50%, -50%);
       display: none;
-      opacity: 0.92;
+      opacity: 0.95;
     }
+    
+    /* Utility to hide image fallbacks gracefully */
+    .fallback-text { animation: popIn 0.2s ease-out; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between text-gray-700 select-none bg-pastelBg">
 
+  <!-- Floating Ghost Element for Mobile Dragging -->
   <div id="dragGhost" class="w-32 h-32 bg-white border-4 border-sky-400 rounded-3xl shadow-xl flex flex-col items-center justify-between p-2">
-    <div class="w-full flex-grow flex items-center justify-center overflow-hidden">
-      <img id="ghostImg" src="" alt="Ghost" class="max-h-full max-w-full object-contain pointer-events-none" />
+    <div class="w-full flex-grow flex items-center justify-center overflow-hidden pointer-events-none">
+      <img id="ghostImg" src="" alt="Ghost" data-letter="" class="max-h-full max-w-full object-contain pointer-events-none" onerror="handleGameImgError(this)" />
     </div>
-    <span id="ghostLabel" class="text-xl font-black text-sky-800"></span>
+    <span id="ghostLabel" class="text-2xl font-black text-sky-800 pointer-events-none"></span>
   </div>
 
   <header class="bg-white/85 backdrop-blur-md border-b border-sky-100 sticky top-0 z-30">
@@ -98,6 +102,7 @@
 
   <main class="max-w-3xl w-full mx-auto p-4 flex-grow flex flex-col justify-start space-y-4">
 
+    <!-- Game Tabs -->
     <div class="flex items-center justify-center p-1.5 bg-white rounded-2xl border border-sky-100 shadow-sm max-w-md mx-auto w-full">
       <button 
         id="tab-memory" 
@@ -118,6 +123,7 @@
       </button>
     </div>
 
+    <!-- GAME 1: MEMORY -->
     <section id="game-memory-view" class="space-y-4">
       <div class="flex items-center justify-between bg-white p-3 rounded-2xl border border-purple-100 shadow-sm">
         <div>
@@ -137,6 +143,7 @@
       </div>
     </section>
 
+    <!-- GAME 2: MATCH AND DRAG -->
     <section id="game-drag-view" class="hidden space-y-4">
       <div class="flex items-center justify-between bg-white p-3 rounded-2xl border border-sky-100 shadow-sm flex-wrap gap-2">
         <div>
@@ -177,30 +184,27 @@
           البطاقة المستهدفة (اضغط للاستماع أو اضغط مطولاً للسحب)
         </span>
 
+        <!-- Target Card Container -->
         <div 
           id="targetCard" 
           draggable="true" 
-          class="w-32 h-32 md:w-36 md:h-36 bg-white border-4 border-dashed border-sky-300 rounded-3xl shadow-sm flex flex-col items-center justify-between p-3 cursor-grab active:cursor-grabbing hover:border-sky-400 transition-all relative overflow-hidden"
+          class="w-32 h-32 md:w-36 md:h-36 bg-white border-4 border-dashed border-sky-300 rounded-3xl shadow-sm flex flex-col items-center justify-between p-3 cursor-grab active:cursor-grabbing hover:border-sky-400 transition-all relative overflow-hidden touch-none"
         >
-          <div class="absolute top-2 left-2 bg-sky-50 text-sky-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-sky-100 z-10">
-            <i class="fa-solid fa-volume-high"></i>
-          </div>
-          <div id="targetImgContainer" class="w-full flex-grow flex items-center justify-center overflow-hidden">
-            <img id="targetImg" src="" alt="Target" class="max-h-full max-w-full object-contain pointer-events-none" onerror="handleGameImgError(this)"[cite: 4] />
-          </div>
-          <span id="targetLabel" class="text-2xl font-black text-gray-800 pointer-events-none z-10"></span>
+          <!-- Dynamic Content Injected via JS -->
         </div>
       </div>
 
       <div class="pt-2">
         <p class="text-center text-xs font-bold text-gray-500 mb-2">الخيارات الثلاثة (اضغط للاستماع للصوت):</p>
         <div id="dragOptionsGrid" class="grid grid-cols-3 gap-2.5 md:gap-4 max-w-md mx-auto w-full">
+          <!-- Options Injected via JS -->
         </div>
       </div>
     </section>
 
   </main>
 
+  <!-- Settings Modal -->
   <div id="settingsModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
     <div class="modal-pop bg-white rounded-3xl p-5 max-w-md w-full border border-sky-100 shadow-xl space-y-4">
       <div class="flex items-center justify-between border-b border-sky-100 pb-3">
@@ -227,7 +231,7 @@
         </div>
 
         <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-gray-700">وضع إخفاء الصور (Cover Mode - إخفاء الصور دائماً وسماع الصوت فقط عند النقر):</span>
+          <span class="text-xs font-bold text-gray-700">وضع إخفاء الصور (Cover Mode - إخفاء الصور دائماً):</span>
           <input type="checkbox" id="coverModeCheckbox" class="w-4 h-4 text-sky-600 rounded border-gray-300 focus:ring-sky-500 cursor-pointer" />
         </div>
       </div>
@@ -243,6 +247,7 @@
     </div>
   </div>
 
+  <!-- Feedback Overlay -->
   <div id="feedbackOverlay" class="fixed inset-0 pointer-events-none z-50 hidden flex items-center justify-center">
     <div id="feedbackBox" class="modal-pop p-5 rounded-3xl flex items-center justify-center shadow-lg bg-white/95 border-2">
     </div>
@@ -274,7 +279,10 @@
     let isLockedSetEnabled = true;
     let isCoverMode = false;
 
+    // --- Audio Utilities ---
     let audioCtx = null;
+    let lastAudioPlayTime = 0;
+
     function getAudioContext() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -286,13 +294,18 @@
     }
 
     function playAudioForLetter(letter) {
+      const now = Date.now();
+      if (now - lastAudioPlayTime < 250) return; // Prevent double-triggering on tap
+      lastAudioPlayTime = now;
+      
       const soundIndex = LETTER_MAP[letter] || 1;
       const audioPath = `./sounds/${soundIndex}.wav`;
       const audio = new Audio(audioPath);
+      
       audio.play().catch(() => {
+        // Fallback to beep if user hasn't fully interacted or sound is missing
         playFallbackBeep(300 + soundIndex * 15, 0.15);
       });
-      return audio;
     }
 
     function playSuccessCue() {
@@ -318,14 +331,23 @@
         gain.connect(ctx.destination);
         osc.start();
         osc.stop(ctx.currentTime + duration);
-      } catch (e) {}
+      } catch (e) {
+        console.warn("Fallback beep failed (likely audio context blocked).");
+      }
     }
 
+    // --- Critical Error Handling for Missing Images ---
+    // Instead of replacing the DOM (which crashes future rounds), we hide the img and inject a safe fallback text div
     function handleGameImgError(imgElem) {
-      const letter = imgElem.dataset.letter || 'ص';
+      const letter = imgElem.dataset.letter || '?';
+      imgElem.style.display = 'none'; // Hide broken image cleanly
+      
       const parent = imgElem.parentElement;
-      if (parent) {
-        parent.innerHTML = `<div class="text-3xl md:text-4xl font-black text-sky-400 flex items-center justify-center w-full h-full">${letter}</div>`;
+      if (parent && !parent.querySelector('.fallback-text')) {
+         const fallback = document.createElement('div');
+         fallback.className = 'fallback-text text-5xl md:text-6xl font-black text-sky-400 flex items-center justify-center w-full h-full pointer-events-none';
+         fallback.textContent = letter;
+         parent.appendChild(fallback);
       }
     }
 
@@ -368,8 +390,10 @@
       }
     }
 
+    // --- Cover Mode Utilities ---
     function toggleEyeCoverMode() {
       isCoverMode = !isCoverMode;
+      document.getElementById('coverModeCheckbox').checked = isCoverMode; // Keep synced
       updateCoverModeUI();
     }
 
@@ -384,43 +408,18 @@
         eyeIcon.className = 'fa-solid fa-eye text-base';
         toggleBtn.classList.remove('bg-rose-50', 'border-rose-200');
       }
-
       applyCoverModeToCards();
     }
 
     function applyCoverModeToCards() {
-      const targetImgContainer = document.getElementById('targetImgContainer');
-      const targetLabel = document.getElementById('targetLabel');
-      
-      if (targetImgContainer && targetLabel) {
-        if (isCoverMode) {
-          targetImgContainer.style.opacity = '0';
-          targetLabel.style.opacity = '0';
-        } else {
-          targetImgContainer.style.opacity = '1';
-          targetLabel.style.opacity = '1';
-        }
-      }
-
-      const optionsGrid = document.getElementById('dragOptionsGrid');
-      if (optionsGrid) {
-        const optionCards = optionsGrid.children;
-        for (let card of optionCards) {
-          const imgWrap = card.querySelector('.option-img-container');
-          const lblWrap = card.querySelector('.option-label');
-          if (imgWrap && lblWrap) {
-            if (isCoverMode) {
-              imgWrap.style.opacity = '0';
-              lblWrap.style.opacity = '0';
-            } else {
-              imgWrap.style.opacity = '1';
-              lblWrap.style.opacity = '1';
-            }
-          }
-        }
-      }
+      const elementsToHide = document.querySelectorAll('.target-content-wrapper, .option-content-wrapper');
+      elementsToHide.forEach(el => {
+        el.style.opacity = isCoverMode ? '0' : '1';
+        el.style.transition = 'opacity 0.2s';
+      });
     }
 
+    // --- Settings Modal ---
     function openSettingsModal() {
       buildSettingsChecklist();
       document.getElementById('lockSetCheckbox').checked = isLockedSetEnabled;
@@ -477,7 +476,7 @@
     function initMemoryGame() {
       const grid = document.getElementById('memoryGrid');
       if (!grid) return;
-      grid.innerHTML = '';
+      grid.innerHTML = ''; 
       flippedCards = [];
       matchedPairs = 0;
       memoryLock = false;
@@ -495,19 +494,18 @@
 
       memoryCards.forEach((card, index) => {
         const cardElem = document.createElement('div');
-        cardElem.className = 'card-square perspective-1000 cursor-pointer';
+        cardElem.className = 'card-square perspective-1000 cursor-pointer touch-manipulation';
         cardElem.id = `mem-card-${index}`;
-
         const imgIdx = LETTER_MAP[card.letter] || 1;
 
         cardElem.innerHTML = `
-          <div id="mem-card-inner-${index}" class="w-full h-full relative transform-style-3d transition-transform duration-300">
-            <div class="absolute inset-0 bg-babyPurple border-2 border-purple-200 rounded-2xl flex flex-col items-center justify-center shadow-sm backface-hidden">
+          <div id="mem-card-inner-${index}" class="w-full h-full relative transform-style-3d transition-transform duration-300 pointer-events-none">
+            <div class="absolute inset-0 bg-babyPurple border-2 border-purple-200 rounded-2xl flex flex-col items-center justify-center shadow-sm backface-hidden pointer-events-none">
               <i class="fa-solid fa-puzzle-piece text-purple-300 text-3xl"></i>
             </div>
-            <div class="absolute inset-0 bg-white border-2 border-purple-300 rounded-2xl flex flex-col items-center justify-between p-2 shadow-sm backface-hidden rotate-y-180">
+            <div class="absolute inset-0 bg-white border-2 border-purple-300 rounded-2xl flex flex-col items-center justify-between p-2 shadow-sm backface-hidden rotate-y-180 pointer-events-none">
               <div class="w-full flex-grow flex items-center justify-center overflow-hidden">
-                <img src="./images/${imgIdx}.png" data-letter="${card.letter}" class="max-h-full max-w-full object-contain pointer-events-none" onerror="handleGameImgError(this)"[cite: 4] />
+                <img src="./images/${imgIdx}.png" data-letter="${card.letter}" class="max-h-full max-w-full object-contain" onerror="handleGameImgError(this)" />
               </div>
               <span class="text-xl md:text-2xl font-black text-gray-800 mt-0.5">${card.letter}</span>
             </div>
@@ -526,6 +524,8 @@
 
       card.isFlipped = true;
       document.getElementById(`mem-card-inner-${index}`).classList.add('rotate-y-180');
+      
+      getAudioContext();
       playAudioForLetter(card.letter);
 
       flippedCards.push({ index, letter: card.letter });
@@ -545,9 +545,7 @@
             memoryLock = false;
 
             if (matchedPairs === 6) {
-              setTimeout(() => {
-                alert('ممتاز! أتممت لعبة الذاكرة بنجاح 🎉');
-              }, 600);
+              setTimeout(() => alert('ممتاز! أتممت لعبة الذاكرة بنجاح 🎉'), 600);
             }
           }, 400);
 
@@ -572,36 +570,41 @@
     let dragOptions = [];
 
     function initDragGame() {
-      const targetImg = document.getElementById('targetImg');
-      const targetLabel = document.getElementById('targetLabel');
       const targetCard = document.getElementById('targetCard');
       const optionsGrid = document.getElementById('dragOptionsGrid');
+      if (!targetCard || !optionsGrid) return;
 
-      if (!targetImg || !targetLabel || !targetCard || !optionsGrid) return;
-
+      // Select Target
       let activePool = isLockedSetEnabled ? userLockedSet : ALL_LETTERS;
       if (!activePool || activePool.length === 0) activePool = ALL_LETTERS;
-
       targetLetter = activePool[Math.floor(Math.random() * activePool.length)];
 
+      // Select Distractors
       let otherLetters = ALL_LETTERS.filter(l => l !== targetLetter);
       otherLetters.sort(() => 0.5 - Math.random());
-      let distractors = otherLetters.slice(0, 2);
-
-      dragOptions = [targetLetter, ...distractors].sort(() => 0.5 - Math.random());
-
+      dragOptions = [targetLetter, ...otherLetters.slice(0, 2)].sort(() => 0.5 - Math.random());
+      
       const targetImgIdx = LETTER_MAP[targetLetter] || 1;
-      targetImg.src = `./images/${targetImgIdx}.png`;
-      targetImg.dataset.letter = targetLetter;
-      targetLabel.textContent = targetLetter;
 
-      targetCard.className = 'w-32 h-32 md:w-36 md:h-36 bg-white border-4 border-dashed border-sky-300 rounded-3xl shadow-sm flex flex-col items-center justify-between p-3 cursor-grab active:cursor-grabbing hover:border-sky-400 transition-all relative overflow-hidden';
+      // Build DOM entirely from scratch to avoid stale or broken structures
+      targetCard.innerHTML = `
+        <div class="absolute top-2 left-2 bg-sky-50 text-sky-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-sky-100 z-10 pointer-events-none">
+          <i class="fa-solid fa-volume-high"></i>
+        </div>
+        <div class="target-content-wrapper w-full flex-grow flex flex-col items-center justify-between pointer-events-none transition-opacity">
+          <div class="w-full flex-grow flex items-center justify-center overflow-hidden">
+            <img src="./images/${targetImgIdx}.png" data-letter="${targetLetter}" class="max-h-full max-w-full object-contain pointer-events-none" onerror="handleGameImgError(this)" />
+          </div>
+          <span class="text-3xl font-black text-gray-800 pointer-events-none z-10 mt-1">${targetLetter}</span>
+        </div>
+      `;
 
       targetCard.onclick = () => {
         getAudioContext();
         playAudioForLetter(targetLetter);
       };
 
+      // Desktop Native Drag Setup
       targetCard.ondragstart = (e) => {
         e.dataTransfer.setData('text/plain', targetLetter);
         playAudioForLetter(targetLetter);
@@ -609,23 +612,25 @@
 
       setupTouchDragging(targetCard);
 
+      // Build Options Grid from Scratch
       optionsGrid.innerHTML = '';
-
       dragOptions.forEach((letter) => {
         const optionElem = document.createElement('div');
         const imgIdx = LETTER_MAP[letter] || 1;
 
-        optionElem.className = 'card-square bg-white border-2 border-sky-200 rounded-3xl shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col items-center justify-between p-3 relative active:scale-95 option-drop-target';
+        optionElem.className = 'card-square bg-white border-2 border-sky-200 rounded-3xl shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col items-center justify-between p-3 relative active:scale-95 option-drop-target touch-none';
         optionElem.dataset.letter = letter;
         
         optionElem.innerHTML = `
-          <div class="absolute top-2 left-2 bg-sky-50 text-sky-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-sky-100 z-10">
+          <div class="absolute top-2 left-2 bg-sky-50 text-sky-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-sky-100 z-10 pointer-events-none">
             <i class="fa-solid fa-volume-high"></i>
           </div>
-          <div class="option-img-container w-full flex-grow flex items-center justify-center overflow-hidden">
-            <img src="./images/${imgIdx}.png" data-letter="${letter}" class="max-h-full max-w-full object-contain pointer-events-none" onerror="handleGameImgError(this)"[cite: 4] />
+          <div class="option-content-wrapper w-full flex-grow flex flex-col items-center justify-between pointer-events-none transition-opacity">
+            <div class="w-full flex-grow flex items-center justify-center overflow-hidden">
+              <img src="./images/${imgIdx}.png" data-letter="${letter}" class="max-h-full max-w-full object-contain pointer-events-none" onerror="handleGameImgError(this)" />
+            </div>
+            <span class="text-2xl font-black text-gray-800 pointer-events-none mt-1 z-10">${letter}</span>
           </div>
-          <span class="option-label text-2xl font-black text-gray-800 pointer-events-none mt-1 z-10">${letter}</span>
         `;
 
         optionElem.onclick = () => {
@@ -633,15 +638,14 @@
           playAudioForLetter(letter);
         };
 
+        // Desktop Drop Events
         optionElem.ondragover = (e) => {
           e.preventDefault();
           optionElem.classList.add('border-sky-500', 'bg-sky-50');
         };
-
         optionElem.ondragleave = () => {
           optionElem.classList.remove('border-sky-500', 'bg-sky-50');
         };
-
         optionElem.ondrop = (e) => {
           e.preventDefault();
           optionElem.classList.remove('border-sky-500', 'bg-sky-50');
@@ -655,50 +659,72 @@
       applyCoverModeToCards();
     }
 
+    // --- Custom Mobile Touch & Drag Emulation ---
     function setupTouchDragging(cardElem) {
-      const ghost = document.getElementById('dragGhost');
-      const ghostImg = document.getElementById('ghostImg');
-      const ghostLabel = document.getElementById('ghostLabel');
-
       let isDragging = false;
+      let startX = 0, startY = 0;
+      const dragThreshold = 10; // Pixel buffer to differentiate taps vs swipes
 
-      cardElem.ontouchstart = (e) => {
+      cardElem.addEventListener('touchstart', (e) => {
         getAudioContext();
-        playAudioForLetter(targetLetter);
-        
+        // Do not prevent default here so 'onclick' can still fire if it's just a tap!
         const touch = e.touches[0];
-        isDragging = true;
-        const targetImgIdx = LETTER_MAP[targetLetter] || 1;
-        ghostImg.src = `./images/${targetImgIdx}.png`;
-        ghostLabel.textContent = targetLetter;
-
-        ghost.style.left = `${touch.clientX}px`;
-        ghost.style.top = `${touch.clientY}px`;
-        ghost.style.display = 'flex';
-      };
-
-      cardElem.ontouchmove = (e) => {
-        if (!isDragging) return;
-        const touch = e.touches[0];
-        ghost.style.left = `${touch.clientX}px`;
-        ghost.style.top = `${touch.clientY}px`;
-
-        const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-        const dropTarget = elemBelow ? elemBelow.closest('.option-drop-target') : null;
-
-        document.querySelectorAll('.option-drop-target').forEach(el => {
-          el.classList.remove('border-sky-500', 'bg-sky-50', 'ring-4', 'ring-sky-200');
-        });
-
-        if (dropTarget) {
-          dropTarget.classList.add('border-sky-500', 'bg-sky-50', 'ring-4', 'ring-sky-200');
-        }
-      };
-
-      cardElem.ontouchend = (e) => {
-        if (!isDragging) return;
+        startX = touch.clientX;
+        startY = touch.clientY;
         isDragging = false;
-        ghost.style.display = 'none';
+      }, { passive: true });
+
+      cardElem.addEventListener('touchmove', (e) => {
+        const touch = e.touches[0];
+        const dx = Math.abs(touch.clientX - startX);
+        const dy = Math.abs(touch.clientY - startY);
+
+        // If finger moves beyond threshold, initialize Drag Ghost
+        if (!isDragging && (dx > dragThreshold || dy > dragThreshold)) {
+          isDragging = true;
+          const ghost = document.getElementById('dragGhost');
+          const ghostImg = document.getElementById('ghostImg');
+          const ghostLabel = document.getElementById('ghostLabel');
+          const targetImgIdx = LETTER_MAP[targetLetter] || 1;
+          
+          ghostImg.dataset.letter = targetLetter;
+          ghostImg.src = `./images/${targetImgIdx}.png`; 
+          ghostLabel.textContent = targetLetter;
+          
+          // Re-show image if previous run hid it because of error
+          ghostImg.style.display = 'block'; 
+          const existingFallback = ghost.querySelector('.fallback-text');
+          if (existingFallback) existingFallback.remove();
+
+          ghost.style.display = 'flex';
+          playAudioForLetter(targetLetter); // Play audio on drag start
+        }
+
+        if (isDragging) {
+          e.preventDefault(); // Take control over scrolling ONLY when dragging
+          const ghost = document.getElementById('dragGhost');
+          ghost.style.left = `${touch.clientX}px`;
+          ghost.style.top = `${touch.clientY}px`;
+
+          // Calculate hover state dynamically
+          const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+          const dropTarget = elemBelow ? elemBelow.closest('.option-drop-target') : null;
+
+          document.querySelectorAll('.option-drop-target').forEach(el => {
+            el.classList.remove('border-sky-500', 'bg-sky-50', 'ring-4', 'ring-sky-200');
+          });
+
+          if (dropTarget) {
+            dropTarget.classList.add('border-sky-500', 'bg-sky-50', 'ring-4', 'ring-sky-200');
+          }
+        }
+      }, { passive: false });
+
+      cardElem.addEventListener('touchend', (e) => {
+        if (!isDragging) return; // If wasn't dragging, it was a tap (onclick fires natively)
+        
+        isDragging = false;
+        document.getElementById('dragGhost').style.display = 'none';
 
         const touch = e.changedTouches[0];
         const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -712,7 +738,7 @@
           const chosenLetter = dropTarget.dataset.letter;
           checkDragMatch(targetLetter, chosenLetter);
         }
-      };
+      });
     }
 
     function checkDragMatch(targetVal, chosenVal) {
