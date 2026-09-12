@@ -186,7 +186,7 @@
             <i class="fa-solid fa-volume-high"></i>
           </div>
           <div id="targetImgContainer" class="w-full flex-grow flex items-center justify-center overflow-hidden">
-            <img id="targetImg" src="" alt="Target" class="max-h-full max-w-full object-contain pointer-events-none" onerror="handleGameImgError(this)" />
+            <img id="targetImg" src="" alt="Target" class="max-h-full max-w-full object-contain pointer-events-none" onerror="handleGameImgError(this)"[cite: 4] />
           </div>
           <span id="targetLabel" class="text-2xl font-black text-gray-800 pointer-events-none z-10"></span>
         </div>
@@ -274,6 +274,17 @@
     let isLockedSetEnabled = true;
     let isCoverMode = false;
 
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
     function playAudioForLetter(letter) {
       const soundIndex = LETTER_MAP[letter] || 1;
       const audioPath = `./sounds/${soundIndex}.wav`;
@@ -297,7 +308,7 @@
 
     function playFallbackBeep(freq, duration) {
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const ctx = getAudioContext();
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.frequency.value = freq;
@@ -465,6 +476,7 @@
 
     function initMemoryGame() {
       const grid = document.getElementById('memoryGrid');
+      if (!grid) return;
       grid.innerHTML = '';
       flippedCards = [];
       matchedPairs = 0;
@@ -495,7 +507,7 @@
             </div>
             <div class="absolute inset-0 bg-white border-2 border-purple-300 rounded-2xl flex flex-col items-center justify-between p-2 shadow-sm backface-hidden rotate-y-180">
               <div class="w-full flex-grow flex items-center justify-center overflow-hidden">
-                <img src="./images/${imgIdx}.png" data-letter="${card.letter}" class="max-h-full max-w-full object-contain pointer-events-none" onerror="handleGameImgError(this)" />
+                <img src="./images/${imgIdx}.png" data-letter="${card.letter}" class="max-h-full max-w-full object-contain pointer-events-none" onerror="handleGameImgError(this)"[cite: 4] />
               </div>
               <span class="text-xl md:text-2xl font-black text-gray-800 mt-0.5">${card.letter}</span>
             </div>
@@ -560,6 +572,13 @@
     let dragOptions = [];
 
     function initDragGame() {
+      const targetImg = document.getElementById('targetImg');
+      const targetLabel = document.getElementById('targetLabel');
+      const targetCard = document.getElementById('targetCard');
+      const optionsGrid = document.getElementById('dragOptionsGrid');
+
+      if (!targetImg || !targetLabel || !targetCard || !optionsGrid) return;
+
       let activePool = isLockedSetEnabled ? userLockedSet : ALL_LETTERS;
       if (!activePool || activePool.length === 0) activePool = ALL_LETTERS;
 
@@ -572,30 +591,24 @@
       dragOptions = [targetLetter, ...distractors].sort(() => 0.5 - Math.random());
 
       const targetImgIdx = LETTER_MAP[targetLetter] || 1;
-      const targetImg = document.getElementById('targetImg');
       targetImg.src = `./images/${targetImgIdx}.png`;
       targetImg.dataset.letter = targetLetter;
-      document.getElementById('targetLabel').textContent = targetLetter;
+      targetLabel.textContent = targetLetter;
 
-      const targetCard = document.getElementById('targetCard');
       targetCard.className = 'w-32 h-32 md:w-36 md:h-36 bg-white border-4 border-dashed border-sky-300 rounded-3xl shadow-sm flex flex-col items-center justify-between p-3 cursor-grab active:cursor-grabbing hover:border-sky-400 transition-all relative overflow-hidden';
 
-      // Clicking / tapping target card plays audio ONLY without revealing or submitting
       targetCard.onclick = () => {
+        getAudioContext();
         playAudioForLetter(targetLetter);
       };
 
-      // Desktop HTML5 drag support
       targetCard.ondragstart = (e) => {
         e.dataTransfer.setData('text/plain', targetLetter);
         playAudioForLetter(targetLetter);
       };
 
-      // Mobile Touch Drag and Drop Support (Press and Hold)
       setupTouchDragging(targetCard);
 
-      // Render Options Grid (3 Cards)
-      const optionsGrid = document.getElementById('dragOptionsGrid');
       optionsGrid.innerHTML = '';
 
       dragOptions.forEach((letter) => {
@@ -610,17 +623,16 @@
             <i class="fa-solid fa-volume-high"></i>
           </div>
           <div class="option-img-container w-full flex-grow flex items-center justify-center overflow-hidden">
-            <img src="./images/${imgIdx}.png" data-letter="${letter}" class="max-h-full max-w-full object-contain pointer-events-none" onerror="handleGameImgError(this)" />
+            <img src="./images/${imgIdx}.png" data-letter="${letter}" class="max-h-full max-w-full object-contain pointer-events-none" onerror="handleGameImgError(this)"[cite: 4] />
           </div>
           <span class="option-label text-2xl font-black text-gray-800 pointer-events-none mt-1 z-10">${letter}</span>
         `;
 
-        // Tapping option cards plays audio ONLY without revealing, submitting, or giving feedback
         optionElem.onclick = () => {
+          getAudioContext();
           playAudioForLetter(letter);
         };
 
-        // Desktop HTML5 drop targets
         optionElem.ondragover = (e) => {
           e.preventDefault();
           optionElem.classList.add('border-sky-500', 'bg-sky-50');
@@ -651,6 +663,7 @@
       let isDragging = false;
 
       cardElem.ontouchstart = (e) => {
+        getAudioContext();
         playAudioForLetter(targetLetter);
         
         const touch = e.touches[0];
