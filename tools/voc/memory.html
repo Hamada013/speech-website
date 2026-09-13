@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>لعبة الذاكرة - تطبيق حمادة</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        baby: {
+                            blueLight: '#EBF8FF',
+                            blue: '#E0F2FE',
+                            blueMed: '#38BDF8',
+                            blueDark: '#0284C7',
+                            mintLight: '#ECFDF5',
+                            mint: '#D1FAE5',
+                            mintMed: '#34D399',
+                            mintDark: '#059669',
+                            bg: '#F8FAFC',
+                            textDark: '#0F172A',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 14px 0 rgba(2, 132, 199, 0.12)',
+                        'soft-mint': '0 4px 14px 0 rgba(5, 150, 105, 0.12)',
+                        'glow-gold': '0 0 25px rgba(251, 191, 36, 0.6)',
+                    },
+                    animation: {
+                        'star-celebrate': 'starCelebrate 0.8s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        starCelebrate: {
+                            '0%': { transform: 'scale(1) rotate(-5deg)' },
+                            '100%': { transform: 'scale(1.15) rotate(5deg)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F8FAFC;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            overflow: hidden;
+            height: 100vh;
+            height: 100dvh;
+        }
+
+        .game-workspace {
+            height: calc(100dvh - 68px);
+            max-height: calc(100dvh - 68px);
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .modal-backdrop {
+            background-color: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="text-baby-textDark font-sans h-full w-full flex flex-col antialiased bg-slate-50 items-center justify-center">
+
+    <div class="w-full h-full max-w-7xl mx-auto flex flex-col shadow-xl bg-white relative overflow-hidden">
+
+        <div id="toast-container" class="fixed top-3 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-[90%] max-w-sm pointer-events-none"></div>
+
+        <!-- شاشة إعدادات لعبة الذاكرة (مطابقة تماماً لتصميم rapid.html بشريط جانبي للفئات) -->
+        <div id="category-select-view" class="h-full w-full flex flex-col bg-gradient-to-b from-baby-blueLight via-white to-baby-mintLight overflow-hidden">
+            <!-- شريط علوي -->
+            <header class="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <a href="games.html" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition active:scale-95 flex-shrink-0">
+                        <i class="fas fa-home text-lg"></i>
+                    </a>
+                    <h1 class="text-lg sm:text-xl font-black text-baby-blueDark">لعبة الذاكرة - الإعدادات</h1>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <!-- اختيار عدد البطاقات -->
+                    <div class="hidden sm:flex items-center gap-2 bg-slate-50 p-1 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-600 px-2">عدد البطاقات:</span>
+                        <button onclick="memoryApp.setCardCount(4)" id="btn-count-4" class="count-btn px-3 py-1 rounded-lg text-xs font-black transition border border-baby-blueMed bg-baby-blueLight text-baby-blueDark">4</button>
+                        <button onclick="memoryApp.setCardCount(6)" id="btn-count-6" class="count-btn px-3 py-1 rounded-lg text-xs font-black transition border border-slate-200 bg-white text-slate-600">6</button>
+                        <button onclick="memoryApp.setCardCount(9)" id="btn-count-9" class="count-btn px-3 py-1 rounded-lg text-xs font-black transition border border-slate-200 bg-white text-slate-600">9</button>
+                    </div>
+
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="memoryApp.selectAllCategories(true)" class="text-xs font-bold bg-baby-blue text-baby-blueDark px-3 py-1.5 rounded-xl hover:bg-sky-200 transition">تحديد الكل</button>
+                        <button onclick="memoryApp.selectAllCategories(false)" class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-xl hover:bg-slate-200 transition">إلغاء الكل</button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- محتوى رئيسي مقسم لشريط جانبي وفضاء عرض العناصر (مطابق لـ rapid.html) -->
+            <div class="flex-grow flex overflow-hidden">
+                <!-- الشريط الجانبي للفئات (قابل للتمرير) -->
+                <aside class="w-64 sm:w-72 bg-white border-l border-slate-200 flex flex-col flex-shrink-0 overflow-y-auto no-scrollbar" id="sidebar-categories">
+                    <!-- تعبئة ديناميكية لقائمة الفئات الجانبية -->
+                </aside>
+
+                <!-- منطقة عرض البطاقات والعناصر للفئة النشطة -->
+                <main class="flex-grow flex flex-col bg-slate-50 overflow-hidden">
+                    <!-- شريط تحكم الفئة الحالية (عنوان الفئة وأزرار تحديد عناصرها) -->
+                    <div class="bg-white px-4 py-3 border-b border-slate-200 flex items-center justify-between flex-shrink-0 shadow-sm">
+                        <h2 id="active-category-title" class="text-base sm:text-lg font-black text-baby-blueDark">الكلمات الأساسية</h2>
+                        <div class="flex items-center gap-2">
+                            <button onclick="memoryApp.selectCurrentCategoryItems(true)" class="text-xs font-bold bg-baby-mintLight text-baby-mintDark px-3 py-1.5 rounded-xl hover:bg-emerald-100 transition">حدد الكل</button>
+                            <button onclick="memoryApp.selectCurrentCategoryItems(false)" class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-xl hover:bg-slate-200 transition">إلغاء تحديد الكل</button>
+                        </div>
+                    </div>
+
+                    <!-- شبكة العناصر الفريدة داخل الفئة المحددة -->
+                    <div class="flex-grow overflow-y-auto p-4 no-scrollbar" id="active-category-items-grid">
+                        <!-- تعبئة ديناميكية لبطاقات العناصر -->
+                    </div>
+                </main>
+            </div>
+
+            <!-- ذيل الشاشة (عدد العناصر المختارة وزر البدء) -->
+            <footer class="bg-white px-6 py-3 border-t border-slate-200 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center gap-4">
+                    <div class="text-xs sm:text-sm font-bold text-slate-600">
+                        المحدد: <span id="selected-count-badge" class="text-baby-mintDark font-black">0</span> عناصر
+                    </div>
+                    <!-- اختيار عدد البطاقات للموبايل -->
+                    <div class="flex sm:hidden items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                        <button onclick="memoryApp.setCardCount(4)" id="mob-btn-count-4" class="mob-count-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-baby-blue text-baby-blueDark">4</button>
+                        <button onclick="memoryApp.setCardCount(6)" id="mob-btn-count-6" class="mob-count-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-slate-600">6</button>
+                        <button onclick="memoryApp.setCardCount(9)" id="mob-btn-count-9" class="mob-count-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-slate-600">9</button>
+                    </div>
+                </div>
+
+                <button onclick="memoryApp.startMemoryGame()" class="bg-baby-mintMed hover:bg-emerald-500 text-white font-black px-8 py-2.5 rounded-2xl shadow-soft-mint text-base transition transform active:scale-95 flex items-center gap-2">
+                    <i class="fas fa-play"></i>
+                    <span>ابدأ اللعبة</span>
+                </button>
+            </footer>
+        </div>
+
+        <!-- شاشة اللعب الفعلية للذاكرة -->
+        <div id="game-play-view" class="h-full w-full flex flex-col hidden bg-slate-50">
+            <header class="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between z-20 shadow-sm h-[68px] flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <button onclick="memoryApp.backToSelection()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition active:scale-95" title="العودة للإعدادات">
+                        <i class="fas fa-arrow-right text-lg"></i>
+                    </button>
+                    <span class="font-bold text-slate-700 text-sm sm:text-base">لعبة الذاكرة</span>
+                </div>
+                <div class="flex items-center gap-1.5 bg-slate-100 rounded-xl px-3 py-1 border border-slate-200 overflow-x-auto no-scrollbar max-w-[50vw] sm:max-w-none" id="game-stars-container">
+                    <!-- النجوم -->
+                </div>
+            </header>
+
+            <main class="game-workspace flex-grow p-4 relative flex flex-col items-center justify-center overflow-auto">
+                <div id="memory-grid" class="grid justify-center items-center gap-4 sm:gap-6 w-full max-w-2xl mx-auto my-auto">
+                    <!-- شبكة الكروت -->
+                </div>
+            </main>
+        </div>
+
+        <!-- نافذة الفوز بجولة الذاكرة -->
+        <div id="win-modal" class="fixed inset-0 modal-backdrop z-[70] flex items-center justify-center hidden opacity-0 transition-opacity duration-300 p-4">
+            <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 max-w-sm w-full border-4 border-baby-mintMed text-center flex flex-col items-center">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-baby-mintLight rounded-full flex items-center justify-center text-baby-mintDark text-3xl sm:text-4xl mb-4 shadow-sm">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-black text-slate-800 mb-2">رائع جداً! 🎉</h2>
+                <p class="text-slate-600 font-bold text-sm sm:text-base mb-6">لقد وجدت جميع المطابقات بنجاح وكسبت نجمة جديدة!</p>
+                <button onclick="memoryApp.nextRound()" class="w-full bg-baby-mintMed hover:bg-emerald-500 text-white font-extrabold text-lg py-3 rounded-2xl shadow-soft-mint transition transform active:scale-95">
+                    العب مجدداً ✨
+                </button>
+            </div>
+        </div>
+
+        <!-- نافذة الاحتفال بالنجوم العشرة -->
+        <div id="star-celebration-modal" class="fixed inset-0 modal-backdrop z-[80] flex items-center justify-center hidden opacity-0 transition-opacity duration-300 p-4">
+            <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 max-w-sm w-full border-4 border-amber-300 text-center flex flex-col items-center">
+                <div class="relative my-4">
+                    <i class="fas fa-star text-amber-400 text-7xl sm:text-8xl drop-shadow-lg animate-star-celebrate"></i>
+                    <i class="fas fa-crown text-amber-500 text-2xl sm:text-3xl absolute -top-4 left-1/2 transform -translate-x-1/2"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-black text-slate-800 mb-2">مبروك! حصلت على 10 نجوم! 🎉</h2>
+                <p class="text-baby-blueDark font-bold text-sm sm:text-base mb-6">لقد جمعت ١٠ نجوم كاملة بنجاح مذهل في لعبة الذاكرة!</p>
+                <button onclick="memoryApp.closeStarCelebration()" class="w-full bg-amber-400 hover:bg-amber-500 text-slate-900 font-extrabold text-lg py-3 rounded-2xl shadow-glow-gold transition transform active:scale-95">
+                    متابعة ✨
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const RAW_CATEGORIES = [
+            "01 الكلمات الأساسية", "02 الأفعال", "03 أجزاء الجسم", "04 المشاعر", "05 الطعام", "06 الفواكه",
+            "07 الخضراوات", "08 المشروبات", "09 العائلة", "10 الألعاب", "11 أشياء شائعة", "12 حروف الجر",
+            "13 الحواس", "14 الصفات", "15 الحيوانات الأليفة", "16 الطيور", "17 الكائنات البحرية", "18 الحشرات",
+            "19 الزواحف", "20 الغابة", "21 المزرعة", "22 الملابس", "23 وسائل النقل", "24 الأثاث",
+            "25 الطقس", "26 الملعب", "27 الحديقة", "28 الغرف", "29 بالداخل", "30 بالخارج",
+            "31 المدينة", "32 الألوان", "33 المتضادات", "34 المدرسة", "35 الموسيقى", "36 الإلكترونيات",
+            "37 المهن", "38 الأشكال", "39 الحروف", "40 الأرقام"
+        ];
+
+        const CATEGORY_MAPS = {
+            1: ["خطأ", "استراحة", "تحت", "اشرب", "اكل", "روح", "صح", "مرحبا", "ساعدني", "جوا", "لسا", "برا", "وقف", "شكرا", "فوق", "بدي", "انا", "خلصنا", "انت"],
+            2: ["ياكل", "يشرب", "يغسل", "يمشط", "يلبس", "يشلح", "ينام", "يفيق", "يتحمم", "يفرشي", "يقعد", "يوقف", "يمشي", "يركض", "يعطي", "يضحك", "يبكي", "يدق", "يلعب", "يسمع", "يشوف", "يلمس", "يشم", "يدوق", "يشوط", "يحكي", "يطلع", "ينزل", "ينط", "يفتح", "يسكر", "يدفش", "يسحب", "يرسم", "يكتب", "يقرا", "يسوق", "يشتري", "يسلم", "ينظف"],
+            3: ["اصبع", "لسان", "اصابع", "ذراع", "ظهر", "بطن", "اعضاء الجسم", "وجه ولد", "خد", "صدر", "ذقن", "اذن", "كوع", "عين", "حاجب", "حواجب", "رموش", "قدم", "وجه بنت", "شعر", "يد", "ركبة", "رجلين", "فم", "اسنان", "رقبة", "انف", "كتف"],
+            4: ["معصبة", "معصبين", "مالل", "مالة", "بيبي تبكي", "بيبي يبكي", "ولد يبكي", "بنت تبكي", "ما تعرف", "ما يعرف", "ما بدو", "ولد سعيد", "بنت سعيدة", "ولد يعيط", "بنت تعيط", "بيبي مبسوط", "بيبي مبسوط", "ولد سعيد", "وجه سعيد", "بنت سعيدة", "ولد يحب", "ولد حزين", "وجه حزين", "بنت حزينة", "بنت خايفة ولد يصرخ", "ولد خايف", "بنت خايفة", "خايف من الكلب", "بنت تصرخ", "ولد يصرخ", "ولد وجه مضحك", "بنت وجها مضحك", "بابا معصب", "ولد متفاجئ", "بنت متفاجئة", "ولدين معصبين", "وجه غضبان"],
+            5: ["كبب مشوي", "بسكويت", "خبز", "كعكة", "دجاج", "شبيس", "قهوة", "بسكوت", "مقرمشات", "كب كيك", "دونات", "بيض", "همبرغر", "سمك", "بطاطا", "فواكه", "عصير جبس", "عصير", "مصاصة", "لحم", "حليب", "زيت", "بيتزا", "فشار", "بوظة", "ارز", "سلطة", "ملح", "سندويشة", "شاورما", "كولا", "شوربة", "معكرونة", "تونا", "خضار", "ماء"],
+            6: ["تفاحة", "افوكادو", "موزة", "موز", "توت", "كرز", "حامض", "تين", "فواكه", "عنب", "كيوي", "ليمون", "مانجا", "بطيخ", "برتقال", "دراق", "خوخ", "اجاص", "اناناس", "فريز", "جبسة"],
+            7: ["باذنجان", "فاصوليا", "شمندر", "بروكلي", "ملفوف", "جزر", "قرنبيط", "ذرة", "خيار", "ثوم", "فاصوليا خضراء", "بصل اخضر", "خس", "نعناع", "فطر", "بامية", "بصل", "بقدونس", "بازلاء", "فليفلة", "بطاطا", "قرع", "فجل", "سبانخ", "كوسا", "بطاطا حلوة", "بندورة", "خضار", "هليون"],
+            8: ["حليب", "قنينة مي", "كولا", "عصير", "عصير جبس", "عصير برتقال", "ليمونادة", "كاسة مي", "عصير فريز وتوت", "عصير جزر", "عصير كيوي", "عصير توت", "كوكتيل موز", "كوكتيل فواكه", "شاي", "قهوة"],
+            9: ["بابا وماما", "بابا يلعب مع ابنو", "بابا", "عيلة ياكلوا", "عائلة", "تاتا", "جدو و تاتا", "جدو", "بنت تساعد ماما", "ماما", "اخت", "اخ"],
+            10: ["سيارة اسعاف", "كرة", "خرز", "بسكليت", "مكعبات", "كتاب", "فقاعات صابون", "دلو", "سيارة", "دمية", "سيارة اطفاء", "منزل", "طائرة ورقية", "ليغو", "ميكروفون", "معجون", "سيارة شرطة", "مضارب", "سكوتر", "مجرفة", "حبل نط", "نابض", "عرباية", "دبدوب", "العاب", "قطار"],
+            11: ["شنتة", "بالون", "بلاستر", "سلة", "حمام", "قنينة", "كرتونة", "كاتو", "شمعة", "قبعة", "كرسي", "مشط", "باب", "كريك", "مروحة", "هدية", "كاسة", "نظارات", "مكنسة", "مفاتيح", "سكين", "ضو", "مصاري", "موبايل", "صحن", "خاتم", "شامبو", "صابونة", "ملعقة", "طاولة", "محارم", "محارم تواليت", "تواليت", "فرشاة اسنان", "معجون اسنان", "زبالة", "كنزة", "شمسية", "مكنسة كهربا", "جزدان", "ساعة"],
+            12: ["وراء", "بين", "اسفل", "بعيد", "امام", "جوا", "قريب", "جنب", "فوق", "تحت", "اعلى"],
+            13: ["اسمع", "شوف", "شم", "دوق", "المس", "منبه", "دب", "جرس", "عصفور", "مكعبات", "صبار", "قط", "فليفلة حدة", "ايس كريم شوكولاتة", "بارد", "طبل", "رجلين", "سمك", "زهرة", "اضواء", "موسيقى", "بليل", "رسمة", "عطر", "بيتزا", "معجون", "ارنب", "قوس قزح", "يقرا", "وردات", "ظربان", "حامض", "ايس كريم فراولة", "غروب", "حلو", "تلفون", "زبالة", "شاحنة", "ايس كريم حليب", "بطيخ"],
+            14: ["ضجة", "هدوء", "نايم", "فايق", "كبير", "صغير", "نظيف", "وسخ", "مسكر", "مفتوح", "بارد", "ساخن", "نهار", "ليل", "يموت", "يعيش", "انزل", "اطلع", "ناشف", "مبلول", "فاضي", "مليان", "قاسي", "ناعم", "ثقيل", "خفيف", "جوا", "برا", "بالداخل", "بالخارج", "ضيق", "واسع", "جديد", "قديم", "قصير", "طويل", "يجلس", "يقف", "رفيع", "سميك", "تحت", "فوق"],
+            15: ["عصفور", "قطة", "دجاجة", "كلب", "بطة", "سمكة", "هامستر", "ببغاء", "حيوانات اليفة", "ارنب", "سلحفاة"],
+            16: ["صقر", "عصفور", "طيور", "دجاجة", "ديك", "غراب", "بطة", "فلامنجو", "وزة", "نعامة", "بومة", "طاووس", "بطريق", "حمامة", "دوري", "نسر"],
+            17: ["سمكة مهرج", "سلطعون", "دلفين", "سمكة", "ضفدع", "قنديل بحر", "أخطبوط", "بطريق", "سمكة بالون", "حصان بحر", "فقمة", "قرش", "حبار", "نجمة البحر", "سلحفاة البحر", "حوت"],
+            18: ["فرس النبي", "نملة", "خنفساء", "نحلة", "فراشة", "صرصور", "يعسوب", "ذبابة", "جندب", "حشرات", "بعوضة", "عقرب", "حلزون", "عنكبوت", "دبور", "دودة"],
+            19: ["تمساح", "حرباء", "سحلية", "سحالي", "ثعبان", "سلحفاة"],
+            20: ["تمساح", "دب", "فيل", "فلامنجو", "ثعلب", "غزال", "زرافة", "غوريلا", "ضبع", "حيوانات الغابة", "كنغر", "فهد", "اسد", "قرد", "بومة", "باندا", "ببغاء", "راكون", "وحيد قرن", "افعى", "سنجاب", "نمر", "حمار وحش"],
+            21: ["ثور", "قطة", "صوص", "دجاجة", "ديك", "بقرة", "كلب", "حمار", "بطة", "حيوانات المزرعة", "ماعز", "اوزة", "حصان", "فار", "حمامة", "خنزير", "ارنب", "خروف"],
+            22: ["طاقية", "قشاط", "جزمة صفرا", "ثياب", "حفاض", "فستان", "شحاط", "نظارات", "كفوف", "كعب عالي", "جاكيت", "غسيل", "قناع", "بيجاما", "بنطال", "شال", "بوط", "شورت", "تنورة", "جرابات", "كنزة", "تي شيرت", "كرافيت", "كيلوت"],
+            23: ["منطاد", "بسكليت", "قارب", "باص", "سيارة", "هليكوبتر", "طائرة", "سكة حديد", "صاروخ", "بحر", "سفينة", "سماء", "شارع", "غواصة", "صهريج", "تكسي", "تركتور", "قطار", "مواصلات", "شاحنة"],
+            24: ["بانيو", "تخت", "بطانية", "ابريق", "كرسي", "ساعة", "خزانة", "مشط", "فنجان", "دف تقطيع", "مكتب", "جرس الباب", "باب", "مروحة", "شوكة", "براد", "غاز شغال", "بيت", "مكواة", "مطبخ", "سكين", "سلة غسيل", "ضو", "مراية", "فرن", "مخدة", "صحن", "صحون", "طنجرة", "دوش", "مغسلة", "صابون", "صوفا", "ملعقة", "غاز", "طاولة", "حنفية", "محارم", "مرحاض", "فرشاة أسنان", "منشفة", "تلفزيون", "مغسلة", "غسالة ملابس", "شباك"],
+            25: ["قبعة صوف", "جزمة", "بوط", "فستان", "شحاط", "نظارات", "كفوف", "طاقية", "جاكيت", "بنطال", "صندل", "شال", "كنزة نص كم", "شورت", "جرابات", "كنزة كم", "كنزة وشورت", "مظلة", "بارد", "حار", "قوس قزح", "شمس وغيم", "غائم", "مطر", "ثلج", "عاصفة", "مشمس", "رعد", "إعصار", "هوا", "خريف", "ربيع", "صيف", "شتاء"],
+            26: ["مقعد", "سياج", "شرفة", "سلم", "التسلق", "ملعب", "رمل", "زحليطة", "درج", "مرجوحة", "ميزان", "نفق"],
+            27: ["حديقة", "بيت طيور", "شجيرة", "انفخ وردة", "تراب", "سياج", "زهرة", "طريق الحديقة", "بوابة", "عشب", "مرجوحة", "خرطوم", "جزازة عشب", "ورقة شجرة", "نبته", "مسبح", "بركة ماء", "شوكة", "رفش", "مرشة", "عصاية", "شارع", "ترامبولين", "زبالة", "بيت الشجرة", "شجرة"],
+            28: ["بلكونة", "غرفة نوم", "حمام", "سجادة", "سقف", "باب", "ارضية", "رواق", "مطبخ", "مسكة باب", "غرفة غسيل", "غرفة صالون", "مكتب", "مدخل البيت", "غرفة فاضية"],
+            29: ["قبو", "حمام", "غرفة نوم", "كراج", "غرفة صف", "مطبخ", "غرفة صالون", "صيدلية", "ملعب", "درج", "مخزن", "غرفة انتظار"],
+            30: ["جسر", "موقف حافلات", "صحراء", "مزرعة", "بستان", "مرج", "جبل", "موقف سيارات", "بركة", "نهر", "رصيف", "شارع", "نفق", "وادي", "شلال"],
+            31: ["مطار", "حوض سمك", "مخبز", "مخيم", "مدينة", "محل ملابس", "محطة اطفاء", "محل ورد", "حديقة", "كازية", "مستشفى", "سجن", "مكتبة", "سوق", "شرطة", "مدرسة", "ملعب", "حديقة حيوانات"],
+            32: ["اسود", "ازرق", "بني", "الوان", "رمادي", "اخضر", "برتقالي", "وردي", "بنفسجي", "احمر", "ابيض", "اصفر"],
+            33: ["كثير", "قليل", "نشيط", "متعب", "بالغ", "طفل", "متل بعض", "مختلفين", "وحيد", "مع بعض", "ملاك", "شرير", "جواب", "سؤال", "من ورا", "من قدام", "سيء", "جيد", "خلف", "أمام", "خارج", "داخل", "كبير", "صغير", "ضجر", "متحمس", "شجاع", "خوف", "هادئ", "محبط", "رخيص", "غالي", "نظيف", "قذر", "يتسلق", "ينزل", "مغلق", "مفتوح", "بارد", "ساخن", "يأتي", "يذهب", "صحيح", "خطأ", "يبكي", "يضحك", "متفقين", "مختلفين", "أسفل", "أعلى", "جاف", "مبلل", "فارغ", "ممتلئ", "سريع", "بطيء", "سمين", "نحيف", "يحب", "يعطي", "يأخذ", "سعيد", "حزين", "يكره", "صحة", "مريض", "ثقيل", "خفيف", "ضخم", "صغير جداً", "جائع", "شبعان", "يسار", "يمين", "فوضى", "مرتب", "بين", "بجانب", "ضجيج", "هادئ", "على", "تحت", "فقير", "غني", "يسحب", "يدفع", "قصير", "طويل", "يجلس", "يقف", "قوي", "ضعيف", "سميك", "رفيع", "يطفئ", "يشغل", "عكس"],
+            34: ["حقيبة ظهر", "لوح طباشير", "كتاب", "كتب", "حافلة", "كرسي", "فصل", "الوان", "مكتب", "رفقات", "صندوق غذاء", "ارقام", "ورقة", "اقلام", "يلعبوا", "اشكال", "نحكي قصة", "انسة وطالب", "طالب مدرسة", "طالبة مدرسة", "انسة مدرسة"],
+            35: ["جرس", "كلارينت", "طبل", "طبول", "ناي", "جيتار", "بوق", "ماراكاس", "عود", "بيانو", "ساكسفون", "عصاية طبل", "دف", "كمان", "صفارة", "إكسليفون"],
+            36: ["كاميرا", "مقبض تحكم", "وصلة شاحن", "سماعة رأس", "ايباد", "كيبورد", "لابتوب", "فأرة", "مقبس كهربا", "شاحن هاتف", "هاتف", "فيش كهربا", "جهاز تحكم", "تلفزيون"],
+            37: ["رائد فضاء", "راقصة باليه", "قبطان", "طباخة", "طباخ", "مهرجة", "مهرج", "طبيبة", "طبيب", "جنية اسنان", "مزارعة", "مزارع", "اطفائية", "اطفائي", "بطل", "صيادة", "صياد", "موسيقية", "موسيقي", "رسامة", "رسام", "مصورة", "مصور", "طيار", "لاعبة", "لاعب", "شرطي", "شرطية", "امير", "اميرة", "مغنية", "مغني", "معلمة", "معلم", "ساحرة"],
+            38: ["اشكال", "نجمة", "شبه منحرف", "سداسي", "معين", "مستطيل", "مربع", "خماسي", "قمر", "قلب", "زائد", "دائرة", "بيضوي", "مثلث"],
+            39: ["ا", "ب", "ت", "ث", "ج", "ح", "خ", "د", "ذ", "ر", "ز", "س", "ش", "ص", "ض", "ط", "ظ", "ع", "غ", "ف", "ق", "ك", "م", "ن", "ل", "و", "ي", "ه", "ء", "ة"],
+            40: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"]
+        };
+
+        const CATEGORIES = RAW_CATEGORIES.map((rawName, index) => {
+            const id = index + 1;
+            const name = rawName.substring(3).trim();
+            const rawItems = CATEGORY_MAPS[id] || [];
+            const items = rawItems.map((itemName, i) => ({
+                id: i + 1,
+                catId: id,
+                name: itemName,
+                image: `images/${id}/${i + 1}.png`,
+                audio: `sounds/${id}/${i + 1}.wav`
+            }));
+            return { id, name, items };
+        });
+
+        const memoryApp = {
+            state: {
+                selectedItems: [], 
+                activeCategoryIndex: 0,
+                gridSize: 4, 
+                stars: 0,
+                flippedCards: [],
+                matchedPairs: 0,
+                totalPairsToMatch: 2,
+                isLocked: false
+            },
+
+            init() {
+                const savedStars = localStorage.getItem('hamada_stars');
+                if (savedStars) {
+                    this.state.stars = Math.min(10, Math.max(0, parseInt(savedStars)));
+                }
+                this.renderSidebar();
+                this.renderActiveCategoryContent();
+                this.renderStars();
+            },
+
+            showToast(message, type = 'info') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                let bgColor = 'bg-slate-800';
+                if(type === 'success') bgColor = 'bg-baby-mintDark';
+                if(type === 'error') bgColor = 'bg-rose-600';
+                if(type === 'warning') bgColor = 'bg-amber-500';
+
+                toast.className = `${bgColor} text-white px-4 py-2.5 rounded-xl shadow-lg flex items-center justify-center gap-2 text-sm font-bold transition-all duration-300 transform translate-y-[-10px] opacity-0 pointer-events-auto`;
+                toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type==='error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i><span>${message}</span>`;
+                container.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.remove('translate-y-[-10px]', 'opacity-0');
+                    toast.classList.add('translate-y-0', 'opacity-100');
+                }, 10);
+
+                setTimeout(() => {
+                    toast.classList.remove('translate-y-0', 'opacity-100');
+                    toast.classList.add('translate-y-[-10px]', 'opacity-0');
+                    setTimeout(() => toast.remove(), 300);
+                }, 2500);
+            },
+
+            setCardCount(size) {
+                this.state.gridSize = size;
+                [4, 6, 9].forEach(s => {
+                    const btn = document.getElementById(`btn-count-${s}`);
+                    if(btn) {
+                        if(s === size) {
+                            btn.className = "count-btn px-3 py-1 rounded-lg text-xs font-black transition border border-baby-blueMed bg-baby-blueLight text-baby-blueDark";
+                        } else {
+                            btn.className = "count-btn px-3 py-1 rounded-lg text-xs font-black transition border border-slate-200 bg-white text-slate-600";
+                        }
+                    }
+                    const mobBtn = document.getElementById(`mob-btn-count-${s}`);
+                    if(mobBtn) {
+                        if(s === size) {
+                            mobBtn.className = "mob-count-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-baby-blue text-baby-blueDark";
+                        } else {
+                            mobBtn.className = "mob-count-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-slate-600";
+                        }
+                    }
+                });
+            },
+
+            renderSidebar() {
+                const sidebar = document.getElementById('sidebar-categories');
+                sidebar.innerHTML = '';
+
+                CATEGORIES.forEach((cat, index) => {
+                    const isActive = index === this.state.activeCategoryIndex;
+                    
+                    // حساب عدد العناصر المختارة داخل هذه الفئة
+                    const catSelectedCount = cat.items.filter(item => this.state.selectedItems.includes(`${cat.id}-${item.id}`)).length;
+
+                    const itemEl = document.createElement('div');
+                    itemEl.className = `flex items-center justify-between px-4 py-3 cursor-pointer transition border-b border-slate-100 ${
+                        isActive 
+                            ? 'bg-baby-blueLight text-baby-blueDark font-black border-r-4 border-baby-blueDark' 
+                            : 'hover:bg-slate-50 text-slate-700 font-bold'
+                    }`;
+
+                    itemEl.innerHTML = `
+                        <div class="flex items-center gap-2 truncate">
+                            <span class="text-xs sm:text-sm truncate">${cat.name}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 flex-shrink-0">
+                            ${catSelectedCount > 0 ? `<span class="bg-baby-mintMed text-white text-[10px] px-1.5 py-0.5 rounded-full font-black">${catSelectedCount}</span>` : ''}
+                            <i class="fas fa-chevron-left text-xs opacity-50"></i>
+                        </div>
+                    `;
+
+                    itemEl.onclick = () => {
+                        this.state.activeCategoryIndex = index;
+                        this.renderSidebar();
+                        this.renderActiveCategoryContent();
+                    };
+
+                    sidebar.appendChild(itemEl);
+                });
+            },
+
+            renderActiveCategoryContent() {
+                const cat = CATEGORIES[this.state.activeCategoryIndex];
+                document.getElementById('active-category-title').textContent = cat.name;
+
+                const grid = document.getElementById('active-category-items-grid');
+                grid.innerHTML = '';
+
+                const itemsGrid = document.createElement('div');
+                itemsGrid.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4';
+
+                cat.items.forEach(item => {
+                    const key = `${cat.id}-${item.id}`;
+                    const isSelected = this.state.selectedItems.includes(key);
+
+                    const cardEl = document.createElement('div');
+                    cardEl.className = `flex flex-col items-center justify-between p-3 rounded-2xl border-2 cursor-pointer transition select-none bg-white relative ${
+                        isSelected 
+                            ? 'border-baby-mintMed bg-baby-mintLight/30 shadow-sm' 
+                            : 'border-slate-200 hover:border-slate-300'
+                    }`;
+
+                    cardEl.innerHTML = `
+                        <div class="absolute top-2 right-2 w-5 h-5 rounded-full border-2 flex items-center justify-center transition ${
+                            isSelected ? 'bg-baby-mintMed border-baby-mintMed text-white' : 'border-slate-300 bg-white'
+                        }">
+                            ${isSelected ? '<i class="fas fa-check text-[10px]"></i>' : ''}
+                        </div>
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center p-1 my-2 pointer-events-none">
+                            <img src="${item.image}" alt="${item.name}" class="max-h-full max-w-full object-contain">
+                        </div>
+                        <span class="text-xs sm:text-sm font-bold text-slate-700 text-center truncate w-full">${item.name}</span>
+                    `;
+
+                    cardEl.onclick = () => {
+                        if (isSelected) {
+                            this.state.selectedItems = this.state.selectedItems.filter(k => k !== key);
+                        } else {
+                            this.state.selectedItems.push(key);
+                        }
+                        this.renderSidebar();
+                        this.renderActiveCategoryContent();
+                        document.getElementById('selected-count-badge').innerText = this.state.selectedItems.length;
+                    };
+
+                    itemsGrid.appendChild(cardEl);
+                });
+
+                grid.appendChild(itemsGrid);
+                document.getElementById('selected-count-badge').innerText = this.state.selectedItems.length;
+            },
+
+            selectCurrentCategoryItems(select) {
+                const cat = CATEGORIES[this.state.activeCategoryIndex];
+                cat.items.forEach(item => {
+                    const key = `${cat.id}-${item.id}`;
+                    if (select) {
+                        if (!this.state.selectedItems.includes(key)) {
+                            this.state.selectedItems.push(key);
+                        }
+                    } else {
+                        this.state.selectedItems = this.state.selectedItems.filter(k => k !== key);
+                    }
+                });
+                this.renderSidebar();
+                this.renderActiveCategoryContent();
+            },
+
+            selectAllCategories(select) {
+                if (select) {
+                    let allKeys = [];
+                    CATEGORIES.forEach(cat => {
+                        cat.items.forEach(item => {
+                            allKeys.push(`${cat.id}-${item.id}`);
+                        });
+                    });
+                    this.state.selectedItems = allKeys;
+                } else {
+                    this.state.selectedItems = [];
+                }
+                this.renderSidebar();
+                this.renderActiveCategoryContent();
+            },
+
+            startMemoryGame() {
+                if (this.state.selectedItems.length === 0) {
+                    this.showToast('الرجاء اختيار عنصر واحد على الأقل للبدء', 'warning');
+                    return;
+                }
+
+                document.getElementById('category-select-view').classList.add('hidden');
+                document.getElementById('game-play-view').classList.remove('hidden');
+                this.setupNewRound();
+            },
+
+            backToSelection() {
+                document.getElementById('game-play-view').classList.add('hidden');
+                document.getElementById('category-select-view').classList.remove('hidden');
+            },
+
+            setupNewRound() {
+                this.state.flippedCards = [];
+                this.state.matchedPairs = 0;
+                this.state.isLocked = false;
+
+                let requiredPairs = Math.floor(this.state.gridSize / 2);
+                if (this.state.gridSize === 9) {
+                    requiredPairs = 4; 
+                }
+                if (requiredPairs < 1) requiredPairs = 2;
+                this.state.totalPairsToMatch = requiredPairs;
+
+                let availableItems = [];
+                this.state.selectedItems.forEach(key => {
+                    const [catIdStr, itemIdStr] = key.split('-');
+                    const catId = parseInt(catIdStr);
+                    const itemId = parseInt(itemIdStr);
+                    const cat = CATEGORIES.find(c => c.id === catId);
+                    if (cat) {
+                        const item = cat.items.find(i => i.id === itemId);
+                        if (item) {
+                            availableItems.push(item);
+                        }
+                    }
+                });
+
+                if (availableItems.length < requiredPairs) {
+                    this.showToast(`العناصر المحددة لا تكفي لملء شبكة اللعبة، يرجى تحديد عناصر أكثر`, 'warning');
+                    this.backToSelection();
+                    return;
+                }
+
+                let shuffledItems = [...availableItems].sort(() => 0.5 - Math.random());
+                let selectedItems = shuffledItems.slice(0, requiredPairs);
+
+                let deck = [];
+                selectedItems.forEach((item, index) => {
+                    deck.push({ ...item, uniqueKey: `${item.catId}-${item.id}-1`, pairId: index });
+                    deck.push({ ...item, uniqueKey: `${item.catId}-${item.id}-2`, pairId: index });
+                });
+
+                deck.sort(() => 0.5 - Math.random());
+                this.renderBoard(deck);
+            },
+
+            renderBoard(deck) {
+                const grid = document.getElementById('memory-grid');
+                grid.innerHTML = '';
+
+                let gridColsClass = 'grid-cols-2'; 
+                if (this.state.gridSize === 6) {
+                    gridColsClass = 'grid-cols-3'; 
+                } else if (this.state.gridSize === 9) {
+                    gridColsClass = 'grid-cols-3'; 
+                }
+
+                grid.className = `grid gap-4 sm:gap-6 w-full max-w-xl justify-center items-center ${gridColsClass} mx-auto`;
+
+                deck.forEach((card, index) => {
+                    const cardEl = document.createElement('div');
+                    cardEl.className = 'w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 perspective-1000 cursor-pointer';
+                    cardEl.dataset.pairId = card.pairId;
+                    cardEl.dataset.index = index;
+
+                    cardEl.innerHTML = `
+                        <div class="card-inner relative w-full h-full duration-300 transform-style-3d shadow-soft rounded-2xl">
+                            <!-- وجه الكرت المقلوب (الغلاف) -->
+                            <div class="card-front absolute inset-0 w-full h-full bg-baby-blue border-2 border-baby-blueMed rounded-2xl flex flex-col items-center justify-center backface-hidden shadow-sm">
+                                <i class="fas fa-question text-baby-blueDark text-2xl sm:text-3xl"></i>
+                            </div>
+                            <!-- وجه الكرت المكشوف (الصورة والاسم) -->
+                            <div class="card-back absolute inset-0 w-full h-full bg-white border-2 border-baby-mintMed rounded-2xl flex flex-col items-center justify-between p-2 sm:p-3 backface-hidden rotate-y-180">
+                                <div class="w-full flex-grow p-1 flex items-center justify-center overflow-hidden pointer-events-none">
+                                    <img src="${card.image}" alt="${card.name}" class="max-h-full max-w-full object-contain">
+                                </div>
+                                <div class="w-full text-center text-[10px] sm:text-xs font-bold text-slate-700 truncate px-1 py-0.5 bg-slate-100 rounded-lg">
+                                    ${card.name}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    cardEl.onclick = () => this.flipCard(cardEl, card);
+                    grid.appendChild(cardEl);
+                });
+            },
+
+            flipCard(cardEl, cardData) {
+                if (this.state.isLocked) return;
+                const inner = cardEl.querySelector('.card-inner');
+                
+                if (inner.classList.contains('rotate-y-180') || this.state.flippedCards.includes(cardEl)) {
+                    return;
+                }
+
+                inner.classList.add('rotate-y-180');
+                this.state.flippedCards.push({ element: cardEl, data: cardData });
+
+                if (this.state.flippedCards.length === 2) {
+                    this.checkForMatch();
+                }
+            },
+
+            checkForMatch() {
+                this.state.isLocked = true;
+                const [card1, card2] = this.state.flippedCards;
+
+                if (card1.data.pairId === card2.data.pairId) {
+                    this.state.matchedPairs++;
+                    this.state.flippedCards = [];
+                    this.state.isLocked = false;
+
+                    if (this.state.matchedPairs === this.state.totalPairsToMatch) {
+                        setTimeout(() => this.handleRoundWin(), 500);
+                    }
+                } else {
+                    setTimeout(() => {
+                        card1.element.querySelector('.card-inner').classList.remove('rotate-y-180');
+                        card2.element.querySelector('.card-inner').classList.remove('rotate-y-180');
+                        this.state.flippedCards = [];
+                        this.state.isLocked = false;
+                    }, 800);
+                }
+            },
+
+            handleRoundWin() {
+                this.addStar();
+                const modal = document.getElementById('win-modal');
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            },
+
+            nextRound() {
+                const modal = document.getElementById('win-modal');
+                modal.classList.add('opacity-0');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    this.setupNewRound();
+                }, 300);
+            },
+
+            addStar() {
+                if (this.state.stars < 10) {
+                    this.state.stars++;
+                    localStorage.setItem('hamada_stars', this.state.stars);
+                    this.renderStars();
+
+                    if (this.state.stars === 10) {
+                        setTimeout(() => this.showStarCelebration(), 400);
+                    }
+                }
+            },
+
+            renderStars() {
+                const container = document.getElementById('game-stars-container');
+                if (!container) return;
+                container.innerHTML = '';
+
+                for (let i = 1; i <= 10; i++) {
+                    const star = document.createElement('i');
+                    if (i <= this.state.stars) {
+                        star.className = "fas fa-star text-amber-400 text-sm sm:text-base drop-shadow-sm";
+                    } else {
+                        star.className = "far fa-star text-slate-300 text-sm sm:text-base";
+                    }
+                    container.appendChild(star);
+                }
+            },
+
+            showStarCelebration() {
+                const modal = document.getElementById('star-celebration-modal');
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            },
+
+            closeStarCelebration() {
+                const modal = document.getElementById('star-celebration-modal');
+                modal.classList.add('opacity-0');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    this.state.stars = 0;
+                    localStorage.setItem('hamada_stars', 0);
+                    this.renderStars();
+                }, 300);
+            }
+        };
+
+        window.onload = () => {
+            memoryApp.init();
+        };
+    </script>
+</body>
+</html>

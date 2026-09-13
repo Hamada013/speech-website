@@ -8,13 +8,29 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'pastel-pink': '#ffd1dc',
+              'pastel-blue': '#aec6cf',
+              'pastel-green': '#b7e4c7',
+              'pastel-purple': '#cbaacb',
+              'pastel-text': '#5a5a5a'
+            }
+          }
+        }
+      }
+    </script>
+    
     <style>
       body { 
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         user-select: none; 
         -webkit-user-select: none;
         overscroll-behavior: none;
-        background-color: #fafafa;
+        background-color: #f9fafb;
       }
       @keyframes popIn {
         0% { transform: scale(0.3); opacity: 0; }
@@ -24,16 +40,15 @@
       .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
       .hide-scrollbar::-webkit-scrollbar { display: none; }
       
-      /* Styling matched to previous design */
-      .text-header-title { color: #9bbcc7; }
-      .bg-red-btn { background-color: #ef4444; }
-      .bg-red-btn-hover { background-color: #dc2626; }
-      .bg-red-light { background-color: #fee2e2; }
-      .text-red-dark { color: #dc2626; }
+      .text-header-title { color: #aec6cf; }
+      .bg-red-btn { background-color: #aec6cf; }
+      .bg-red-btn-hover { background-color: #9ab4bf; }
+      .bg-red-light { background-color: rgba(174, 198, 207, 0.25); }
+      .text-red-dark { color: #7ab2bf; }
       .bg-gray-light { background-color: #f1f5f9; }
     </style>
 </head>
-<body class="text-slate-700 h-[100dvh] flex flex-col justify-between overflow-hidden">
+<body class="text-pastel-text h-[100dvh] flex flex-col justify-between overflow-hidden">
 
     <!-- Success Audio -->
     <audio id="sound-success" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=success-1-6297.mp3"></audio>
@@ -60,48 +75,52 @@
 
     <!-- ==================== VIEW 1: HOME SCREEN ==================== -->
     <div id="home-screen" class="absolute inset-0 bg-white z-[100] flex flex-col justify-between p-6 overflow-y-auto hide-scrollbar">
-        <div class="w-full max-w-md mx-auto flex flex-col items-center justify-center my-auto py-6">
-            <div class="w-20 h-20 bg-red-light text-red-dark rounded-3xl flex items-center justify-center mb-6 shadow-sm border border-red-100">
-                <i class="fas fa-ear-listen text-4xl"></i>
-            </div>
-            <h1 class="font-black text-2xl md:text-3xl text-slate-800 text-center mb-2">Auditory Discrimination</h1>
-            <p class="text-slate-500 text-sm text-center mb-8 font-medium">Select a training category to begin</p>
+        <!-- Top bar with main index link button -->
+        <div class="w-full max-w-6xl mx-auto flex items-center justify-between">
+            <a href="index.html" class="p-2 px-4 bg-gray-100 rounded-full text-pastel-text hover:bg-gray-200 transition flex items-center gap-2 font-bold text-xs md:text-sm cursor-pointer">
+                <i class="fas fa-arrow-left"></i> Main Menu
+            </a>
+            <div></div>
+        </div>
 
-            <div class="flex flex-col gap-4 w-full">
+        <div class="w-full max-w-6xl mx-auto flex flex-col items-center justify-center flex-1 my-auto py-4">
+            <div class="flex items-center gap-3 md:gap-4 mb-8 md:mb-12">
+                <div class="h-12 w-12 md:h-16 md:w-16 bg-pastel-blue rounded-full shadow-md flex items-center justify-center">
+                    <i class="fas fa-ear-listen text-white text-xl md:text-3xl"></i>
+                </div>
+                <h1 class="font-black text-2xl md:text-4xl text-slate-700">Sound Identification</h1>
+            </div>
+
+            <!-- Discrimination Categories Grid (Balanced spacing for widescreen monitors) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 w-full max-w-5xl px-4">
                 <!-- Level 1 -->
-                <button onclick="switchView('level1')" class="group flex items-center p-4 bg-white border-2 border-gray-100 rounded-2xl hover:border-red-300 hover:bg-red-50/30 transition shadow-sm cursor-pointer w-full text-left relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-full bg-red-500"></div>
-                    <div class="h-12 w-12 bg-red-light text-red-dark rounded-xl flex items-center justify-center mr-4 shrink-0 font-bold">1</div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="font-bold text-base text-slate-800">Level 1</h3>
-                        <p class="text-xs text-slate-500 truncate">أصوات متباينة غير متشابهة</p>
-                    </div>
+                <button onclick="switchView('level1')" class="group flex flex-col items-center p-6 md:p-10 bg-pastel-pink bg-opacity-20 border-2 border-pastel-pink rounded-3xl hover:bg-opacity-40 transition hover:-translate-y-1 shadow-sm cursor-pointer">
+                    <i class="fas fa-1 text-3xl md:text-5xl text-pastel-pink mb-4 group-hover:scale-110 transition"></i>
+                    <h3 class="font-bold text-lg md:text-2xl text-slate-700">Level 1</h3>
+                    <p class="text-xs md:text-sm text-center text-slate-500 mt-2">أصوات متباينة غير متشابهة</p>
                 </button>
 
                 <!-- Level 2 -->
-                <button onclick="switchView('level2')" class="group flex items-center p-4 bg-white border-2 border-gray-100 rounded-2xl hover:border-red-300 hover:bg-red-50/30 transition shadow-sm cursor-pointer w-full text-left relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-full bg-red-500"></div>
-                    <div class="h-12 w-12 bg-red-light text-red-dark rounded-xl flex items-center justify-center mr-4 shrink-0 font-bold">2</div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="font-bold text-base text-slate-800">Level 2</h3>
-                        <p class="text-xs text-slate-500 truncate">أصوات متشابهة سمعياً</p>
-                    </div>
+                <button onclick="switchView('level2')" class="group flex flex-col items-center p-6 md:p-10 bg-pastel-green bg-opacity-20 border-2 border-pastel-green rounded-3xl hover:bg-opacity-40 transition hover:-translate-y-1 shadow-sm cursor-pointer">
+                    <i class="fas fa-2 text-3xl md:text-5xl text-pastel-green mb-4 group-hover:scale-110 transition"></i>
+                    <h3 class="font-bold text-lg md:text-2xl text-slate-700">Level 2</h3>
+                    <p class="text-xs md:text-sm text-center text-slate-500 mt-2">أصوات متشابهة سمعياً</p>
                 </button>
 
                 <!-- Duration -->
-                <button onclick="switchView('duration')" class="group flex items-center p-4 bg-white border-2 border-gray-100 rounded-2xl hover:border-red-300 hover:bg-red-50/30 transition shadow-sm cursor-pointer w-full text-left relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-full bg-red-500"></div>
-                    <div class="h-12 w-12 bg-red-light text-red-dark rounded-xl flex items-center justify-center mr-4 shrink-0 font-bold"><i class="fas fa-clock text-lg"></i></div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="font-bold text-base text-slate-800">Duration</h3>
-                        <p class="text-xs text-slate-500 truncate">Long vs Short Training</p>
-                    </div>
+                <button onclick="switchView('duration')" class="group flex flex-col items-center p-6 md:p-10 bg-pastel-purple bg-opacity-20 border-2 border-pastel-purple rounded-3xl hover:bg-opacity-40 transition hover:-translate-y-1 shadow-sm cursor-pointer">
+                    <i class="fas fa-clock text-3xl md:text-5xl text-pastel-purple mb-4 group-hover:scale-110 transition"></i>
+                    <h3 class="font-bold text-lg md:text-2xl text-slate-700">Duration</h3>
+                    <p class="text-xs md:text-sm text-center text-slate-500 mt-2">Long vs Short Training</p>
                 </button>
             </div>
         </div>
 
-        <footer class="w-full text-center text-[10px] text-gray-400 font-bold uppercase tracking-widest py-2 shrink-0">
-            SPEECH AND LANGUAGE PATHOLOGY • AHMAD GHANEM
+        <footer class="w-full text-center text-[10px] md:text-xs text-gray-400 leading-relaxed uppercase tracking-wider py-2 shrink-0">
+            SPEECH AND LANGUAGE PATHOLOGY<br>
+            Ahmad Ghanem<br>
+            Latakia - Syria<br>
+            slp.ahmadghanem@gmail.com
         </footer>
     </div>
 
@@ -116,13 +135,13 @@
                 <h2 id="standard-header-title" class="text-sm sm:text-base font-black text-header-title truncate w-full text-center">Level 1</h2>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
-                <button onclick="playTargetSound()" class="w-10 h-10 bg-red-light text-red-dark rounded-xl hover:bg-red-200 transition flex items-center justify-center font-bold text-sm cursor-pointer shadow-xs" title="Play Sound">
+                <button onclick="playTargetSound()" class="w-10 h-10 bg-red-light text-red-dark rounded-xl hover:bg-pastel-blue/40 transition flex items-center justify-center font-bold text-sm cursor-pointer shadow-xs" title="Play Sound">
                     <i class="fas fa-volume-high"></i>
                 </button>
                 <button onclick="toggleTrialModal(true)" class="w-10 h-10 bg-gray-light text-slate-700 rounded-xl hover:bg-gray-200 transition flex items-center justify-center font-bold text-sm cursor-pointer shadow-xs" title="Catalog / Library">
                     <i class="fas fa-th-large"></i>
                 </button>
-                <button id="test-btn-standard" onclick="triggerTestMode()" class="px-3 h-10 bg-red-light text-red-dark rounded-xl hover:bg-red-200 transition flex items-center justify-center font-bold text-xs cursor-pointer shadow-xs gap-1" title="Test Mode (10 Trials)">
+                <button id="test-btn-standard" onclick="triggerTestMode()" class="px-3 h-10 bg-red-light text-red-dark rounded-xl hover:bg-pastel-blue/40 transition flex items-center justify-center font-bold text-xs cursor-pointer shadow-xs gap-1" title="Test Mode (10 Trials)">
                     <i class="fas fa-bolt"></i>
                     <span id="test-counter-badge" class="hidden">0/10</span>
                 </button>
@@ -133,7 +152,7 @@
         <div class="flex-1 flex flex-col items-center justify-center p-4 w-full gap-4 my-auto">
             <div class="grid grid-cols-2 gap-4 w-full max-w-sm">
                 <!-- Card Slot A -->
-                <div onclick="handleCardSelection('A')" class="bg-white rounded-3xl p-4 shadow-sm border-2 border-gray-100 hover:border-red-300 flex flex-col items-center justify-center cursor-pointer transition-transform active:scale-95 group">
+                <div onclick="handleCardSelection('A')" class="bg-white rounded-3xl p-4 shadow-sm border-2 border-gray-100 hover:border-pastel-blue flex flex-col items-center justify-center cursor-pointer transition-transform active:scale-95 group">
                     <div class="w-32 h-32 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center p-2 mb-2 relative overflow-hidden">
                         <img id="slot-img-A" src="" alt="Sound A" class="w-full h-full object-contain pointer-events-none group-hover:scale-105 transition-transform">
                     </div>
@@ -141,7 +160,7 @@
                 </div>
 
                 <!-- Card Slot B -->
-                <div onclick="handleCardSelection('B')" class="bg-white rounded-3xl p-4 shadow-sm border-2 border-gray-100 hover:border-red-300 flex flex-col items-center justify-center cursor-pointer transition-transform active:scale-95 group">
+                <div onclick="handleCardSelection('B')" class="bg-white rounded-3xl p-4 shadow-sm border-2 border-gray-100 hover:border-pastel-blue flex flex-col items-center justify-center cursor-pointer transition-transform active:scale-95 group">
                     <div class="w-32 h-32 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-center p-2 mb-2 relative overflow-hidden">
                         <img id="slot-img-B" src="" alt="Sound B" class="w-full h-full object-contain pointer-events-none group-hover:scale-105 transition-transform">
                     </div>
@@ -166,7 +185,7 @@
                 <h2 class="text-sm sm:text-base font-black text-header-title truncate w-full text-center">Duration Training</h2>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
-                <button onclick="playDurationSound()" class="w-10 h-10 bg-red-light text-red-dark rounded-xl hover:bg-red-200 transition flex items-center justify-center font-bold text-sm cursor-pointer shadow-xs" title="Play Sound">
+                <button onclick="playDurationSound()" class="w-10 h-10 bg-red-light text-red-dark rounded-xl hover:bg-pastel-blue/40 transition flex items-center justify-center font-bold text-sm cursor-pointer shadow-xs" title="Play Sound">
                     <i class="fas fa-volume-high"></i>
                 </button>
                 <button onclick="toggleTrialModal(true)" class="w-10 h-10 bg-gray-light text-slate-700 rounded-xl hover:bg-gray-200 transition flex items-center justify-center font-bold text-sm cursor-pointer shadow-xs" title="Catalog / Library">
@@ -249,7 +268,6 @@
         const durationTypes = ['short', 'long'];
         const durationTrials = [];
         for (let i = 1; i <= 50; i++) {
-            // Pseudo-random assignment per sound index based on stable logic or Math.random
             const assignedType = (i * 7) % 2 === 0 ? 'short' : 'long';
             durationTrials.push({ id: i, sound: i, type: assignedType });
         }
@@ -386,7 +404,7 @@
             if (forceIdx !== null) currentIndex = forceIdx;
             currentTrial = durationTrials[currentIndex];
 
-            const subfolder = currentTrial.type; // 'long' or 'short'
+            const subfolder = currentTrial.type;
             activeAudio.src = `sounds/${subfolder}/${currentTrial.sound}.wav`;
 
             document.getElementById('dur-card-img').src = `images/${currentTrial.sound}.png`;
@@ -445,7 +463,7 @@
                 document.getElementById('modal-title').innerText = "Duration Catalog (50 Trials)";
                 durationTrials.forEach((trial, idx) => {
                     const btn = document.createElement('button');
-                    btn.className = `flex flex-col items-center p-3 rounded-2xl border transition cursor-pointer bg-gray-50 hover:border-red-300 shadow-sm ${currentIndex === idx ? 'border-red-400 bg-red-50 ring-2 ring-red-100' : 'border-gray-200'}`;
+                    btn.className = `flex flex-col items-center p-3 rounded-2xl border transition cursor-pointer bg-gray-50 hover:border-pastel-blue shadow-sm ${currentIndex === idx ? 'border-pastel-blue bg-pastel-blue/10 ring-2 ring-pastel-blue/30' : 'border-gray-200'}`;
                     btn.onclick = () => { currentIndex = idx; toggleTrialModal(false); loadDurationTrial(); };
                     btn.innerHTML = `
                         <div class="w-12 h-12 bg-white rounded-xl p-1 border border-gray-100 flex items-center justify-center mb-1 shadow-xs">
@@ -461,7 +479,7 @@
                 const list = getActiveTrialsList();
                 list.forEach((trial, idx) => {
                     const btn = document.createElement('button');
-                    btn.className = `flex flex-col items-center p-3 rounded-2xl border transition cursor-pointer bg-gray-50 hover:border-red-300 shadow-sm ${currentIndex === idx && !isTestModeActive ? 'border-red-400 bg-red-50 ring-2 ring-red-100' : 'border-gray-200'}`;
+                    btn.className = `flex flex-col items-center p-3 rounded-2xl border transition cursor-pointer bg-gray-50 hover:border-pastel-blue shadow-sm ${currentIndex === idx && !isTestModeActive ? 'border-pastel-blue bg-pastel-blue/10 ring-2 ring-pastel-blue/30' : 'border-gray-200'}`;
                     btn.onclick = () => { isTestModeActive = false; document.getElementById('test-counter-badge').classList.add('hidden'); currentIndex = idx; toggleTrialModal(false); loadStandardTrial(); };
                     btn.innerHTML = `
                         <div class="flex items-center gap-1 mb-1">
