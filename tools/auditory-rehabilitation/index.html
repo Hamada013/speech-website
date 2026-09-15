@@ -35,6 +35,23 @@
 </head>
 <body class="bg-gray-50 text-pastel-text overflow-hidden h-[100dvh] flex flex-col">
 
+    <!-- Preloader Overlay -->
+    <div id="preloader" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center p-6 transition-opacity duration-700 ease-in-out">
+        <div class="flex flex-col items-center max-w-sm w-full text-center">
+            <img src="images/logo.png" alt="Logo" class="h-20 w-20 object-contain rounded-full shadow-lg mb-6 animate-pulse">
+            <h2 class="text-xl font-bold text-slate-700 mb-2">Loading Application...</h2>
+            <p id="preloader-status" class="text-sm text-gray-500 mb-6">Preparing assets (0/201)</p>
+            
+            <!-- Visual Progress Bar -->
+            <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner mb-3">
+                <div id="preloader-bar" class="bg-pastel-blue h-full w-0 transition-all duration-150 ease-out"></div>
+            </div>
+            
+            <!-- Percentage Indicator -->
+            <span id="preloader-percentage" class="text-base font-bold text-slate-600">0%</span>
+        </div>
+    </div>
+
     <!-- Home Screen -->
     <div id="home-screen" class="absolute inset-0 bg-white z-[60] flex flex-col items-center justify-between p-6 transition-all duration-300 overflow-y-auto">
 
@@ -85,5 +102,72 @@
             slp.ahmadghanem@gmail.com
         </footer>
     </div>
+
+    <!-- Preloader & Asset Caching Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const preloader = document.getElementById("preloader");
+            const progressBar = document.getElementById("preloader-bar");
+            const progressText = document.getElementById("preloader-percentage");
+            const statusText = document.getElementById("preloader-status");
+
+            // Compile complete asset list from images and sound directories
+            const assets = [
+                'images/logo.png',
+                ...Array.from({length: 50}, (_, i) => `images/${i + 1}.png`),
+                ...Array.from({length: 50}, (_, i) => `sounds/long/${i + 1}.wav`),
+                ...Array.from({length: 50}, (_, i) => `sounds/short/${i + 1}.wav`),
+                ...Array.from({length: 50}, (_, i) => `sounds/${i + 1}.wav`)
+            ];
+
+            let loadedCount = 0;
+            const total = assets.length;
+
+            function updateProgress() {
+                loadedCount++;
+                const percent = Math.min(100, Math.floor((loadedCount / total) * 100));
+                progressBar.style.width = percent + '%';
+                progressText.textContent = percent + '%';
+                statusText.textContent = `Loading assets (${loadedCount}/${total})`;
+
+                if (loadedCount >= total) {
+                    // Finished loading all assets
+                    statusText.textContent = 'Ready!';
+                    setTimeout(() => {
+                        preloader.style.opacity = '0';
+                        setTimeout(() => {
+                            preloader.style.display = 'none';
+                        }, 700); // Matches transition duration
+                    }, 300);
+                }
+            }
+
+            // Preload each asset with graceful error handling so the app never freezes
+            assets.forEach(url => {
+                if (url.match(/\.(png|jpg|jpeg)$/i)) {
+                    const img = new Image();
+                    img.onload = updateProgress;
+                    img.onerror = () => {
+                        console.warn(`Skipped missing image: ${url}`);
+                        updateProgress();
+                    };
+                    img.src = url;
+                } else if (url.match(/\.(wav|mp3)$/i)) {
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Network response failed');
+                            return response.blob();
+                        })
+                        .then(() => updateProgress())
+                        .catch(() => {
+                            console.warn(`Skipped missing sound: ${url}`);
+                            updateProgress();
+                        });
+                } else {
+                    updateProgress();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
