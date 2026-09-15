@@ -38,16 +38,6 @@
                     boxShadow: {
                         'soft': '0 4px 14px 0 rgba(2, 132, 199, 0.12)',
                         'soft-mint': '0 4px 14px 0 rgba(5, 150, 105, 0.12)',
-                        'glow-gold': '0 0 25px rgba(251, 191, 36, 0.6)',
-                    },
-                    animation: {
-                        'star-celebrate': 'starCelebrate 0.8s ease-in-out infinite alternate',
-                    },
-                    keyframes: {
-                        starCelebrate: {
-                            '0%': { transform: 'scale(1) rotate(-5deg)' },
-                            '100%': { transform: 'scale(1.15) rotate(5deg)' },
-                        }
                     }
                 }
             }
@@ -62,163 +52,141 @@
             overflow: hidden;
             height: 100vh;
             height: 100dvh;
-        }
-
-        .game-workspace {
-            height: calc(100dvh - 68px);
-            max-height: calc(100dvh - 68px);
+            touch-action: none;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .modal-backdrop {
-            background-color: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(5px);
+
+        .memory-card {
+            perspective: 1000px;
+            cursor: pointer;
         }
 
-        .perspective-1000 {
-            perspective: 1000px;
-        }
-        .transform-style-3d {
+        .memory-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s;
             transform-style: preserve-3d;
         }
-        .backface-hidden {
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-        }
-        .rotate-y-180 {
+
+        .memory-card.flipped .memory-card-inner {
             transform: rotateY(180deg);
+        }
+
+        .memory-card-front, .memory-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .memory-card-back {
+            background: linear-gradient(135deg, #0284C7, #38BDF8);
+            color: white;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+        }
+
+        .memory-card-front {
+            background: white;
+            transform: rotateY(180deg);
+            border: 2px solid #34D399;
         }
     </style>
 </head>
-<body class="text-baby-textDark font-sans h-full w-full flex flex-col antialiased bg-slate-50 items-center justify-center">
+<body class="text-baby-textDark font-sans h-full w-full flex flex-col items-center justify-center antialiased bg-slate-50 overflow-hidden">
 
     <div class="w-full h-full max-w-7xl mx-auto flex flex-col shadow-xl bg-white relative overflow-hidden">
 
         <div id="toast-container" class="fixed top-3 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-[90%] max-w-sm pointer-events-none"></div>
 
-        <!-- شاشة إعدادات لعبة الذاكرة (مطابقة تماماً لتصميم rapid.html بشريط جانبي للفئات) -->
-        <div id="category-select-view" class="h-full w-full flex flex-col bg-gradient-to-b from-baby-blueLight via-white to-baby-mintLight overflow-hidden">
-            <!-- شريط علوي -->
-            <header class="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white flex-shrink-0">
+        <!-- شاشة إعدادات لعبة الذاكرة -->
+        <div id="category-select-view" class="h-full w-full flex flex-col bg-slate-50 overflow-hidden">
+            <header class="flex items-center justify-between px-4 py-2.5 border-b border-slate-200 bg-white flex-shrink-0">
                 <div class="flex items-center gap-3">
-                    <a href="games.html" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition active:scale-95 flex-shrink-0">
-                        <i class="fas fa-home text-lg"></i>
+                    <a href="games.html" class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition active:scale-95 flex-shrink-0">
+                        <i class="fas fa-home text-base"></i>
                     </a>
-                    <h1 class="text-lg sm:text-xl font-black text-baby-blueDark">لعبة الذاكرة - الإعدادات</h1>
+                    <h1 class="text-sm sm:text-lg font-black text-baby-blueDark">لعبة الذاكرة</h1>
                 </div>
 
-                <div class="flex items-center gap-4">
-                    <!-- اختيار عدد البطاقات -->
-                    <div class="hidden sm:flex items-center gap-2 bg-slate-50 p-1 rounded-xl border border-slate-200">
-                        <span class="text-xs font-bold text-slate-600 px-2">عدد البطاقات:</span>
-                        <button onclick="memoryApp.setCardCount(4)" id="btn-count-4" class="count-btn px-3 py-1 rounded-lg text-xs font-black transition border border-baby-blueMed bg-baby-blueLight text-baby-blueDark">4</button>
-                        <button onclick="memoryApp.setCardCount(6)" id="btn-count-6" class="count-btn px-3 py-1 rounded-lg text-xs font-black transition border border-slate-200 bg-white text-slate-600">6</button>
-                        <button onclick="memoryApp.setCardCount(9)" id="btn-count-9" class="count-btn px-3 py-1 rounded-lg text-xs font-black transition border border-slate-200 bg-white text-slate-600">9</button>
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <div class="relative w-32 sm:w-60">
+                        <input type="text" id="card-search-input" oninput="memoryApp.handleSearch(this.value)" placeholder="ابحث..." 
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl py-1 pr-7 sm:pr-8 pl-3 text-xs sm:text-sm font-bold text-slate-700 focus:outline-none focus:border-baby-blueDark transition">
+                        <i class="fas fa-search absolute right-2.5 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs"></i>
                     </div>
 
-                    <div class="flex items-center gap-1.5">
-                        <button onclick="memoryApp.selectAllCategories(true)" class="text-xs font-bold bg-baby-blue text-baby-blueDark px-3 py-1.5 rounded-xl hover:bg-sky-200 transition">تحديد الكل</button>
-                        <button onclick="memoryApp.selectAllCategories(false)" class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-xl hover:bg-slate-200 transition">إلغاء الكل</button>
+                    <div class="hidden sm:flex items-center gap-1.5">
+                        <button onclick="memoryApp.selectAllCategories(true)" class="text-xs font-bold bg-baby-blue text-baby-blueDark px-2.5 py-1 rounded-xl hover:bg-sky-200 transition">تحديد الكل</button>
+                        <button onclick="memoryApp.selectAllCategories(false)" class="text-xs font-bold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-xl hover:bg-slate-200 transition">إلغاء الكل</button>
                     </div>
                 </div>
             </header>
 
-            <!-- محتوى رئيسي مقسم لشريط جانبي وفضاء عرض العناصر (مطابق لـ rapid.html) -->
-            <div class="flex-grow flex overflow-hidden">
-                <!-- الشريط الجانبي للفئات (قابل للتمرير) -->
-                <aside class="w-64 sm:w-72 bg-white border-l border-slate-200 flex flex-col flex-shrink-0 overflow-y-auto no-scrollbar" id="sidebar-categories">
-                    <!-- تعبئة ديناميكية لقائمة الفئات الجانبية -->
+            <div class="flex-grow flex overflow-hidden min-h-0">
+                <aside class="w-40 sm:w-64 bg-white border-l border-slate-200 flex flex-col flex-shrink-0 overflow-y-auto no-scrollbar" id="sidebar-categories">
                 </aside>
 
-                <!-- منطقة عرض البطاقات والعناصر للفئة النشطة -->
-                <main class="flex-grow flex flex-col bg-slate-50 overflow-hidden">
-                    <!-- شريط تحكم الفئة الحالية (عنوان الفئة وأزرار تحديد عناصرها) -->
-                    <div class="bg-white px-4 py-3 border-b border-slate-200 flex items-center justify-between flex-shrink-0 shadow-sm">
-                        <h2 id="active-category-title" class="text-base sm:text-lg font-black text-baby-blueDark">الكلمات الأساسية</h2>
-                        <div class="flex items-center gap-2">
-                            <button onclick="memoryApp.selectCurrentCategoryItems(true)" class="text-xs font-bold bg-baby-mintLight text-baby-mintDark px-3 py-1.5 rounded-xl hover:bg-emerald-100 transition">حدد الكل</button>
-                            <button onclick="memoryApp.selectCurrentCategoryItems(false)" class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-xl hover:bg-slate-200 transition">إلغاء تحديد الكل</button>
+                <main class="flex-grow flex flex-col bg-slate-50 overflow-hidden min-h-0">
+                    <div class="bg-white px-3 sm:px-4 py-2 border-b border-slate-200 flex items-center justify-between flex-shrink-0 shadow-sm">
+                        <h2 id="active-category-title" class="text-xs sm:text-base font-black text-baby-blueDark truncate max-w-[130px] sm:max-w-none">جميع البطاقات</h2>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="memoryApp.selectCurrentCategoryItems(true)" class="text-[11px] sm:text-xs font-bold bg-baby-mintLight text-baby-mintDark px-2 py-1 rounded-xl hover:bg-emerald-100 transition">حدد الكل</button>
+                            <button onclick="memoryApp.selectCurrentCategoryItems(false)" class="text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-600 px-2 py-1 rounded-xl hover:bg-slate-200 transition">إلغاء</button>
                         </div>
                     </div>
 
-                    <!-- شبكة العناصر الفريدة داخل الفئة المحددة -->
-                    <div class="flex-grow overflow-y-auto p-4 no-scrollbar" id="active-category-items-grid">
-                        <!-- تعبئة ديناميكية لبطاقات العناصر -->
+                    <div class="flex-grow overflow-y-auto p-3 sm:p-5 no-scrollbar min-h-0" id="active-category-items-grid">
                     </div>
                 </main>
             </div>
 
-            <!-- ذيل الشاشة (عدد العناصر المختارة وزر البدء) -->
-            <footer class="bg-white px-6 py-3 border-t border-slate-200 flex items-center justify-between flex-shrink-0">
-                <div class="flex items-center gap-4">
-                    <div class="text-xs sm:text-sm font-bold text-slate-600">
-                        المحدد: <span id="selected-count-badge" class="text-baby-mintDark font-black">0</span> عناصر
-                    </div>
-                    <!-- اختيار عدد البطاقات للموبايل -->
-                    <div class="flex sm:hidden items-center gap-1 bg-slate-100 p-1 rounded-xl">
-                        <button onclick="memoryApp.setCardCount(4)" id="mob-btn-count-4" class="mob-count-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-baby-blue text-baby-blueDark">4</button>
-                        <button onclick="memoryApp.setCardCount(6)" id="mob-btn-count-6" class="mob-count-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-slate-600">6</button>
-                        <button onclick="memoryApp.setCardCount(9)" id="mob-btn-count-9" class="mob-count-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-slate-600">9</button>
-                    </div>
+            <footer class="bg-white px-4 sm:px-6 py-2 border-t border-slate-200 flex items-center justify-between flex-shrink-0">
+                <div class="text-xs sm:text-sm font-bold text-slate-600">
+                    المحدد: <span id="selected-count-badge" class="text-baby-mintDark font-black">0</span> عناصر
                 </div>
 
-                <button onclick="memoryApp.startMemoryGame()" class="bg-baby-mintMed hover:bg-emerald-500 text-white font-black px-8 py-2.5 rounded-2xl shadow-soft-mint text-base transition transform active:scale-95 flex items-center gap-2">
+                <button onclick="memoryApp.startMemoryGame()" class="bg-baby-mintMed hover:bg-emerald-500 text-white font-black px-6 sm:px-8 py-2 rounded-2xl shadow-soft-mint text-xs sm:text-sm transition transform active:scale-95 flex items-center gap-2">
                     <i class="fas fa-play"></i>
                     <span>ابدأ اللعبة</span>
                 </button>
             </footer>
         </div>
 
-        <!-- شاشة اللعب الفعلية للذاكرة -->
-        <div id="game-play-view" class="h-full w-full flex flex-col hidden bg-slate-50">
-            <header class="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between z-20 shadow-sm h-[68px] flex-shrink-0">
+        <!-- شاشة اللعب الفعلي -->
+        <div id="game-play-view" class="h-full w-full flex flex-col hidden bg-gradient-to-b from-baby-blueLight via-white to-baby-mintLight overflow-hidden">
+            <header class="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between z-20 shadow-sm flex-shrink-0">
                 <div class="flex items-center gap-3">
-                    <button onclick="memoryApp.backToSelection()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition active:scale-95" title="العودة للإعدادات">
-                        <i class="fas fa-arrow-right text-lg"></i>
+                    <button onclick="memoryApp.endGame()" class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition active:scale-95" title="العودة للإعدادات">
+                        <i class="fas fa-arrow-right text-base"></i>
                     </button>
-                    <span class="font-bold text-slate-700 text-sm sm:text-base">لعبة الذاكرة</span>
+                    <span class="font-bold text-slate-700 text-xs sm:text-sm">لعبة الذاكرة - جولة (<span id="current-round-num">1</span>)</span>
                 </div>
-                <div class="flex items-center gap-1.5 bg-slate-100 rounded-xl px-3 py-1 border border-slate-200 overflow-x-auto no-scrollbar max-w-[50vw] sm:max-w-none" id="game-stars-container">
-                    <!-- النجوم -->
+                <div class="flex items-center gap-4">
+                    <div class="text-xs sm:text-sm font-bold text-slate-600">
+                        الأزواج المطابقة: <span id="matched-pairs-display" class="text-baby-mintDark font-black">0</span> / <span id="total-pairs-display">4</span>
+                    </div>
                 </div>
             </header>
 
-            <main class="game-workspace flex-grow p-4 relative flex flex-col items-center justify-center overflow-auto">
-                <div id="memory-grid" class="grid justify-center items-center gap-4 sm:gap-6 w-full max-w-2xl mx-auto my-auto">
-                    <!-- شبكة الكروت -->
+            <main class="flex-grow flex flex-col items-center justify-center p-4 sm:p-6 overflow-y-auto no-scrollbar relative min-h-0">
+                <div class="w-full h-full flex items-center justify-center">
+                    <div id="memory-board" class="grid gap-3 sm:gap-4 justify-items-center items-center mx-auto">
+                    </div>
+                </div>
+
+                <div id="success-overlay" class="absolute inset-0 bg-white/80 z-50 flex flex-col items-center justify-center hidden opacity-0 transition-opacity duration-300">
+                    <div class="text-6xl text-baby-mintMed mb-4 animate-bounce"><i class="fas fa-star"></i></div>
+                    <h2 class="text-2xl font-black text-slate-800">أحسنت! أنهيت اللعبة بنجاح</h2>
                 </div>
             </main>
-        </div>
-
-        <!-- نافذة الفوز بجولة الذاكرة -->
-        <div id="win-modal" class="fixed inset-0 modal-backdrop z-[70] flex items-center justify-center hidden opacity-0 transition-opacity duration-300 p-4">
-            <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 max-w-sm w-full border-4 border-baby-mintMed text-center flex flex-col items-center">
-                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-baby-mintLight rounded-full flex items-center justify-center text-baby-mintDark text-3xl sm:text-4xl mb-4 shadow-sm">
-                    <i class="fas fa-trophy"></i>
-                </div>
-                <h2 class="text-2xl sm:text-3xl font-black text-slate-800 mb-2">رائع جداً! 🎉</h2>
-                <p class="text-slate-600 font-bold text-sm sm:text-base mb-6">لقد وجدت جميع المطابقات بنجاح وكسبت نجمة جديدة!</p>
-                <button onclick="memoryApp.nextRound()" class="w-full bg-baby-mintMed hover:bg-emerald-500 text-white font-extrabold text-lg py-3 rounded-2xl shadow-soft-mint transition transform active:scale-95">
-                    العب مجدداً ✨
-                </button>
-            </div>
-        </div>
-
-        <!-- نافذة الاحتفال بالنجوم العشرة -->
-        <div id="star-celebration-modal" class="fixed inset-0 modal-backdrop z-[80] flex items-center justify-center hidden opacity-0 transition-opacity duration-300 p-4">
-            <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 max-w-sm w-full border-4 border-amber-300 text-center flex flex-col items-center">
-                <div class="relative my-4">
-                    <i class="fas fa-star text-amber-400 text-7xl sm:text-8xl drop-shadow-lg animate-star-celebrate"></i>
-                    <i class="fas fa-crown text-amber-500 text-2xl sm:text-3xl absolute -top-4 left-1/2 transform -translate-x-1/2"></i>
-                </div>
-                <h2 class="text-2xl sm:text-3xl font-black text-slate-800 mb-2">مبروك! حصلت على 10 نجوم! 🎉</h2>
-                <p class="text-baby-blueDark font-bold text-sm sm:text-base mb-6">لقد جمعت ١٠ نجوم كاملة بنجاح مذهل في لعبة الذاكرة!</p>
-                <button onclick="memoryApp.closeStarCelebration()" class="w-full bg-amber-400 hover:bg-amber-500 text-slate-900 font-extrabold text-lg py-3 rounded-2xl shadow-glow-gold transition transform active:scale-95">
-                    متابعة ✨
-                </button>
-            </div>
         </div>
 
     </div>
@@ -254,7 +222,7 @@
             17: ["سمكة مهرج", "سلطعون", "دلفين", "سمكة", "ضفدع", "قنديل بحر", "أخطبوط", "بطريق", "سمكة بالون", "حصان بحر", "فقمة", "قرش", "حبار", "نجمة البحر", "سلحفاة البحر", "حوت"],
             18: ["فرس النبي", "نملة", "خنفساء", "نحلة", "فراشة", "صرصور", "يعسوب", "ذبابة", "جندب", "حشرات", "بعوضة", "عقرب", "حلزون", "عنكبوت", "دبور", "دودة"],
             19: ["تمساح", "حرباء", "سحلية", "سحالي", "ثعبان", "سلحفاة"],
-            20: ["تمساح", "دب", "فيل", "فلامنجو", "ثعلب", "غزال", "زرافة", "غوريلا", "ضبع", "حيوانات الغابة", "كنغر", "فهد", "اسد", "قرد", "بومة", "باندا", "ببغاء", "راكون", "وحيد قرن", "افعى", "سنجاب", "نمر", "حمار وحش"],
+            20: ["تمساح", "دب", "فيل", "فلامنجو", "ثعلب", "غزال", "زرافة", "غوريلا", "ضبع", "حيوانات الغابة", "كنغر", "فهد", "اسد", "قرد", "بومة", "بانダ", "ببغاء", "راكون", "وحيد قرن", "افعى", "سنجاب", "نمر", "حمار وحش"],
             21: ["ثور", "قطة", "صوص", "دجاجة", "ديك", "بقرة", "كلب", "حمار", "بطة", "حيوانات المزرعة", "ماعز", "اوزة", "حصان", "فار", "حمامة", "خنزير", "ارنب", "خروف"],
             22: ["طاقية", "قشاط", "جزمة صفرا", "ثياب", "حفاض", "فستان", "شحاط", "نظارات", "كفوف", "كعب عالي", "جاكيت", "غسيل", "قناع", "بيجاما", "بنطال", "شال", "بوط", "شورت", "تنورة", "جرابات", "كنزة", "تي شيرت", "كرافيت", "كيلوت"],
             23: ["منطاد", "بسكليت", "قارب", "باص", "سيارة", "هليكوبتر", "طائرة", "سكة حديد", "صاروخ", "بحر", "سفينة", "سماء", "شارع", "غواصة", "صهريج", "تكسي", "تركتور", "قطار", "مواصلات", "شاحنة"],
@@ -284,6 +252,7 @@
             const items = rawItems.map((itemName, i) => ({
                 id: i + 1,
                 catId: id,
+                uniqueKey: `${id}_${i + 1}`,
                 name: itemName,
                 image: `images/${id}/${i + 1}.png`,
                 audio: `sounds/${id}/${i + 1}.wav`
@@ -293,24 +262,19 @@
 
         const memoryApp = {
             state: {
-                selectedItems: [], 
+                selectedCardKeys: [],
                 activeCategoryIndex: 0,
-                gridSize: 4, 
-                stars: 0,
-                flippedCards: [],
+                searchQuery: '',
                 matchedPairs: 0,
-                totalPairsToMatch: 2,
-                isLocked: false
+                totalPairs: 0,
+                roundNumber: 1,
+                isLocked: false,
+                firstCard: null
             },
 
             init() {
-                const savedStars = localStorage.getItem('hamada_stars');
-                if (savedStars) {
-                    this.state.stars = Math.min(10, Math.max(0, parseInt(savedStars)));
-                }
                 this.renderSidebar();
                 this.renderActiveCategoryContent();
-                this.renderStars();
             },
 
             showToast(message, type = 'info') {
@@ -318,11 +282,10 @@
                 const toast = document.createElement('div');
                 let bgColor = 'bg-slate-800';
                 if(type === 'success') bgColor = 'bg-baby-mintDark';
-                if(type === 'error') bgColor = 'bg-rose-600';
                 if(type === 'warning') bgColor = 'bg-amber-500';
 
-                toast.className = `${bgColor} text-white px-4 py-2.5 rounded-xl shadow-lg flex items-center justify-center gap-2 text-sm font-bold transition-all duration-300 transform translate-y-[-10px] opacity-0 pointer-events-auto`;
-                toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type==='error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i><span>${message}</span>`;
+                toast.className = `${bgColor} text-white px-4 py-2 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs sm:text-sm font-bold transition-all duration-300 transform translate-y-[-10px] opacity-0 pointer-events-auto`;
+                toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i><span>${message}</span>`;
                 container.appendChild(toast);
 
                 setTimeout(() => {
@@ -337,40 +300,16 @@
                 }, 2500);
             },
 
-            setCardCount(size) {
-                this.state.gridSize = size;
-                [4, 6, 9].forEach(s => {
-                    const btn = document.getElementById(`btn-count-${s}`);
-                    if(btn) {
-                        if(s === size) {
-                            btn.className = "count-btn px-3 py-1 rounded-lg text-xs font-black transition border border-baby-blueMed bg-baby-blueLight text-baby-blueDark";
-                        } else {
-                            btn.className = "count-btn px-3 py-1 rounded-lg text-xs font-black transition border border-slate-200 bg-white text-slate-600";
-                        }
-                    }
-                    const mobBtn = document.getElementById(`mob-btn-count-${s}`);
-                    if(mobBtn) {
-                        if(s === size) {
-                            mobBtn.className = "mob-count-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-baby-blue text-baby-blueDark";
-                        } else {
-                            mobBtn.className = "mob-count-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-slate-600";
-                        }
-                    }
-                });
-            },
-
             renderSidebar() {
                 const sidebar = document.getElementById('sidebar-categories');
                 sidebar.innerHTML = '';
 
                 CATEGORIES.forEach((cat, index) => {
                     const isActive = index === this.state.activeCategoryIndex;
-                    
-                    // حساب عدد العناصر المختارة داخل هذه الفئة
-                    const catSelectedCount = cat.items.filter(item => this.state.selectedItems.includes(`${cat.id}-${item.id}`)).length;
+                    const catSelectedCount = cat.items.filter(item => this.state.selectedCardKeys.includes(item.uniqueKey)).length;
 
                     const itemEl = document.createElement('div');
-                    itemEl.className = `flex items-center justify-between px-4 py-3 cursor-pointer transition border-b border-slate-100 ${
+                    itemEl.className = `flex items-center justify-between px-3 py-2.5 cursor-pointer transition border-b border-slate-100 ${
                         isActive 
                             ? 'bg-baby-blueLight text-baby-blueDark font-black border-r-4 border-baby-blueDark' 
                             : 'hover:bg-slate-50 text-slate-700 font-bold'
@@ -378,11 +317,11 @@
 
                     itemEl.innerHTML = `
                         <div class="flex items-center gap-2 truncate">
-                            <span class="text-xs sm:text-sm truncate">${cat.name}</span>
+                            <span class="text-xs truncate">${cat.name}</span>
                         </div>
-                        <div class="flex items-center gap-1.5 flex-shrink-0">
-                            ${catSelectedCount > 0 ? `<span class="bg-baby-mintMed text-white text-[10px] px-1.5 py-0.5 rounded-full font-black">${catSelectedCount}</span>` : ''}
-                            <i class="fas fa-chevron-left text-xs opacity-50"></i>
+                        <div class="flex items-center gap-1 flex-shrink-0">
+                            ${catSelectedCount > 0 ? `<span class="bg-baby-mintMed text-white text-[10px] px-1.5 py-0.2 rounded-full font-black">${catSelectedCount}</span>` : ''}
+                            <i class="fas fa-chevron-left text-[9px] opacity-50"></i>
                         </div>
                     `;
 
@@ -404,59 +343,77 @@
                 grid.innerHTML = '';
 
                 const itemsGrid = document.createElement('div');
-                itemsGrid.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4';
+                itemsGrid.className = 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5 sm:gap-3';
 
-                cat.items.forEach(item => {
-                    const key = `${cat.id}-${item.id}`;
-                    const isSelected = this.state.selectedItems.includes(key);
+                let itemsToShow = cat.items;
+                const query = this.state.searchQuery.trim().toLowerCase();
+                if (query) {
+                    itemsToShow = cat.items.filter(item => item.name.toLowerCase().includes(query));
+                }
+
+                if (itemsToShow.length === 0) {
+                    grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 font-bold text-xs">لا توجد بطاقات مطابقة</div>`;
+                    document.getElementById('selected-count-badge').innerText = this.state.selectedCardKeys.length;
+                    return;
+                }
+
+                itemsToShow.forEach(item => {
+                    const isSelected = this.state.selectedCardKeys.includes(item.uniqueKey);
 
                     const cardEl = document.createElement('div');
-                    cardEl.className = `flex flex-col items-center justify-between p-3 rounded-2xl border-2 cursor-pointer transition select-none bg-white relative ${
+                    cardEl.className = `flex flex-col items-center justify-center p-2.5 aspect-square rounded-xl border-2 cursor-pointer transition select-none bg-white relative ${
                         isSelected 
-                            ? 'border-baby-mintMed bg-baby-mintLight/30 shadow-sm' 
-                            : 'border-slate-200 hover:border-slate-300'
+                            ? 'border-baby-mintMed shadow-sm' 
+                            : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                     }`;
 
                     cardEl.innerHTML = `
-                        <div class="absolute top-2 right-2 w-5 h-5 rounded-full border-2 flex items-center justify-center transition ${
-                            isSelected ? 'bg-baby-mintMed border-baby-mintMed text-white' : 'border-slate-300 bg-white'
+                        <div class="absolute top-1.5 right-1.5 w-4 h-4 rounded-full border-2 flex items-center justify-center transition ${
+                            isSelected ? 'bg-baby-mintMed border-baby-mintMed text-white' : 'border-slate-300 bg-transparent'
                         }">
-                            ${isSelected ? '<i class="fas fa-check text-[10px]"></i>' : ''}
+                            ${isSelected ? '<i class="fas fa-check text-[8px]"></i>' : ''}
                         </div>
-                        <div class="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center p-1 my-2 pointer-events-none">
-                            <img src="${item.image}" alt="${item.name}" class="max-h-full max-w-full object-contain">
-                        </div>
-                        <span class="text-xs sm:text-sm font-bold text-slate-700 text-center truncate w-full">${item.name}</span>
+                        <img src="${item.image}" alt="${item.name}" class="h-9 w-9 sm:h-11 sm:w-11 object-contain mb-1.5 pointer-events-none">
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-700 text-center w-full truncate">${item.name}</span>
                     `;
 
                     cardEl.onclick = () => {
                         if (isSelected) {
-                            this.state.selectedItems = this.state.selectedItems.filter(k => k !== key);
+                            this.state.selectedCardKeys = this.state.selectedCardKeys.filter(k => k !== item.uniqueKey);
                         } else {
-                            this.state.selectedItems.push(key);
+                            this.state.selectedCardKeys.push(item.uniqueKey);
                         }
                         this.renderSidebar();
                         this.renderActiveCategoryContent();
-                        document.getElementById('selected-count-badge').innerText = this.state.selectedItems.length;
                     };
 
                     itemsGrid.appendChild(cardEl);
                 });
 
                 grid.appendChild(itemsGrid);
-                document.getElementById('selected-count-badge').innerText = this.state.selectedItems.length;
+                document.getElementById('selected-count-badge').innerText = this.state.selectedCardKeys.length;
+            },
+
+            handleSearch(val) {
+                this.state.searchQuery = val;
+                this.renderActiveCategoryContent();
             },
 
             selectCurrentCategoryItems(select) {
                 const cat = CATEGORIES[this.state.activeCategoryIndex];
-                cat.items.forEach(item => {
-                    const key = `${cat.id}-${item.id}`;
+                let itemsToCheck = cat.items;
+                const query = this.state.searchQuery.trim().toLowerCase();
+                if (query) {
+                    itemsToCheck = cat.items.filter(item => item.name.toLowerCase().includes(query));
+                }
+
+                itemsToCheck.forEach(item => {
                     if (select) {
-                        if (!this.state.selectedItems.includes(key)) {
-                            this.state.selectedItems.push(key);
+                        if (!this.state.selectedCardKeys.includes(item.uniqueKey)) {
+                            this.state.selectedCardKeys.push(item.uniqueKey);
                         }
                     } else {
-                        this.state.selectedItems = this.state.selectedItems.filter(k => k !== key);
+                        this.state.selectedCardKeys = this.state.selectedCardKeys.filter(k => k !== item.uniqueKey);
                     }
                 });
                 this.renderSidebar();
@@ -468,223 +425,160 @@
                     let allKeys = [];
                     CATEGORIES.forEach(cat => {
                         cat.items.forEach(item => {
-                            allKeys.push(`${cat.id}-${item.id}`);
+                            allKeys.push(item.uniqueKey);
                         });
                     });
-                    this.state.selectedItems = allKeys;
+                    this.state.selectedCardKeys = allKeys;
                 } else {
-                    this.state.selectedItems = [];
+                    this.state.selectedCardKeys = [];
                 }
                 this.renderSidebar();
                 this.renderActiveCategoryContent();
             },
 
             startMemoryGame() {
-                if (this.state.selectedItems.length === 0) {
-                    this.showToast('الرجاء اختيار عنصر واحد على الأقل للبدء', 'warning');
+                if (this.state.selectedCardKeys.length < 2) {
+                    this.showToast('الرجاء اختيار عنصرين على الأقل للبدء بلعبة الذاكرة', 'warning');
                     return;
                 }
 
                 document.getElementById('category-select-view').classList.add('hidden');
                 document.getElementById('game-play-view').classList.remove('hidden');
-                this.setupNewRound();
+                
+                this.state.roundNumber = 1;
+                this.loadRound();
             },
 
-            backToSelection() {
+            endGame() {
                 document.getElementById('game-play-view').classList.add('hidden');
                 document.getElementById('category-select-view').classList.remove('hidden');
             },
 
-            setupNewRound() {
-                this.state.flippedCards = [];
-                this.state.matchedPairs = 0;
-                this.state.isLocked = false;
-
-                let requiredPairs = Math.floor(this.state.gridSize / 2);
-                if (this.state.gridSize === 9) {
-                    requiredPairs = 4; 
-                }
-                if (requiredPairs < 1) requiredPairs = 2;
-                this.state.totalPairsToMatch = requiredPairs;
-
-                let availableItems = [];
-                this.state.selectedItems.forEach(key => {
-                    const [catIdStr, itemIdStr] = key.split('-');
-                    const catId = parseInt(catIdStr);
-                    const itemId = parseInt(itemIdStr);
-                    const cat = CATEGORIES.find(c => c.id === catId);
-                    if (cat) {
-                        const item = cat.items.find(i => i.id === itemId);
-                        if (item) {
-                            availableItems.push(item);
+            loadRound() {
+                let pool = [];
+                CATEGORIES.forEach(cat => {
+                    cat.items.forEach(item => {
+                        if (this.state.selectedCardKeys.includes(item.uniqueKey)) {
+                            pool.push(item);
                         }
-                    }
+                    });
                 });
 
-                if (availableItems.length < requiredPairs) {
-                    this.showToast(`العناصر المحددة لا تكفي لملء شبكة اللعبة، يرجى تحديد عناصر أكثر`, 'warning');
-                    this.backToSelection();
-                    return;
-                }
+                pool.sort(() => 0.5 - Math.random());
+                const pairCount = Math.min(6, pool.length);
+                const selectedPairs = pool.slice(0, pairCount);
 
-                let shuffledItems = [...availableItems].sort(() => 0.5 - Math.random());
-                let selectedItems = shuffledItems.slice(0, requiredPairs);
-
-                let deck = [];
-                selectedItems.forEach((item, index) => {
-                    deck.push({ ...item, uniqueKey: `${item.catId}-${item.id}-1`, pairId: index });
-                    deck.push({ ...item, uniqueKey: `${item.catId}-${item.id}-2`, pairId: index });
+                let gameCards = [];
+                selectedPairs.forEach(item => {
+                    gameCards.push({...item, cardId: Math.random()});
+                    gameCards.push({...item, cardId: Math.random()});
                 });
 
-                deck.sort(() => 0.5 - Math.random());
-                this.renderBoard(deck);
-            },
+                gameCards.sort(() => 0.5 - Math.random());
 
-            renderBoard(deck) {
-                const grid = document.getElementById('memory-grid');
-                grid.innerHTML = '';
+                this.state.matchedPairs = 0;
+                this.state.totalPairs = selectedPairs.length;
+                this.state.isLocked = false;
+                this.state.firstCard = null;
 
-                let gridColsClass = 'grid-cols-2'; 
-                if (this.state.gridSize === 6) {
-                    gridColsClass = 'grid-cols-3'; 
-                } else if (this.state.gridSize === 9) {
-                    gridColsClass = 'grid-cols-3'; 
-                }
+                document.getElementById('current-round-num').innerText = this.state.roundNumber;
+                document.getElementById('matched-pairs-display').innerText = '0';
+                document.getElementById('total-pairs-display').innerText = this.state.totalPairs;
 
-                grid.className = `grid gap-4 sm:gap-6 w-full max-w-xl justify-center items-center ${gridColsClass} mx-auto`;
+                const board = document.getElementById('memory-board');
+                board.innerHTML = '';
 
-                deck.forEach((card, index) => {
-                    const cardEl = document.createElement('div');
-                    cardEl.className = 'w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 perspective-1000 cursor-pointer';
-                    cardEl.dataset.pairId = card.pairId;
-                    cardEl.dataset.index = index;
+                let colsClass = 'grid-cols-3 sm:grid-cols-4';
+                if (gameCards.length > 8) colsClass = 'grid-cols-4 sm:grid-cols-6';
+                if (gameCards.length <= 4) colsClass = 'grid-cols-2 sm:grid-cols-4';
+                board.className = `grid ${colsClass} gap-3 sm:gap-4 justify-items-center items-center mx-auto`;
 
-                    cardEl.innerHTML = `
-                        <div class="card-inner relative w-full h-full duration-300 transform-style-3d shadow-soft rounded-2xl">
-                            <!-- وجه الكرت المقلوب (الغلاف) -->
-                            <div class="card-front absolute inset-0 w-full h-full bg-baby-blue border-2 border-baby-blueMed rounded-2xl flex flex-col items-center justify-center backface-hidden shadow-sm">
-                                <i class="fas fa-question text-baby-blueDark text-2xl sm:text-3xl"></i>
+                gameCards.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'memory-card w-24 h-24 sm:w-32 sm:h-32 rounded-2xl shadow-sm';
+                    card.setAttribute('data-key', item.uniqueKey);
+
+                    card.innerHTML = `
+                        <div class="memory-card-inner">
+                            <div class="memory-card-back">
+                                <i class="fas fa-question text-2xl sm:text-3xl"></i>
                             </div>
-                            <!-- وجه الكرت المكشوف (الصورة والاسم) -->
-                            <div class="card-back absolute inset-0 w-full h-full bg-white border-2 border-baby-mintMed rounded-2xl flex flex-col items-center justify-between p-2 sm:p-3 backface-hidden rotate-y-180">
-                                <div class="w-full flex-grow p-1 flex items-center justify-center overflow-hidden pointer-events-none">
-                                    <img src="${card.image}" alt="${card.name}" class="max-h-full max-w-full object-contain">
-                                </div>
-                                <div class="w-full text-center text-[10px] sm:text-xs font-bold text-slate-700 truncate px-1 py-0.5 bg-slate-100 rounded-lg">
-                                    ${card.name}
-                                </div>
+                            <div class="memory-card-front p-2">
+                                <img src="${item.image}" alt="${item.name}" class="h-10 w-10 sm:h-14 sm:w-14 object-contain mb-1 pointer-events-none">
+                                <span class="text-[9px] sm:text-xs font-bold text-slate-800 text-center w-full truncate">${item.name}</span>
                             </div>
                         </div>
                     `;
 
-                    cardEl.onclick = () => this.flipCard(cardEl, card);
-                    grid.appendChild(cardEl);
+                    card.onclick = () => this.handleCardClick(card, item);
+                    board.appendChild(card);
                 });
             },
 
-            flipCard(cardEl, cardData) {
+            handleCardClick(cardEl, item) {
                 if (this.state.isLocked) return;
-                const inner = cardEl.querySelector('.card-inner');
-                
-                if (inner.classList.contains('rotate-y-180') || this.state.flippedCards.includes(cardEl)) {
+                if (cardEl.classList.contains('flipped') || cardEl.classList.contains('matched')) return;
+
+                cardEl.classList.add('flipped');
+
+                if (!this.state.firstCard) {
+                    this.state.firstCard = { el: cardEl, item: item };
                     return;
                 }
 
-                inner.classList.add('rotate-y-180');
-                this.state.flippedCards.push({ element: cardEl, data: cardData });
+                const first = this.state.firstCard;
+                this.state.firstCard = null;
 
-                if (this.state.flippedCards.length === 2) {
-                    this.checkForMatch();
-                }
-            },
+                if (first.item.uniqueKey === item.uniqueKey) {
+                    // Match!
+                    first.el.classList.add('matched');
+                    cardEl.classList.add('matched');
 
-            checkForMatch() {
-                this.state.isLocked = true;
-                const [card1, card2] = this.state.flippedCards;
+                    try {
+                        const audio = new Audio(item.audio);
+                        audio.play().catch(e => console.log('تعذر تشغيل الصوت', e));
+                    } catch(e) {}
 
-                if (card1.data.pairId === card2.data.pairId) {
                     this.state.matchedPairs++;
-                    this.state.flippedCards = [];
-                    this.state.isLocked = false;
+                    document.getElementById('matched-pairs-display').innerText = this.state.matchedPairs;
 
-                    if (this.state.matchedPairs === this.state.totalPairsToMatch) {
-                        setTimeout(() => this.handleRoundWin(), 500);
+                    if (this.state.matchedPairs === this.state.totalPairs) {
+                        setTimeout(() => this.handleGameSuccess(), 600);
                     }
                 } else {
+                    // No match
+                    this.state.isLocked = true;
                     setTimeout(() => {
-                        card1.element.querySelector('.card-inner').classList.remove('rotate-y-180');
-                        card2.element.querySelector('.card-inner').classList.remove('rotate-y-180');
-                        this.state.flippedCards = [];
+                        first.el.classList.remove('flipped');
+                        cardEl.classList.remove('flipped');
                         this.state.isLocked = false;
-                    }, 800);
+                    }, 1000);
                 }
             },
 
-            handleRoundWin() {
-                this.addStar();
-                const modal = document.getElementById('win-modal');
-                modal.classList.remove('hidden');
-                setTimeout(() => modal.classList.remove('opacity-0'), 10);
-            },
-
-            nextRound() {
-                const modal = document.getElementById('win-modal');
-                modal.classList.add('opacity-0');
+            handleGameSuccess() {
+                const overlay = document.getElementById('success-overlay');
+                overlay.classList.remove('hidden');
                 setTimeout(() => {
-                    modal.classList.add('hidden');
-                    this.setupNewRound();
-                }, 300);
-            },
+                    overlay.classList.remove('opacity-0');
+                    overlay.classList.add('opacity-100');
+                }, 10);
 
-            addStar() {
-                if (this.state.stars < 10) {
-                    this.state.stars++;
-                    localStorage.setItem('hamada_stars', this.state.stars);
-                    this.renderStars();
-
-                    if (this.state.stars === 10) {
-                        setTimeout(() => this.showStarCelebration(), 400);
-                    }
-                }
-            },
-
-            renderStars() {
-                const container = document.getElementById('game-stars-container');
-                if (!container) return;
-                container.innerHTML = '';
-
-                for (let i = 1; i <= 10; i++) {
-                    const star = document.createElement('i');
-                    if (i <= this.state.stars) {
-                        star.className = "fas fa-star text-amber-400 text-sm sm:text-base drop-shadow-sm";
-                    } else {
-                        star.className = "far fa-star text-slate-300 text-sm sm:text-base";
-                    }
-                    container.appendChild(star);
-                }
-            },
-
-            showStarCelebration() {
-                const modal = document.getElementById('star-celebration-modal');
-                modal.classList.remove('hidden');
-                setTimeout(() => modal.classList.remove('opacity-0'), 10);
-            },
-
-            closeStarCelebration() {
-                const modal = document.getElementById('star-celebration-modal');
-                modal.classList.add('opacity-0');
                 setTimeout(() => {
-                    modal.classList.add('hidden');
-                    this.state.stars = 0;
-                    localStorage.setItem('hamada_stars', 0);
-                    this.renderStars();
-                }, 300);
+                    overlay.classList.remove('opacity-100');
+                    overlay.classList.add('opacity-0');
+                    setTimeout(() => {
+                        overlay.classList.add('hidden');
+                        this.state.roundNumber++;
+                        this.loadRound();
+                    }, 300);
+                }, 2000);
             }
         };
 
-        window.onload = () => {
+        document.addEventListener('DOMContentLoaded', () => {
             memoryApp.init();
-        };
+        });
     </script>
 </body>
 </html>

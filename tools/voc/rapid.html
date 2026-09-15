@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>اللعبة السريعة - تطبيق حمادة</title>
+    <title>التمرير السريع - تطبيق حمادة</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -38,7 +38,6 @@
                     boxShadow: {
                         'soft': '0 4px 14px 0 rgba(2, 132, 199, 0.12)',
                         'soft-mint': '0 4px 14px 0 rgba(5, 150, 105, 0.12)',
-                        'glow-gold': '0 0 25px rgba(251, 191, 36, 0.6)',
                     }
                 }
             }
@@ -53,149 +52,113 @@
             overflow: hidden;
             height: 100vh;
             height: 100dvh;
-        }
-
-        .game-workspace {
-            height: calc(100dvh - 68px);
-            max-height: calc(100dvh - 68px);
+            touch-action: none;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .modal-backdrop {
-            background-color: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(5px);
-        }
     </style>
 </head>
-<body class="text-baby-textDark font-sans h-full w-full flex flex-col items-center justify-center antialiased bg-slate-50">
+<body class="text-baby-textDark font-sans h-full w-full flex flex-col items-center justify-center antialiased bg-slate-50 overflow-hidden">
 
     <div class="w-full h-full max-w-7xl mx-auto flex flex-col shadow-xl bg-white relative overflow-hidden">
 
         <div id="toast-container" class="fixed top-3 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-[90%] max-w-sm pointer-events-none"></div>
 
-        <!-- شاشة إعدادات اللعبة السريعة (مطابقة تماماً لتصميم الذاكرة من حيث الشريط الجانبي والهيكل) -->
-        <div id="category-select-view" class="h-full w-full flex flex-col bg-gradient-to-b from-baby-blueLight via-white to-baby-mintLight overflow-hidden">
-            <!-- شريط علوي -->
-            <header class="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white flex-shrink-0">
+        <!-- شاشة إعدادات التمرير السريع -->
+        <div id="category-select-view" class="h-full w-full flex flex-col bg-slate-50 overflow-hidden">
+            <header class="flex items-center justify-between px-4 py-2.5 border-b border-slate-200 bg-white flex-shrink-0">
                 <div class="flex items-center gap-3">
-                    <a href="games.html" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition active:scale-95 flex-shrink-0">
-                        <i class="fas fa-home text-lg"></i>
+                    <a href="games.html" class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition active:scale-95 flex-shrink-0">
+                        <i class="fas fa-home text-base"></i>
                     </a>
-                    <h1 class="text-lg sm:text-xl font-black text-baby-blueDark">اللعبة السريعة - الإعدادات</h1>
+                    <h1 class="text-sm sm:text-lg font-black text-baby-blueDark">التمرير السريع</h1>
                 </div>
 
-                <div class="flex items-center gap-4">
-                    <!-- حقل البحث -->
-                    <div class="relative w-48 sm:w-64">
-                        <input type="text" id="card-search-input" oninput="rapidApp.handleSearch(this.value)" placeholder="ابحث باسم البطاقة..." 
-                               class="w-full bg-slate-50 border border-slate-200 rounded-xl py-1.5 pr-8 pl-3 text-xs sm:text-sm font-bold text-slate-700 focus:outline-none focus:border-baby-blueDark transition">
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <div class="relative w-32 sm:w-60">
+                        <input type="text" id="card-search-input" oninput="rapidApp.handleSearch(this.value)" placeholder="ابحث..." 
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl py-1 pr-7 sm:pr-8 pl-3 text-xs sm:text-sm font-bold text-slate-700 focus:outline-none focus:border-baby-blueDark transition">
                         <i class="fas fa-search absolute right-2.5 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs"></i>
                     </div>
 
-                    <div class="flex items-center gap-1.5">
-                        <button onclick="rapidApp.selectAllCategories(true)" class="text-xs font-bold bg-baby-blue text-baby-blueDark px-3 py-1.5 rounded-xl hover:bg-sky-200 transition">تحديد الكل</button>
-                        <button onclick="rapidApp.selectAllCategories(false)" class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-xl hover:bg-slate-200 transition">إلغاء الكل</button>
+                    <div class="hidden sm:flex items-center gap-1.5">
+                        <button onclick="rapidApp.selectAllCategories(true)" class="text-xs font-bold bg-baby-blue text-baby-blueDark px-2.5 py-1 rounded-xl hover:bg-sky-200 transition">تحديد الكل</button>
+                        <button onclick="rapidApp.selectAllCategories(false)" class="text-xs font-bold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-xl hover:bg-slate-200 transition">إلغاء الكل</button>
                     </div>
                 </div>
             </header>
 
-            <!-- محتوى رئيسي مقسم لشريط جانبي وفضاء عرض العناصر -->
-            <div class="flex-grow flex overflow-hidden">
-                <!-- الشريط الجانبي للفئات (قابل للتمرير) -->
-                <aside class="w-64 sm:w-72 bg-white border-l border-slate-200 flex flex-col flex-shrink-0 overflow-y-auto no-scrollbar" id="sidebar-categories">
-                    <!-- تعبئة ديناميكية لقائمة الفئات الجانبية -->
+            <div class="flex-grow flex overflow-hidden min-h-0">
+                <aside class="w-40 sm:w-64 bg-white border-l border-slate-200 flex flex-col flex-shrink-0 overflow-y-auto no-scrollbar" id="sidebar-categories">
                 </aside>
 
-                <!-- منطقة عرض البطاقات والعناصر للفئة النشطة -->
-                <main class="flex-grow flex flex-col bg-slate-50 overflow-hidden">
-                    <!-- شريط تحكم الفئة الحالية -->
-                    <div class="bg-white px-4 py-3 border-b border-slate-200 flex items-center justify-between flex-shrink-0 shadow-sm">
-                        <h2 id="active-category-title" class="text-base sm:text-lg font-black text-baby-blueDark">جميع البطاقات</h2>
-                        <div class="flex items-center gap-2">
-                            <button onclick="rapidApp.selectCurrentCategoryItems(true)" class="text-xs font-bold bg-baby-mintLight text-baby-mintDark px-3 py-1.5 rounded-xl hover:bg-emerald-100 transition">حدد الكل</button>
-                            <button onclick="rapidApp.selectCurrentCategoryItems(false)" class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-xl hover:bg-slate-200 transition">إلغاء تحديد الكل</button>
+                <main class="flex-grow flex flex-col bg-slate-50 overflow-hidden min-h-0">
+                    <div class="bg-white px-3 sm:px-4 py-2 border-b border-slate-200 flex items-center justify-between flex-shrink-0 shadow-sm">
+                        <h2 id="active-category-title" class="text-xs sm:text-base font-black text-baby-blueDark truncate max-w-[130px] sm:max-w-none">جميع البطاقات</h2>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="rapidApp.selectCurrentCategoryItems(true)" class="text-[11px] sm:text-xs font-bold bg-baby-mintLight text-baby-mintDark px-2 py-1 rounded-xl hover:bg-emerald-100 transition">حدد الكل</button>
+                            <button onclick="rapidApp.selectCurrentCategoryItems(false)" class="text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-600 px-2 py-1 rounded-xl hover:bg-slate-200 transition">إلغاء</button>
                         </div>
                     </div>
 
-                    <!-- شبكة العناصر داخل الفئة المحددة -->
-                    <div class="flex-grow overflow-y-auto p-4 no-scrollbar" id="active-category-items-grid">
-                        <!-- تعبئة ديناميكية لبطاقات العناصر -->
+                    <div class="flex-grow overflow-y-auto p-3 sm:p-5 no-scrollbar min-h-0" id="active-category-items-grid">
                     </div>
                 </main>
             </div>
 
-            <!-- ذيل الشاشة (عدد العناصر المختارة وزر البدء) -->
-            <footer class="bg-white px-6 py-3 border-t border-slate-200 flex items-center justify-between flex-shrink-0">
-                <div class="flex items-center gap-4">
-                    <div class="text-xs sm:text-sm font-bold text-slate-600">
-                        المحدد: <span id="selected-count-badge" class="text-baby-mintDark font-black">0</span> عناصر
-                    </div>
+            <footer class="bg-white px-4 sm:px-6 py-2 border-t border-slate-200 flex items-center justify-between flex-shrink-0">
+                <div class="text-xs sm:text-sm font-bold text-slate-600">
+                    المحدد: <span id="selected-count-badge" class="text-baby-mintDark font-black">0</span> عناصر
                 </div>
 
-                <button onclick="rapidApp.startRapidGame()" class="bg-baby-mintMed hover:bg-emerald-500 text-white font-black px-8 py-2.5 rounded-2xl shadow-soft-mint text-base transition transform active:scale-95 flex items-center gap-2">
+                <button onclick="rapidApp.startRapidGame()" class="bg-baby-mintMed hover:bg-emerald-500 text-white font-black px-6 sm:px-8 py-2 rounded-2xl shadow-soft-mint text-xs sm:text-sm transition transform active:scale-95 flex items-center gap-2">
                     <i class="fas fa-play"></i>
                     <span>ابدأ اللعبة</span>
                 </button>
             </footer>
         </div>
 
-        <!-- شاشة اللعب الفعلية للعبة السريعة -->
-        <div id="game-play-view" class="h-full w-full flex flex-col hidden bg-slate-50">
-            <header class="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between z-20 shadow-sm h-[68px] flex-shrink-0">
+        <!-- شاشة اللعب الفعلي -->
+        <div id="game-play-view" class="h-full w-full flex flex-col hidden bg-gradient-to-b from-baby-blueLight via-white to-baby-mintLight overflow-hidden">
+            <header class="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between z-20 shadow-sm flex-shrink-0">
                 <div class="flex items-center gap-3">
-                    <button onclick="rapidApp.endGame()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition active:scale-95" title="العودة للإعدادات">
-                        <i class="fas fa-arrow-right text-lg"></i>
+                    <button onclick="rapidApp.endGame()" class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition active:scale-95" title="العودة للإعدادات">
+                        <i class="fas fa-arrow-right text-base"></i>
                     </button>
-                    <span class="font-bold text-slate-700 text-sm sm:text-base">اللعبة السريعة (<span id="current-trial-num">1</span>/<span id="total-trial-num">10</span>)</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="rapidApp.navigateCard(-1)" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition active:scale-95" title="السابق">
-                        <i class="fas fa-arrow-right text-sm"></i>
-                    </button>
-                    <button onclick="rapidApp.navigateCard(1)" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition active:scale-95" title="التالي">
-                        <i class="fas fa-arrow-left text-sm"></i>
-                    </button>
+                    <span class="font-bold text-slate-700 text-xs sm:text-sm">التمرير السريع - التجربة (<span id="current-trial-num">1</span> / <span id="total-trials-num">10</span>)</span>
                 </div>
             </header>
 
-            <main class="game-workspace flex-grow p-4 relative flex flex-col items-center justify-center overflow-auto">
-                <div class="w-full max-w-md bg-white rounded-3xl shadow-xl border-2 border-slate-200 p-6 flex flex-col items-center relative">
-                    
-                    <!-- البطاقة والعرض -->
-                    <div id="card-display-container" class="w-60 h-60 sm:w-64 sm:h-64 flex flex-col items-center justify-center bg-slate-50 rounded-2xl border-2 border-slate-100 p-4 mb-4 relative cursor-pointer" onclick="rapidApp.replayAudio()">
-                        <div class="w-full flex-grow flex items-center justify-center overflow-hidden mb-2">
-                            <img id="rapid-card-img" src="" alt="" class="max-h-full max-w-full object-contain pointer-events-none">
-                        </div>
-                        <div id="rapid-card-name" class="text-base sm:text-lg font-black text-slate-800 text-center truncate w-full"></div>
-                        <div class="absolute top-2 left-2 text-baby-blueDark text-sm opacity-60">
-                            <i class="fas fa-volume-high"></i>
-                        </div>
-                    </div>
+            <main class="flex-grow flex flex-col items-center justify-center p-3 sm:p-6 overflow-hidden min-h-0 relative">
+                <div id="card-display-container" class="w-full max-w-[280px] sm:max-w-sm aspect-square bg-white rounded-3xl border-4 border-baby-blueDark shadow-xl flex flex-col items-center justify-center p-4 sm:p-6 relative transition-all duration-300">
+                    <img id="game-card-img" src="" alt="" class="h-28 w-28 sm:h-48 sm:w-48 object-contain mb-3 sm:mb-4 pointer-events-none">
+                    <h2 id="game-card-title" class="text-lg sm:text-2xl font-black text-slate-800 text-center truncate w-full"></h2>
+                </div>
 
-                    <!-- شريط التقدم والنجم -->
-                    <div class="w-full flex items-center gap-3 mb-6 px-2">
-                        <div class="flex-grow bg-slate-100 h-3.5 rounded-full overflow-hidden border border-slate-200 relative">
-                            <div id="rapid-progress-bar" class="bg-baby-mintMed h-full w-0 transition-all duration-100 linear"></div>
-                        </div>
-                        <div id="rapid-star-icon" class="text-slate-300 text-2xl transition-colors duration-300 flex-shrink-0">
-                            <i class="fas fa-star"></i>
-                        </div>
+                <!-- Progress Bar below card with ending star -->
+                <div class="w-full max-w-[280px] sm:max-w-sm mt-4 sm:mt-5 px-2 flex items-center gap-2">
+                    <div class="flex-grow bg-slate-200 h-3 rounded-full overflow-hidden shadow-inner">
+                        <div id="game-progress-bar" class="bg-baby-mintMed h-full w-0 transition-all duration-100"></div>
                     </div>
-
-                    <!-- أزرار الاختيار (تظهر بعد اكتمال الشريط أو التجاوز) -->
-                    <div id="action-buttons-container" class="w-full flex items-center justify-center gap-4 opacity-0 pointer-events-none transition-opacity duration-300">
-                        <button onclick="rapidApp.handleChoice('cross')" class="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border-2 border-rose-200 font-black py-3 rounded-2xl flex items-center justify-center gap-2 text-lg transition active:scale-95 shadow-sm">
-                            <i class="fas fa-times"></i>
-                            <span>خطأ</span>
-                        </button>
-                        <button onclick="rapidApp.handleChoice('tick')" class="flex-1 bg-baby-mintLight hover:bg-emerald-100 text-baby-mintDark border-2 border-baby-mintMed font-black py-3 rounded-2xl flex items-center justify-center gap-2 text-lg transition active:scale-95 shadow-sm">
-                            <i class="fas fa-check"></i>
-                            <span>صح</span>
-                        </button>
+                    <div id="progress-star-icon" class="text-slate-300 text-lg sm:text-xl transition-colors duration-200 flex-shrink-0">
+                        <i class="fas fa-star"></i>
                     </div>
+                </div>
 
+                <div id="feedback-buttons-container" class="mt-4 sm:mt-5 flex items-center gap-6 hidden">
+                    <button onclick="rapidApp.handleTrialFeedback(false)" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-600 flex items-center justify-center text-xl sm:text-2xl font-black shadow-md transition active:scale-95">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <button onclick="rapidApp.handleTrialFeedback(true)" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-600 flex items-center justify-center text-xl sm:text-2xl font-black shadow-md transition active:scale-95">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </div>
+
+                <div id="success-overlay" class="absolute inset-0 bg-white/90 z-50 flex flex-col items-center justify-center hidden opacity-0 transition-opacity duration-300">
+                    <div class="text-6xl text-baby-mintMed mb-4 animate-bounce"><i class="fas fa-star"></i></div>
+                    <h2 class="text-2xl font-black text-slate-800">أحسنت! أنهيت الجولة بنجاح</h2>
+                    <button onclick="rapidApp.startRapidGame()" class="mt-4 bg-baby-blueDark text-white font-black px-6 py-2 rounded-xl text-sm shadow-soft">لعب مرة أخرى</button>
                 </div>
             </main>
         </div>
@@ -233,7 +196,7 @@
             17: ["سمكة مهرج", "سلطعون", "دلفين", "سمكة", "ضفدع", "قنديل بحر", "أخطبوط", "بطريق", "سمكة بالون", "حصان بحر", "فقمة", "قرش", "حبار", "نجمة البحر", "سلحفاة البحر", "حوت"],
             18: ["فرس النبي", "نملة", "خنفساء", "نحلة", "فراشة", "صرصور", "يعسوب", "ذبابة", "جندب", "حشرات", "بعوضة", "عقرب", "حلزون", "عنكبوت", "دبور", "دودة"],
             19: ["تمساح", "حرباء", "سحلية", "سحالي", "ثعبان", "سلحفاة"],
-            20: ["تمساح", "دب", "فيل", "فلامنجو", "ثعلب", "غزال", "زرافة", "غوريلا", "ضبع", "حيوانات الغابة", "كنغر", "فهد", "اسد", "قرد", "بومة", "باندا", "ببغاء", "راكون", "وحيد قرن", "افعى", "سنجاب", "نمر", "حمار وحش"],
+            20: ["تمساح", "دب", "فيل", "فلامنجو", "ثعلب", "غزال", "زرافة", "غوريلا", "ضبع", "حيوانات الغابة", "كنغر", "فهد", "اسد", "قرد", "بومة", "بانダ", "ببغاء", "راكون", "وحيد قرن", "افعى", "سنجاب", "نمر", "حمار وحش"],
             21: ["ثور", "قطة", "صوص", "دجاجة", "ديك", "بقرة", "كلب", "حمار", "بطة", "حيوانات المزرعة", "ماعز", "اوزة", "حصان", "فار", "حمامة", "خنزير", "ارنب", "خروف"],
             22: ["طاقية", "قشاط", "جزمة صفرا", "ثياب", "حفاض", "فستان", "شحاط", "نظارات", "كفوف", "كعب عالي", "جاكيت", "غسيل", "قناع", "بيجاما", "بنطال", "شال", "بوط", "شورت", "تنورة", "جرابات", "كنزة", "تي شيرت", "كرافيت", "كيلوت"],
             23: ["منطاد", "بسكليت", "قارب", "باص", "سيارة", "هليكوبتر", "طائرة", "سكة حديد", "صاروخ", "بحر", "سفينة", "سماء", "شارع", "غواصة", "صهريج", "تكسي", "تركتور", "قطار", "مواصلات", "شاحنة"],
@@ -276,27 +239,16 @@
                 selectedCardKeys: [],
                 activeCategoryIndex: 0,
                 searchQuery: '',
-                currentTrialItems: [],
-                currentIndex: 0,
-                timer: null,
-                progressInterval: null,
-                progressStartTime: null,
-                crossItemsQueue: [],
-                isRepeatPhase: false
+                trialQueue: [],
+                currentTrialIndex: 0,
+                currentTrialItem: null,
+                timerInterval: null,
+                retryQueue: []
             },
 
             init() {
                 this.renderSidebar();
                 this.renderActiveCategoryContent();
-                
-                window.addEventListener('keydown', (e) => {
-                    if (document.getElementById('game-play-view').classList.contains('hidden')) return;
-                    if (e.key === 'ArrowRight') {
-                        this.navigateCard(1);
-                    } else if (e.key === 'ArrowLeft') {
-                        this.navigateCard(-1);
-                    }
-                });
             },
 
             showToast(message, type = 'info') {
@@ -304,11 +256,10 @@
                 const toast = document.createElement('div');
                 let bgColor = 'bg-slate-800';
                 if(type === 'success') bgColor = 'bg-baby-mintDark';
-                if(type === 'error') bgColor = 'bg-rose-600';
                 if(type === 'warning') bgColor = 'bg-amber-500';
 
-                toast.className = `${bgColor} text-white px-4 py-2.5 rounded-xl shadow-lg flex items-center justify-center gap-2 text-sm font-bold transition-all duration-300 transform translate-y-[-10px] opacity-0 pointer-events-auto`;
-                toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type==='error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i><span>${message}</span>`;
+                toast.className = `${bgColor} text-white px-4 py-2 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs sm:text-sm font-bold transition-all duration-300 transform translate-y-[-10px] opacity-0 pointer-events-auto`;
+                toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i><span>${message}</span>`;
                 container.appendChild(toast);
 
                 setTimeout(() => {
@@ -332,7 +283,7 @@
                     const catSelectedCount = cat.items.filter(item => this.state.selectedCardKeys.includes(item.uniqueKey)).length;
 
                     const itemEl = document.createElement('div');
-                    itemEl.className = `flex items-center justify-between px-4 py-3 cursor-pointer transition border-b border-slate-100 ${
+                    itemEl.className = `flex items-center justify-between px-3 py-2.5 cursor-pointer transition border-b border-slate-100 ${
                         isActive 
                             ? 'bg-baby-blueLight text-baby-blueDark font-black border-r-4 border-baby-blueDark' 
                             : 'hover:bg-slate-50 text-slate-700 font-bold'
@@ -340,11 +291,11 @@
 
                     itemEl.innerHTML = `
                         <div class="flex items-center gap-2 truncate">
-                            <span class="text-xs sm:text-sm truncate">${cat.name}</span>
+                            <span class="text-xs truncate">${cat.name}</span>
                         </div>
-                        <div class="flex items-center gap-1.5 flex-shrink-0">
-                            ${catSelectedCount > 0 ? `<span class="bg-baby-mintMed text-white text-[10px] px-1.5 py-0.5 rounded-full font-black">${catSelectedCount}</span>` : ''}
-                            <i class="fas fa-chevron-left text-xs opacity-50"></i>
+                        <div class="flex items-center gap-1 flex-shrink-0">
+                            ${catSelectedCount > 0 ? `<span class="bg-baby-mintMed text-white text-[10px] px-1.5 py-0.2 rounded-full font-black">${catSelectedCount}</span>` : ''}
+                            <i class="fas fa-chevron-left text-[9px] opacity-50"></i>
                         </div>
                     `;
 
@@ -366,7 +317,7 @@
                 grid.innerHTML = '';
 
                 const itemsGrid = document.createElement('div');
-                itemsGrid.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4';
+                itemsGrid.className = 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5 sm:gap-3';
 
                 let itemsToShow = cat.items;
                 const query = this.state.searchQuery.trim().toLowerCase();
@@ -375,7 +326,7 @@
                 }
 
                 if (itemsToShow.length === 0) {
-                    grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400 font-bold text-sm">لا توجد بطاقات مطابقة في هذه الفئة</div>`;
+                    grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 font-bold text-xs">لا توجد بطاقات مطابقة</div>`;
                     document.getElementById('selected-count-badge').innerText = this.state.selectedCardKeys.length;
                     return;
                 }
@@ -384,22 +335,20 @@
                     const isSelected = this.state.selectedCardKeys.includes(item.uniqueKey);
 
                     const cardEl = document.createElement('div');
-                    cardEl.className = `flex flex-col items-center justify-between p-3 rounded-2xl border-2 cursor-pointer transition select-none bg-white relative ${
+                    cardEl.className = `flex flex-col items-center justify-center p-2.5 aspect-square rounded-xl border-2 cursor-pointer transition select-none bg-white relative ${
                         isSelected 
-                            ? 'border-baby-mintMed bg-baby-mintLight/30 shadow-sm' 
-                            : 'border-slate-200 hover:border-slate-300'
+                            ? 'border-baby-mintMed shadow-sm' 
+                            : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                     }`;
 
                     cardEl.innerHTML = `
-                        <div class="absolute top-2 right-2 w-5 h-5 rounded-full border-2 flex items-center justify-center transition ${
-                            isSelected ? 'bg-baby-mintMed border-baby-mintMed text-white' : 'border-slate-300 bg-white'
+                        <div class="absolute top-1.5 right-1.5 w-4 h-4 rounded-full border-2 flex items-center justify-center transition ${
+                            isSelected ? 'bg-baby-mintMed border-baby-mintMed text-white' : 'border-slate-300 bg-transparent'
                         }">
-                            ${isSelected ? '<i class="fas fa-check text-[10px]"></i>' : ''}
+                            ${isSelected ? '<i class="fas fa-check text-[8px]"></i>' : ''}
                         </div>
-                        <div class="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center p-1 my-2 pointer-events-none">
-                            <img src="${item.image}" alt="${item.name}" class="max-h-full max-w-full object-contain">
-                        </div>
-                        <span class="text-xs sm:text-sm font-bold text-slate-700 text-center truncate w-full">${item.name}</span>
+                        <img src="${item.image}" alt="${item.name}" class="h-9 w-9 sm:h-11 sm:w-11 object-contain mb-1.5 pointer-events-none">
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-700 text-center w-full truncate">${item.name}</span>
                     `;
 
                     cardEl.onclick = () => {
@@ -462,8 +411,8 @@
             },
 
             startRapidGame() {
-                if (this.state.selectedCardKeys.length === 0) {
-                    this.showToast('الرجاء اختيار بطاقة واحدة على الأقل للبدء', 'warning');
+                if (this.state.selectedCardKeys.length < 1) {
+                    this.showToast('الرجاء اختيار عنصر واحد على الأقل للبدء', 'warning');
                     return;
                 }
 
@@ -477,131 +426,95 @@
                 });
 
                 pool.sort(() => 0.5 - Math.random());
-                this.state.currentTrialItems = pool.slice(0, 10);
-                this.state.currentIndex = 0;
-                this.state.crossItemsQueue = [];
-                this.state.isRepeatPhase = false;
+                this.state.trialQueue = pool.slice(0, Math.min(10, pool.length));
+                this.state.currentTrialIndex = 0;
+                this.state.retryQueue = [];
 
                 document.getElementById('category-select-view').classList.add('hidden');
                 document.getElementById('game-play-view').classList.remove('hidden');
-                
-                document.getElementById('total-trial-num').innerText = this.state.currentTrialItems.length;
-                this.loadCurrentCard();
+                document.getElementById('success-overlay').classList.add('hidden');
+
+                this.loadTrial();
             },
 
             endGame() {
-                this.clearTimers();
+                if (this.state.timerInterval) clearInterval(this.state.timerInterval);
                 document.getElementById('game-play-view').classList.add('hidden');
                 document.getElementById('category-select-view').classList.remove('hidden');
             },
 
-            clearTimers() {
-                if (this.state.timer) clearTimeout(this.state.timer);
-                if (this.state.progressInterval) clearInterval(this.state.progressInterval);
-            },
+            loadTrial() {
+                if (this.state.timerInterval) clearInterval(this.state.timerInterval);
 
-            loadCurrentCard() {
-                this.clearTimers();
-                const currentItem = this.state.currentTrialItems[this.state.currentIndex];
-                
-                document.getElementById('current-trial-num').innerText = this.state.currentIndex + 1;
-                document.getElementById('rapid-card-img').src = currentItem.image;
-                document.getElementById('rapid-card-name').innerText = currentItem.name;
-                
-                const starIcon = document.getElementById('rapid-star-icon');
-                starIcon.className = "text-slate-300 text-2xl transition-colors duration-300 flex-shrink-0";
-                starIcon.innerHTML = '<i class="fas fa-star"></i>';
-
-                const actionsContainer = document.getElementById('action-buttons-container');
-                actionsContainer.classList.add('opacity-0', 'pointer-events-none');
-
-                this.playAudio(currentItem.audio);
-                this.startProgressBar();
-            },
-
-            playAudio(path) {
-                const audio = new Audio(path);
-                audio.play().catch(() => {});
-            },
-
-            replayAudio() {
-                const currentItem = this.state.currentTrialItems[this.state.currentIndex];
-                if (currentItem) {
-                    this.playAudio(currentItem.audio);
-                }
-            },
-
-            startProgressBar() {
-                const bar = document.getElementById('rapid-progress-bar');
-                bar.style.width = '0%';
-                
-                const duration = 3000;
-                const intervalTime = 30;
-                const increment = (intervalTime / duration) * 100;
-                let currentProgress = 0;
-
-                this.state.progressInterval = setInterval(() => {
-                    currentProgress += increment;
-                    if (currentProgress >= 100) {
-                        currentProgress = 100;
-                        clearInterval(this.state.progressInterval);
-                        this.onProgressBarComplete();
-                    }
-                    bar.style.width = `${currentProgress}%`;
-                }, intervalTime);
-            },
-
-            onProgressBarComplete() {
-                const starIcon = document.getElementById('rapid-star-icon');
-                starIcon.className = "text-amber-400 text-2xl transition-colors duration-300 flex-shrink-0 animate-bounce";
-                starIcon.innerHTML = '<i class="fas fa-star"></i>';
-
-                const actionsContainer = document.getElementById('action-buttons-container');
-                actionsContainer.classList.remove('opacity-0', 'pointer-events-none');
-            },
-
-            handleChoice(choice) {
-                this.clearTimers();
-                const currentItem = this.state.currentTrialItems[this.state.currentIndex];
-
-                if (choice === 'cross') {
-                    if (!this.state.crossItemsQueue.some(i => i.uniqueKey === currentItem.uniqueKey)) {
-                        this.state.crossItemsQueue.push(currentItem);
-                    }
-                }
-
-                this.navigateCard(1);
-            },
-
-            navigateCard(direction) {
-                this.clearTimers();
-                const nextIndex = this.state.currentIndex + direction;
-
-                if (nextIndex >= this.state.currentTrialItems.length) {
-                    if (this.state.crossItemsQueue.length > 0 && !this.state.isRepeatPhase) {
-                        this.state.isRepeatPhase = true;
-                        this.state.currentTrialItems = [...this.state.crossItemsQueue];
-                        this.state.crossItemsQueue = [];
-                        this.state.currentIndex = 0;
-                        document.getElementById('total-trial-num').innerText = this.state.currentTrialItems.length;
-                        this.showToast('إعادة البطاقات التي تحتاج تدريباً إضافياً', 'warning');
-                        this.loadCurrentCard();
+                if (this.state.currentTrialIndex >= this.state.trialQueue.length) {
+                    if (this.state.retryQueue.length > 0) {
+                        this.state.trialQueue = [...this.state.retryQueue];
+                        this.state.retryQueue = [];
+                        this.state.currentTrialIndex = 0;
                     } else {
-                        this.showToast('أحسنت! أتممت الجلسة بنجاح 🎉', 'success');
-                        setTimeout(() => this.endGame(), 1000);
+                        this.showSuccessOverlay();
+                        return;
                     }
-                } else if (nextIndex < 0) {
-                    return;
-                } else {
-                    this.state.currentIndex = nextIndex;
-                    this.loadCurrentCard();
                 }
+
+                document.getElementById('current-trial-num').innerText = this.state.currentTrialIndex + 1;
+                document.getElementById('total-trials-num').innerText = this.state.trialQueue.length;
+
+                const item = this.state.trialQueue[this.state.currentTrialIndex];
+                this.state.currentTrialItem = item;
+
+                document.getElementById('game-card-img').src = item.image;
+                document.getElementById('game-card-title').innerText = item.name;
+                document.getElementById('feedback-buttons-container').classList.add('hidden');
+
+                try {
+                    const audio = new Audio(item.audio);
+                    audio.play().catch(e => console.log('تعذر تشغيل الصوت', e));
+                } catch(e) {}
+
+                const progressBar = document.getElementById('game-progress-bar');
+                const starIcon = document.getElementById('progress-star-icon');
+                
+                progressBar.style.width = '0%';
+                starIcon.className = 'text-slate-300 text-lg sm:text-xl transition-colors duration-200 flex-shrink-0';
+
+                let startTime = Date.now();
+                let duration = 2000;
+
+                this.state.timerInterval = setInterval(() => {
+                    let elapsed = Date.now() - startTime;
+                    let progress = Math.min(100, (elapsed / duration) * 100);
+                    progressBar.style.width = `${progress}%`;
+
+                    if (progress >= 100) {
+                        clearInterval(this.state.timerInterval);
+                        starIcon.className = 'text-amber-400 text-lg sm:text-xl transition-colors duration-200 flex-shrink-0 animate-bounce';
+                        document.getElementById('feedback-buttons-container').classList.remove('hidden');
+                    }
+                }, 50);
+            },
+
+            handleTrialFeedback(isCorrect) {
+                if (!isCorrect) {
+                    this.state.retryQueue.push(this.state.currentTrialItem);
+                }
+                this.state.currentTrialIndex++;
+                this.loadTrial();
+            },
+
+            showSuccessOverlay() {
+                const overlay = document.getElementById('success-overlay');
+                overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    overlay.classList.remove('opacity-0');
+                    overlay.classList.add('opacity-100');
+                }, 10);
             }
         };
 
-        window.onload = () => {
+        document.addEventListener('DOMContentLoaded', () => {
             rapidApp.init();
-        };
+        });
     </script>
 </body>
 </html>

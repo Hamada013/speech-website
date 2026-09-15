@@ -49,9 +49,35 @@
     .modal-pop {
       animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
+    /* Preloader styling */
+    #preloader-overlay {
+      transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between text-gray-700 select-none bg-pastelBg">
+
+  <!-- Preloader Screen Overlay -->
+  <div id="preloader-overlay" class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6">
+    <div class="flex flex-col items-center space-y-5 max-w-xs w-full text-center">
+      <img 
+        src="images/logo.png" 
+        alt="Logo" 
+        class="w-20 h-20 object-contain rounded-full bg-sky-50 p-2 border-2 border-sky-100 shadow-sm animate-bounce"
+        onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-20 h-20 rounded-full bg-sky-100 flex items-center justify-center font-bold text-sky-600 text-3xl shadow-sm\'>H</div>';"
+      />
+      <div>
+        <h2 class="text-lg font-black text-sky-900 tracking-wide uppercase font-sans">Arabic Sounds with Hamada</h2>
+        <p class="text-xs text-gray-400 mt-1">جاري تحميل الملفات والأصوات...</p>
+      </div>
+      <!-- Visual Progress Bar -->
+      <div class="w-full bg-sky-100 h-3 rounded-full overflow-hidden p-0.5 border border-sky-200">
+        <div id="preloader-bar" class="bg-sky-500 h-full rounded-full transition-all duration-200" style="width: 0%;"></div>
+      </div>
+      <!-- Percentage Indicator -->
+      <div id="preloader-percentage" class="text-sm font-bold text-sky-700">0%</div>
+    </div>
+  </div>
 
   <header class="bg-white/80 backdrop-blur-md border-b border-sky-100 sticky top-0 z-30">
     <div class="max-w-4xl mx-auto px-4 py-2.5 flex items-center justify-between">
@@ -154,8 +180,7 @@
         <p class="text-xs text-gray-500 mt-0.5">انقر على <span class="font-bold text-sky-600">صوتين اثنين</span> للتدرب عليهما في بطاقات العرض</p>
       </div>
 
-      <div id="soundGrid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-7 gap-2.5 pt-1">
-        </div>
+      <div id="soundGrid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-7 gap-2.5 pt-1"></div>
 
       <div class="pt-2 flex justify-center">
         <button 
@@ -224,8 +249,7 @@
           <div class="absolute top-2.5 left-2.5 bg-sky-50 text-sky-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-sky-100">
             <i class="fa-solid fa-volume-high"></i>
           </div>
-          <div id="cardImgContainer0" class="w-full flex-grow flex items-center justify-center overflow-hidden">
-            </div>
+          <div id="cardImgContainer0" class="w-full flex-grow flex items-center justify-center overflow-hidden"></div>
           <span id="cardLabel0" class="text-3xl md:text-4xl font-black text-gray-800 mt-1"></span>
         </div>
 
@@ -237,8 +261,7 @@
           <div class="absolute top-2.5 left-2.5 bg-sky-50 text-sky-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-sky-100">
             <i class="fa-solid fa-volume-high"></i>
           </div>
-          <div id="cardImgContainer1" class="w-full flex-grow flex items-center justify-center overflow-hidden">
-            </div>
+          <div id="cardImgContainer1" class="w-full flex-grow flex items-center justify-center overflow-hidden"></div>
           <span id="cardLabel1" class="text-3xl md:text-4xl font-black text-gray-800 mt-1"></span>
         </div>
       </div>
@@ -254,14 +277,12 @@
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
-      <div id="modalPairsList" class="flex flex-col space-y-2.5 overflow-y-auto p-1">
-        </div>
+      <div id="modalPairsList" class="flex flex-col space-y-2.5 overflow-y-auto p-1"></div>
     </div>
   </div>
 
   <div id="feedbackOverlay" class="fixed inset-0 pointer-events-none z-50 hidden flex items-center justify-center">
-    <div id="feedbackBox" class="modal-pop p-5 rounded-3xl flex items-center justify-center shadow-xl bg-white/95 border-2">
-      </div>
+    <div id="feedbackBox" class="modal-pop p-5 rounded-3xl flex items-center justify-center shadow-xl bg-white/95 border-2"></div>
   </div>
 
   <div id="resultModal" class="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
@@ -334,7 +355,8 @@
         ]
       }
     ];
-// Speech Levels Data Structure with fully updated level 1 and level 2 mappings (Converted to Arabic letters/symbols)
+
+    // Speech Levels Data Structure with fully updated level 1 and level 2 mappings
     const SPEECH_LEVELS = {
       level1: {
         title: 'أصوات كلامية - مستوى ١',
@@ -796,9 +818,77 @@
       });
     }
 
+    // Asset Preloader Implementation
+    async function preloadAssets() {
+      const assetList = [];
+
+      // Add logo image
+      assetList.push({ type: 'image', url: 'images/logo.png' });
+
+      // Add images 1 through 29 (.png) and 30-31 (.jpeg) as specified in directory listing
+      for (let i = 1; i <= 31; i++) {
+        let ext = (i >= 30) ? 'jpeg' : 'png';
+        assetList.push({ type: 'image', url: `images/${i}.${ext}` });
+      }
+
+      // Add sound files 1 through 31 (.wav)
+      for (let i = 1; i <= 31; i++) {
+        assetList.push({ type: 'audio', url: `sounds/${i}.wav` });
+      }
+
+      const totalAssets = assetList.length;
+      let loadedCount = 0;
+
+      const progressBar = document.getElementById('preloader-bar');
+      const progressText = document.getElementById('preloader-percentage');
+      const preloaderOverlay = document.getElementById('preloader-overlay');
+
+      const updateProgress = () => {
+        loadedCount++;
+        const percentage = Math.floor((loadedCount / totalAssets) * 100);
+        if (progressBar) progressBar.style.width = `${percentage}%`;
+        if (progressText) progressText.textContent = `${percentage}%`;
+
+        if (loadedCount >= totalAssets) {
+          // Smooth fade out of preloader overlay
+          if (preloaderOverlay) {
+            preloaderOverlay.style.opacity = '0';
+            preloaderOverlay.style.visibility = 'hidden';
+            setTimeout(() => {
+              preloaderOverlay.remove();
+            }, 500);
+          }
+        }
+      };
+
+      // Loop and load each asset gracefully (handles missing files without breaking/freezing)
+      assetList.forEach(asset => {
+        if (asset.type === 'image') {
+          const img = new Image();
+          img.onload = updateProgress;
+          img.onerror = () => {
+            console.warn(`Preloader warning: Failed to load image asset: ${asset.url}`);
+            updateProgress(); // Continue loading sequence even if file is missing
+          };
+          img.src = asset.url;
+        } else if (asset.type === 'audio') {
+          const audio = document.createElement('audio');
+          audio.preload = 'auto';
+          audio.oncanplaythrough = updateProgress;
+          audio.onerror = () => {
+            console.warn(`Preloader warning: Failed to load audio asset: ${asset.url}`);
+            updateProgress(); // Graceful fallback
+          };
+          audio.src = asset.url;
+          audio.load();
+        }
+      });
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       renderSoundSelectionGrid();
       updatePracticeCards();
+      preloadAssets();
     });
   </script>
 </body>
