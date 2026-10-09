@@ -27,6 +27,10 @@ function enhanceDropdowns() {
    value.textContent=select.selectedOptions[0]?.textContent||options()[0]?.textContent||'';
    list.replaceChildren();options().forEach((option,index)=>{
     const item=document.createElement('div');item.className='select-option';item.id=id+'-option-'+index;item.setAttribute('role','option');item.setAttribute('aria-selected',String(option.selected));item.setAttribute('aria-disabled',String(option.disabled));item.textContent=option.textContent;
+    // Keep focus on the combobox until click selects an option. Otherwise a
+    // dialog can take focus on mousedown and close the list before click fires.
+    // Touch scrolling remains native; no touchstart/pointerdown is cancelled.
+    item.addEventListener('mousedown',event=>event.preventDefault());
     item.addEventListener('pointermove',()=>setActive(index));item.addEventListener('click',()=>choose(index));list.append(item);
    });
   }

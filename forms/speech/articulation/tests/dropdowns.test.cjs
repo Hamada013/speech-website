@@ -26,6 +26,7 @@ const control=run('styledDropdowns.values().next().value'),wrap=control.wrap,tri
 assert.equal(outer.children[0].children[0].textContent,'طريقة الإجراء');assert.equal(trigger.attributes.role,'combobox');assert.equal(list.attributes.role,'listbox');assert.equal(trigger.children[0].textContent,'لم يُحدد');
 trigger.dispatchEvent(new Event('click'));assert.equal(list.hidden,false);assert.equal(trigger.attributes['aria-expanded'],'true');
 let inputs=0,changes=0;select.addEventListener('input',()=>inputs++);select.addEventListener('change',()=>changes++);
+let keptFocus=false;list.children[2].dispatchEvent({type:'mousedown',preventDefault(){keptFocus=true;}});assert.equal(keptFocus,true);
 list.children[2].dispatchEvent(new Event('click'));assert.equal(select.value,'عن بُعد');assert.equal(inputs,1);assert.equal(changes,1);assert.equal(list.hidden,true);assert.equal(trigger.children[0].textContent,'عن بُعد');
 select.value='حضوري';run('enhanceDropdowns()');assert.equal(trigger.children[0].textContent,'حضوري');assert.equal(run('styledDropdowns.size'),1);
 const key=k=>trigger.dispatchEvent({type:'keydown',key:k,preventDefault(){},stopPropagation(){}});

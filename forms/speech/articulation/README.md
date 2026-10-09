@@ -1,6 +1,8 @@
 # Arabic speech sound screener / فاحص النطق العربي
 
-Open `index.html` in a modern browser. Keep the `assets` folder alongside it. No installation or Internet connection is needed.
+A standalone, installable Progressive Web App built with HTML, CSS and JavaScript. All 69 naming pictures are included as genuine lossless WebP files. Scoring, reports and pictures work offline after the initial download. No account, build server or external fonts are required.
+
+Serve this entire folder over HTTPS (or localhost for development). Open `index.html`, expand “تثبيت التطبيق والعمل دون إنترنت”, and wait for “جاهز دون إنترنت”. Then install using the app button or your browser menu. On iPhone/iPad use Share → Add to Home Screen; on Mac Safari use File → Add to Dock. Opening a local file directly does not enable PWA installation or service workers.
 
 ## Picture-led screening
 
@@ -33,7 +35,7 @@ For PDF choose “Save as PDF” in the browser print window, A4 paper, and disa
 
 ## Picture assets
 
-Put `1.png` through `69.png` in `assets/images/`. [IMAGE-LIST.md](assets/images/IMAGE-LIST.md) describes every picture, filename and word. Repeated words reuse the same file. No icons or image files are included. Use clear pictures without written labels. Missing images show a styled text placeholder; picture-only mode hides the target label and scoring panel. A custom replacement word hides the original picture until you provide a matching prompt.
+The included pictures are `1.webp` through `69.webp` in `assets/images/`. They were converted from PNG data with misleading WebP filenames using lossless compression; decoded RGBA pixels were checked for equality. [IMAGE-LIST.md](assets/images/IMAGE-LIST.md) describes every picture, filename and word. Repeated words reuse the same file. Use clear pictures without written labels. Missing images show a styled text placeholder; picture-only mode hides the target label and scoring panel. A custom replacement word hides the original picture until you provide a matching prompt.
 
 ## Files and privacy
 
@@ -50,7 +52,7 @@ Put `1.png` through `69.png` in `assets/images/`. [IMAGE-LIST.md](assets/images/
 
 Draft saving is off by default; enable it only on a private device. Local drafts are not encrypted. Use the new-case dialog after exporting to clear the recording and saved draft. This app does not send reports or patient data to a server.
 
-Run `node child/tests/screener.test.cjs` from the workspace root, or `node tests/screener.test.cjs` from this folder. Run `node child/tests/dropdowns.test.cjs` to check the styled menus, keyboard operation and selection events. Automated checks cover behavior and report data. Visual browser layout and native PDF pagination remain to be checked in a browser.
+Run `node forms/speech/articulation/tests/screener.test.cjs` from the workspace root, or `node tests/screener.test.cjs` from this folder. Run `node forms/speech/articulation/tests/dropdowns.test.cjs` to check the styled menus, keyboard operation and selection events. Automated checks cover behavior and report data. The additional Playwright suite checks real Chromium and WebKit layouts, picture decoding, reports, draft restore, offline launch and PWA updates. Native PDF pagination should also be reviewed on the intended device.
 
 References: [ASHA — Selected Phonological Patterns](https://www.asha.org/practice-portal/clinical-topics/articulation-and-phonology/selected-phonological-patterns/), [ASHA — Speech Sound Disorders](https://www.asha.org/practice-portal/clinical-topics/articulation-and-phonology/), [Living Arabic — Sounds of Levantine Arabic](https://www.livingarabic.com/brief-introduction-to-the-sounds-of-levantine-arabic).
 
@@ -65,16 +67,41 @@ Current browsers are the intended target. Native dialog support was added in [Sa
 
 Automated checks:
 
-- `node child/tests/screener.test.cjs` — recording, analysis, dates and bilingual reports.
-- `node child/tests/dropdowns.test.cjs` — styled menus, selection events and keyboard controls.
-- `node child/tests/browser.test.cjs` — viewport/keyboard dimensions, native/fallback dialogs, scroll restoration and download cleanup.
+- `node forms/speech/articulation/tests/screener.test.cjs` — recording, analysis, dates and bilingual reports.
+- `node forms/speech/articulation/tests/dropdowns.test.cjs` — styled menus, selection events and keyboard controls.
+- `node forms/speech/articulation/tests/browser.test.cjs` — viewport/keyboard dimensions, native/fallback dialogs, scroll restoration and download cleanup.
 
-Physical-device verification is still needed because no live browser or iPad was available in this workspace. Check the following on the iPad browsers you plan to use:
+Automated Chromium and WebKit checks are included; they do not replace testing native installation, sharing and printing on a physical phone or iPad. Check the following on your intended devices:
 
 1. Portrait, landscape and narrow Split View: square picture, visible arrows, no page-wide overflow.
-2. Load square, landscape and portrait PNGs: all remain contained in the square; delete/rename a test image to confirm the placeholder has the same size.
+2. Load square, landscape and portrait WebP pictures: all remain contained in the square; delete/rename a test image to confirm the placeholder has the same size.
 3. Tap every score type, select a replacement phoneme, enter a custom phoneme and cancel the picker: confirm the intended record is saved.
 4. Open menus near the bottom of the page or report dialog; scroll and select long options. Rotate the device and reopen the menu.
 5. Open the keyboard in notes and custom sound entry: controls remain reachable, the background stays still and closing the dialog restores the page position.
 6. Enable draft saving, reload and restore; check behavior when saving is unavailable in the browser’s current context.
 7. Export Arabic and English TXT, then print/save PDF: review all pages and the final professional footer using the iPad’s native print/share interface.
+
+## PWA deployment and maintenance
+
+Upload **the entire folder together**, including `sw.js`, `manifest.webmanifest`, `assets/pwa-release.js`, all scripts, icons and 69 pictures. Paths are relative, so the app works in a subfolder such as `/forms/speech/articulation/`. Use HTTPS and serve `.webmanifest` as `application/manifest+json`, `.webp` as `image/webp`, and JavaScript as `text/javascript`. Avoid long-lived HTTP caching for `sw.js` and `assets/pwa-release.js`.
+
+The initial download includes every picture. Offline readiness appears only after the complete release is cached. Browser storage can be cleared or evicted; reopen online if offline files are removed. Offline caching stores app assets, not patient records. Draft saving stays off by default and remains separate from installation. Reports and patient data are not uploaded.
+
+Updates download and verify a complete release before becoming available. The app does not automatically reload an open assessment. Choose “تحديث وإعادة تحميل” after exporting or saving. An unsaved current case requires a separate confirmation; cancelling preserves it. A failed/incomplete download leaves the previous offline release available.
+
+After changing shipped files, run from this folder:
+
+```sh
+node scripts/build-pwa.cjs
+node scripts/build-pwa.cjs --check
+node tests/screener.test.cjs
+node tests/dropdowns.test.cjs
+node tests/browser.test.cjs
+ARTICULATION_PLAYWRIGHT=/path/to/playwright node tests/pwa-browser.cjs
+```
+
+The Playwright suite needs installed Chromium/Chrome and WebKit. Set `PLAYWRIGHT_BROWSERS_PATH` if their binaries are in a custom location. Icons are already included; `scripts/build-icons.cjs` regenerates them from the local SVG using Playwright. `scripts/normalize-images.cjs` is an optional maintenance utility requiring `sharp`; it checks pixel equality and keeps originals in a temporary backup when correcting PNG data named `.webp`. Rebuild the PWA release after regenerating icons or images.
+
+For local testing, run `python3 -m http.server 8080` from the repository root and open `http://localhost:8080/forms/speech/articulation/`. A phone needs a reachable HTTPS website for installation and offline support.
+
+PWA platform references: [MDN installation guide](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable), [MDN service workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers).

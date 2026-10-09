@@ -3,8 +3,12 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="فاحص عربي غير معياري لأصوات الكلام مع صور تسمية وتقرير سريري.">
+<meta name="theme-color" content="#d9efff">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="فاحص النطق"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <title>فاحص النطق العربي | Ahmad Ghanem</title>
-<link rel="stylesheet" href="assets/styles.css"><script src="assets/stimuli.js" defer></script><script src="assets/browser.js" defer></script><script src="assets/phonology.js" defer></script><script src="assets/reporting.js" defer></script><script src="assets/dropdowns.js" defer></script><script src="assets/app.js" defer></script>
+<link rel="stylesheet" href="assets/styles.css"><script src="assets/stimuli.js" defer></script><script src="assets/browser.js" defer></script><script src="assets/phonology.js" defer></script><script src="assets/reporting.js" defer></script><script src="assets/dropdowns.js" defer></script><script src="assets/app.js" defer></script><script src="assets/pwa.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">انتقل إلى الفحص</a>
@@ -37,6 +41,12 @@
 <fieldset class="wide"><legend>إجراءات يقترحها الفاحص</legend><div id="recommendations" class="choices"></div></fieldset>
 <fieldset class="wide"><legend>توصيات فردية / إحالات وأسبابها / موعد المتابعة</legend><textarea data-meta="plan" aria-label="الخطة الفردية والمتابعة"></textarea><details class="english-note"><summary>إضافة نسخة إنجليزية للملاحظة (اختياري)</summary><label lang="en" dir="ltr">English version<textarea data-meta="planEn" dir="ltr"></textarea></label></details></fieldset>
 </div><div class="bottom"><button data-page="screen">العودة للأصوات</button><button id="summaryReport" class="primary">مراجعة التقرير وتصديره</button></div></section>
+<details id="pwaPanel" class="card pwa-panel"><summary>تثبيت التطبيق والعمل دون إنترنت <span id="pwaStatus" role="status">جارٍ تجهيز التطبيق والصور دون إنترنت…</span></summary>
+<p>أضف الفاحص إلى الشاشة الرئيسية لفتحه كتطبيق. يُنزّل التطبيق الصور الـ69 مرة واحدة (نحو 7 ميغابايت) لتعمل دون إنترنت. انتظر ظهور «جاهز دون إنترنت» قبل قطع الاتصال.</p>
+<div class="actions"><button id="pwaInstall" type="button" class="primary" aria-controls="pwaInstallHelp" aria-expanded="false">تثبيت التطبيق</button></div>
+<div id="pwaInstallHelp" hidden><h3>طريقة التثبيت</h3><p>على iPhone أو iPad: افتح قائمة المشاركة ثم اختر «إضافة إلى الشاشة الرئيسية».</p><p>على Android أو الكمبيوتر: افتح قائمة المتصفح واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية». على Safari في Mac، اختر File ثم Add to Dock.</p><p lang="en" dir="ltr">iPhone/iPad: Share → Add to Home Screen. Android/desktop: browser menu → Install app. Mac Safari: File → Add to Dock.</p></div>
+<div id="pwaUpdatePanel" hidden><p role="status">يتوفر تحديث للتطبيق. لن يُعاد تحميل الفحص تلقائياً.</p><p>صدّر التقرير أو احفظ المسودة قبل التحديث حتى لا تفقد الحالة الحالية.</p><button id="pwaUpdate" type="button">تحديث وإعادة تحميل</button></div>
+<p id="pwaError" class="error" role="alert" hidden></p></details>
 <section class="draft-bar"><label class="inline"><input id="remember" type="checkbox">حفظ مسودة على هذا الجهاز</label><span id="saveStatus" role="status" class="muted">الحفظ معطل افتراضياً. فعّله على جهاز خاص فقط.</span><button id="newCase">حالة جديدة / مسح</button></section>
 </main>
 <footer class="app-footer" dir="ltr">SPEECH AND LANGUAGE PATHOLOGY<br><strong>Ahmad Ghanem</strong><br>Latakia - Syria<br><a href="mailto:slp.ahmadghanem@gmail.com">slp.ahmadghanem@gmail.com</a></footer>
@@ -44,6 +54,7 @@
 <dialog id="pictureDialog" aria-label="صورة التسمية للطفل"><button id="closePicture">إغلاق الصورة</button><div id="childPicture" class="child-picture"></div></dialog>
 <dialog id="soundDialog" aria-labelledby="soundDialogTitle"><div class="section-head"><h2 id="soundDialogTitle">اختر الصوت الذي نطق به الطفل</h2><button id="closeSound">إلغاء</button></div><p id="soundDialogHelp" class="muted">اختر الحرف والصوت الدقيق؛ توجد خيارات إضافية للنطق اللهجي والأصوات الأخرى.</p><div id="phonemeGrid" class="phoneme-grid"></div><div class="actions"><button id="customSoundToggle">الصوت غير موجود؟ اكتب الصوت</button><button id="absentTarget" hidden>لا يوجد صوت مستهدف في هذه الصيغة</button></div><form id="customSoundForm" hidden><label for="customSound">الصوت / النسخ الصوتي الذي تريد تسجيله<input id="customSound" dir="auto" autocomplete="off" placeholder="IPA أو وصف صوتي"></label><button type="submit" class="primary">استخدام هذا الصوت</button></form><p id="soundPickerError" class="error" role="alert"></p></dialog>
 <dialog id="resetDialog" aria-labelledby="resetTitle"><h2 id="resetTitle">بدء حالة جديدة؟</h2><p>سيُمسح التسجيل الحالي والمسودة المحفوظة. صدّر التقرير أولاً إذا كنت تحتاجه.</p><div class="actions"><button id="cancelReset">إلغاء</button><button id="confirmReset">مسح وبدء حالة جديدة</button></div></dialog>
+<dialog id="pwaUpdateDialog" aria-labelledby="pwaUpdateTitle"><h2 id="pwaUpdateTitle">إعادة تحميل التطبيق؟</h2><p>الحالة الحالية غير محفوظة بالكامل كمسودة. ستُمسح من هذه النافذة عند إعادة التحميل. صدّر التقرير أو احفظ المسودة قبل المتابعة إذا كنت تحتاجها.</p><div class="actions"><button id="pwaCancelUpdate" type="button">العودة إلى الفحص</button><button id="pwaConfirmUpdate" type="button">متابعة التحديث وإعادة التحميل</button></div></dialog>
 <article id="printArea" class="report" dir="rtl"></article>
 <noscript><p>يرجى تفعيل JavaScript لتشغيل الفاحص.</p></noscript>
 </body></html>

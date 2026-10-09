@@ -733,3 +733,11 @@ html.dialog-open { overflow:hidden; }
  .table-wrap { overflow:visible; max-width:none; }
 }
 button,input:not([type=checkbox]):not([type=radio]),textarea { -webkit-appearance:none; appearance:none; }
+
+/* Install and offline readiness; excluded automatically from the printed report. */
+.pwa-panel { margin-block:24px; background:linear-gradient(115deg,#f1fbff,#ecf9f1); }
+.pwa-panel summary { cursor:pointer; font-weight:700; padding:8px 0; }
+#pwaStatus { display:block; font-size:14px; color:#365f74; font-weight:500; }
+#pwaInstallHelp,#pwaUpdatePanel { margin-top:16px; padding-top:12px; border-top:1px solid var(--line); }
+.pwa-panel p { overflow-wrap:anywhere; }
+@media (display-mode:standalone) { html { overscroll-behavior-y:contain; } }

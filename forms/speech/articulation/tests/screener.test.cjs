@@ -1,4 +1,4 @@
-// Run: node child/tests/screener.test.cjs
+// Run: node forms/speech/articulation/tests/screener.test.cjs
 // Tests recording and clinical inference; the DOM stub does not verify visual layout.
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'..');
@@ -12,13 +12,19 @@ function fixture(saved=null){
 const {run,el}=fixture();
 assert.equal(run('allProbes.length'),84);assert.equal(run('new Set(allProbes.map(p=>p.image)).size'),69);
 assert.equal(run('allProbes.every(p=>p.spoken&&p.reference)'),true);
+for(const image of run('[...new Set(allProbes.map(p=>p.image))]')){
+ assert.match(image,/^\d+\.webp$/);
+ const bytes=fs.readFileSync(path.join(root,'assets/images',image));
+ assert.equal(bytes.toString('ascii',0,4),'RIFF',image);
+ assert.equal(bytes.toString('ascii',8,12),'WEBP',image);
+}
 assert.equal(run("allProbes.find(p=>p.id==='s1-1').spoken"),'فأس');
 assert.equal(run("allProbes.find(p=>p.id==='s1-1').targetIPA"),'ʔ');
 assert.equal(run("allProbes.find(p=>p.id==='s1-1').reference"),'faʔs');
 assert.equal(run("allProbes.find(p=>p.id==='s1-2').spoken"),'ماء');
 assert.equal(run("allProbes.find(p=>p.id==='s1-2').reference"),'maːʔ');
 assert.equal(run("allProbes.find(p=>p.id==='s1-2').gloss"),'water');
-assert.equal(run("allProbes.find(p=>p.id==='s1-2').image"),'3.png');
+assert.equal(run("allProbes.find(p=>p.id==='s1-2').image"),'3.webp');
 
 assert.equal(run("allProbes.find(p=>p.id==='s28-0').spoken"),'إيد');
 assert.equal(run("allProbes.find(p=>p.id==='s28-0').targetIPA"),null);

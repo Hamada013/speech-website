@@ -100,7 +100,7 @@ function pictureMarkup(probe,child=false) {
  const word=trialFor(probe.id).word?.trim();
  let content;
  if(word&&![probe.word,probe.spoken].includes(word))content=`<div class="placeholder">${child?'الصورة غير مرتبطة بهذه الكلمة.':'كلمة بديلة — أضف صورة ملائمة قبل عرضها للطفل.'}</div>`;
- else content=`<img src="assets/images/${probe.image}" alt="${child?'صورة للتسمية':escapeHTML(spokenWord(probe))}"><div class="placeholder" hidden><span class="picture-space" aria-hidden="true"></span>${child?'الصورة غير متوفرة بعد.':`مساحة صورتنا القادمة<br><b dir="ltr">${probe.image}</b><span>${escapeHTML(spokenWord(probe))}</span>`}</div>`;
+ else content=`<img decoding="async" src="assets/images/${probe.image}" alt="${child?'صورة للتسمية':escapeHTML(spokenWord(probe))}"><div class="placeholder" hidden><span class="picture-space" aria-hidden="true"></span>${child?'الصورة غير متوفرة بعد.':`مساحة صورتنا القادمة<br><b dir="ltr">${probe.image}</b><span>${escapeHTML(spokenWord(probe))}</span>`}</div>`;
  return `<div class="picture-frame">${content}</div>`;
 }
 function wireImages(root){root.querySelectorAll('img').forEach(img=>{const fail=()=>{img.hidden=true;img.nextElementSibling.hidden=false;};img.addEventListener('error',fail);if(img.complete&&img.naturalWidth===0)fail();});}
