@@ -43,13 +43,18 @@ function setActivityBusy(busy) {
 }
 function openActivitySetup(mode) {
     navigateTo('activity');
-    activity = { mode, mount: 'setup', folder: null, subgroup: null, presentation: 'advanced', repeatCount: 1, index: 0, results: [], completed: new Set(), busy: false, autoplay: false };
+    activity = { mode, mount: 'setup', folder: null, subgroup: null, presentation: 'advanced', trialsPerSubgroup: 3, repeatCount: 1, index: 0, results: [], completed: new Set(), busy: false, autoplay: false };
     renderActivitySetup();
 }
 function chooseActivityMode(mode) { activity.mode = mode; renderActivitySetup(); }
 function chooseActivityFolder(folder) { activity.folder = folder; activity.subgroup = null; renderActivitySetup(); }
 function chooseActivitySubgroup(subgroup) { activity.subgroup = subgroup; renderActivitySetup(); }
 function chooseTestPresentation(presentation) { activity.presentation = presentation; renderActivitySetup(); }
+function chooseAssessmentTrials(count) {
+    if (!Number.isInteger(count) || count < 3 || count > 10) return;
+    activity.trialsPerSubgroup = count;
+    renderActivitySetup();
+}
 function activityButton(label, action, selected = false, attrs = '') {
     return `<button class="activity-choice${selected ? ' selected' : ''}" onclick="${action}" aria-pressed="${selected}" ${attrs}>${label}</button>`;
 }
@@ -68,8 +73,16 @@ function activityIconButton(id, label, icon, action, primary = false, attrs = ''
     };
     return `<button${id ? ` id="${id}"` : ''} class="${primary ? 'activity-primary' : 'activity-secondary'} activity-icon-button" onclick="${action}" aria-label="${htmlText(label)}" title="${htmlText(label)}" ${attrs}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[icon]}"${icon === 'play' ? ' fill="currentColor" stroke="none"' : ''}/></svg></button>`;
 }
+function clearComprehensionHeader() {
+    document.querySelector('.app-header').classList.remove('comprehension-header-active');
+    const header = document.getElementById('comprehensionHeader');
+    header.classList.add('hidden');
+    header.innerHTML = '';
+}
 function renderActivitySetup() {
+    clearComprehensionHeader();
     const a = activity;
+    document.getElementById('activityView').classList.remove('comprehension-session');
     activityRoot().classList.toggle('activity-centered', a.mode === 'test');
     if (a.mode === 'test') {
         activityRoot().innerHTML = `<div class="activity-top"><h2 id="activityHeading">اختبار الطفل</h2></div>
@@ -85,20 +98,21 @@ function renderActivitySetup() {
         <section class="activity-field"><h3>اختر طول الجملة</h3><div class="word-count-options">${[2, 3, 4, 5, 6].map(folder => activityButton(`${folder}<span> كلمات</span>`, `chooseActivityFolder(${folder})`, folder === a.folder, `data-folder="${folder}"`)).join('')}</div></section>
         ${(a.mode === 'repetition' || assessment) && cat ? `<section class="activity-field"><h3>اختر المجموعة الفرعية</h3><div class="subgroup-options">${assessment ? activityButton('كل المجموعات', 'chooseActivitySubgroup(null)', a.subgroup === null, 'data-subgroup="all"') : ''}${cat.subcategories.map(sub => activityButton(`${sub.id}. ${htmlText(sub.name)}`, `chooseActivitySubgroup(${sub.id})`, sub.id === a.subgroup, `data-subgroup="${sub.id}"`)).join('')}</div></section>` : ''}
         ${a.mode === 'comprehension' && a.folder ? `<section class="activity-field"><h3>كيف تريد عرض الخيارات؟</h3><div class="presentation-options">${activityButton('الصور المتكاملة', "chooseTestPresentation('advanced')", a.presentation === 'advanced', 'data-presentation="advanced"')}${activityButton('بطاقات الكلمات', "chooseTestPresentation('slots')", a.presentation === 'slots', 'data-presentation="slots"')}</div></section>` : ''}
-        ${assessment ? `<p class="activity-intro">${a.subgroup ? 'ثلاث محاولات عشوائية من المجموعة الفرعية المختارة' : 'ثلاث محاولات عشوائية لكل مجموعة فرعية · ٨ مجموعات · ٢٤ محاولة'}</p>` : ''}
+        ${assessment && a.folder ? `<section class="activity-field"><h3 id="assessmentTrialsHeading">عدد المحاولات لكل مجموعة فرعية</h3><div class="assessment-trial-options" role="group" aria-labelledby="assessmentTrialsHeading">${[3, 4, 5, 6, 7, 8, 9, 10].map(count => activityButton(count, `chooseAssessmentTrials(${count})`, a.trialsPerSubgroup === count, `data-trial-count="${count}"`)).join('')}</div></section>` : ''}
+        ${assessment ? `<p class="activity-intro" id="assessmentTrialInfo">${a.trialsPerSubgroup} محاولات عشوائية ${a.subgroup ? 'من المجموعة الفرعية المختارة' : `لكل مجموعة فرعية · 8 مجموعات · ${a.trialsPerSubgroup * 8} محاولة`}</p>` : ''}
         ${a.mode === 'game' ? '<p class="activity-intro">اختر البطاقة، واسحبها إلى الخانة الناقصة. يمكنك أيضاً اختيارها باللمس ثم لمس الخانة.</p>' : ''}
         <div class="activity-controls"><button id="startActivityBtn" class="activity-primary" onclick="startActivity()" ${ready ? '' : 'disabled'}>ابدأ</button></div>`;
 }
 function startActivity() {
     if (!activity.folder || (activity.mode === 'repetition' && !activity.subgroup)) return;
     stopActivityPlayback();
-    Object.assign(activity, { mount: 'session', index: 0, results: [], completed: new Set(), phase: 'ready' });
+    Object.assign(activity, { mount: 'session', index: 0, results: [], completed: new Set(), phase: 'ready', testStartedAt: new Date() });
     if (activity.mode === 'repetition') activity.sentences = SENBActivities.sentences(activity.folder, activity.subgroup);
     else if (activity.mode === 'game') {
         activity.bag = SENBActivities.gameBag(activity.folder);
         activity.round = SENBActivities.gameRound(activity.bag[0]);
     } else {
-        activity.plan = SENBActivities.testPlan(activity.folder, activity.presentation, Math.random, activity.subgroup);
+        activity.plan = SENBActivities.testPlan(activity.folder, activity.presentation, Math.random, activity.subgroup, activity.trialsPerSubgroup);
         activity.wordMarks = Array(activity.folder).fill(false);
     }
     renderActivity();
@@ -107,7 +121,7 @@ function startActivity() {
 function progressHTML() {
     const completed = activity.mode === 'repetition' ? activity.completed : new Set(activity.results.map((_, index) => index));
     const total = activityTrialCount();
-    return `<div id="activityStars" class="activity-stars" style="--star-count:${total}" role="img" aria-label="تم إكمال ${completed.size} من ${total} جملة">${Array.from({ length: total }, (_, index) => `<span class="activity-star${completed.has(index) ? ' lit' : ''}${index === activity.index ? ' current' : ''}" aria-hidden="true">★</span>`).join('')}</div>`;
+    return `<div id="activityStars" class="activity-stars" style="--star-count:${Math.min(total, 24)}" role="img" aria-label="تم إكمال ${completed.size} من ${total} جملة">${Array.from({ length: total }, (_, index) => `<span class="activity-star${completed.has(index) ? ' lit' : ''}${index === activity.index ? ' current' : ''}" aria-hidden="true">★</span>`).join('')}</div>`;
 }
 function refreshProgress() {
     const stars = document.getElementById('activityStars');
@@ -124,9 +138,18 @@ function renderActivity() {
     const sentence = currentActivitySentence();
     const group = ADVANCED_CATEGORIES.find(cat => Number(cat.folder) === activity.folder).subcategories.find(sub => String(sub.id) === sentence.subCatId);
     activityRoot().classList.remove('activity-centered');
-    activityRoot().innerHTML = `<div class="activity-top"><div><h2 id="activityHeading">${ACTIVITY_NAMES[activity.mode]}</h2><p>${activity.folder} كلمات · ${htmlText(group.name)}</p></div>${activityIconButton('activitySetupBtn', 'تغيير الاختيار', 'settings', 'returnToActivitySetup()')}</div>
-        <div class="activity-progress-label">${activity.mode === 'game' ? `الجولة ${activity.index + 1}` : `${activity.mode === 'repetition' ? 'الجملة' : 'المحاولة'} ${activity.index + 1} / ${activityTrialCount()}${activity.mode !== 'repetition' ? ` · المجموعة ${sentence.subCatId}${activity.subgroup ? '' : ' / 8'}` : ''}`}</div>
-        ${activity.mode === 'game' ? '' : progressHTML()}
+    document.getElementById('activityView').classList.toggle('comprehension-session', activity.mode === 'comprehension');
+    const title = `<div class="activity-title"><h2 id="activityHeading">${ACTIVITY_NAMES[activity.mode]}</h2><p>${activity.folder} كلمات · ${htmlText(group.name)}</p></div>`;
+    const settings = activityIconButton('activitySetupBtn', 'تغيير الاختيار', 'settings', 'returnToActivitySetup()');
+    const progress = `<div class="activity-progress-label">${activity.mode === 'game' ? `الجولة ${activity.index + 1}` : `${activity.mode === 'repetition' ? 'الجملة' : 'المحاولة'} ${activity.index + 1} / ${activityTrialCount()}${activity.mode !== 'repetition' ? ` · المجموعة ${sentence.subCatId}${activity.subgroup ? '' : ' / 8'}` : ''}`}</div>${activity.mode === 'game' ? '' : progressHTML()}`;
+    clearComprehensionHeader();
+    if (activity.mode === 'comprehension') {
+        const header = document.getElementById('comprehensionHeader');
+        header.innerHTML = `${title}<div class="comprehension-header-progress">${progress}</div><div class="comprehension-header-controls">${activityIconButton('testListenBtn', 'استمع إلى الجملة', 'listen', 'playTestPrompt()', true)}${settings}</div>`;
+        header.classList.remove('hidden');
+        document.querySelector('.app-header').classList.add('comprehension-header-active');
+    }
+    activityRoot().innerHTML = `${activity.mode === 'comprehension' ? '' : `<div class="activity-top">${title}${settings}</div>${progress}`}
         <div id="activityStage"></div><p id="activityStatus" class="activity-status" role="status" aria-live="polite"></p>`;
     const stage = document.getElementById('activityStage');
     if (activity.mode === 'repetition') renderRepetition(stage, sentence);
@@ -196,7 +219,7 @@ async function playRepetition(automatic) {
         const sentence = currentActivitySentence();
         const repeats = activity.repeatCount;
         for (let repeat = 0; repeat < repeats; repeat++) {
-            activityStatus(`تكرار ${repeat + 1} / ${repeats}`);
+            activityStatus('');
             if (!await playActivitySegments([{ path: sentence.soundPath, text: sentence.title }], token)) return finishRepetitionRun(token);
             for (let index = 0; index < sentence.slots.length; index++) {
                 const card = document.querySelectorAll('#activityStage .activity-slot')[index];
@@ -226,8 +249,7 @@ function finishRepetitionRun(token, message = 'اضغط على التشغيل ل
 }
 function renderComprehension(stage) {
     activity.phase = 'listening';
-    stage.innerHTML = `<div class="test-prompt-controls">${activityIconButton('testListenBtn', 'استمع إلى الجملة', 'listen', 'playTestPrompt()', true)}</div>
-        <div class="comprehension-grid">${activity.plan[activity.index].choices.map((sentence, index) => `<button class="comprehension-option" data-choice="${index}" onclick="answerComprehension(${index})" aria-label="الخيار ${index + 1}" disabled>${activity.presentation === 'advanced' ? `<img src="${sentence.imgPath}" alt="الخيار ${index + 1}" onerror="this.onerror=null;this.src='assets/image-fallback.svg'">` : `<span class="comprehension-slots" style="--slot-count:${sentence.slots.length}">${sentence.slots.map(slot => `<img src="${SENBActivities.imagePath(slot)}" alt="بطاقة الخيار ${index + 1}" onerror="this.onerror=null;this.src='assets/image-fallback.svg'">`).join('')}</span>`}</button>`).join('')}</div>`;
+    stage.innerHTML = `<div class="comprehension-grid">${activity.plan[activity.index].choices.map((sentence, index) => `<button class="comprehension-option" data-choice="${index}" onclick="answerComprehension(${index})" aria-label="الخيار ${index + 1}" disabled>${activity.presentation === 'advanced' ? `<img src="${sentence.imgPath}" alt="الخيار ${index + 1}" onerror="this.onerror=null;this.src='assets/image-fallback.svg'">` : `<span class="comprehension-slots" style="--slot-count:${sentence.slots.length}">${sentence.slots.map(slot => `<img src="${SENBActivities.imagePath(slot)}" alt="بطاقة الخيار ${index + 1}" onerror="this.onerror=null;this.src='assets/image-fallback.svg'">`).join('')}</span>`}</button>`).join('')}</div>`;
     activityStatus('استمع، ثم المس الجملة المناسبة.');
 }
 async function playTestPrompt() {
@@ -278,13 +300,18 @@ function nextExpressiveTrial() {
 }
 function renderActivitySummary() {
     stopActivityPlayback();
+    clearComprehensionHeader();
+    document.getElementById('activityView').classList.remove('comprehension-session');
     activity.mount = 'summary';
     const expressive = activity.mode === 'expressive';
-    const total = activity.results.reduce((sum, result) => sum + (expressive ? result.words : Number(result.correct)), 0);
-    const percentage = Math.round(total / (activity.plan.length * (expressive ? activity.folder : 1)) * 1000) / 10;
+    const summary = SENBActivities.assessmentSummary(activity.results, expressive, activity.folder);
+    activity.reportDate = activity.testStartedAt;
     activityRoot().classList.add('activity-centered');
-    activityRoot().innerHTML = `<div class="activity-summary"><h2 id="activityHeading">${expressive ? 'نسبة الإنجاز في التعبير' : 'نسبة الإنجاز في الفهم'}</h2><p class="activity-intro">${activity.folder} كلمات · ${activity.subgroup ? `المجموعة الفرعية ${activity.subgroup}` : 'كل المجموعات'}</p><div class="activity-result-total" dir="ltr">${percentage}%</div>
-        <div class="activity-controls">${activityIconButton('testRestartBtn', 'اختبار جديد', 'restart', 'returnToActivitySetup()', true)}${activityIconButton('testHomeBtn', 'الرئيسية', 'home', "navigateTo('home')")}</div></div>`;
+    activityRoot().innerHTML = `<div class="activity-summary"><h2 id="activityHeading">${expressive ? 'متوسط طول الملفوظ بالكلمات (MLU)' : 'نسبة الإنجاز في الفهم'}</h2><p class="activity-intro">${activity.folder} كلمات · ${activity.subgroup ? `المجموعة الفرعية ${activity.subgroup}` : 'كل المجموعات'}</p><p class="activity-report-meta">تاريخ الاختبار: ${htmlText(SENBReport.formatDate(activity.reportDate))}</p><p class="activity-report-meta" dir="ltr">${SENBReport.clinicianName}</p><div class="activity-result-total" dir="ltr">${expressive ? summary.mlu : `${summary.percentage}%`}</div>
+        ${expressive ? '<p class="activity-intro">MLU بالكلمات = مجموع الكلمات المحددة ÷ عدد المحاولات المكتملة</p>' : ''}
+        <div class="activity-report-table"><table><caption>نتائج المجموعات الفرعية</caption><thead><tr><th scope="col">المجموعة الفرعية</th><th scope="col">${expressive ? 'MLU بالكلمات' : 'الإجابات الصحيحة'}</th><th scope="col">${expressive ? 'المحاولات' : 'النسبة'}</th></tr></thead><tbody>${summary.groups.map(group => `<tr data-result-subgroup="${group.id}"><th scope="row">${group.id}. ${htmlText(group.name)}</th><td dir="ltr">${expressive ? group.mlu : `${group.earned} / ${group.possible}`}</td><td dir="ltr">${expressive ? group.trials : `${group.percentage}%`}</td></tr>`).join('')}</tbody></table></div>
+        ${expressive ? `<div class="activity-report-table"><table><caption>الأداء حسب نوع الكلمة</caption><thead><tr><th scope="col">نوع الكلمة</th><th scope="col">نسبة الإنتاج</th></tr></thead><tbody>${summary.wordTypes.map(type => `<tr data-word-type="${type.id}"><th scope="row">${htmlText(type.label)}</th><td dir="ltr">${type.percentage}%</td></tr>`).join('')}</tbody></table><p class="activity-intro">النسبة لكل نوع = الكلمات المحددة من هذا النوع ÷ مرات عرضه في الاختبار</p><div class="activity-word-findings">${SENBReport.wordFindings(summary).map(finding => `<p>${htmlText(finding)}</p>`).join('')}</div></div>` : ''}
+        <div class="activity-controls"><button id="downloadActivityResultsBtn" class="activity-primary" onclick="downloadActivityResults()">تنزيل التقرير PDF</button>${activityIconButton('testRestartBtn', 'اختبار جديد', 'restart', 'returnToActivitySetup()', true)}${activityIconButton('testHomeBtn', 'الرئيسية', 'home', "navigateTo('home')")}</div><p id="reportStatus" class="activity-status" role="status"></p></div>`;
 }
 function renderGame(stage, sentence) {
     const round = activity.round;

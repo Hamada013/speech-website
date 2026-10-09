@@ -39,7 +39,7 @@
     { id: 11, title: 'بنتين', genderCode: 'they', gender: 'female' },
     { id: 12, title: 'تاتا', genderCode: 'she', gender: 'female' },
     { id: 13, title: 'جدو', genderCode: 'he', gender: 'male' },
-    { id: 14, title: 'خالو', genderCode: 'he', gender: 'male' },
+    { id: 14, title: 'خالة', genderCode: 'she', gender: 'female' },
     { id: 15, title: 'عمو', genderCode: 'he', gender: 'male' },
     { id: 16, title: 'استاذ', genderCode: 'he', gender: 'male' },
     { id: 17, title: 'انسة', genderCode: 'she', gender: 'female' },
@@ -171,7 +171,7 @@
                 { id: 13, title: 'وقف' }, { id: 14, title: 'قعد' }, { id: 15, title: 'بدُو' },
                 { id: 16, title: 'مشى' }, { id: 17, title: 'ركض' }, { id: 18, title: 'زحف' },
                 { id: 19, title: 'نزل' }, { id: 20, title: 'طلع' }, { id: 21, title: 'نط' },
-                { id: 22, title: 'تسلق' }, { id: 23, title: 'خالط' }, { id: 24, title: 'قطع' },
+                { id: 22, title: 'تسلق' }, { id: 23, title: 'خلط' }, { id: 24, title: 'قطع' },
                 { id: 25, title: 'خبز' }, { id: 26, title: 'طبخ' }, { id: 27, title: 'أشر' },
                 { id: 28, title: 'خار' }, { id: 29, title: 'حكى' }, { id: 30, title: 'لعب' },
                 { id: 31, title: 'مسك' }, { id: 32, title: 'فرش' }, { id: 33, title: 'نفخ' },
@@ -281,7 +281,7 @@
                 { id: 155, title: 'اقلام', gender: 'male' }, { id: 156, title: 'سيارات', gender: 'female' },
                 { id: 157, title: 'موبايلات', gender: 'female' }, { id: 158, title: 'مفتاح', gender: 'male' },
                 { id: 159, title: 'مفاتيح', gender: 'male' }, { id: 160, title: 'دوش', gender: 'male' },
-                { id: 161, title: 'سماعة', gender: 'female' }
+                { id: 161, title: 'سماعة', gender: 'female' }, { id: 162, title: 'اكل', gender: 'male' }
             ],
 '04 place': [
     { id: 1, title: 'المطار', genderCode: 'he', gender: 'male' },
@@ -407,7 +407,8 @@
     { id: 51, titleMale: 'مليان', titleFemale: 'مليانة' },
     { id: 52, titleMale: 'فاضي', titleFemale: 'فاضية' },
     { id: 53, titleMale: 'شاطر', titleFemale: 'شاطرة' },
-    { id: 54, titleMale: 'كسلان', titleFemale: 'كسلانة' }
+    { id: 54, titleMale: 'كسلان', titleFemale: 'كسلانة' },
+    { id: 55, titleMale: 'مقلي', titleFemale: 'مقلية' }
 ],
 '06 time': [
         { id: 1, title: 'الضهر' },
@@ -1221,7 +1222,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "شرطي يمسك",
             slots: [
                 getDbItem('01 subject', 24, 'شرطي'),
-                getDbItem('02 verbs', 31, 'يمسك', { verbTense: 'present', conjugation: 'he' })
+                getDbItem('02 verbs', 75, 'يساعد', { verbTense: 'present', conjugation: 'he' })
             ]
         },
         17: {
@@ -1367,9 +1368,9 @@ const ADVANCED_REFERENCE_DB = {
             ]
         },
         13: {
-            title: "زرافتين ياكلوا",
+            title: "زرافات ياكلوا",
             slots: [
-                getDbItem('01 subject', 112, 'زرافتين'),
+                getDbItem('01 subject', 116, 'زرافتين'),
                 getDbItem('02 verbs', 1, 'ياكلوا', { verbTense: 'present', conjugation: 'they' })
             ]
         },
@@ -1633,7 +1634,7 @@ const ADVANCED_REFERENCE_DB = {
         2: {
             title: "بدها تشرب",
             slots: [
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 2, 'تشرب', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -1647,14 +1648,14 @@ const ADVANCED_REFERENCE_DB = {
         4: {
             title: "بدها تطبخ",
             slots: [
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 26, 'تطبخ', { verbTense: 'present', conjugation: 'she' })
             ]
         },
         5: {
             title: "بدهم ياكلوا",
             slots: [
-                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'past', conjugation: 'they' }),
+                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('02 verbs', 1, 'ياكلوا', { verbTense: 'present', conjugation: 'they' })
             ]
         },
@@ -1668,7 +1669,7 @@ const ADVANCED_REFERENCE_DB = {
         7: {
             title: "بدها تطلع",
             slots: [
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 20, 'تطلع', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -1682,7 +1683,7 @@ const ADVANCED_REFERENCE_DB = {
         9: {
             title: "بدها تمشط",
             slots: [
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 3, 'تمشط', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -1696,14 +1697,14 @@ const ADVANCED_REFERENCE_DB = {
         11: {
             title: "بدهم يلبسوا",
             slots: [
-                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'past', conjugation: 'they' }),
+                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('02 verbs', 7, 'يلبسوا', { verbTense: 'present', conjugation: 'they' })
             ]
         },
         12: {
             title: "بدهم يناموا",
             slots: [
-                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'past', conjugation: 'they' }),
+                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('02 verbs', 6, 'يناموا', { verbTense: 'present', conjugation: 'they' })
             ]
         },
@@ -1717,14 +1718,14 @@ const ADVANCED_REFERENCE_DB = {
         14: {
             title: "بدها تشرب",
             slots: [
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 2, 'تشرب', { verbTense: 'present', conjugation: 'she' })
             ]
         },
         15: {
             title: "بدها تاكل",
             slots: [
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 1, 'تاكل', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -1738,7 +1739,7 @@ const ADVANCED_REFERENCE_DB = {
         17: {
             title: "بدها تطلع",
             slots: [
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 20, 'تطلع', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -1766,7 +1767,7 @@ const ADVANCED_REFERENCE_DB = {
         21: {
             title: "بدها تحمل",
             slots: [
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 47, 'تحمل', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -2085,7 +2086,7 @@ const ADVANCED_REFERENCE_DB = {
         18: {
             title: "ايس كريم باردة",
             slots: [
-                getDbItem('03 object', 57, 'بوظة'),
+                getDbItem('03 object', 56, 'بوظة'),
                 getDbItem('05 adjectives', 11, 'باردة')
             ]
         },
@@ -2221,7 +2222,7 @@ const ADVANCED_REFERENCE_DB = {
         13: {
             title: "هي نملة",
             slots: [
-                getDbItem('07 pronoun', 3, 'هي'),
+                getDbItem('07 pronoun', 5, 'هي'),
                 getDbItem('03 object', 2, 'نملة')
             ]
         },
@@ -2235,7 +2236,7 @@ const ADVANCED_REFERENCE_DB = {
         15: {
             title: "هي سيارة",
             slots: [
-                getDbItem('07 pronoun', 3, 'هي'),
+                getDbItem('07 pronoun', 5, 'هي'),
                 getDbItem('03 object', 25, 'سيارة')
             ]
         },
@@ -2249,7 +2250,7 @@ const ADVANCED_REFERENCE_DB = {
         17: {
             title: "هي قطة",
             slots: [
-                getDbItem('07 pronoun', 3, 'هي'),
+                getDbItem('07 pronoun', 5, 'هي'),
                 getDbItem('01 subject', 71, 'قطة')
             ]
         },
@@ -2271,7 +2272,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "هدول كتب",
             slots: [
                 getDbItem('07 pronoun', 11, 'هدول'),
-                getDbItem('UNKNOWN', 57, 'كتب')
+                getDbItem('03 object', 57, 'كتب')
             ]
         },
         21: {
@@ -2798,7 +2799,7 @@ const ADVANCED_REFERENCE_DB = {
             slots: [
                 getDbItem('01 subject', 83, 'نملات'),
                 getDbItem('02 verbs', 47, 'يحملوا', { verbTense: 'present', conjugation: 'they' }),
-                getDbItem('UNKNOWN', 0, 'اكل') /* WARNING: Not Found */
+                getDbItem('03 object', 162, 'اكل')
             ]
         },
         17: {
@@ -3073,7 +3074,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "بنت بدها تشرب",
             slots: [
                 getDbItem('01 subject', 2, 'بنت'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 2, 'تشرب', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -3089,7 +3090,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "ماما بدها تطبخ",
             slots: [
                 getDbItem('01 subject', 6, 'ماما'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 26, 'تطبخ', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -3097,7 +3098,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "دودات بدهم ياكلوا",
             slots: [
                 getDbItem('01 subject', 88, 'دودات'),
-                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'past', conjugation: 'they' }),
+                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('02 verbs', 1, 'ياكلوا', { verbTense: 'present', conjugation: 'they' })
             ]
         },
@@ -3113,7 +3114,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "ساحرة بدها تطلع",
             slots: [
                 getDbItem('01 subject', 62, 'ساحرة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 20, 'تطلع', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -3129,7 +3130,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "ملكة بدها تمشط",
             slots: [
                 getDbItem('01 subject', 49, 'ملكة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 3, 'تمشط', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -3145,7 +3146,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "اولاد بدهم يلبسوا",
             slots: [
                 getDbItem('01 subject', 4, 'اولاد'),
-                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'past', conjugation: 'they' }),
+                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('02 verbs', 7, 'يلبسوا', { verbTense: 'present', conjugation: 'they' })
             ]
         },
@@ -3153,7 +3154,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "بنات بدهم يناموا",
             slots: [
                 getDbItem('01 subject', 9, 'بنات'),
-                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'past', conjugation: 'they' }),
+                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('02 verbs', 6, 'يناموا', { verbTense: 'present', conjugation: 'they' })
             ]
         },
@@ -3169,7 +3170,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "زرافة بدها تشرب",
             slots: [
                 getDbItem('01 subject', 111, 'زرافة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 2, 'تشرب', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -3177,7 +3178,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "فارة بدها تاكل",
             slots: [
                 getDbItem('01 subject', 77, 'فارة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 1, 'تاكل', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -3193,7 +3194,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "قطة بدها تطلع",
             slots: [
                 getDbItem('01 subject', 71, 'قطة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 20, 'تطلع', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -3225,7 +3226,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "نملة بدها تحمل",
             slots: [
                 getDbItem('03 object', 2, 'نملة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 47, 'تحمل', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -3590,7 +3591,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "ايس بني بارد",
             slots: [
                 getDbItem('03 object', 56, 'ايس كريم') ,
-                getDbItem('03 object', 4, 'شوكولا'),
+                getDbItem('03 object', 31, 'شوكولا'),
                 getDbItem('05 adjectives', 11, 'بارد')
             ]
         },
@@ -3603,10 +3604,10 @@ const ADVANCED_REFERENCE_DB = {
             ]
         },
         20: {
-            title: "بيض ابيض ساخن",
+            title: "بيض مقلي ساخن",
             slots: [
                 getDbItem('03 object', 39, 'بيض') ,
-                getDbItem('10 colors', 11, 'ابيض'),
+                getDbItem('05 adjectives', 55, 'مقلي'),
                 getDbItem('05 adjectives', 12, 'ساخن')
             ]
         },
@@ -4295,7 +4296,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "اولاد يقصوا و يكتبوا",
             slots: [
                 getDbItem('01 subject', 4, 'اولاد'),
-                getDbItem('UNKNOWN', 0, 'يقصوا') /* WARNING: Not Found */,
+                getDbItem('02 verbs', 59, 'يقصوا', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('08 linking', 3, 'و'),
                 getDbItem('02 verbs', 57, 'يكتبوا', { verbTense: 'present', conjugation: 'they' })
             ]
@@ -4421,7 +4422,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "طالب وقف و يحكي",
             slots: [
                 getDbItem('01 subject', 18, 'طالب'),
-                getDbItem('UNKNOWN', 13, 'وقف'),
+                getDbItem('02 verbs', 13, 'وقف', { verbTense: 'past', conjugation: 'he' }),
                 getDbItem('08 linking', 3, 'و'),
                 getDbItem('02 verbs', 29, 'يحكي', { verbTense: 'present', conjugation: 'he' })
             ]
@@ -4473,7 +4474,7 @@ const ADVANCED_REFERENCE_DB = {
             }
         },
         3: { // Subgroup 3
-                        1: {
+        1: {
             title: "ولد و بنت يلعبوا",
             slots: [
                 getDbItem('01 subject', 1, 'ولد'),
@@ -4704,7 +4705,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "بنت بدها تشرب عصير",
             slots: [
                 getDbItem('01 subject', 2, 'بنت'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 2, 'تشرب', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 59, 'عصير')
             ]
@@ -4722,7 +4723,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "ماما بدها تطبخ رز",
             slots: [
                 getDbItem('01 subject', 6, 'ماما'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 26, 'تطبخ', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 89, 'رز')
             ]
@@ -4731,7 +4732,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "دودات بدهم ياكلوا تفاحة",
             slots: [
                 getDbItem('01 subject', 88, 'دودات'),
-                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'past', conjugation: 'they' }),
+                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('02 verbs', 1, 'ياكلوا', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('03 object', 3, 'تفاحة')
             ]
@@ -4749,7 +4750,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "ساحرة بدها تطلع البرج",
             slots: [
                 getDbItem('01 subject', 62, 'ساحرة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 20, 'تطلع', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('04 place', 53, 'البرج')
             ]
@@ -4767,7 +4768,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "ملكة بدها تمشط شعر",
             slots: [
                 getDbItem('01 subject', 49, 'ملكة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 3, 'تمشط', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 49, 'شعر')
             ]
@@ -4785,7 +4786,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "اولاد بدهم يلبسوا جاكيت",
             slots: [
                 getDbItem('01 subject', 4, 'اولاد'),
-                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'past', conjugation: 'they' }),
+                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('02 verbs', 7, 'يلبسوا', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('03 object', 58, 'جاكيت')
             ]
@@ -4794,7 +4795,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "بنات بدهم يناموا تخت",
             slots: [
                 getDbItem('01 subject', 9, 'بنات'),
-                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'past', conjugation: 'they' }),
+                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('02 verbs', 6, 'يناموا', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('03 object', 9, 'تخت')
             ]
@@ -4812,7 +4813,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "زرافة بدها تشرب عصير",
             slots: [
                 getDbItem('01 subject', 111, 'زرافة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 2, 'تشرب', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 59, 'عصير')
             ]
@@ -4821,7 +4822,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "فارة بدها تاكل جبنة",
             slots: [
                 getDbItem('01 subject', 77, 'فارة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 1, 'تاكل', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 30, 'جبنة')
             ]
@@ -4839,7 +4840,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "قطة بدها تطلع الشجرة",
             slots: [
                 getDbItem('01 subject', 71, 'قطة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 20, 'تطلع', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 149, 'الشجرة')
             ]
@@ -4875,7 +4876,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "نملة بدها تحمل بسكوتة",
             slots: [
                 getDbItem('03 object', 2, 'نملة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 47, 'تحمل', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 140, 'بسكوتة')
             ]
@@ -5204,7 +5205,7 @@ const ADVANCED_REFERENCE_DB = {
             slots: [
                 getDbItem('01 subject', 1, 'ولد'),
                 getDbItem('02 verbs', 5, 'يتحمم', { verbTense: 'present', conjugation: 'he' }),
-                getDbItem('06 time', 18, 'الساعة'),
+                getDbItem('03 object', 32, 'ساعة'),
                 getDbItem('12 numbers', 9, '9')
             ]
         },
@@ -5213,7 +5214,7 @@ const ADVANCED_REFERENCE_DB = {
             slots: [
                 getDbItem('01 subject', 2, 'بنت'),
                 getDbItem('02 verbs', 5, 'تتحمم', { verbTense: 'present', conjugation: 'she' }),
-                getDbItem('06 time', 20, 'الساعة') ,
+                getDbItem('03 object', 32, 'ساعة'),
                 getDbItem('12 numbers', 6, '6')
             ]
         },
@@ -5472,11 +5473,11 @@ const ADVANCED_REFERENCE_DB = {
             ]
         },
         15: {
-            title: "فارة تسرق في الماركت",
+            title: "فارة تسرق من الماركت",
             slots: [
                 getDbItem('01 subject', 77, 'فارة'),
                 getDbItem('02 verbs', 93, 'تسرق', { verbTense: 'present', conjugation: 'she' }),
-                getDbItem('08 linking', 11, 'في'),
+                getDbItem('08 linking', 7, 'من'),
                 getDbItem('04 place', 29, 'الماركت')
             ]
         },
@@ -5486,11 +5487,11 @@ const ADVANCED_REFERENCE_DB = {
                 getDbItem('01 subject', 13, 'جدو'),
                 getDbItem('02 verbs', 14, 'يقعد', { verbTense: 'present', conjugation: 'he' }),
                 getDbItem('08 linking', 11, 'في'),
-                getDbItem('04 place', 13, 'محطة باصات')
+                getDbItem('04 place', 12, 'محطة باصات')
             ]
         },
         17: {
-            title: "رسام يرسم مدينه العاب",
+            title: "رسام يرسم في مدينه العاب",
             slots: [
                 getDbItem('01 subject', 53, 'رسام'),
                 getDbItem('02 verbs', 55, 'يرسم', { verbTense: 'present', conjugation: 'he' }),
@@ -5526,7 +5527,7 @@ const ADVANCED_REFERENCE_DB = {
             ]
         },
         21: {
-            title: "ولد يضحك مدينه العاب",
+            title: "ولد يضحك في مدينه العاب",
             slots: [
                 getDbItem('01 subject', 1, 'ولد'),
                 getDbItem('02 verbs', 39, 'يضحك', { verbTense: 'present', conjugation: 'he' }),
@@ -5585,7 +5586,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "بنت امام بيت اصفر",
             slots: [
                 getDbItem('01 subject', 2, 'بنت'),
-                getDbItem('09 Prepositions', 9, 'أمام'),
+                getDbItem('09 Prepositions', 5, 'أمام'),
                 getDbItem('03 object', 94, 'بيت'),
                 getDbItem('10 colors', 12, 'اصفر')
             ]
@@ -5636,12 +5637,12 @@ const ADVANCED_REFERENCE_DB = {
             ]
         },
         9: {
-            title: "بقرة على طابة بنفسجي",
+            title: "بقرة على طابة بنفسجية",
             slots: [
                 getDbItem('01 subject', 97, 'بقرة'),
                 getDbItem('09 Prepositions', 9, 'على'),
                 getDbItem('03 object', 4, 'طابة'),
-                getDbItem('10 colors', 9, 'بنفسجي')
+                getDbItem('10 colors', 9, 'بنفسجية')
             ]
         },
         10: {
@@ -5667,7 +5668,7 @@ const ADVANCED_REFERENCE_DB = {
             slots: [
                 getDbItem('01 subject', 100, 'ارنب'),
                 getDbItem('10 colors', 11, 'ابيض'),
-                getDbItem('09 Prepositions', 9, 'أمام'),
+                getDbItem('09 Prepositions', 5, 'أمام'),
                 getDbItem('01 subject', 90, 'فيل')
             ]
         },
@@ -6509,7 +6510,8 @@ const ADVANCED_REFERENCE_DB = {
                 getDbItem('02 verbs', 46, 'يشتروا', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('06 time', 1, 'الضهر')
                 ]
-            }            },
+            }            
+        },
         4: { // Subgroup 4
         1: {
             title: "ولد بدو ياكل تفاحة حمرا",
@@ -6525,7 +6527,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "بنت بدها تشرب عصير برتقال",
             slots: [
                 getDbItem('01 subject', 2, 'بنت'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 2, 'تشرب', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 59, 'عصير'),
                 getDbItem('03 object', 75, 'برتقال')
@@ -6545,7 +6547,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "ماما بدها تطبخ رز ابيض",
             slots: [
                 getDbItem('01 subject', 6, 'ماما'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 26, 'تطبخ', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 89, 'رز'),
                 getDbItem('10 colors', 11, 'ابيض')
@@ -6555,7 +6557,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "دودات بدهم ياكلوا تفاحة كبيرة",
             slots: [
                 getDbItem('01 subject', 88, 'دودات'),
-                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'past', conjugation: 'they' }),
+                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('02 verbs', 1, 'ياكلوا', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('03 object', 3, 'تفاحة'),
                 getDbItem('05 adjectives', 5, 'كبيرة')
@@ -6575,7 +6577,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "ساحرة بدها تطلع البرج طويل",
             slots: [
                 getDbItem('01 subject', 62, 'ساحرة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 20, 'تطلع', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('04 place', 53, 'البرج'),
                 getDbItem('05 adjectives', 32, 'طويل')
@@ -6595,7 +6597,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "ملكة بدها تمشط شعر احمر",
             slots: [
                 getDbItem('01 subject', 49, 'ملكة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 3, 'تمشط', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 49, 'شعر'),
                 getDbItem('10 colors', 10, 'احمر')
@@ -6615,7 +6617,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "اولاد بدهم يلبسوا جاكيت صفرا",
             slots: [
                 getDbItem('01 subject', 4, 'اولاد'),
-                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'past', conjugation: 'they' }),
+                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('02 verbs', 7, 'يلبسوا', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('03 object', 58, 'جاكيت'),
                 getDbItem('10 colors', 12, 'صفرا')
@@ -6625,7 +6627,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "بنات بدهم يناموا تخت كبير",
             slots: [
                 getDbItem('01 subject', 9, 'بنات'),
-                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'past', conjugation: 'they' }),
+                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('02 verbs', 6, 'يناموا', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('03 object', 9, 'تخت'),
                 getDbItem('05 adjectives', 5, 'كبير')
@@ -6645,7 +6647,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "زرافة بدها تشرب عصير برتقال",
             slots: [
                 getDbItem('01 subject', 111, 'زرافة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 2, 'تشرب', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 59, 'عصير'),
                 getDbItem('03 object', 75, 'برتقال')
@@ -6655,7 +6657,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "فارة بدها تاكل جبنة صفرا",
             slots: [
                 getDbItem('01 subject', 77, 'فارة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 1, 'تاكل', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 30, 'جبنة'),
                 getDbItem('10 colors', 12, 'صفرا')
@@ -6675,7 +6677,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "قطة بدها تطلع بيت شجرة",
             slots: [
                 getDbItem('01 subject', 71, 'قطة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 20, 'تطلع', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 94, 'بيت'),
                 getDbItem('03 object', 124, 'شجرة')
@@ -6715,7 +6717,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "نملة بدها تحمل بسكوتة صغيرة",
             slots: [
                 getDbItem('03 object', 2, 'نملة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 47, 'تحمل', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 140, 'بسكوتة'),
                 getDbItem('05 adjectives', 6, 'صغيرة')
@@ -7082,7 +7084,7 @@ const ADVANCED_REFERENCE_DB = {
                 getDbItem('02 verbs', 5, 'يتحمم', { verbTense: 'present', conjugation: 'he' }),
                 getDbItem('03 object', 96, 'شامبو'),
                 getDbItem('10 colors', 12, 'اصفر'),
-                getDbItem('06 time', 18, 'ساعة 6')
+                getDbItem('06 time', 18, 'ساعة 9')
             ]
         },
         10: {
@@ -7984,7 +7986,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "ديناصور لبس طاقية في الكهف بليل",
             slots: [
                 getDbItem('01 subject', 84, 'ديناصور'),
-                getDbItem('02 verbs', 7, { verbTense: 'past', conjugation: 'he' }),
+                getDbItem('02 verbs', 7, 'لبس', { verbTense: 'past', conjugation: 'he' }),
                 getDbItem('03 object', 53, 'طاقية'),
                 getDbItem('08 linking', 11, 'في'),
                 getDbItem('04 place', 15, 'الكهف'),
@@ -8540,7 +8542,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "بنت بدها تشرب عصير برتقال الان",
             slots: [
                 getDbItem('01 subject', 2, 'بنت'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 2, 'تشرب', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 59, 'عصير'),
                 getDbItem('03 object', 75, 'برتقال'),
@@ -8562,7 +8564,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "ماما بدها تطبخ رز ابيض بكرا",
             slots: [
                 getDbItem('01 subject', 6, 'ماما'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 26, 'تطبخ', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 89, 'رز'),
                 getDbItem('10 colors', 11, 'ابيض'),
@@ -8573,7 +8575,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "دودات بدهم ياكلوا تفاحة كبيرة الان",
             slots: [
                 getDbItem('01 subject', 88, 'دودات'),
-                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'past', conjugation: 'they' }),
+                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('02 verbs', 1, 'ياكلوا', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('03 object', 3, 'تفاحة'),
                 getDbItem('05 adjectives', 5, 'كبيرة'),
@@ -8595,7 +8597,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "ساحرة بدها تطلع البرج طويل بليل",
             slots: [
                 getDbItem('01 subject', 62, 'ساحرة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 20, 'تطلع', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('04 place', 53, 'البرج'),
                 getDbItem('05 adjectives', 32, 'طويل'),
@@ -8617,7 +8619,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "ملكة بدها تمشط شعر احمر بكرا",
             slots: [
                 getDbItem('01 subject', 49, 'ملكة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 3, 'تمشط', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 49, 'شعر'),
                 getDbItem('10 colors', 10, 'احمر'),
@@ -8639,7 +8641,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "اولاد بدهم يلبسوا جاكيت صفرا الشتاء",
             slots: [
                 getDbItem('01 subject', 4, 'اولاد'),
-                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'past', conjugation: 'they' }),
+                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('02 verbs', 7, 'يلبسوا', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('03 object', 58, 'جاكيت'),
                 getDbItem('10 colors', 12, 'صفرا'),
@@ -8650,7 +8652,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "بنات بدهم يناموا تخت كبير الان",
             slots: [
                 getDbItem('01 subject', 9, 'بنات'),
-                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'past', conjugation: 'they' }),
+                getDbItem('02 verbs', 15, 'بدهم', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('02 verbs', 6, 'يناموا', { verbTense: 'present', conjugation: 'they' }),
                 getDbItem('03 object', 9, 'تخت'),
                 getDbItem('05 adjectives', 5, 'كبير'),
@@ -8672,7 +8674,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "زرافة بدها تشرب عصير برتقال  الصبح",
             slots: [
                 getDbItem('01 subject', 111, 'زرافة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 2, 'تشرب', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 59, 'عصير'),
                 getDbItem('03 object', 75, 'برتقال'),
@@ -8683,7 +8685,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "فارة بدها تاكل جبنة صفرا بليل",
             slots: [
                 getDbItem('01 subject', 77, 'فارة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 1, 'تاكل', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 30, 'جبنة'),
                 getDbItem('10 colors', 12, 'صفرا'),
@@ -8705,7 +8707,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "قطة بدها تطلع بيت شجرة الصبح",
             slots: [
                 getDbItem('01 subject', 71, 'قطة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 20, 'تطلع', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 94, 'بيت'),
                 getDbItem('03 object', 124, 'شجرة'),
@@ -8749,7 +8751,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "نملة بدها تحمل بسكوتة كبيرة الصبح",
             slots: [
                 getDbItem('03 object', 2, 'نملة'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 47, 'تحمل', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 140, 'بسكوتة'),
                 getDbItem('05 adjectives', 5, 'كبيرة'),
@@ -9086,7 +9088,7 @@ const ADVANCED_REFERENCE_DB = {
                 getDbItem('02 verbs', 1, 'تاكل', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 5, 'موزة'),
                 getDbItem('01 subject', 2, 'بنت'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 1, 'تاكل', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -9097,7 +9099,7 @@ const ADVANCED_REFERENCE_DB = {
                 getDbItem('02 verbs', 2, 'تشرب', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 67, 'حليب'),
                 getDbItem('01 subject', 2, 'بنت'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 2, 'تشرب', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -9119,7 +9121,7 @@ const ADVANCED_REFERENCE_DB = {
                 getDbItem('02 verbs', 4, 'تغسل', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 47, 'فواكه'),
                 getDbItem('01 subject', 6, 'ماما'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 4, 'تغسل', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -9141,7 +9143,7 @@ const ADVANCED_REFERENCE_DB = {
                 getDbItem('02 verbs', 3, 'تمشط', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 49, 'شعر'),
                 getDbItem('01 subject', 6, 'ماما'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 3, 'تمشط', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -9163,7 +9165,7 @@ const ADVANCED_REFERENCE_DB = {
                 getDbItem('02 verbs', 5, 'تتحمم', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 96, 'شامبو'),
                 getDbItem('01 subject', 2, 'بنت'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 5, 'تتحمم', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -9185,7 +9187,7 @@ const ADVANCED_REFERENCE_DB = {
                 getDbItem('02 verbs', 30, 'تلعب', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 4, 'طابة'),
                 getDbItem('01 subject', 2, 'بنت'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 30, 'تلعب', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -9207,7 +9209,7 @@ const ADVANCED_REFERENCE_DB = {
                 getDbItem('02 verbs', 6, 'تنام', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 9, 'تخت'),
                 getDbItem('01 subject', 2, 'بنت'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 6, 'تنام', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -9229,7 +9231,7 @@ const ADVANCED_REFERENCE_DB = {
                 getDbItem('02 verbs', 26, 'تطبخ', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 object', 162, 'اكل'),
                 getDbItem('01 subject', 6, 'ماما'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 26, 'تطبخ', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -9251,7 +9253,7 @@ const ADVANCED_REFERENCE_DB = {
                 getDbItem('02 verbs', 61, 'تسوق', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('03 object', 11, 'بسكليت'),
                 getDbItem('01 subject', 2, 'بنت'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 61, 'تسوق', { verbTense: 'present', conjugation: 'she' })
             ]
         },
@@ -9281,7 +9283,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "بنت بدها ترسم بنت ترسم قطة",
             slots: [
                 getDbItem('01 subject', 2, 'بنت'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 55, 'ترسم', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('01 subject', 2, 'بنت'),
                 getDbItem('02 verbs', 55, 'ترسم', { verbTense: 'present', conjugation: 'she' }),
@@ -9292,7 +9294,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "تاتا بدها تلمس تاتا تلمس قطة",
             slots: [
                 getDbItem('01 subject', 12, 'تاتا'),
-                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'past', conjugation: 'she' }),
+                getDbItem('02 verbs', 15, 'بدها', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('02 verbs', 10, 'تلمس', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('01 subject', 12, 'تاتا'),
                 getDbItem('02 verbs', 10, 'تلمس', { verbTense: 'present', conjugation: 'she' }),
@@ -9560,7 +9562,7 @@ const ADVANCED_REFERENCE_DB = {
                 getDbItem('01 subject', 18, 'طالب'),
                 getDbItem('02 verbs', 13, 'وقف', { verbTense: 'past', conjugation: 'he' }),
                 getDbItem('08 linking', 3, 'و'),
-                getDbItem('02 verbs', 0, 'يسأل', { verbTense: 'present', conjugation: 'he' }),
+                getDbItem('02 verbs', 42, 'يسأل', { verbTense: 'present', conjugation: 'he' }),
                 getDbItem('08 linking', 11, 'في'),
                 getDbItem('04 place', 18, 'الصف')
             ]
@@ -9704,7 +9706,7 @@ const ADVANCED_REFERENCE_DB = {
             slots: [
                 getDbItem('01 subject', 6, 'ماما'),
                 getDbItem('05 adjectives', 39, 'حلوة'),
-                getDbItem('UNKNOWN', 0, 'مبسوطة') /* WARNING: Not Found */,
+                getDbItem('05 adjectives', 44, 'سعيدة'),
                 getDbItem('02 verbs', 26, 'تطبخ', { verbTense: 'present', conjugation: 'she' }),
                 getDbItem('08 linking', 11, 'في'),
                 getDbItem('04 place', 35, 'المطبخ')

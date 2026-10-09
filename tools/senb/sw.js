@@ -38,8 +38,6 @@ self.addEventListener('message', event => {
 });
 async function serve(request) {
     const url = new URL(request.url);
-    // The downloader writes verified full responses itself; avoid double work.
-    if (request.headers.get('X-SENB-Download') === '1') return fetch(request);
     const shell = await caches.open(SHELL);
     if (request.mode === 'navigate' && (url.pathname === new URL(BASE).pathname || url.pathname === new URL('index.html', BASE).pathname)) {
         return (await shell.match(new URL('index.html', BASE))) || fetch(request);
@@ -63,7 +61,7 @@ async function serve(request) {
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
     if (event.request.method !== 'GET' || url.origin !== self.location.origin || !url.href.startsWith(BASE)) return;
-    // Aborted downloads/offline misses are network failures, not uncaught
-    // worker errors. The page's normal media/download handlers report them.
+    // Offline misses are network failures, not uncaught worker errors.
+    // The page handles unavailable media.
     event.respondWith(serve(event.request).catch(() => Response.error()));
 });

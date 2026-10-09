@@ -97,7 +97,7 @@ if (require.main === module) {
     const baseline = JSON.parse(fs.readFileSync(path.join(__dirname, 'baseline.json'), 'utf8'));
     assert.equal(hashes.data, baseline.data, 'Vocabulary/conjugation/image-folder data changed');
     assert.equal(hashes.advanced, baseline.advanced, 'Advanced image/audio/title/slot mappings changed');
-    assert.equal(hashes.grammar, baseline.grammarAfterSubjectScan || baseline.grammar, 'Grammar outputs changed from the reviewed behavior');
+    assert.equal(hashes.grammar, baseline.grammarAfterCompoundSubjects || baseline.grammarAfterSubjectScan || baseline.grammar, 'Grammar outputs changed from the reviewed behavior');
     for (const item of advanced) {
         assert.ok(fs.existsSync(path.join(root, item.imgPath)), item.imgPath);
         assert.ok(fs.existsSync(path.join(root, item.soundPath)), item.soundPath);

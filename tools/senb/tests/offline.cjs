@@ -53,7 +53,6 @@ Object.assign(context, {
     caches: { async open(name) { if (!stores.has(name)) stores.set(name, new MemoryCache()); return stores.get(name); } },
     async fetch(url, options) {
         requests++;
-        if (options.signal?.aborted) throw new DOMException('Paused', 'AbortError');
         const index = Number(new URL(url).pathname.split('/').at(-1).split('.')[0]);
         return new Response(corrupt ? 'HTML error page' : fixtures[index], { headers: { 'Content-Type': 'audio/mp4' } });
     }
@@ -61,23 +60,23 @@ Object.assign(context, {
 vm.runInContext(fs.readFileSync(path.join(root, 'assets/offline-store.js'), 'utf8'), context);
 const offline = context.SENBOffline;
 (async () => {
-    const pause = new AbortController();
-    await offline.download(sample, base, { concurrency: 1, signal: pause.signal, onProgress(value) { if (value.count === 2) pause.abort(); } });
-    assert.equal((await offline.inspect(sample, base)).count, 2);
-    await offline.download(sample, base);
-    assert.equal(requests, 6, 'Resume must request only unfinished files');
-    assert.equal((await offline.inspect(sample, base)).count, 6);
-    await offline.download(sample, base);
-    assert.equal(requests, 6, 'Completed downloads must not be repeated');
-    const updated = { ...sample, assets: [{ ...sample.assets[0], revision: 'changed' }, ...sample.assets.slice(1)] };
-    assert.equal((await offline.inspect(updated, base)).count, 5, 'Changed media must not be reported as already downloaded');
+    assert.equal(offline.download, undefined, 'The bulk-download API is removed');
+    assert.equal(offline.inspect, undefined, 'Download progress inspection is removed');
+    const media = await context.caches.open(offline.names(base).media);
+    const entry = sample.assets[0];
+    await offline.fetchAndStore(entry, media, base);
+    assert.equal(requests, 1, 'On-demand caching requests only the displayed media');
+    assert.equal((await media.keys()).length, 1);
+    assert.equal(await (await media.match(offline.key(entry, base))).text(), fixtures[0].toString());
+    const updated = { ...entry, revision: 'changed' };
+    assert.equal(await media.match(offline.key(updated, base)), undefined, 'Changed revisions cannot reuse stale media');
     corrupt = true;
-    await assert.rejects(offline.download(updated, base), /File changed/);
-    assert.equal((await offline.inspect(updated, base)).count, 5, 'HTML/error responses must never become complete media');
+    await assert.rejects(offline.fetchAndStore(sample.assets[1], media, base), /File changed/);
+    assert.equal((await media.keys()).length, 1, 'HTML/error responses must never enter the media cache');
     const complete = () => new Response('0123456789', { headers: { 'Content-Type': 'audio/mp4' } });
     for (const [range, expected, status] of [['bytes=0-3', '0123', 206], ['bytes=7-', '789', 206], ['bytes=-2', '89', 206], ['bytes=8-50', '89', 206], ['bytes=20-', '', 416], ['bytes=3-1', '', 416], ['bytes=-0', '', 416], ['bytes=0-2,5-6', '', 416]]) {
         const response = await offline.rangeResponse(new Request(base + 'test.m4a', { headers: { Range: range } }), complete());
         assert.equal(response.status, status, range); assert.equal(await response.text(), expected, range);
     }
-    console.log(`PASS: ${basic.length} basic image paths and ${catalog.assets.length} converted files match case-sensitive folders and SHA-256 revisions; installation scope/icons, pause/resume, changed-file detection, corrupt-response rejection, and audio byte ranges.`);
+    console.log(`PASS: ${basic.length} basic image paths and ${catalog.assets.length} converted files match case-sensitive folders and SHA-256 revisions; installation scope/icons, on-demand caching, changed-file detection, corrupt-response rejection, and audio byte ranges.`);
 })().catch(error => { console.error(error); process.exitCode = 1; });

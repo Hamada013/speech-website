@@ -27,6 +27,19 @@ const server = http.createServer((req, res) => {
 
 async function assertLayout(page) {
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'Page must not overflow horizontally');
+    if (await page.locator('.comprehension-header-active').count()) {
+        assert.equal(await page.locator('.app-header #activityHeading, .app-header #activityStars, .app-header #testListenBtn, .app-header #activitySetupBtn').count(), 4, 'Comprehension title, stars, sound, and settings belong in the header');
+        assert.equal(await page.locator('#activityContent .activity-top, #activityContent .activity-stars, #activityContent #testListenBtn').count(), 0, 'Only the choices and status occupy the comprehension body');
+        const outsideHeader = await page.locator('#comprehensionHeader h2, #comprehensionHeader p, #comprehensionHeader button, #comprehensionHeader .activity-star').evaluateAll(nodes => nodes.filter(node => {
+            const box = node.getBoundingClientRect();
+            const header = document.querySelector('.app-header').getBoundingClientRect();
+            return box.width && (box.left < -1 || box.right > innerWidth + 1 || box.top < header.top - 1 || box.bottom > header.bottom + 1);
+        }).map(node => node.id || node.className));
+        assert.deepEqual(outsideHeader, [], 'Header content remains visible without clipping');
+    } else {
+        assert.equal(await page.locator('#comprehensionHeader').isVisible(), false, 'Session controls disappear outside comprehension');
+        assert.equal(await page.locator('#comprehensionHeader').textContent(), '');
+    }
     const outside = await page.locator('#activityContent button, #activityContent img').evaluateAll(nodes => nodes.filter(node => {
         const rect = node.getBoundingClientRect();
         return rect.width && (rect.left < -1 || rect.right > innerWidth + 1);
@@ -41,6 +54,21 @@ async function assertLayout(page) {
         return node.textContent.trim() || !node.querySelector('svg') || !node.getAttribute('aria-label') || rect.width < 44 || rect.height < 44;
     }).map(node => node.id));
     assert.deepEqual(invalidIcons, [], 'Icon buttons must retain accessible names and touch-sized targets');
+    if (await page.locator('#activityView.comprehension-session').count() && page.viewportSize().width >= 768 && page.viewportSize().height >= 600) {
+        const bounds = await page.evaluate(() => {
+            const view = document.getElementById('activityView');
+            const rect = view.getBoundingClientRect();
+            return { scrollHeight: view.scrollHeight, clientHeight: view.clientHeight, top: rect.top, bottom: rect.bottom, outside: [...view.querySelectorAll('button, img, #activityStatus')].filter(node => {
+                const box = node.getBoundingClientRect();
+                return box.height && (box.top < rect.top - 1 || box.bottom > rect.bottom + 1);
+            }).map(node => node.id || node.className) };
+        });
+        assert.ok(bounds.scrollHeight <= bounds.clientHeight + 1, `Desktop comprehension must fit without scrolling: ${JSON.stringify(bounds)}`);
+        assert.deepEqual(bounds.outside, [], 'Every choice and control must fit vertically without clipping');
+        assert.equal(await page.locator('.comprehension-option').count(), 4);
+        const grid = await page.locator('.comprehension-grid').boundingBox();
+        assert.ok(grid.height > (bounds.bottom - bounds.top) * .85, 'Images receive most of the available content height');
+    }
 }
 async function assertTestPicker(page) {
     const grid = await page.locator('.test-mode-grid').boundingBox();
@@ -51,7 +79,7 @@ async function assertTestPicker(page) {
     assert.ok(Math.abs(grid.y + grid.height / 2 - (view.y + view.height / 2)) < 65, 'Test choices must be near the center of the available screen');
     await assertLayout(page);
 }
-async function setup(page, mode, folder, subgroup, presentation) {
+async function setup(page, mode, folder, subgroup, presentation, trials = 3) {
     await page.locator('#activityHomeBtn').click();
     await page.locator(mode === 'repetition' ? '#homeTasksBtn' : mode === 'game' ? '#homeGameBtn' : '#homeTestBtn').click();
     if (mode === 'comprehension' || mode === 'expressive') {
@@ -62,6 +90,12 @@ async function setup(page, mode, folder, subgroup, presentation) {
     await page.locator(`[data-folder="${folder}"]`).click();
     if (mode === 'comprehension' || mode === 'expressive') {
         assert.equal(await page.locator('[data-subgroup]').count(), 9);
+        assert.deepEqual(await page.locator('[data-trial-count]').allTextContents(), ['3', '4', '5', '6', '7', '8', '9', '10']);
+        assert.equal(await page.locator('[data-trial-count="3"]').getAttribute('aria-pressed'), 'true');
+        if (trials !== 3) {
+            await page.locator(`[data-trial-count="${trials}"]`).click();
+            assert.match(await page.locator('#assessmentTrialInfo').textContent(), new RegExp(`${trials * 8} محاولة`));
+        }
         assert.equal(await page.locator('[data-subgroup="all"]').getAttribute('aria-pressed'), 'true');
         if (!subgroup) {
             await page.locator('[data-subgroup="8"]').click();
@@ -70,6 +104,7 @@ async function setup(page, mode, folder, subgroup, presentation) {
     }
     if (subgroup) await page.locator(`[data-subgroup="${subgroup}"]`).click();
     if (presentation) await page.locator(`[data-presentation="${presentation}"]`).click();
+    if (mode === 'comprehension' || mode === 'expressive') assert.equal(await page.locator(`[data-trial-count="${trials}"]`).getAttribute('aria-pressed'), 'true', 'Changing subgroup or presentation retains the trial count');
     await page.locator('#startActivityBtn').click();
     await assertLayout(page);
 }
@@ -79,7 +114,7 @@ async function run(browserType, name) {
     if (name === 'chromium' && fs.existsSync(chromePath)) options.executablePath = chromePath;
     const browser = await browserType.launch(options);
     try {
-        const viewports = [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 768, height: 1024 }, { width: 1024, height: 768 }, { width: 1366, height: 768 }];
+        const viewports = [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 768, height: 1024 }, { width: 1024, height: 768 }, { width: 1366, height: 768 }, { width: 1280, height: 640 }, { width: 1920, height: 1080 }];
         for (const viewport of process.env.SENB_ACTIVITY_SMOKE === '1' ? viewports.slice(0, 1) : viewports) {
             const context = await browser.newContext({ viewport, hasTouch: true });
             await context.route('https://**', route => route.abort());
@@ -89,8 +124,56 @@ async function run(browserType, name) {
             await page.goto(`http://127.0.0.1:${server.address().port}/index.html`, { waitUntil: 'load' });
             assert.equal(await page.locator('.home-menu-card').count(), 4);
             assert.deepEqual(await page.locator('#homeFooter p').allTextContents(), ['SPEECH AND LANGUAGE PATHOLOGY', 'Ahmad Ghanem', 'Latakia - Syria', 'slp.ahmadghanem@gmail.com']);
+            assert.deepEqual(await page.locator('.brand-logo, .home-logo').evaluateAll(nodes => nodes.map(node => {
+                const style = getComputedStyle(node);
+                return [style.borderTopWidth, style.backgroundColor, style.backgroundImage, style.boxShadow, style.paddingTop];
+            })), Array(2).fill(['0px', 'rgba(0, 0, 0, 0)', 'none', 'none', '0px']), 'Both logos use the original image without a decorative frame');
             assert.equal(await page.locator('#activityHomeBtn').isVisible(), false);
-            if (viewport.width === 320 || viewport.width === 768) await page.screenshot({ path: `/private/tmp/senb-${name}-${viewport.width}-home.png` });
+            assert.equal(await page.locator('.app-header #pwaInstallBtn svg').count(), 1);
+            assert.equal(await page.locator('#pwaInstallBtn').textContent().then(text => text.trim()), '', 'App installation uses an icon button');
+            assert.equal(await page.locator('#pwaDownloadToggle, #offlinePanel, #offlineBadge, .home-device-tools').count(), 0, 'The manual media download and its explanatory text are removed');
+            if (viewport.width >= 768 && viewport.height >= 600) {
+                const home = await page.locator('#homeView').evaluate(view => {
+                    const bounds = view.getBoundingClientRect();
+                    return { scrollHeight: view.scrollHeight, clientHeight: view.clientHeight, outside: [...view.querySelectorAll('img, h1, p, button:not([hidden])')].filter(node => {
+                        const box = node.getBoundingClientRect();
+                        return box.height && (box.top < bounds.top - 1 || box.bottom > bounds.bottom + 1);
+                    }).map(node => node.id || node.className) };
+                });
+                assert.ok(home.scrollHeight <= home.clientHeight + 1, `Desktop home must fit without scrolling: ${JSON.stringify(home)}`);
+                assert.deepEqual(home.outside, [], 'Home logo, menu, and contact details must remain visible');
+            }
+            await page.screenshot({ path: `/private/tmp/senb-${name}-${viewport.width}-home.png` });
+            if (process.env.SENB_HOME_ONLY === '1') {
+                await page.evaluate(() => {
+                    const event = new Event('beforeinstallprompt', { cancelable: true });
+                    event.prompt = async () => { window.installPromptShown = true; };
+                    event.userChoice = Promise.resolve({ outcome: 'dismissed' });
+                    window.dispatchEvent(event);
+                });
+                await page.locator('#pwaInstallBtn').click();
+                assert.equal(await page.evaluate(() => window.installPromptShown), true);
+                await page.locator('#pwaInstallBtn').click();
+                assert.equal(await page.locator('#pwaInstallHelp').isVisible(), true);
+                assert.equal(await page.locator('#pwaInstallBtn').getAttribute('aria-expanded'), 'true');
+                const help = await page.locator('#pwaInstallHelp').boundingBox();
+                assert.ok(help.x >= 0 && help.x + help.width <= viewport.width, 'Install instructions stay on screen');
+                await page.keyboard.press('Escape');
+                assert.equal(await page.locator('#pwaInstallHelp').isVisible(), false);
+                await page.locator('#homeWorkplaceBtn').click();
+                assert.equal(await page.locator('#workplaceView').isVisible(), true);
+                assert.equal(await page.locator('#pwaInstallBtn').isVisible(), false);
+                await page.locator('.app-brand').click();
+                assert.equal(await page.locator('#homeView').isVisible(), true);
+                assert.equal(await page.locator('#pwaInstallBtn').isVisible(), true);
+                await page.evaluate(() => window.dispatchEvent(new Event('appinstalled')));
+                assert.equal(await page.locator('#pwaInstallBtn').isDisabled(), true);
+                assert.equal(await page.locator('#pwaInstallBtn').getAttribute('aria-label'), 'التطبيق مثبت');
+                assert.deepEqual(errors, []);
+                console.log(`PASS ${name} ${viewport.width}x${viewport.height}: home layout, header install icon/prompt/help, menu navigation, removed media download`);
+                await context.close();
+                continue;
+            }
             await page.locator('#homeTestBtn').click();
             await assertTestPicker(page);
             if (viewport.width === 768 || viewport.width === 1366) await page.screenshot({ path: `/private/tmp/senb-${name}-${viewport.width}-test-picker.png` });
@@ -125,6 +208,7 @@ async function run(browserType, name) {
             await page.locator('[data-repeat-count="2"]').click();
             assert.equal(await page.locator('[data-repeat-count="2"]').getAttribute('aria-pressed'), 'true');
             await page.locator('#repeatPlayBtn').click();
+            assert.equal(await page.locator('#activityStatus').textContent(), '', 'Playback does not show a repetition counter');
             await page.waitForFunction(() => activity.completed.size === 1 && !activity.busy);
             const paths = await page.evaluate(() => playedPaths);
             const expected = ['/sounds/advanced/5/8/1.m4a', '/sounds/subject/1.m4a', '/sounds/adjectives/male/43.m4a', '/sounds/verbs/present/he/14.m4a', '/sounds/prepositions/9.m4a', '/sounds/object/28.m4a'];
@@ -166,7 +250,14 @@ async function run(browserType, name) {
                 }
                 await page.locator('.activity-result-total').waitFor();
                 assert.equal(await page.locator('.activity-result-total').textContent(), '50%');
-                assert.equal(await page.locator('#activityContent table, #activityContent [onclick*="downloadActivityResults"]').count(), 0);
+                assert.equal(await page.locator('[data-result-subgroup]').count(), 8);
+                assert.deepEqual(await page.locator('[data-result-subgroup] td:last-child').allTextContents(), ['66.7%', '33.3%', '66.7%', '33.3%', '66.7%', '33.3%', '66.7%', '33.3%']);
+                const comprehensionDownload = page.waitForEvent('download');
+                await page.locator('#downloadActivityResultsBtn').click();
+                const comprehensionPdf = await comprehensionDownload;
+                assert.equal(comprehensionPdf.suggestedFilename(), 'senb-comprehension-2-words.pdf');
+                await comprehensionPdf.saveAs(`/private/tmp/senb-${name}-${viewport.width}-comprehension-report.pdf`);
+                assert.equal(fs.readFileSync(`/private/tmp/senb-${name}-${viewport.width}-comprehension-report.pdf`).subarray(0, 8).toString(), '%PDF-1.4');
                 await assertLayout(page);
                 assert.equal(await page.evaluate(() => activity.results.every((result, index) => Number(result.subgroup) === Math.floor(index / 3) + 1)), true);
                 await setup(page, 'comprehension', 6, null, 'slots');
@@ -186,8 +277,15 @@ async function run(browserType, name) {
                     if (!index) await page.screenshot({ path: `/private/tmp/senb-${name}-${viewport.width}-expressive.png` });
                     await page.locator('#expressiveNextBtn').click();
                 }
-                assert.equal(await page.locator('.activity-result-total').textContent(), '40%');
-                assert.equal(await page.locator('#activityContent table, #activityContent [onclick*="downloadActivityResults"]').count(), 0);
+                assert.equal(await page.locator('.activity-result-total').textContent(), '2');
+                assert.equal(await page.locator('[data-result-subgroup]').count(), 8);
+                assert.deepEqual(await page.locator('[data-result-subgroup] td:first-of-type').allTextContents(), Array(8).fill('2'));
+                assert.deepEqual(await page.locator('[data-result-subgroup] td:last-child').allTextContents(), Array(8).fill('3'));
+                const expressiveDownload = page.waitForEvent('download');
+                await page.locator('#downloadActivityResultsBtn').click();
+                const expressivePdf = await expressiveDownload;
+                await expressivePdf.saveAs(`/private/tmp/senb-${name}-${viewport.width}-expressive-report.pdf`);
+                assert.match(fs.readFileSync(`/private/tmp/senb-${name}-${viewport.width}-expressive-report.pdf`).toString('latin1'), /\/Count [2-9]/, 'The expanded all-subgroup report must paginate');
                 assert.equal(await page.evaluate(() => activity.results.every(result => result.words === 2)), true);
                 await assertLayout(page);
                 await page.screenshot({ path: `/private/tmp/senb-${name}-${viewport.width}-result.png` });
@@ -217,13 +315,73 @@ async function run(browserType, name) {
                     for (let word = 0; word < index * 2 + 1; word++) await page.locator('.word-score-dot').nth(word).tap();
                     await page.locator('#expressiveNextBtn').click();
                 }
-                assert.equal(await page.locator('.activity-result-total').textContent(), '60%', 'Single-subgroup production must score nine spoken words out of fifteen');
+                assert.equal(await page.locator('.activity-result-total').textContent(), '3', 'Nine spoken words in three trials gives MLU 3');
                 assert.equal(await page.evaluate(() => activity.results.length), 3);
                 await page.locator('#testRestartBtn').click();
                 assert.equal(await page.locator('[data-subgroup="8"]').getAttribute('aria-pressed'), 'true');
                 await page.locator('[data-folder="3"]').click();
                 assert.equal(await page.locator('[data-subgroup="all"]').getAttribute('aria-pressed'), 'true', 'Changing sentence length must reset the subgroup selection');
                 if (viewport.width === 768) await page.screenshot({ path: `/private/tmp/senb-${name}-${viewport.width}-test-subgroups.png` });
+            }
+            await setup(page, 'comprehension', 2, null, 'advanced', 10);
+            assert.equal(await page.evaluate(() => activity.plan.length), 80);
+            assert.equal(await page.locator('.activity-star').count(), 80);
+            await assertLayout(page);
+            if (viewport.width >= 1024) await page.screenshot({ path: `/private/tmp/senb-${name}-${viewport.width}-comprehension-fit.png` });
+            await page.locator('#activitySetupBtn').click();
+            assert.equal(await page.locator('[data-trial-count="10"]').getAttribute('aria-pressed'), 'true');
+            await page.locator('[data-subgroup="8"]').click();
+            for (const count of [3, 4, 5, 6, 7, 8, 9, 10]) {
+                await page.locator(`[data-trial-count="${count}"]`).click();
+                assert.equal(await page.locator(`[data-trial-count="${count}"]`).getAttribute('aria-pressed'), 'true');
+            }
+            await assertLayout(page);
+            if (viewport.width === 320 || viewport.width === 768) await page.screenshot({ path: `/private/tmp/senb-${name}-${viewport.width}-trial-picker.png` });
+            await page.locator('#startActivityBtn').click();
+            assert.equal(await page.evaluate(() => activity.plan.length), 10);
+            assert.match(await page.locator('.activity-progress-label').textContent(), /1 \/ 10/);
+            for (let trial = 0; trial < 10; trial++) {
+                await page.waitForFunction(() => activity.phase === 'answer');
+                const answer = await page.evaluate(() => {
+                    const trial = activity.plan[activity.index];
+                    return trial.choices.findIndex(sentence => SENBActivities.key(sentence) === SENBActivities.key(trial.target));
+                });
+                await page.locator(`[data-choice="${answer}"]`).tap();
+                if (trial < 9) await page.waitForFunction(next => activity.index === next, trial + 1);
+            }
+            await page.locator('.activity-result-total').waitFor();
+            assert.equal(await page.locator('.activity-result-total').textContent(), '100%');
+            assert.equal(await page.locator('[data-result-subgroup="8"] td').first().textContent(), '10 / 10');
+            await setup(page, 'expressive', 2, 1, undefined, 4);
+            assert.equal(await page.evaluate(() => activity.plan.length), 4);
+            const testStartedAt = await page.evaluate(() => activity.testStartedAt.toISOString());
+            for (let trial = 0; trial < 4; trial++) {
+                await page.locator('.word-score-dot').first().tap();
+                await page.locator('#expressiveNextBtn').click();
+            }
+            assert.equal(await page.locator('.activity-result-total').textContent(), '1');
+            assert.equal(await page.locator('[data-result-subgroup="1"] td').first().textContent(), '1');
+            assert.equal(await page.locator('[data-word-type="subject"] td').textContent(), '100%');
+            assert.equal(await page.locator('[data-word-type="verb-present"] td').textContent(), '0%');
+            assert.match(await page.locator('.activity-word-findings').textContent(), /فاعل \(100%\)/);
+            assert.match(await page.locator('.activity-word-findings').textContent(), /فعل حاضر \(0%\)/);
+            assert.equal(await page.evaluate(() => activity.reportDate.toISOString()), testStartedAt, 'The report uses the test start date');
+            assert.match(await page.locator('.activity-report-meta').allTextContents().then(lines => lines.join(' ')), /SLP\.AHMAD GHANEM/);
+            if (viewport.width === 320 || viewport.width === 768) {
+                await page.screenshot({ path: `/private/tmp/senb-${name}-${viewport.width}-mlu-report.png`, fullPage: true });
+                await page.evaluate(() => {
+                    window.reportText = [];
+                    const fill = CanvasRenderingContext2D.prototype.fillText;
+                    CanvasRenderingContext2D.prototype.fillText = function (value, ...args) { reportText.push(String(value)); return fill.call(this, value, ...args); };
+                });
+                const sampleDownload = page.waitForEvent('download');
+                await page.locator('#downloadActivityResultsBtn').click();
+                await (await sampleDownload).saveAs(`/private/tmp/senb-${name}-${viewport.width}-mlu-report.pdf`);
+                const drawnText = await page.evaluate(() => reportText.join(' '));
+                assert.match(drawnText, /SLP\.AHMAD GHANEM/);
+                assert.match(drawnText, /تاريخ الاختبار:/);
+                assert.match(drawnText, /MLU = 1/);
+                assert.match(drawnText, /فعل حاضر/);
             }
             await setup(page, 'game', 6);
             assert.equal(await page.locator('.game-choice').count(), 3);
@@ -281,6 +439,31 @@ async function run(browserType, name) {
             assert.equal(await page.locator('#activityView').isVisible(), false);
             assert.equal(await page.evaluate(() => state.isPlayingSequence), false);
             assert.equal(await page.evaluate(() => JSON.stringify(state.row1Slots) === manualBoardBefore), true, 'Activities must preserve the original manual slot assignments');
+            await page.evaluate(() => {
+                state.slotCount = 4;
+                if (!state.isMultiline) toggleMultilineRow();
+                const noun = id => ({ ...ITEMS_DATABASE['01 subject'].find(item => item.id === id), categoryId: '01 subject' });
+                const pronoun = id => ({ ...ITEMS_DATABASE['07 Pronoun'].find(item => item.id === id), categoryId: '07 Pronoun' });
+                const and = { categoryId: '08 linking', id: 3, title: 'و' };
+                const verb = { categoryId: '02 verbs', id: 14, verbTense: 'present' };
+                state.row1Slots = [noun(1), and, noun(2), verb];
+                state.row2Slots = [pronoun(1), and, pronoun(8), verb];
+                renderWorkplace();
+            });
+            assert.equal(await page.locator('#slot-1-3').getAttribute('aria-label'), await page.evaluate(() => VERB_CONJUGATIONS[14].present.they));
+            assert.equal(await page.locator('#slot-2-3').getAttribute('aria-label'), await page.evaluate(() => VERB_CONJUGATIONS[14].present.we));
+            const clearCorner = page.locator('#slot-1-0 .slot-clear');
+            assert.equal(await clearCorner.locator('svg').count(), 0);
+            assert.equal(await clearCorner.evaluate(node => getComputedStyle(node).backgroundColor), 'rgba(0, 0, 0, 0)');
+            const playedBeforeClear = await page.evaluate(() => playedPaths.length);
+            await clearCorner.tap();
+            assert.equal(await page.evaluate(() => state.row1Slots[0]), null);
+            assert.equal(await page.evaluate(() => playedPaths.length), playedBeforeClear, 'The invisible corner clears without playing the card');
+            assert.equal(await page.locator('#slot-1-3').getAttribute('aria-label'), await page.evaluate(() => VERB_CONJUGATIONS[14].present.she));
+            await page.locator('#slot-2-0 .slot-clear').focus();
+            await page.keyboard.press('Enter');
+            assert.equal(await page.evaluate(() => state.row2Slots[0]), null, 'The invisible corner also works from the keyboard');
+            assert.equal(await page.locator('#slot-2-3').getAttribute('aria-label'), await page.evaluate(() => VERB_CONJUGATIONS[14].present.youfemale));
             assert.deepEqual(errors, []);
             console.log(`PASS ${name} ${viewport.width}x${viewport.height}: activity layout, complete-sentence repetition, stars, auto/pause, test plans/scoring, game touch/drag/hint, navigation cancellation`);
             await context.close();

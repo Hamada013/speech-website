@@ -16,7 +16,7 @@ const server = http.createServer((req, res) => {
     const relative = pathname.slice(prefix.length) || 'index.html';
     const file = path.resolve(root, relative);
     if (!pathname.startsWith(prefix) || !file.startsWith(root + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) { res.writeHead(404); res.end(); return; }
-    requests.push({ relative, download: req.headers['x-senb-download'] === '1' });
+    requests.push({ relative });
     const override = overrides.get(relative);
     const body = override?.body || fs.readFileSync(file);
     const headers = { 'Content-Type': mime[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store', 'Accept-Ranges': 'bytes' };
@@ -46,17 +46,14 @@ function releaseOverride(version) {
     for (const file of release.shell) release.integrity[file] = `sha256-${crypto.createHash('sha256').update(overrides.get(file)?.body || fs.readFileSync(path.join(root, file))).digest('base64')}`;
     overrides.set('assets/pwa-release.js', { body: Buffer.from(`self.SENB_RELEASE = ${JSON.stringify(release)};`) });
 }
-async function openPanel(page) {
-    if (await page.locator('#offlinePanel').isHidden()) await page.locator('#pwaDownloadToggle').click();
-}
 async function waitReady(page) {
-    await page.waitForFunction(() => navigator.serviceWorker.controller && document.getElementById('offlineCounts').textContent.includes('4881'), null, { timeout: 30000 });
+    await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000 });
 }
 async function savedCount(page) {
     return page.evaluate(async () => {
-        const base = new URL('./', document.baseURI).href;
-        const catalog = await (await fetch('assets/offline-assets.json')).json();
-        return (await SENBOffline.inspect(catalog, base)).count;
+        const prefix = `senb:${encodeURIComponent(new URL('./', document.baseURI).pathname)}:`;
+        const media = await caches.open(`${prefix}media:v1`);
+        return (await media.keys()).length;
     });
 }
 async function run(browserType, name) {
@@ -72,7 +69,7 @@ async function run(browserType, name) {
         const errors = [];
         page.on('pageerror', error => {
             // WebKit reports Response.error() as a page error when we deliberately
-            // abort a download or request an uncached URL with the origin stopped.
+            // request an uncached URL with the origin stopped.
             // These expected network failures are separately asserted below.
             if (name === 'webkit' && error.message === 'Response served by service worker is an error') return;
             errors.push(error.message);
@@ -83,11 +80,9 @@ async function run(browserType, name) {
         assert.ok((await savedCount(page)) < 5, 'Startup must not download the media library');
         assert.equal(requests.filter(request => request.relative.endsWith('.m4a')).length, 0);
         await page.evaluate(async () => { const cache = await caches.open('another-app-cache'); await cache.put('/outside-data', new Response('preserve')); });
-        if (name === 'webkit') {
-            await page.locator('#pwaInstallBtn').tap();
-            assert.equal(await page.locator('#pwaInstallHelp').isVisible(), true);
-            assert.ok((await page.locator('#pwaInstallHelp').textContent()).includes('Safari'));
-        }
+        assert.equal(await page.locator('.app-header #pwaInstallBtn svg').count(), 1);
+        assert.equal(await page.locator('#pwaDownloadToggle, #offlinePanel, #offlineBadge').count(), 0);
+        assert.equal(await page.evaluate(() => typeof SENBOffline), 'undefined', 'The page has no media-download API');
         await page.locator('#homeTasksBtn').click();
         await page.locator('[data-folder="5"]').click();
         await page.locator('[data-subgroup="8"]').click();
@@ -96,16 +91,17 @@ async function run(browserType, name) {
         await page.waitForFunction(() => playbackAudio.currentTime > 0, null, { timeout: 15000 });
         assert.equal(await page.evaluate(() => playbackAudio.error), null);
         await page.locator('#activityHomeBtn').click();
-        await openPanel(page);
-        await page.locator('#offlineDownloadBtn').click();
-        await page.waitForFunction(() => Number(document.getElementById('offlineCounts').textContent.split('/')[0]) > 20);
-        await page.locator('#offlineDownloadBtn').click();
-        await page.waitForFunction(() => document.getElementById('offlineDownloadBtn').textContent.includes('استكمال'));
-        const pausedCount = await savedCount(page);
-        assert.ok(pausedCount > 0 && pausedCount < originalCatalog.assets.length);
+        // A viewed sentence is cached on demand; no manual library download.
+        await page.waitForFunction(async () => {
+            const prefix = `senb:${encodeURIComponent(new URL('./', document.baseURI).pathname)}:`;
+            const cache = await caches.open(`${prefix}media:v1`);
+            return (await cache.keys()).some(request => request.url.includes('sounds/advanced/5/8/1.m4a'));
+        });
+        const cachedCount = await savedCount(page);
+        assert.ok(cachedCount > 0 && cachedCount < 30, 'Viewing one sentence must not fetch the full library');
         await page.reload({ waitUntil: 'load' });
         await waitReady(page);
-        assert.equal(await savedCount(page), pausedCount, 'Completed files must survive reload');
+        assert.equal(await savedCount(page), cachedCount, 'Viewed media survives reload');
         await setOffline(context, name, true);
         if (process.env.SENB_PWA_DEBUG) console.log(name, 'offline navigation diagnostic', await page.evaluate(async () => {
             const names = await caches.keys();
@@ -132,32 +128,10 @@ async function run(browserType, name) {
         });
         assert.deepEqual(ranges.map(result => [result.status, result.bytes]), [[206, 100], [206, 12], [416, 0]]);
         await page.locator('#activityHomeBtn').click();
-        await openPanel(page);
-        await page.locator('#offlineDownloadBtn').click();
-        if (name === 'chromium') assert.ok((await page.locator('#offlineStatus').textContent()).includes('بالإنترنت'));
-        else await page.waitForFunction(() => document.getElementById('offlineStatus').textContent.includes('توقف التنزيل'));
-        await setOffline(context, name, false);
-        await page.locator('#offlineDownloadBtn').click();
-        console.log(`${name}: resuming ${pausedCount}/${originalCatalog.assets.length} files; testing full 107.9 MB download`);
-        await page.waitForFunction(() => document.getElementById('offlineDownloadBtn').disabled && document.getElementById('offlineDownloadBtn').textContent.includes('اكتمل'), null, { timeout: 180000 });
-        assert.equal(await savedCount(page), originalCatalog.assets.length);
-        await page.screenshot({ path: `/private/tmp/senb-${name}-offline-download.png` });
-        await setOffline(context, name, true);
-        await page.reload({ waitUntil: 'load' });
-        await waitReady(page);
-        assert.equal(await savedCount(page), originalCatalog.assets.length);
-        await page.locator('#homeGameBtn').click();
-        await page.locator('[data-folder="6"]').click();
-        await page.locator('#startActivityBtn').click();
-        await page.locator('#gameHintBtn').tap();
-        await page.waitForFunction(() => playbackAudio.currentTime > 0, null, { timeout: 15000 });
-        assert.equal(await page.evaluate(() => playbackAudio.error), null);
-        assert.equal(await page.locator('#activityStage img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)), true);
-        await page.locator('#activityHomeBtn').click();
         await setOffline(context, name, false);
         // Simulate an atomic deployment in memory, without changing project files.
         const updated = JSON.parse(JSON.stringify(originalCatalog));
-        const changed = updated.assets.find(entry => entry.url.endsWith('.m4a'));
+        const changed = updated.assets.find(entry => entry.url === 'sounds/advanced/5/8/1.m4a');
         const changedBody = Buffer.concat([fs.readFileSync(path.join(root, changed.url)), Buffer.alloc(8)]);
         changed.bytes = changedBody.length; changed.revision = sha(changedBody);
         updated.totalBytes += 8; updated.version = 'test-media-update';
@@ -167,16 +141,19 @@ async function run(browserType, name) {
         releaseOverride(`test-update-${name}`);
         await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration()).update(); });
         await page.locator('#pwaUpdateBtn').waitFor({ state: 'visible', timeout: 30000 });
-        assert.equal(await savedCount(page), originalCatalog.assets.length, 'Waiting update must not replace the current catalog or media');
+        assert.equal(await savedCount(page), cachedCount, 'Waiting update must not replace the current catalog or media');
         await Promise.all([page.waitForEvent('load'), page.locator('#pwaUpdateBtn').click()]);
         await waitReady(page);
-        assert.equal(await savedCount(page), originalCatalog.assets.length - 1, 'Only changed media needs downloading after an update');
-        const beforeResume = requests.filter(request => request.download).length;
-        await openPanel(page);
-        await page.locator('#offlineDownloadBtn').click();
-        await page.waitForFunction(() => document.getElementById('offlineDownloadBtn').disabled);
-        assert.equal(requests.filter(request => request.download).length - beforeResume, 1, 'An update must reuse all unchanged media');
-        assert.equal(await savedCount(page), originalCatalog.assets.length);
+        assert.equal(await savedCount(page), cachedCount - 1, 'An update only removes the obsolete cached revision');
+        const beforeFetch = requests.filter(request => request.relative === changed.url).length;
+        const changedHash = await page.evaluate(async url => {
+            const response = await fetch(url);
+            const digest = await crypto.subtle.digest('SHA-256', await response.arrayBuffer());
+            return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
+        }, changed.url);
+        assert.equal(changedHash, changed.revision);
+        assert.equal(requests.filter(request => request.relative === changed.url).length - beforeFetch, 1, 'Changed media refreshes only when requested');
+        assert.equal(await savedCount(page), cachedCount);
         // A failed next release must preserve the complete, working release.
         releaseOverride(`test-broken-${name}`);
         overrides.set('assets/pwa.css', { body: Buffer.from('unavailable'), status: 503 });
@@ -195,13 +172,13 @@ async function run(browserType, name) {
         await setOffline(context, name, true);
         await page.reload({ waitUntil: 'load' });
         await waitReady(page);
-        assert.equal(await savedCount(page), originalCatalog.assets.length);
+        assert.equal(await savedCount(page), cachedCount);
         const outside = await context.newPage();
         await setOffline(context, name, false);
         await outside.goto(`http://127.0.0.1:${server.address().port}/outside.html`);
         assert.equal(await outside.evaluate(() => navigator.serviceWorker.controller), null, 'SENB must not control other apps');
         assert.deepEqual(errors, []);
-        console.log(`PASS ${name}: scoped installation, no bulk startup download, pause/resume/reload, full library offline, real M4A playback/ranges, safe updates, one-file refresh, failed-release rollback, and other-app isolation`);
+        console.log(`PASS ${name}: header installation, removed bulk download, on-demand media cache/reload, real offline M4A playback/ranges, safe updates, one-file refresh, failed-release rollback, and other-app isolation`);
     } finally { await setOffline(context, name, false); await context.close(); await browser.close(); overrides.clear(); }
 }
 (async () => {

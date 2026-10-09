@@ -131,6 +131,8 @@ button:disabled { cursor: wait; }
 #workplaceView { justify-content: flex-start; }
 #slotsRow1, #slotsRow2 { height: auto; }
 .slot-clear, .featured-clear { width: 28px; height: 28px; }
+.slot-clear { background: transparent; border: 0; box-shadow: none; }
+.slot-clear:focus-visible { outline: 2px solid #0284c7; outline-offset: -2px; }
 .slot-cover-toggle {
     width: 32px;
     height: 32px;

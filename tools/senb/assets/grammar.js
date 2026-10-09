@@ -44,19 +44,58 @@ function getContextGenderForSlot(rowNumber, slotIndex) {
     return 'male'; 
 }
 
-// Find the nearest earlier noun or personal pronoun in this row, skipping gaps
-// and modifiers. A preset's explicit conjugation is a fallback without context.
-function getContextVerbSubject(item, rowNumber, slotIndex) {
+// Some legacy pronoun cards have codes that do not match their Arabic label.
+// Resolve the spoken person from the word without remapping card/audio IDs.
+function getVerbSubjectCode(slot) {
     const codes = ['i', 'he', 'she', 'they', 'we', 'youfemale', 'youmale', 'youplural'];
+    if (slot.categoryId === '07 Pronoun') {
+        if (slot.pronounModifier && slot.pronounModifier !== 'standard') return null;
+        const title = (slot.title || '').trim();
+        const word = title.replace(/[\u064b-\u065f\u0670]/g, '').replace(/[أإآ]/g, 'ا');
+        const words = { انا: 'i', هو: 'he', هاد: 'he', هذا: 'he', هي: 'she', هذه: 'she', نحن: 'we', هم: 'they', هدول: 'they', انتم: 'youplural', انتو: 'youplural', انتما: 'youplural' };
+        if (word === 'انت') return title.includes('ِ') ? 'youfemale' : 'youmale';
+        return words[word] || (codes.includes(slot.code) ? slot.code : null);
+    }
+    if (['01 subject', '03 object', '04 place'].includes(slot.categoryId)) {
+        if (codes.includes(slot.genderCode)) return slot.genderCode;
+        return ['female', 'she'].includes(slot.gender) ? 'she' : 'he';
+    }
+    return null;
+}
+
+// Combine preceding subjects even across gaps, linking words and modifiers.
+// Stop at the previous verb so separate clauses keep separate subjects.
+function getEarlierVerbSubjects(rowNumber, slotIndex) {
     const slots = rowNumber === 1 ? state.row1Slots : state.row2Slots;
+    const subjects = [];
     for (let i = slotIndex - 1; i >= 0; i--) {
         const slot = slots[i];
         if (!slot) continue;
-        if (slot.categoryId === '07 Pronoun' && codes.includes(slot.code)) return slot.code;
-        if (['01 subject', '03 object', '04 place'].includes(slot.categoryId)) {
-            if (codes.includes(slot.genderCode)) return slot.genderCode;
-            if (slot.gender === 'female' || slot.gender === 'she') return 'she';
-            if (slot.gender === 'male' || slot.gender === 'he') return 'he';
+        if (slot.categoryId === '02 verbs') break;
+        const code = getVerbSubjectCode(slot);
+        if (code) subjects.push(code);
+    }
+    return subjects;
+}
+
+function getContextVerbSubject(item, rowNumber, slotIndex) {
+    const codes = ['i', 'he', 'she', 'they', 'we', 'youfemale', 'youmale', 'youplural'];
+    const subjects = getEarlierVerbSubjects(rowNumber, slotIndex);
+    if (subjects.length === 1) return subjects[0];
+    if (subjects.length > 1) {
+        if (subjects.includes('i')) return 'we';
+        // Explicit SENB mapping requested for نحن + هم.
+        if (subjects.includes('we') && subjects.includes('they')) return 'we';
+        if (subjects.some(code => code.startsWith('you'))) return 'youplural';
+        if (subjects.includes('we')) return 'we';
+        return 'they';
+    }
+    // Consecutive verbs with no new subject inherit the previous verb's subject.
+    const slots = rowNumber === 1 ? state.row1Slots : state.row2Slots;
+    for (let i = slotIndex - 1; i >= 0; i--) {
+        if (slots[i]?.categoryId === '02 verbs') {
+            if (slots.slice(0, i).some(slot => slot && getVerbSubjectCode(slot))) return getContextVerbSubject(slots[i], rowNumber, i);
+            return codes.includes(item.conjugation) ? item.conjugation : getContextVerbSubject(slots[i], rowNumber, i);
         }
     }
     return codes.includes(item.conjugation) ? item.conjugation : 'i';
@@ -65,8 +104,8 @@ function getContextVerbSubject(item, rowNumber, slotIndex) {
 function getDisplayedItemTitle(item, rowNumber, slotIndex) {
     if (!item) return '';
 
-    // Bypass mapping if it's explicitly from the Advanced Sentence presets 
-    if (item.isAdvancedOverride) return item.title;
+    // Preserve preset wording while its annotated subject still matches the strip.
+    if (item.isAdvancedOverride && (item.categoryId !== '02 verbs' || getContextVerbSubject(item, rowNumber, slotIndex) === item.conjugation)) return item.title;
 
     if (item.categoryId === '02 verbs') {
         const tense = item.verbTense || 'present';

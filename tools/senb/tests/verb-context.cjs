@@ -27,13 +27,59 @@ for (const row of [1, 2]) {
             checks++;
         }
     }
-    // The closest valid earlier subject wins; later nouns and the other row do not affect it.
+    // Combine earlier subjects; later nouns and the other row do not affect it.
     run(`state.row${row}Slots = [{ categoryId: '01 subject', genderCode: 'he' }, { categoryId: '07 Pronoun', code: 'she' }, null, { categoryId: '03 object', gender: 'male' }];`);
-    assert.equal(context.resolveAudioPath({ ...verb, verbTense: 'present', conjugation: 'he' }, row, 2), 'sounds/verbs/present/she/14.m4a');
+    assert.equal(context.resolveAudioPath({ ...verb, verbTense: 'present', conjugation: 'he' }, row, 2), 'sounds/verbs/present/they/14.m4a');
     run(`state.row${row}Slots = [null, { categoryId: '05 adjectives' }];`);
     assert.equal(context.resolveAudioPath({ ...verb, verbTense: 'past' }, row, 2), 'sounds/verbs/past/i/14.m4a');
     assert.equal(context.resolveAudioPath({ ...verb, verbTense: 'past', conjugation: 'they' }, row, 2), 'sounds/verbs/past/they/14.m4a');
 }
+
+const codes = ['i', 'he', 'she', 'they', 'we', 'youfemale', 'youmale', 'youplural'];
+// Explicit matrix covers both orders and fills in unspecified combinations.
+const pairs = [
+    ['we', 'we', 'we', 'we', 'we', 'we', 'we', 'we'],
+    ['we', 'they', 'they', 'they', 'we', 'youplural', 'youplural', 'youplural'],
+    ['we', 'they', 'they', 'they', 'we', 'youplural', 'youplural', 'youplural'],
+    ['we', 'they', 'they', 'they', 'we', 'youplural', 'youplural', 'youplural'],
+    ['we', 'we', 'we', 'we', 'we', 'youplural', 'youplural', 'youplural'],
+    ['we', 'youplural', 'youplural', 'youplural', 'youplural', 'youplural', 'youplural', 'youplural'],
+    ['we', 'youplural', 'youplural', 'youplural', 'youplural', 'youplural', 'youplural', 'youplural'],
+    ['we', 'youplural', 'youplural', 'youplural', 'youplural', 'youplural', 'youplural', 'youplural']
+];
+for (const row of [1, 2]) for (const [a, first] of codes.entries()) for (const [b, second] of codes.entries()) {
+    context.subjects = [{ categoryId: '07 Pronoun', code: first }, null, { categoryId: '08 linking', title: 'و' }, { categoryId: '07 Pronoun', code: second }];
+    run(`state.row${row}Slots = subjects;`);
+    for (const tense of ['past', 'present', 'future']) {
+        const item = { ...verb, verbTense: tense };
+        assert.equal(context.getContextVerbSubject(item, row, 4), pairs[a][b], `${first} + ${second}`);
+        assert.equal(context.getDisplayedItemTitle(item, row, 4), run(`VERB_CONJUGATIONS[14]['${tense}']['${pairs[a][b]}']`));
+        assert.equal(context.resolveAudioPath(item, row, 4), `sounds/verbs/${tense}/${pairs[a][b]}/14.m4a`);
+        const paths = context.getSlotAudioSegments(item, row, 4).map(segment => segment.path);
+        assert.ok(paths.every(path => path.includes(`/${pairs[a][b]}/`)));
+        checks++;
+    }
+}
+for (const row of [1, 2]) {
+    context.subjects = [{ categoryId: '04 place' }, { categoryId: '05 adjectives' }, { categoryId: '03 object', gender: 'female' }, null, { categoryId: '01 subject', gender: 'male' }];
+    run(`state.row${row}Slots = subjects;`);
+    assert.equal(context.getContextVerbSubject(verb, row, 5), 'they', 'Unordered noun categories, modifiers and gaps form a plural');
+    context.subjects = [{ categoryId: '07 Pronoun', code: 'i' }, { categoryId: '07 Pronoun', code: 'she' }, verb];
+    run(`state.row${row}Slots = subjects;`);
+    assert.equal(context.getContextVerbSubject(verb, row, 3), 'we', 'Compound subjects affect every subsequent verb');
+    assert.equal(context.getContextVerbSubject({ ...verb, conjugation: 'he' }, row, 3), 'we', 'A stale preset conjugation cannot override the subjects of consecutive verbs');
+    assert.equal(context.getDisplayedItemTitle({ ...verb, isAdvancedOverride: true, title: 'يقعد' }, row, 3), run("VERB_CONJUGATIONS[14].present.we"), 'Compound agreement updates a preset verb after editing its strip');
+    context.subjects = [{ categoryId: '07 Pronoun', code: 'i' }, verb, { categoryId: '07 Pronoun', code: 'she' }];
+    run(`state.row${row}Slots = subjects;`);
+    assert.equal(context.getContextVerbSubject(verb, row, 3), 'she', 'Separate clauses keep separate subjects');
+}
+for (const [title, expected] of Object.entries({ انا: 'i', 'انتَ': 'youmale', 'انتِ': 'youfemale', انتما: 'youplural', نحن: 'we', هم: 'they', هي: 'she', هاد: 'he' })) {
+    context.pronoun = { categoryId: '07 Pronoun', title, code: 'your_f' };
+    run('state.row1Slots = [pronoun];');
+    assert.equal(context.getContextVerbSubject(verb, 1, 1), expected, title);
+}
+run("state.row1Slots = [{ categoryId: '07 Pronoun', title: 'نحن', pronounModifier: 'possessive_male' }];");
+assert.equal(context.getContextVerbSubject(verb, 1, 1), 'i', 'Possessive pronouns are not subjects');
 
 const example = context.getAdvancedItemData(5, 8, 1);
 context.example = example;

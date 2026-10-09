@@ -21,6 +21,7 @@ let state = {
 };
 
 function navigateTo(viewName) {
+    if (typeof clearComprehensionHeader === 'function') clearComprehensionHeader();
     if (typeof stopActivityPlayback === 'function') stopActivityPlayback();
     else stopAllPlayback();
     state.currentView = viewName;
@@ -30,6 +31,9 @@ function navigateTo(viewName) {
     document.getElementById('workplaceHeaderToolbar').classList.toggle('hidden', viewName !== 'workplace');
     document.getElementById('clearBoardBtn').classList.toggle('hidden', viewName !== 'workplace');
     document.getElementById('activityHomeBtn').classList.toggle('hidden', viewName !== 'activity');
+    document.getElementById('homeHeaderTools').classList.toggle('hidden', viewName !== 'home');
+    document.getElementById('pwaInstallHelp').hidden = true;
+    document.getElementById('pwaInstallBtn').setAttribute('aria-expanded', 'false');
     if (viewName === 'workplace') renderWorkplace();
 }
 
@@ -228,9 +232,7 @@ function renderSlotRow(containerId, rowNumber) {
             const titleText = getDisplayedItemTitle(item, rowNumber, i);
 
             card.innerHTML = `
-                <button onclick="clearSingleSlot(${rowNumber}, ${i}, event)" aria-label="مسح الخانة" class="clear-card-btn slot-clear absolute top-0.5 left-0.5 sm:top-1 sm:left-1 z-10 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-slate-100/90 hover:bg-rose-500 hover:text-white text-slate-400 flex items-center justify-center shadow-sm">
-                    <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+                <button onclick="clearSingleSlot(${rowNumber}, ${i}, event)" aria-label="مسح الخانة" class="clear-card-btn slot-clear absolute top-0.5 left-0.5 sm:top-1 sm:left-1 z-10"></button>
                 <div class="w-full h-full flex items-center justify-center p-1 sm:p-2">
                     <img src="${imagePath}" alt="${titleText}" class="w-full h-full object-contain filter drop-shadow-sm" onerror="this.onerror=null; this.src='assets/image-fallback.svg';">
                 </div>
