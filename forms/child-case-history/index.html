@@ -1,14 +1,20 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-    <script type="module" crossorigin src="../child-case-history/assets/index-DvvkLrO6.js"></script>
-    <link rel="stylesheet" crossorigin href="../child-case-history/assets/index-Bscd4IaO.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Offline child speech and language case history, accessible interview form and report.">
+<title>Child History · Ahmad Ghanem</title>
+<link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+<a href="#main" class="skip">Skip to form</a>
+<header><div class="topline"><div><div class="eyebrow">Ahmad Ghanem · Speech and Language Pathology</div><h1 id="appTitle">Child case history</h1><p id="subtitle" class="muted">First assessment · Caregiver interview & clinical notes</p></div><button id="language" lang="ar">العربية</button></div></header>
+<div class="layout"><aside><div id="stepStatus" class="muted"></div><div class="progress" aria-hidden="true"><span id="progress"></span></div><nav id="nav" aria-label="Assessment sections"></nav><div class="privacy"><label><input id="remember" type="checkbox"><span id="rememberLabel">Save draft on this device</span></label><p id="privacyText">Off by default. Reports stay in this browser. Enable only on a private device; clear the draft after use.</p><p id="saveStatus" class="status" role="status" aria-live="polite"></p><button id="clear">New / clear form</button></div></aside>
+<main id="main" tabindex="-1"><form id="history" novalidate><div id="sections"></div><div class="bottom"><button type="button" id="previous">← Previous</button><button type="button" id="review" class="primary">Review & export report</button><button type="button" id="next">Next →</button></div><p id="message" class="status" role="status" aria-live="polite"></p></form></main></div>
+<footer class="app-footer">SPEECH AND LANGUAGE PATHOLOGY · Ahmad Ghanem · Latakia - Syria · <a href="mailto:slp.ahmadghanem@gmail.com">slp.ahmadghanem@gmail.com</a></footer>
+<dialog id="reportDialog" aria-labelledby="reportTitle"><div class="dialogtop"><h2 id="reportTitle">Review & export</h2><button id="closeReport">Close</button></div><p id="exportHelp" class="muted">Check the report below, then choose a format. PDF opens your browser’s print window; choose “Save as PDF”.</p><div class="actions"><button id="textExport" class="primary">Download text (.txt)</button><button id="pdfExport">Print / Save as PDF</button><label class="choice"><input id="includeEmpty" type="checkbox"><span id="emptyLabel">Include unanswered fields</span></label></div><div id="reportPreview" class="report"></div></dialog>
+<dialog id="clearDialog" aria-labelledby="clearTitle"><h2 id="clearTitle">Start a new history?</h2><p id="clearHelp">This clears all current answers and the saved draft on this device. Download your report first if you need it.</p><div class="bottom"><button id="cancelClear">Cancel</button><button id="confirmClear">Clear form</button></div></dialog>
+<div id="printArea" class="report"></div>
+<script src="./assets/app.js" defer></script>
+</body>
 </html>
-

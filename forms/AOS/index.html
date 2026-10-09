@@ -1,221 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" dir="ltr">
 <head>
-  <meta charset="UTF-8">
-  <title>Neuro | Ahmad Ghanem SLP</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Google Fonts -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&display=swap">
-
-  <!-- Tab Icon -->
-  <link rel="icon" href="images/logo.png" type="image/png">
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="English and Arabic acquired apraxia of speech assessment and motor-speech resources by Ahmad Ghanem.">
+  <meta name="theme-color" content="#dff3e6">
+  <title>Acquired AOS · Ahmad Ghanem</title>
+  <link rel="icon" href="./AOS%20and%20disarthria/assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./AOS%20and%20disarthria/assets/styles.css">
   <style>
-    body {
-      font-family: 'Segoe UI', Arial, 'Noto Sans Arabic', sans-serif;
-      background: #f8fafd;
-      margin: 0;
-      color: #233;
-    }
-
-    .site-nav-bar {
-      margin-bottom: 1.7em;
-      text-align: center;
-      width: 100%;
-      background: #fcfdff;
-      border-bottom: 1px solid #e3f1ff;
-      padding: 0.45em 0;
-      position: relative;
-      z-index: 2;
-    }
-
-    .site-nav-bar a {
-      color: #43a6f8;
-      text-decoration: none;
-      padding: 10px 22px;
-      border-radius: 18px;
-      font-weight: bold;
-      font-size: 1em;
-      margin: 0 0.5em;
-      transition: background 0.13s;
-    }
-
-    .site-nav-bar a.active, .site-nav-bar a:hover {
-      background: #e0f2ff;
-      color: #2693d9;
-    }
-
-    .forms-header {
-      margin-top: 2em;
-      margin-bottom: 2.5em;
-      text-align: center;
-    }
-
-    .subtitle {
-      font-size: 1.11em;
-      color: #3496d8;
-      margin-bottom: 0.5em;
-      font-weight: bold;
-    }
-
-    .forms-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1.5em;
-      max-width: 1200px;
-      margin: 3em auto;
-      padding: 0 1em;
-      align-items: stretch;
-    }
-
-    .form-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      background: #fcfdff;
-      border-radius: 16px;
-      box-shadow: 0 3px 14px #a4d4ff16;
-      border: 1.8px solid #e3f1ff;
-      padding: 25px 18px;
-      min-height: 280px;
-      box-sizing: border-box;
-      cursor: pointer;
-      text-decoration: none;
-      color: inherit;
-      transition: box-shadow 0.17s, border-color 0.17s;
-    }
-
-    .form-card:hover {
-      box-shadow: 0 8px 32px #43a6f830;
-      border-color: #43a6f8;
-      z-index: 1;
-    }
-
-    .form-card img {
-      width: 70px;
-      height: 70px;
-      margin-bottom: 0.9em;
-      object-fit: contain;
-      filter: drop-shadow(0 2px 12px #43a6f814);
-    }
-
-    .form-card-title {
-      font-size: 1.16em;
-      font-weight: bold;
-      margin: 0.5em 0;
-    }
-
-    .form-card-desc {
-      font-size: 0.95em;
-      color: #6b7689;
-      margin: 0.5em 0 1.2em;
-      flex-grow: 1;
-    }
-
-    .about-contact {
-      margin-top: 2.5em;
-      font-size: 1.05em;
-      line-height: 1.7;
-      color: #3e4666;
-      text-align: center;
-    }
-
-    .about-contact a {
-      color: #3496d8;
-      text-decoration: none;
-    }
-
-    @media (max-width: 1024px) {
-      .form-card img { width: 60px; height: 60px; }
-      .form-card { min-height: 250px; padding: 20px 15px; }
-    }
-
-    @media (max-width: 768px) {
-      .forms-list { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1em; }
-      .form-card img { width: 55px; height: 55px; }
-      .form-card { min-height: 220px; padding: 18px 12px; }
-    }
-
-    @media (max-width: 480px) {
-      .forms-list { grid-template-columns: 1fr; gap: 0.9em; }
-      .form-card img { width: 50px; height: 50px; margin-bottom: 0.7em; }
-      .form-card-title { font-size: 1.05em; }
-      .form-card-desc { font-size: 0.9em; }
-    }
+    .landing { max-width:1100px; margin:28px auto; padding:0 20px; }
+    .landing .intro { padding:26px; background:white; border:1px solid var(--line); border-radius:22px; }
+    .landing-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; margin:24px 0; }
+    .landing-card { display:block; padding:24px; background:white; border:1px solid var(--line); border-radius:20px; text-decoration:none; color:inherit; }
+    .landing-card.main-card { grid-column:1/-1; background:linear-gradient(110deg,#dff3e6,#edf7ff); border-color:#a8cbb7; }
+    .landing-card h2 { font-size:22px; color:var(--blue-ink); }
+    .landing-card p { color:#52676f; }
+    .landing-card:hover { border-color:var(--brand); }
+    .site-links { display:flex; flex-wrap:wrap; gap:12px; padding:16px 20px; max-width:1100px; margin:auto; }
+    .site-links a { padding:8px; }
+    .landing-research { background:white; border:1px solid var(--line); padding:24px; border-radius:20px; }
+    @media(max-width:700px) { .landing-grid { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
-
-  <nav class="site-nav-bar">
-    <a href="index.html">Home</a>
-    <a href="tools.html">Tools</a>
-    <a href="resources.html">Resources</a>
-  </nav>
-
-  <main>
-    <div class="forms-header">
-      <h1>Aphasia</h1>
-      <div class="subtitle">All digital assessment and intake forms</div>
+  <a class="skip" href="#main" data-en="Skip to resources" data-ar="الانتقال إلى الموارد">Skip to resources</a>
+  <nav class="site-links" aria-label="Site navigation"><a href="../../index.html" data-en="Home" data-ar="الرئيسية">Home</a><a href="../../forms.html" data-en="Forms" data-ar="النماذج">Forms</a><a href="../../resources.html" data-en="Resources" data-ar="الموارد">Resources</a></nav>
+  <header><div class="topline"><div><p class="eyebrow" data-en="Ahmad Ghanem · Speech and Language Pathology" data-ar="أحمد غانم · اختصاص النطق واللغة">Ahmad Ghanem · Speech and Language Pathology</p><h1 data-en="Acquired apraxia of speech" data-ar="تعذر الأداء النطقي المكتسب">Acquired apraxia of speech</h1><p class="muted" data-en="Adult motor speech assessment · English and Arabic" data-ar="تقييم الكلام الحركي للبالغين · العربية والإنجليزية">Adult motor speech assessment · English and Arabic</p></div><button id="language" type="button">العربية</button></div></header>
+  <main class="landing" id="main">
+    <div class="intro"><h2 data-en="A structured clinical assessment" data-ar="تقييم سريري منظم">A structured clinical assessment</h2><p data-en="Document speech samples, repeated attempts, motor-speech observations, the differential, and functional communication. Review linked research and export an English, Arabic, or bilingual report." data-ar="وثّق عينات الكلام والمحاولات المتكررة وملاحظات الكلام الحركي والتشخيص التفريقي والتواصل الوظيفي. راجع الأبحاث المرتبطة وصدّر تقريراً بالعربية أو الإنجليزية أو باللغتين.">Document speech samples, repeated attempts, motor-speech observations, the differential, and functional communication. Review linked research and export an English, Arabic, or bilingual report.</p><p class="hint" data-en="For adult acquired AOS. This descriptive worksheet and its original Arabic prompts are not a standardized test or a validated Arabic ASRS translation." data-ar="لتعذر الأداء النطقي المكتسب لدى البالغين. هذه الورقة الوصفية ومثيراتها العربية الأصلية ليست اختباراً مقنناً أو ترجمة عربية متحققاً من صلاحيتها لمقياس ASRS.">For adult acquired AOS. This descriptive worksheet and its original Arabic prompts are not a standardized test or a validated Arabic ASRS translation.</p></div>
+    <div class="landing-grid">
+      <a class="landing-card main-card" id="assessmentLink" href="./AOS%20and%20disarthria/index.html"><h2 data-en="Open the AOS assessment →" data-ar="فتح تقييم تعذر الأداء النطقي ←">Open the AOS assessment →</h2><p data-en="Nine sections · Visible choices · Editable speech tasks · Research references · PDF / text reports" data-ar="تسعة أقسام · خيارات ظاهرة · مهام كلام قابلة للتعديل · مراجع بحثية · تقارير PDF / نصية">Nine sections · Visible choices · Editable speech tasks · Research references · PDF / text reports</p></a>
+      <a class="landing-card" href="../adult-case-history/index.html"><h2 data-en="Adult case history" data-ar="تاريخ حالة البالغين">Adult case history</h2><p data-en="Medical, language and participation background." data-ar="الخلفية الطبية واللغوية والمشاركة.">Medical, language and participation background.</p></a>
+      <a class="landing-card" href="../speech/oral-motor-exam/index.html"><h2 data-en="Oral motor examination" data-ar="فحص الوظائف الحركية الفموية">Oral motor examination</h2><p data-en="Document oral structure and function separately." data-ar="توثيق البنية والوظيفة الفموية بصورة منفصلة.">Document oral structure and function separately.</p></a>
+      <a class="landing-card" href="../speech/DDK/index.html"><h2 data-en="DDK recording and analysis" data-ar="تسجيل وتحليل DDK">DDK recording and analysis</h2><p data-en="Local audio support for AMR / SMR observations." data-ar="دعم صوتي محلي لملاحظات AMR / SMR.">Local audio support for AMR / SMR observations.</p></a>
+      <a class="landing-card" href="../aphasia/index.html"><h2 data-en="Aphasia resources" data-ar="موارد الحبسة">Aphasia resources</h2><p data-en="Review language and motor-speech difficulties separately." data-ar="مراجعة الصعوبات اللغوية والكلام الحركي بصورة منفصلة.">Review language and motor-speech difficulties separately.</p></a>
     </div>
-
-    <div class="forms-list">
-      <a href="../../forms/AOS/AOS and disarthria/index.html" target="_blank" rel="noopener" class="form-card">
-        <img src="../../images/brain.gif" alt="Language forms icon">
-        <div class="form-card-title">NeuroSpeech</div>
-        <div class="form-card-desc">Acquired Neurogenic Speech Disorders Assessment</div>
-      </a>
-
-      <a href="forms/speech/index.html" target="_blank" rel="noopener" class="form-card">
-        <img src="images/speech.gif" alt="Speech forms icon">
-        <div class="form-card-title">Speech</div>
-        <div class="form-card-desc">Explore speech-related assessment.</div>
-      </a>
-
-      <a href="forms/asd/index.html" target="_blank" rel="noopener" class="form-card">
-        <img src="images/ASD.gif" alt="ASD/Autism forms icon">
-        <div class="form-card-title">ASD</div>
-        <div class="form-card-desc">Assessment for autism spectrum.</div>
-      </a>
-
-      <a href="forms/child-case-history/index.html" target="_blank" rel="noopener" class="form-card">
-        <img src="images/baby-smile.gif" alt="Child icon">
-        <div class="form-card-title">Child Case History</div>
-        <div class="form-card-desc">Basic developmental and family intake.</div>
-      </a>
-
-      <a href="forms/adult-case-history/index.html" target="_blank" rel="noopener" class="form-card">
-        <img src="images/adult.gif" alt="Adult icon">
-        <div class="form-card-title">Adult Case History</div>
-        <div class="form-card-desc">Basic intake for adults.</div>
-      </a>
-
-      <a href="forms/oral-motor-exam/index.html" target="_blank" rel="noopener" class="form-card">
-        <img src="images/oral.gif" alt="Oral Motor Exam icon">
-        <div class="form-card-title">Oral Motor Exam</div>
-        <div class="form-card-desc">Comprehensive oral motor evaluation.</div>
-      </a>
-
-      <a href="forms/voice/index.html" target="_blank" rel="noopener" class="form-card">
-        <img src="images/voice.gif" alt="Voice icon">
-        <div class="form-card-title">Voice Evaluation</div>
-        <div class="form-card-desc">Assessment for voice issues.</div>
-      </a>
-
-      <a href="forms/aphasia.html" target="_blank" rel="noopener" class="form-card">
-        <img src="images/aphasia.gif" alt="Aphasia icon">
-        <div class="form-card-title">Aphasia</div>
-        <div class="form-card-desc">Assessment for neurodevelopmental issues.</div>
-      </a>
-    </div>
-
-    <div class="about-contact">
-      <strong>Questions?</strong>
-      <a href="mailto:slp.ahmadghanem@gmail.com">slp.ahmadghanem@gmail.com</a> &bull;
-      <a href="tel:+963988451245">+963 988 451 245</a>
-    </div>
+    <div class="landing-research"><h2 data-en="Research behind the form" data-ar="الأبحاث الداعمة للنموذج">Research behind the form</h2><p data-en="The assessment contains nine linked guidance and research references, with their clinical use and limitations explained in both languages." data-ar="يضم التقييم تسعة مراجع مرتبطة من الإرشادات والأبحاث مع شرح استخدامها السريري وحدودها باللغتين.">The assessment contains nine linked guidance and research references, with their clinical use and limitations explained in both languages.</p><p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7890226/" target="_blank" rel="noopener noreferrer">Allison et al. (2020) · Differential diagnosis review</a></p><p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10171845/" target="_blank" rel="noopener noreferrer">Duffy et al. (2023) · ASRS reliability and validity</a></p></div>
   </main>
-
+  <footer class="app-footer"><span data-en="SPEECH AND LANGUAGE PATHOLOGY · Ahmad Ghanem · Latakia - Syria" data-ar="اختصاص النطق واللغة · أحمد غانم · اللاذقية - سوريا">SPEECH AND LANGUAGE PATHOLOGY · Ahmad Ghanem · Latakia - Syria</span><br><a href="mailto:slp.ahmadghanem@gmail.com" dir="ltr">slp.ahmadghanem@gmail.com</a> · <a href="tel:+963988451245" dir="ltr">+963 988 451 245</a></footer>
+  <script>
+    (() => {
+      let arabic = new URLSearchParams(location.search).get('lang') === 'ar';
+      function render() {
+        document.documentElement.lang = arabic ? 'ar' : 'en'; document.documentElement.dir = arabic ? 'rtl' : 'ltr';
+        document.querySelectorAll('[data-en]').forEach(node => { node.textContent = arabic ? node.dataset.ar : node.dataset.en; });
+        document.getElementById('language').textContent = arabic ? 'English' : 'العربية';
+        document.getElementById('language').setAttribute('aria-label', arabic ? 'التبديل إلى الإنجليزية' : 'Switch to Arabic');
+        document.getElementById('assessmentLink').href = './AOS%20and%20disarthria/index.html' + (arabic ? '?lang=ar' : '?lang=en');
+        document.title = arabic ? 'تعذر الأداء النطقي المكتسب · أحمد غانم' : 'Acquired AOS · Ahmad Ghanem';
+      }
+      document.getElementById('language').onclick = () => { arabic = !arabic; render(); }; render();
+    })();
+  </script>
 </body>
 </html>

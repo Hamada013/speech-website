@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>التقييم السريري</title>
+<title>التقييم المعرفي واللغوي · أحمد غانم</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -44,6 +44,7 @@
     ؟
 </button>
 
+    <nav class="form-nav" id="sectionButtons" aria-label="أقسام التقييم"></nav>
     </header>
 
 <!-- القسم 0 – البيانات الشخصية والطبية -->
@@ -70,11 +71,20 @@
 
   </div>
 </section>
+<section id="assessmentContext" aria-labelledby="contextTitle">
+<h2 id="contextTitle">سياق التقييم</h2>
+<p class="assessment-help">اختر نتيجة كل بند. إعادة الضغط على النتيجة يلغيها. تُحسب الدقة من البنود المُقيّمة فقط؛ البنود غير المُقيّمة والمستبعدة لا تُعد أخطاء. ملاحظات السلوك والصوت تسجّل كوجود أو غياب، ولا تُحسب كإجابات صحيحة.</p>
+<p class="assessment-help">النسب وصفية لهذا النموذج؛ لا تمثل درجة معيارية أو تشخيصاً آلياً.</p>
+<div class="card-row">
+<div class="card"><label for="languageContext">اللغة / اللهجة والخلفية التعليمية</label><textarea id="languageContext" rows="2"></textarea></div>
+<div class="card"><label for="assessmentConditions">ظروف التطبيق والدعم المستخدم</label><textarea id="assessmentConditions" rows="2" placeholder="مثل إعادة التعليمات، التلميحات، السمع، الرؤية، التعب أو الاستجابة بالإشارة"></textarea></div>
+</div>
+</section>
 <!-- القسم 1 -->
 <section id="section1">
   <h2>
     التوجه والوعي <span id="percent1">0%</span>
-    <button class="btn-note" onclick="addNote(3)">!</button>
+    <button class="btn-note" onclick="addNote(1)">!</button>
 <!-- Info button for التوجه والوعي -->
 <button class="btn-info" 
     style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
@@ -277,6 +287,7 @@
 </button>
 
 
+  </h2>
   <!-- Subsection 2: الأسئلة الشخصية البسيطة -->
   <h3>الأسئلة الشخصية البسيطة</h3>
   <div class="card-row">
@@ -307,7 +318,7 @@
       </div>
     </div>
     <div class="card">
-      <label>هل آنا ارتدي قبعة؟</label>
+      <label>هل أنا أرتدي قبعة؟</label>
       <div class="button-row">
         <button class="btn-correct" onclick="score('2subC','correct',this)">+</button>
         <button class="btn-dontknow" onclick="score('2subC','dontknow',this)">/</button>
@@ -320,12 +331,7 @@
         <button class="btn-dontknow" onclick="score('2subC','dontknow',this)">/</button>
       </div>
     </div>
-    <div class="card">
-      <div class="button-row">
-        <button class="btn-correct" onclick="score('2subC','correct',this)">+</button>
-        <button class="btn-dontknow" onclick="score('2subC','dontknow',this)">/</button>
-      </div>
-    </div>
+
     <div class="card">
       <label>هل السماء زرقاء؟</label>
       <div class="button-row">
@@ -679,7 +685,7 @@
     </div>
 
     <div class="card">
-      <label>اذا اسايقظت صباحا ولم تجد هاتفك؟</label>
+      <label>ماذا تفعل إذا استيقظت صباحاً ولم تجد هاتفك؟</label>
       <div class="button-row">
         <button class="btn-correct" onclick="score(4,'correct',this)">+</button>
         <button class="btn-dontknow" onclick="score(4,'dontknow',this)">/</button>
@@ -1381,8 +1387,7 @@
   </h2>
 
   <!-- Subsection 1 – استبعاد كلمة (4 بطاقات) -->
-  <h3> استبعاد كلمة <button class="btn-info" onclick="showInfo('التعليمات للمُقيّم: اطلب من الشخص قراءة الكلمات وستُعرض عليه، كل صف يحتوي على ٣ كلمات. اطلب منه أن يشطب الكلمة التي لا تنتمي إلى باقي الكلمات في كل صف. 
-')">?</button></h3>
+  <h3> استبعاد كلمة <button class="btn-info" onclick="showInfo('التعليمات للمُقيّم: اطلب من الشخص قراءة الكلمات وستُعرض عليه، كل صف يحتوي على ٣ كلمات. اطلب منه أن يشطب الكلمة التي لا تنتمي إلى باقي الكلمات في كل صف.')">?</button></h3>
   <div class="card-row">
     <div class="card">
       <label>بقرة، تفاحة، جزر</label>
@@ -1456,8 +1461,7 @@
   </div>
 
   <!-- Subsection 3 – فهم القرائي (4 بطاقات) -->
-  <h3> فهم القرائي <button class="btn-info" onclick="showInfo('سمير وسامر أخوان. كلاهما شارك في بطولة كرة القدم على أمل الفوز بجائزة قدرها 1,000 دولار. فاز سمير بمباراته الأولى والثانية، لكنه خرج من البطولة بعد خسارته في المباراة الثالثة. سامر وصل حتى نصف النهائي. خسر هناك، لكن حصل على لباس رياضة كجائزة تعزية.
-')">?</button></h3>
+  <h3> فهم القرائي <button class="btn-info" onclick="showInfo('سمير وسامر أخوان. كلاهما شارك في بطولة كرة القدم على أمل الفوز بجائزة قدرها 1,000 دولار. فاز سمير بمباراته الأولى والثانية، لكنه خرج من البطولة بعد خسارته في المباراة الثالثة. سامر وصل حتى نصف النهائي. خسر هناك، لكن حصل على لباس رياضة كجائزة تعزية.')">?</button></h3>
   <div class="card-row">
     <div class="card">
       <label>هل سامر وسمير أولاد عم؟</label>
@@ -2274,7 +2278,7 @@
 <button class="btn-info" 
     style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
     onclick="showInfo('<div style=&quot;max-width:100%; overflow-x:auto;&quot;>\
-        <p><strong>شرح تفصيلي عن الصوت الضعيف:</strong></p>\
+        <p><strong>تقييم المنطق والاستدلال:</strong></p>\
         <ul>\
             <li>هل يفهم السبب والنتيجة؟ (مثلاً: لماذا أخذ الشخص الكعكة)</li>\
             <li>هل يلاحظ أي تناقضات أو اختلاط بالأحداث؟</li>\
@@ -2381,16 +2385,36 @@
 </div>
 
 
-<!-- القسم 13 – تقرير نهائي -->
-<section id="section13">
-  <h2>القسم 13: التقرير النهائي</h2>
-  <textarea id="report" readonly></textarea>
-  <button class="btn-download" onclick="downloadReport()">ملف</button>
+</section>
+
+<section id="clinicalSummary" aria-labelledby="summaryTitle">
+<h2 id="summaryTitle">الخلاصة السريرية وخطة المتابعة</h2>
+<label for="clinicalImpression">انطباع الفاحص والقدرات والصعوبات الملحوظة</label><textarea id="clinicalImpression" rows="4"></textarea>
+<label for="recommendations">التوصيات والأهداف وخطة المتابعة</label><textarea id="recommendations" rows="4"></textarea>
+</section>
+<!-- التقرير النهائي -->
+<section id="reportSection" aria-labelledby="reportTitle">
+  <h2 id="reportTitle" data-report-ar="التقرير النهائي" data-report-en="Final report">التقرير النهائي</h2>
+  <div class="report-language" role="group" aria-label="لغة التقرير / Report language">
+    <button type="button" class="action secondary" data-report-language="ar" aria-pressed="true" onclick="setReportLanguage('ar')">العربية</button>
+    <button type="button" class="action secondary" data-report-language="en" aria-pressed="false" onclick="setReportLanguage('en')">English</button>
+  </div>
+  <p class="assessment-help" data-report-ar="لغة التقرير فقط. تبقى بيانات الحالة والملاحظات والاستجابات كما أدخلتها." data-report-en="Report language only. Patient details, notes and responses remain as entered.">لغة التقرير فقط. تبقى بيانات الحالة والملاحظات والاستجابات كما أدخلتها.</p>
+  <div class="report-options"><label><input id="includeUnanswered" type="checkbox"> <span data-report-ar="إظهار البنود التي لم تُقيّم في تفاصيل التقرير" data-report-en="Include unassessed items in report details">إظهار البنود التي لم تُقيّم في تفاصيل التقرير</span></label></div>
+  <div class="report-actions">
+    <button type="button" class="action" data-report-ar="تنزيل التقرير النصي" data-report-en="Download English text report" onclick="downloadReport()">تنزيل التقرير النصي</button>
+    <button type="button" class="action" data-report-ar="طباعة / حفظ PDF" data-report-en="Print / Save PDF" onclick="printReport()">طباعة / حفظ PDF</button>
+    <button type="button" class="action secondary" data-report-ar="نسخ التقرير" data-report-en="Copy report" onclick="copyReport()">نسخ التقرير</button>
+  </div>
+  <p id="reportStatus" role="status" aria-live="polite"></p>
+  <div id="reportPreview" class="report-document" aria-label="معاينة التقرير"></div>
+  <details><summary data-report-ar="عرض النسخة النصية" data-report-en="View text version">عرض النسخة النصية</summary><textarea id="report" readonly aria-label="التقرير النصي"></textarea></details>
 </section>
 
 </div>
 
-<div class="floating-box" id="floatingBox"></div>
+<div class="floating-box" id="floatingBox" role="dialog" aria-modal="true" aria-label="معلومات التقييم" hidden></div>
+<div id="printArea" class="report-document" lang="ar" dir="rtl"></div>
 
 <script src="script.js"></script>
 </body>

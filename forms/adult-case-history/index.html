@@ -1,14 +1,58 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-    <script type="module" crossorigin src="../adult-case-history/assets/index-BC8XHZwp.js"></script>
-    <link rel="stylesheet" crossorigin href="../adult-case-history/assets/index-BlKxBqMs.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Adult speech and language case history. English and Arabic interview, optional private-device drafts, and printable clinical reports by Ahmad Ghanem.">
+  <meta name="theme-color" content="#dff3e6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Adult History">
+  <title>Adult Case History · Ahmad Ghanem</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/icon.svg">
+  <link rel="apple-touch-icon" href="./assets/icon-192.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./assets/styles.css">
+  <script defer src="./assets/data.js"></script>
+  <script defer src="./assets/model.js"></script>
+  <script defer src="./assets/app.js"></script>
+</head>
+<body>
+  <a class="skip" id="skipLink" href="#main">Skip to form</a>
+  <header><div class="topline">
+    <div><p class="eyebrow" id="branding">Ahmad Ghanem · Speech and Language Pathology</p><h1 id="appTitle">Adult case history</h1><p class="muted" id="subtitle">Initial assessment · Patient interview &amp; clinical notes</p></div>
+    <button id="language" type="button" aria-label="Switch to Arabic">العربية</button>
+  </div></header>
+  <div class="layout">
+    <aside aria-labelledby="stepStatus">
+      <strong id="stepStatus">Section 1 of 9</strong>
+      <div class="progress" role="progressbar" id="sectionProgress" aria-label="Current section" aria-valuemin="1" aria-valuemax="9" aria-valuenow="1"><span id="progress"></span></div>
+      <nav id="nav" aria-label="Case history sections"></nav>
+      <p class="hint" id="completion" aria-live="polite"></p>
+      <div class="privacy"><label><input id="remember" type="checkbox"><span id="rememberLabel">Save draft on this device</span></label><p id="privacyText">Saving is off by default. Use a private device and clear the draft after use.</p><p id="saveStatus" class="status" role="status"></p></div>
+      <button id="clear" class="clear-button" type="button">New / clear form</button>
+    </aside>
+    <main id="main" tabindex="-1">
+      <form id="history" autocomplete="off" novalidate>
+        <div id="sections"></div>
+        <div class="bottom"><button id="previous" type="button">← Previous</button><button id="review" class="primary" type="button">Review &amp; export report</button><button id="next" type="button">Next →</button></div>
+        <p id="message" class="status error" role="status"></p>
+      </form>
+    </main>
+  </div>
+  <footer class="app-footer"><span id="footerProfession">SPEECH AND LANGUAGE PATHOLOGY</span> · <span id="footerName">Ahmad Ghanem</span> · <span id="footerLocation">Latakia - Syria</span><br><a href="mailto:slp.ahmadghanem@gmail.com" dir="ltr">slp.ahmadghanem@gmail.com</a></footer>
+  <dialog id="reportDialog" aria-labelledby="reportTitle">
+    <div class="dialogtop"><h2 id="reportTitle">Review &amp; export</h2><button type="button" id="closeReport">Close</button></div>
+    <p class="muted" id="exportHelp">Review the report, then print or save it as PDF from your browser.</p>
+    <div class="actions report-tools"><button id="pdfExport" class="primary" type="button">Print / Save as PDF</button><button id="textExport" type="button">Download text (.txt)</button></div>
+    <div class="report-options"><label><input id="bilingual" type="checkbox"><span id="bilingualLabel">Bilingual report (English + Arabic)</span></label><label><input id="includeEmpty" type="checkbox"><span id="emptyLabel">Include unanswered fields</span></label></div>
+    <div id="reportPreview" class="report"></div>
+  </dialog>
+  <dialog id="clearDialog" aria-labelledby="clearTitle" aria-describedby="clearHelp">
+    <h2 id="clearTitle">Start a new history?</h2><p id="clearHelp">This clears the current answers and this form’s saved draft. Export the report first if needed.</p><p id="clearError" class="error" role="status"></p>
+    <div class="actions"><button id="cancelClear" type="button">Cancel</button><button id="confirmClear" type="button" class="primary">Clear form</button></div>
+  </dialog>
+  <article id="printArea" class="report" aria-label="Printable report"></article>
+  <noscript><p class="noscript">Enable JavaScript to complete this form. فعّل جافاسكريبت لتعبئة هذا النموذج.</p></noscript>
+</body>
 </html>
-

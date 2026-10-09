@@ -1,14 +1,49 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-    <script type="module" crossorigin src="../articulation/assets/index-Dj8wzMwW.js"></script>
-    <link rel="stylesheet" crossorigin href="../articulation/assets/index-2WWK4WwL.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
-</html>
-
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="فاحص عربي غير معياري لأصوات الكلام مع صور تسمية وتقرير سريري.">
+<title>فاحص النطق العربي | Ahmad Ghanem</title>
+<link rel="stylesheet" href="assets/styles.css"><script src="assets/stimuli.js" defer></script><script src="assets/browser.js" defer></script><script src="assets/phonology.js" defer></script><script src="assets/reporting.js" defer></script><script src="assets/dropdowns.js" defer></script><script src="assets/app.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">انتقل إلى الفحص</a>
+<header><div><p class="eyebrow">Ahmad Ghanem · Speech and Language Pathology</p><h1>فاحص النطق العربي</h1><p class="muted">صورة واحدة، محاولة واحدة · نحتفل بكل خطوة في التواصل</p></div><button id="reportButton" class="primary">مراجعة التقرير وتصديره</button></header>
+<main id="main" tabindex="-1">
+<nav class="tabs" aria-label="خطوات الفحص"><button data-page="details" aria-current="page">١. بيانات الفحص</button><button data-page="screen">٢. فحص الأصوات</button><button data-page="summary">٣. الملاحظات والخلاصة</button></nav>
+<p id="message" role="status" aria-live="polite"></p>
+<section id="details" class="card" aria-labelledby="detailsTitle"><h2 id="detailsTitle" tabindex="-1">بيانات الطفل والفحص</h2><p class="notice">فحص وصفي غير معياري، دون درجات معيارية أو حدود نجاح مرتبطة بالعمر. قيّم النطق وفق لغة الطفل ولهجته؛ الكلمات أمثلة قابلة للتعديل وليست قائمة مُقننة.</p><form id="detailsForm" class="grid" novalidate>
+<label>اسم الطفل<input id="childName" data-meta="childName" autocomplete="off"></label>
+<label>رقم الملف<input data-meta="recordId" autocomplete="off"></label>
+<fieldset><legend>تاريخ الميلاد</legend><div class="dateparts"><label>اليوم<input data-date="dob" data-part="day" inputmode="numeric" maxlength="2" placeholder="DD"></label><label>الشهر<input data-date="dob" data-part="month" inputmode="numeric" maxlength="2" placeholder="MM"></label><label>السنة<input data-date="dob" data-part="year" inputmode="numeric" maxlength="4" placeholder="YYYY"></label></div></fieldset>
+<fieldset><legend>تاريخ الفحص</legend><div class="dateparts"><label>اليوم<input data-date="assessment" data-part="day" inputmode="numeric" maxlength="2" placeholder="DD"></label><label>الشهر<input data-date="assessment" data-part="month" inputmode="numeric" maxlength="2" placeholder="MM"></label><label>السنة<input data-date="assessment" data-part="year" inputmode="numeric" maxlength="4" placeholder="YYYY"></label></div></fieldset>
+<p id="dateError" class="error wide" role="alert"></p><p id="age" class="muted wide"></p>
+<label>الفاحص<input data-meta="examiner"></label><label>مصدر المعلومات / مرافق الطفل<input data-meta="informant"></label>
+<label>اللهجة المرجعية للفحص<input data-meta="dialect" placeholder="راجع النطق المرجعي وفق لهجة الأسرة"></label><label>لغات الطفل ولهجاته<input data-meta="languages"></label>
+<label>طريقة الإجراء<select data-meta="procedure"><option value="">لم يُحدد</option><option>حضوري</option><option>عن بُعد</option></select></label>
+<label>حالة السمع<select data-meta="hearing"><option value="">غير مسجلة</option><option>فحص سمع موثق دون شكوى حالية</option><option>شكوى سمعية / نتيجة تتطلب متابعة</option><option>لم يُفحص / النتيجة غير معروفة</option></select></label>
+<label>مراجعة آلية النطق الفموية<select data-meta="oral"><option value="">غير مسجلة</option><option>لم تُجرَ</option><option>أُجريت دون ملاحظات في العينة</option><option>ملاحظات تحتاج تقييماً إضافياً</option></select></label>
+<label>موافقة ولي الأمر<select data-meta="consent"><option value="">غير موثقة</option><option>موثقة</option><option>بانتظار التوثيق</option></select></label>
+<fieldset class="wide"><legend>سبب الإحالة / الشكوى / تاريخ السمع</legend><textarea data-meta="concerns" aria-label="سبب الإحالة والشكوى"></textarea><details class="english-note"><summary>إضافة نسخة إنجليزية للملاحظة (اختياري)</summary><label lang="en" dir="ltr">English version<textarea data-meta="concernsEn" dir="ltr"></textarea></label></details></fieldset>
+</form><div class="bottom"><button data-page="screen" class="primary">بدء فحص الأصوات</button></div></section>
+<section id="screen" hidden aria-labelledby="screenTitle"><div class="card screen-top"><div class="section-head"><div><h2 id="screenTitle" tabindex="-1">فحص الأصوات في الكلمات</h2><p class="muted">اعرض الصورة في المنتصف، ثم اختر النتيجة تحتها. تنقّل بالسهمين بين الصور.</p></div><label class="inline"><input id="unansweredOnly" type="checkbox">إظهار الأصوات غير المكتملة</label></div><details class="quick-guide"><summary>إرشادات سريعة للفحص</summary><p class="notice">جرّب التسمية أولاً. إذا أعطيت نموذجاً لفظياً، اختر «تقليد». سجّل التحقق باللهجة عند اختلاف النطق المحلي عن الكلمة المكتوبة؛ لا تسجّل اختلاف اللهجة كخطأ. عند تغيير كلمة، تحقق من وجود الصوت المستهدف وموضعه.</p></details><p id="coverage" class="muted" aria-live="polite"></p><progress id="coverageBar" value="0" max="84" aria-label="اكتمال تسجيل بنود الفحص"></progress><details class="sound-menu"><summary>الانتقال إلى صوت معيّن</summary><div id="soundNav" class="sound-nav" aria-label="الأصوات المستهدفة"></div></details></div><div id="trials"></div><div class="bottom"><button data-page="summary" class="primary">إنهاء الفحص ومراجعة النتائج</button></div></section>
+<section id="summary" class="card" hidden aria-labelledby="summaryTitle"><h2 id="summaryTitle" tabindex="-1">الملاحظات السريرية والخطوات التالية</h2><section id="automaticSummary" class="process-panel" aria-label="التحليل الفونولوجي التلقائي"></section><div class="grid">
+<label>وضوح الكلام في عينة متصلة<select data-meta="intelligibility"><option value="">لم يُقيّم</option><option>مفهوم غالباً</option><option>مفهوم جزئياً / يحتاج تكراراً</option><option>يصعب فهمه غالباً</option><option>عينة غير كافية للحكم</option></select></label>
+<label>المشاركة وصلاحية العينة<select data-meta="participation"><option value="">غير مسجلة</option><option>مشاركة جيدة وعينة مناسبة للفحص</option><option>مشاركة متغيرة / احتاج دعماً</option><option>عينة محدودة؛ يلزم استكمال الفحص</option></select></label>
+<fieldset class="wide"><legend>وصف عينة الكلام المتصل / سياقها وأمثلة</legend><textarea data-meta="connected" aria-label="وصف عينة الكلام المتصل"></textarea><details class="english-note"><summary>إضافة نسخة إنجليزية للملاحظة (اختياري)</summary><label lang="en" dir="ltr">English version<textarea data-meta="connectedEn" dir="ltr"></textarea></label></details></fieldset>
+<fieldset class="wide"><legend>أنماط لاحظها الفاحص (تحتاج أمثلة وتحليلاً)</legend><div id="patterns" class="choices"></div></fieldset>
+<fieldset class="wide"><legend>الأمثلة والتحليل / مدى ثبات الأخطاء / قيود الفحص</legend><textarea data-meta="analysis" aria-label="التحليل السريري والأمثلة"></textarea><details class="english-note"><summary>إضافة نسخة إنجليزية للملاحظة (اختياري)</summary><label lang="en" dir="ltr">English version<textarea data-meta="analysisEn" dir="ltr"></textarea></label></details></fieldset>
+<label class="wide">قرار الفاحص<select data-meta="conclusion"><option value="">لم يُحدد؛ يلزم مراجعة سريرية</option><option>يُقترح تقييم شامل لأصوات الكلام</option><option>يُقترح متابعة وإعادة فحص</option><option>لا توجد أخطاء ملحوظة ضمن العينة المفحوصة؛ تُراجع الشكوى والقيود</option><option>الفحص غير مكتمل / العينة غير كافية</option></select></label>
+<fieldset class="wide"><legend>إجراءات يقترحها الفاحص</legend><div id="recommendations" class="choices"></div></fieldset>
+<fieldset class="wide"><legend>توصيات فردية / إحالات وأسبابها / موعد المتابعة</legend><textarea data-meta="plan" aria-label="الخطة الفردية والمتابعة"></textarea><details class="english-note"><summary>إضافة نسخة إنجليزية للملاحظة (اختياري)</summary><label lang="en" dir="ltr">English version<textarea data-meta="planEn" dir="ltr"></textarea></label></details></fieldset>
+</div><div class="bottom"><button data-page="screen">العودة للأصوات</button><button id="summaryReport" class="primary">مراجعة التقرير وتصديره</button></div></section>
+<section class="draft-bar"><label class="inline"><input id="remember" type="checkbox">حفظ مسودة على هذا الجهاز</label><span id="saveStatus" role="status" class="muted">الحفظ معطل افتراضياً. فعّله على جهاز خاص فقط.</span><button id="newCase">حالة جديدة / مسح</button></section>
+</main>
+<footer class="app-footer" dir="ltr">SPEECH AND LANGUAGE PATHOLOGY<br><strong>Ahmad Ghanem</strong><br>Latakia - Syria<br><a href="mailto:slp.ahmadghanem@gmail.com">slp.ahmadghanem@gmail.com</a></footer>
+<dialog id="reportDialog" aria-labelledby="reportTitle"><div class="section-head"><h2 id="reportTitle">مراجعة التقرير</h2><button id="closeReport">إغلاق</button></div><p id="exportHelp" class="muted">راجع النتائج والخلاصة قبل التصدير. لحفظ PDF اختر «حفظ كـ PDF» في نافذة الطباعة.</p><div class="actions report-actions"><label class="report-language">لغة التقرير / Language<select id="reportLanguage"><option value="ar">العربية</option><option value="en">English</option></select></label><button id="exportText" class="primary">تنزيل نص TXT</button><button id="exportPdf">طباعة / حفظ PDF</button><label class="inline"><input id="includeUntested" type="checkbox"><span id="includeUntestedLabel">تضمين البنود غير المفحوصة</span></label></div><p id="reportLanguageNote" class="muted"></p><article id="reportPreview" class="report"></article></dialog>
+<dialog id="pictureDialog" aria-label="صورة التسمية للطفل"><button id="closePicture">إغلاق الصورة</button><div id="childPicture" class="child-picture"></div></dialog>
+<dialog id="soundDialog" aria-labelledby="soundDialogTitle"><div class="section-head"><h2 id="soundDialogTitle">اختر الصوت الذي نطق به الطفل</h2><button id="closeSound">إلغاء</button></div><p id="soundDialogHelp" class="muted">اختر الحرف والصوت الدقيق؛ توجد خيارات إضافية للنطق اللهجي والأصوات الأخرى.</p><div id="phonemeGrid" class="phoneme-grid"></div><div class="actions"><button id="customSoundToggle">الصوت غير موجود؟ اكتب الصوت</button><button id="absentTarget" hidden>لا يوجد صوت مستهدف في هذه الصيغة</button></div><form id="customSoundForm" hidden><label for="customSound">الصوت / النسخ الصوتي الذي تريد تسجيله<input id="customSound" dir="auto" autocomplete="off" placeholder="IPA أو وصف صوتي"></label><button type="submit" class="primary">استخدام هذا الصوت</button></form><p id="soundPickerError" class="error" role="alert"></p></dialog>
+<dialog id="resetDialog" aria-labelledby="resetTitle"><h2 id="resetTitle">بدء حالة جديدة؟</h2><p>سيُمسح التسجيل الحالي والمسودة المحفوظة. صدّر التقرير أولاً إذا كنت تحتاجه.</p><div class="actions"><button id="cancelReset">إلغاء</button><button id="confirmReset">مسح وبدء حالة جديدة</button></div></dialog>
+<article id="printArea" class="report" dir="rtl"></article>
+<noscript><p>يرجى تفعيل JavaScript لتشغيل الفاحص.</p></noscript>
+</body></html>
