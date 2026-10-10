@@ -10,3 +10,9 @@
 @media (max-width: 480px) {
     .install-help { position: fixed; top: 68px; left: 12px; right: 12px; width: auto; }
 }
+.offline-control { position: relative; }
+.offline-panel { position: absolute; top: calc(100% + 8px); left: 0; width: min(360px, calc(100vw - 24px)); max-height: calc(100dvh - 90px); overflow-y: auto; padding: 14px; background: white; border: 1px solid #bae6fd; border-radius: 14px; box-shadow: 0 8px 24px #0f172a26; color: #075985; font-size: 13px; line-height: 1.8; }
+.offline-panel p { margin-block: 8px; }
+.offline-panel progress { width: 100%; accent-color: #0284c7; }
+.offline-panel button { margin: 3px; }
+@media (max-width: 767px) { .offline-panel { position: fixed; top: 68px; left: 12px; right: 12px; width: auto; } }

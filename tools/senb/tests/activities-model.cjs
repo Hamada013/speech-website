@@ -127,3 +127,12 @@ assert.equal(model.imagePath({ categoryId: 'UNKNOWN', id: 57, title: 'كتب' })
 assert.equal(model.slotSegments(sentence, { categoryId: 'UNKNOWN', id: 0, title: 'مبسوطة' }, 1)[0].path, null, 'An unassigned card must not play an unrelated subject recording');
 assert.equal(vm.runInContext('JSON.stringify(ADVANCED_REFERENCE_DB)', context), originalPresets, 'Planning and grammar reads must leave every original preset unchanged');
 console.log('PASS: default and 3-10 trial assessment plans preserve distinct targets, unique choices and subgroup scoring; 960 game rounds retain mapped cards; preset data and manual context are preserved.');
+
+for (const folder of [2, 3, 4, 5, 6]) {
+    for (const groups of [[2], [1, 4, 8], []]) {
+        const bag = model.gameBag(folder, random(folder), groups);
+        assert.equal(bag.length, (groups.length || 8) * 24);
+        assert.equal(new Set(bag.map(model.key)).size, bag.length);
+        if (groups.length) assert.ok(bag.every(sentence => groups.includes(Number(sentence.subCatId))));
+    }
+}

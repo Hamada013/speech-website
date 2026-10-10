@@ -45,9 +45,17 @@ async function assertLayout(page) {
         return rect.width && (rect.left < -1 || rect.right > innerWidth + 1);
     }).map(node => node.outerHTML.slice(0, 180)));
     assert.deepEqual(outside, [], 'Activity cards must fit the screen width');
-    if (await page.locator('#activityAdvancedCard').count()) {
+    if (await page.locator('#activityAdvancedCard').count() && !await page.locator('.fixed-session').count()) {
         const image = await page.locator('#activityAdvancedCard').boundingBox();
         assert.ok(Math.abs(image.width / image.height - 16 / 9) < .01, 'Advanced cards must keep a 16:9 ratio in every activity');
+    }
+    if (await page.locator('.fixed-session').count()) {
+        const bounds = await page.locator('#activityView').evaluate(view => ({ scroll: view.scrollHeight - view.clientHeight, outside: [...view.querySelectorAll('button, img, p, span')].filter(node => {
+            const box = node.getBoundingClientRect(), rect = view.getBoundingClientRect();
+            return box.width && box.height && (box.top < rect.top - 1 || box.bottom > rect.bottom + 1);
+        }).map(node => node.id || node.className) }));
+        assert.ok(bounds.scroll <= 1, JSON.stringify(bounds));
+        assert.deepEqual(bounds.outside, [], 'All game and expressive content fits without clipping');
     }
     const invalidIcons = await page.locator('.activity-icon-button:visible').evaluateAll(nodes => nodes.filter(node => {
         const rect = node.getBoundingClientRect();
@@ -131,7 +139,7 @@ async function run(browserType, name) {
             assert.equal(await page.locator('#activityHomeBtn').isVisible(), false);
             assert.equal(await page.locator('.app-header #pwaInstallBtn svg').count(), 1);
             assert.equal(await page.locator('#pwaInstallBtn').textContent().then(text => text.trim()), '', 'App installation uses an icon button');
-            assert.equal(await page.locator('#pwaDownloadToggle, #offlinePanel, #offlineBadge, .home-device-tools').count(), 0, 'The manual media download and its explanatory text are removed');
+            assert.equal(await page.locator('#pwaDownloadToggle, #offlinePanel').count(), 2, 'Header download controls are present');
             if (viewport.width >= 768 && viewport.height >= 600) {
                 const home = await page.locator('#homeView').evaluate(view => {
                     const bounds = view.getBoundingClientRect();
@@ -170,7 +178,7 @@ async function run(browserType, name) {
                 assert.equal(await page.locator('#pwaInstallBtn').isDisabled(), true);
                 assert.equal(await page.locator('#pwaInstallBtn').getAttribute('aria-label'), 'التطبيق مثبت');
                 assert.deepEqual(errors, []);
-                console.log(`PASS ${name} ${viewport.width}x${viewport.height}: home layout, header install icon/prompt/help, menu navigation, removed media download`);
+                console.log(`PASS ${name} ${viewport.width}x${viewport.height}: home layout, header install icon/prompt/help, menu navigation, header media download`);
                 await context.close();
                 continue;
             }
@@ -384,6 +392,13 @@ async function run(browserType, name) {
                 assert.match(drawnText, /فعل حاضر/);
             }
             await setup(page, 'game', 6);
+            await page.locator('#activitySetupBtn').click();
+            await page.locator('[data-game-subgroup="2"]').click();
+            await page.locator('[data-game-subgroup="7"]').click();
+            await page.locator('#startActivityBtn').click();
+            assert.equal(await page.evaluate(() => activity.bag.length), 48);
+            assert.equal(await page.evaluate(() => activity.bag.every(sentence => [2, 7].includes(Number(sentence.subCatId)))), true);
+            await assertLayout(page);
             assert.equal(await page.locator('.game-choice').count(), 3);
             assert.equal(await page.locator('#gameMissingSlot').count(), 1);
             assert.equal(await page.locator('#gameNextBtn').isDisabled(), true);

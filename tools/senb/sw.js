@@ -19,7 +19,9 @@ self.addEventListener('install', event => {
         const cache = await caches.open(SHELL);
         try {
             // A failed release never replaces the working offline shell.
-            await cache.addAll(SENB_RELEASE.shell.map(path => new Request(new URL(path, BASE), { cache: 'reload', integrity: SENB_RELEASE.integrity[path] })));
+            for (let offset = 0; offset < SENB_RELEASE.shell.length; offset += 6) {
+                await cache.addAll(SENB_RELEASE.shell.slice(offset, offset + 6).map(path => new Request(new URL(path, BASE), { cache: 'reload', integrity: SENB_RELEASE.integrity[path] })));
+            }
         } catch (error) { await caches.delete(SHELL); throw error; }
     })());
 });
@@ -61,6 +63,8 @@ async function serve(request) {
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
     if (event.request.method !== 'GET' || url.origin !== self.location.origin || !url.href.startsWith(BASE)) return;
+    // The page downloader verifies and stores revision requests itself.
+    if (url.searchParams.has('__senb_revision')) return;
     // Offline misses are network failures, not uncaught worker errors.
     // The page handles unavailable media.
     event.respondWith(serve(event.request).catch(() => Response.error()));

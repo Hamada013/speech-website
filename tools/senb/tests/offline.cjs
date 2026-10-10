@@ -37,46 +37,4 @@ const manifest = JSON.parse(fs.readFileSync(path.join(root, 'manifest.webmanifes
 assert.equal(manifest.scope, './'); assert.equal(manifest.display, 'standalone');
 for (const icon of manifest.icons) assert.ok(fs.existsSync(path.join(root, icon.src)));
 
-class MemoryCache {
-    constructor() { this.entries = new Map(); }
-    async keys() { return [...this.entries.keys()].map(url => new Request(url)); }
-    async match(key) { return this.entries.get(String(key))?.clone(); }
-    async put(key, response) { this.entries.set(String(key), response.clone()); }
-}
-const stores = new Map();
-let requests = 0, corrupt = false;
-const base = 'https://example.com/tools/senb/';
-const fixtures = Array.from({ length: 6 }, (_, index) => Buffer.from(`recording-${index}`));
-const sample = { assets: fixtures.map((body, index) => ({ url: `sounds/test/${index}.m4a`, bytes: body.length, revision: hash(body) })), totalBytes: fixtures.reduce((sum, body) => sum + body.length, 0) };
-Object.assign(context, {
-    URL, Request, Response, Headers, DOMException, AbortController, crypto: crypto.webcrypto,
-    caches: { async open(name) { if (!stores.has(name)) stores.set(name, new MemoryCache()); return stores.get(name); } },
-    async fetch(url, options) {
-        requests++;
-        const index = Number(new URL(url).pathname.split('/').at(-1).split('.')[0]);
-        return new Response(corrupt ? 'HTML error page' : fixtures[index], { headers: { 'Content-Type': 'audio/mp4' } });
-    }
-});
-vm.runInContext(fs.readFileSync(path.join(root, 'assets/offline-store.js'), 'utf8'), context);
-const offline = context.SENBOffline;
-(async () => {
-    assert.equal(offline.download, undefined, 'The bulk-download API is removed');
-    assert.equal(offline.inspect, undefined, 'Download progress inspection is removed');
-    const media = await context.caches.open(offline.names(base).media);
-    const entry = sample.assets[0];
-    await offline.fetchAndStore(entry, media, base);
-    assert.equal(requests, 1, 'On-demand caching requests only the displayed media');
-    assert.equal((await media.keys()).length, 1);
-    assert.equal(await (await media.match(offline.key(entry, base))).text(), fixtures[0].toString());
-    const updated = { ...entry, revision: 'changed' };
-    assert.equal(await media.match(offline.key(updated, base)), undefined, 'Changed revisions cannot reuse stale media');
-    corrupt = true;
-    await assert.rejects(offline.fetchAndStore(sample.assets[1], media, base), /File changed/);
-    assert.equal((await media.keys()).length, 1, 'HTML/error responses must never enter the media cache');
-    const complete = () => new Response('0123456789', { headers: { 'Content-Type': 'audio/mp4' } });
-    for (const [range, expected, status] of [['bytes=0-3', '0123', 206], ['bytes=7-', '789', 206], ['bytes=-2', '89', 206], ['bytes=8-50', '89', 206], ['bytes=20-', '', 416], ['bytes=3-1', '', 416], ['bytes=-0', '', 416], ['bytes=0-2,5-6', '', 416]]) {
-        const response = await offline.rangeResponse(new Request(base + 'test.m4a', { headers: { Range: range } }), complete());
-        assert.equal(response.status, status, range); assert.equal(await response.text(), expected, range);
-    }
-    console.log(`PASS: ${basic.length} basic image paths and ${catalog.assets.length} converted files match case-sensitive folders and SHA-256 revisions; installation scope/icons, on-demand caching, changed-file detection, corrupt-response rejection, and audio byte ranges.`);
-})().catch(error => { console.error(error); process.exitCode = 1; });
+require('./offline-download.cjs');

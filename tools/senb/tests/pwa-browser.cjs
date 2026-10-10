@@ -6,7 +6,7 @@ const crypto = require('node:crypto');
 const assert = require('node:assert/strict');
 const { chromium, webkit } = require(process.env.SENB_PLAYWRIGHT || 'playwright');
 const root = path.resolve(__dirname, '..');
-const prefix = '/tools/senb/';
+const prefix = '/speech-website/tools/senb/';
 const overrides = new Map(), requests = [];
 let originPort;
 const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.m4a': 'audio/mp4', '.json': 'application/json', '.webmanifest': 'application/manifest+json' };
@@ -81,8 +81,8 @@ async function run(browserType, name) {
         assert.equal(requests.filter(request => request.relative.endsWith('.m4a')).length, 0);
         await page.evaluate(async () => { const cache = await caches.open('another-app-cache'); await cache.put('/outside-data', new Response('preserve')); });
         assert.equal(await page.locator('.app-header #pwaInstallBtn svg').count(), 1);
-        assert.equal(await page.locator('#pwaDownloadToggle, #offlinePanel, #offlineBadge').count(), 0);
-        assert.equal(await page.evaluate(() => typeof SENBOffline), 'undefined', 'The page has no media-download API');
+        assert.equal(await page.locator('#pwaDownloadToggle, #offlinePanel').count(), 2);
+        assert.equal(await page.evaluate(() => typeof SENBOffline.download), 'function');
         await page.locator('#homeTasksBtn').click();
         await page.locator('[data-folder="5"]').click();
         await page.locator('[data-subgroup="8"]').click();
@@ -91,17 +91,34 @@ async function run(browserType, name) {
         await page.waitForFunction(() => playbackAudio.currentTime > 0, null, { timeout: 15000 });
         assert.equal(await page.evaluate(() => playbackAudio.error), null);
         await page.locator('#activityHomeBtn').click();
-        // A viewed sentence is cached on demand; no manual library download.
+        // Viewing a sentence caches only its media before the full download starts.
         await page.waitForFunction(async () => {
             const prefix = `senb:${encodeURIComponent(new URL('./', document.baseURI).pathname)}:`;
             const cache = await caches.open(`${prefix}media:v1`);
             return (await cache.keys()).some(request => request.url.includes('sounds/advanced/5/8/1.m4a'));
         });
-        const cachedCount = await savedCount(page);
+        let cachedCount = await savedCount(page);
         assert.ok(cachedCount > 0 && cachedCount < 30, 'Viewing one sentence must not fetch the full library');
         await page.reload({ waitUntil: 'load' });
         await waitReady(page);
         assert.equal(await savedCount(page), cachedCount, 'Viewed media survives reload');
+        await page.locator('#pwaDownloadToggle').click();
+        await page.locator('#offlineDownloadBtn').click();
+        await page.waitForFunction(() => document.getElementById('offlineProgress').value > 50);
+        await page.locator('#offlinePauseBtn').click();
+        await page.locator('#offlinePauseBtn').waitFor({ state: 'hidden' });
+        const pausedCount = await savedCount(page);
+        assert.ok(pausedCount > 50 && pausedCount < originalCatalog.assets.length);
+        await page.reload({ waitUntil: 'load' });
+        await waitReady(page);
+        assert.equal(await savedCount(page), pausedCount, 'Interrupted download survives reopening');
+        await page.locator('#pwaDownloadToggle').click();
+        await page.locator('#offlineDownloadBtn').click();
+        await page.waitForFunction(() => document.getElementById('offlineStatus').textContent.includes('جاهز للاستخدام'), null, { timeout: 180000 });
+        const fullCount = await savedCount(page);
+        assert.equal(fullCount, originalCatalog.assets.length, 'Every media file is saved');
+        cachedCount = fullCount;
+        await page.locator('#offlineCloseBtn').click();
         await setOffline(context, name, true);
         if (process.env.SENB_PWA_DEBUG) console.log(name, 'offline navigation diagnostic', await page.evaluate(async () => {
             const names = await caches.keys();
@@ -178,7 +195,7 @@ async function run(browserType, name) {
         await outside.goto(`http://127.0.0.1:${server.address().port}/outside.html`);
         assert.equal(await outside.evaluate(() => navigator.serviceWorker.controller), null, 'SENB must not control other apps');
         assert.deepEqual(errors, []);
-        console.log(`PASS ${name}: header installation, removed bulk download, on-demand media cache/reload, real offline M4A playback/ranges, safe updates, one-file refresh, failed-release rollback, and other-app isolation`);
+        console.log(`PASS ${name}: header installation, full batched download, on-demand media cache/reload, real offline M4A playback/ranges, safe updates, one-file refresh, failed-release rollback, and other-app isolation`);
     } finally { await setOffline(context, name, false); await context.close(); await browser.close(); overrides.clear(); }
 }
 (async () => {

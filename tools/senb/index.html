@@ -25,6 +25,7 @@
     <script src="assets/activities-model.js" defer></script>
     <script src="assets/activity-report.js" defer></script>
     <script src="assets/activities.js" defer></script>
+    <script src="assets/offline-store.js" defer></script>
     <script src="assets/pwa.js" defer></script>
 </head>
 <body class="app-shell bg-slate-50 flex flex-col overflow-hidden">
@@ -49,6 +50,18 @@
 
             <!-- Header Action Controls -->
             <div class="header-actions flex items-center gap-1.5 sm:gap-2">
+                <div class="offline-control">
+                    <button id="pwaDownloadToggle" class="pwa-header-button" aria-label="تنزيل التطبيق للاستخدام دون إنترنت" title="تنزيل للاستخدام دون إنترنت" aria-controls="offlinePanel" aria-expanded="false"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg></button>
+                    <section id="offlinePanel" class="offline-panel" aria-label="التنزيل دون إنترنت" hidden>
+                        <strong>تنزيل التطبيق كاملاً</strong>
+                        <p>يحفظ الصور والأصوات على هذا الجهاز. أبقِ التطبيق مفتوحاً حتى يكتمل التنزيل.</p>
+                        <progress id="offlineProgress" max="1" value="0" aria-label="تقدم التنزيل"></progress>
+                        <p id="offlineStatus" role="status" aria-live="polite">جاهز للتنزيل</p>
+                        <button id="offlineDownloadBtn" class="activity-primary">تنزيل / استكمال</button>
+                        <button id="offlinePauseBtn" class="activity-secondary" hidden>إيقاف مؤقت</button>
+                        <button id="offlineCloseBtn" class="activity-secondary">إغلاق</button>
+                    </section>
+                </div>
                 <div id="homeHeaderTools" class="home-header-tools">
                     <div class="pwa-install-control">
                         <button id="pwaInstallBtn" class="pwa-header-button" aria-label="تثبيت التطبيق" title="تثبيت التطبيق" aria-controls="pwaInstallHelp" aria-expanded="false">

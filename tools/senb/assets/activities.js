@@ -43,12 +43,21 @@ function setActivityBusy(busy) {
 }
 function openActivitySetup(mode) {
     navigateTo('activity');
-    activity = { mode, mount: 'setup', folder: null, subgroup: null, presentation: 'advanced', trialsPerSubgroup: 3, repeatCount: 1, index: 0, results: [], completed: new Set(), busy: false, autoplay: false };
+    activity = { mode, mount: 'setup', folder: null, subgroup: null, gameSubgroups: [], presentation: 'advanced', trialsPerSubgroup: 3, repeatCount: 1, index: 0, results: [], completed: new Set(), busy: false, autoplay: false };
     renderActivitySetup();
 }
 function chooseActivityMode(mode) { activity.mode = mode; renderActivitySetup(); }
-function chooseActivityFolder(folder) { activity.folder = folder; activity.subgroup = null; renderActivitySetup(); }
+function chooseActivityFolder(folder) { activity.folder = folder; activity.subgroup = null; activity.gameSubgroups = []; renderActivitySetup(); }
 function chooseActivitySubgroup(subgroup) { activity.subgroup = subgroup; renderActivitySetup(); }
+function chooseGameSubgroup(subgroup) {
+    if (subgroup === null) activity.gameSubgroups = [];
+    else {
+        const selected = new Set(activity.gameSubgroups);
+        if (selected.has(subgroup)) selected.delete(subgroup); else selected.add(subgroup);
+        activity.gameSubgroups = [...selected].sort((a, b) => a - b);
+    }
+    renderActivitySetup();
+}
 function chooseTestPresentation(presentation) { activity.presentation = presentation; renderActivitySetup(); }
 function chooseAssessmentTrials(count) {
     if (!Number.isInteger(count) || count < 3 || count > 10) return;
@@ -82,7 +91,7 @@ function clearComprehensionHeader() {
 function renderActivitySetup() {
     clearComprehensionHeader();
     const a = activity;
-    document.getElementById('activityView').classList.remove('comprehension-session');
+    document.getElementById('activityView').classList.remove('comprehension-session', 'fixed-session', 'game-session', 'expressive-session');
     activityRoot().classList.toggle('activity-centered', a.mode === 'test');
     if (a.mode === 'test') {
         activityRoot().innerHTML = `<div class="activity-top"><h2 id="activityHeading">اختبار الطفل</h2></div>
@@ -97,6 +106,7 @@ function renderActivitySetup() {
     activityRoot().innerHTML = `<div class="activity-top"><h2 id="activityHeading">${ACTIVITY_NAMES[a.mode]}</h2></div>
         <section class="activity-field"><h3>اختر طول الجملة</h3><div class="word-count-options">${[2, 3, 4, 5, 6].map(folder => activityButton(`${folder}<span> كلمات</span>`, `chooseActivityFolder(${folder})`, folder === a.folder, `data-folder="${folder}"`)).join('')}</div></section>
         ${(a.mode === 'repetition' || assessment) && cat ? `<section class="activity-field"><h3>اختر المجموعة الفرعية</h3><div class="subgroup-options">${assessment ? activityButton('كل المجموعات', 'chooseActivitySubgroup(null)', a.subgroup === null, 'data-subgroup="all"') : ''}${cat.subcategories.map(sub => activityButton(`${sub.id}. ${htmlText(sub.name)}`, `chooseActivitySubgroup(${sub.id})`, sub.id === a.subgroup, `data-subgroup="${sub.id}"`)).join('')}</div></section>` : ''}
+        ${a.mode === 'game' && cat ? `<section class="activity-field"><h3>اختر كل المجموعة أو مجموعات فرعية متعددة</h3><div class="subgroup-options">${activityButton('كل المجموعات', 'chooseGameSubgroup(null)', !a.gameSubgroups.length, 'data-game-subgroup="all"')}${cat.subcategories.map(sub => activityButton(`${sub.id}. ${htmlText(sub.name)}`, `chooseGameSubgroup(${sub.id})`, a.gameSubgroups.includes(sub.id), `data-game-subgroup="${sub.id}"`)).join('')}</div></section>` : ''}
         ${a.mode === 'comprehension' && a.folder ? `<section class="activity-field"><h3>كيف تريد عرض الخيارات؟</h3><div class="presentation-options">${activityButton('الصور المتكاملة', "chooseTestPresentation('advanced')", a.presentation === 'advanced', 'data-presentation="advanced"')}${activityButton('بطاقات الكلمات', "chooseTestPresentation('slots')", a.presentation === 'slots', 'data-presentation="slots"')}</div></section>` : ''}
         ${assessment && a.folder ? `<section class="activity-field"><h3 id="assessmentTrialsHeading">عدد المحاولات لكل مجموعة فرعية</h3><div class="assessment-trial-options" role="group" aria-labelledby="assessmentTrialsHeading">${[3, 4, 5, 6, 7, 8, 9, 10].map(count => activityButton(count, `chooseAssessmentTrials(${count})`, a.trialsPerSubgroup === count, `data-trial-count="${count}"`)).join('')}</div></section>` : ''}
         ${assessment ? `<p class="activity-intro" id="assessmentTrialInfo">${a.trialsPerSubgroup} محاولات عشوائية ${a.subgroup ? 'من المجموعة الفرعية المختارة' : `لكل مجموعة فرعية · 8 مجموعات · ${a.trialsPerSubgroup * 8} محاولة`}</p>` : ''}
@@ -109,7 +119,7 @@ function startActivity() {
     Object.assign(activity, { mount: 'session', index: 0, results: [], completed: new Set(), phase: 'ready', testStartedAt: new Date() });
     if (activity.mode === 'repetition') activity.sentences = SENBActivities.sentences(activity.folder, activity.subgroup);
     else if (activity.mode === 'game') {
-        activity.bag = SENBActivities.gameBag(activity.folder);
+        activity.bag = SENBActivities.gameBag(activity.folder, Math.random, activity.gameSubgroups);
         activity.round = SENBActivities.gameRound(activity.bag[0]);
     } else {
         activity.plan = SENBActivities.testPlan(activity.folder, activity.presentation, Math.random, activity.subgroup, activity.trialsPerSubgroup);
@@ -139,6 +149,10 @@ function renderActivity() {
     const group = ADVANCED_CATEGORIES.find(cat => Number(cat.folder) === activity.folder).subcategories.find(sub => String(sub.id) === sentence.subCatId);
     activityRoot().classList.remove('activity-centered');
     document.getElementById('activityView').classList.toggle('comprehension-session', activity.mode === 'comprehension');
+    const view = document.getElementById('activityView');
+    view.classList.toggle('fixed-session', activity.mode === 'game' || activity.mode === 'expressive');
+    view.classList.toggle('game-session', activity.mode === 'game');
+    view.classList.toggle('expressive-session', activity.mode === 'expressive');
     const title = `<div class="activity-title"><h2 id="activityHeading">${ACTIVITY_NAMES[activity.mode]}</h2><p>${activity.folder} كلمات · ${htmlText(group.name)}</p></div>`;
     const settings = activityIconButton('activitySetupBtn', 'تغيير الاختيار', 'settings', 'returnToActivitySetup()');
     const progress = `<div class="activity-progress-label">${activity.mode === 'game' ? `الجولة ${activity.index + 1}` : `${activity.mode === 'repetition' ? 'الجملة' : 'المحاولة'} ${activity.index + 1} / ${activityTrialCount()}${activity.mode !== 'repetition' ? ` · المجموعة ${sentence.subCatId}${activity.subgroup ? '' : ' / 8'}` : ''}`}</div>${activity.mode === 'game' ? '' : progressHTML()}`;
@@ -301,7 +315,7 @@ function nextExpressiveTrial() {
 function renderActivitySummary() {
     stopActivityPlayback();
     clearComprehensionHeader();
-    document.getElementById('activityView').classList.remove('comprehension-session');
+    document.getElementById('activityView').classList.remove('comprehension-session', 'fixed-session', 'game-session', 'expressive-session');
     activity.mount = 'summary';
     const expressive = activity.mode === 'expressive';
     const summary = SENBActivities.assessmentSummary(activity.results, expressive, activity.folder);
@@ -364,7 +378,7 @@ function nextGameRound() {
     activity.results.push({ sentence: SENBActivities.key(activity.round.sentence), attempts: activity.round.attempts, hintUsed: activity.round.hintUsed });
     stopActivityPlayback();
     activity.index++;
-    if (activity.index === activity.bag.length) { activity.bag = SENBActivities.gameBag(activity.folder); activity.index = 0; }
+    if (activity.index === activity.bag.length) { activity.bag = SENBActivities.gameBag(activity.folder, Math.random, activity.gameSubgroups); activity.index = 0; }
     activity.round = SENBActivities.gameRound(activity.bag[activity.index]);
     renderActivity();
 }

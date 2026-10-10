@@ -58,8 +58,10 @@ const SENBActivities = (() => {
         }
         return plan;
     }
-    function gameBag(folder, random = Math.random) {
-        return shuffle(Array.from({ length: 8 }, (_, index) => sentences(folder, index + 1)).flat(), random);
+    function gameBag(folder, random = Math.random, selectedSubgroups = []) {
+        const groups = selectedSubgroups.length ? [...new Set(selectedSubgroups)] : Array.from({ length: 8 }, (_, index) => index + 1);
+        if (groups.some(group => !Number.isInteger(group) || group < 1 || group > 8)) throw new RangeError('Invalid game subgroup');
+        return shuffle(groups.flatMap(group => sentences(folder, group)), random);
     }
     function gameRound(sentence, random = Math.random) {
         const eligible = sentence.slots.map((slot, index) => hasMappedCard(slot) ? index : -1).filter(index => index >= 0);

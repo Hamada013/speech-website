@@ -180,3 +180,42 @@
     .home-menu-card { min-height: 118px; gap: 5px; padding-block: 10px; }
     .home-menu-symbol { width: 38px; height: 38px; font-size: 25px; }
 }
+
+/* Active game and expressive trials use the space below the app header. */
+.subgroup-options [data-game-subgroup="all"] { grid-column: 1 / -1; }
+.activity-view.fixed-session { overflow: hidden; padding-block: 6px; }
+.fixed-session .activity-content { height: 100%; min-height: 0; padding-bottom: 0; display: flex; flex-direction: column; }
+.fixed-session .activity-top { flex-shrink: 0; margin-bottom: 2px; gap: 6px; }
+.fixed-session .activity-top h2 { font-size: clamp(16px, 2.5vw, 24px); }
+.fixed-session .activity-top p { margin: 0; }
+.fixed-session .activity-progress-label { margin: 2px 0; }
+.fixed-session .activity-stars { margin: 2px auto; }
+.fixed-session .activity-star { font-size: 13px; line-height: 1; }
+.fixed-session #activityStage { flex: 1; min-height: 0; display: grid; gap: 4px; grid-template-rows: minmax(0, 1fr) auto auto auto; }
+.game-session #activityStage { grid-template-rows: minmax(0, 1fr) auto auto auto auto; }
+.fixed-session .activity-feature { min-height: 0; width: 100%; margin: 0; gap: 2px; }
+.fixed-session .activity-image-card { width: 100%; max-width: 620px; min-height: 0; height: 100%; flex: 1; aspect-ratio: auto; }
+.fixed-session .activity-sentence-title { font-size: 13px; line-height: 1.3; flex-shrink: 0; }
+.fixed-session .activity-intro { margin: 0; font-size: 12px; line-height: 1.4; }
+.fixed-session .activity-slots { width: min(100%, 700px); margin: 0 auto; gap: 4px; }
+.fixed-session .activity-slot { max-width: min(110px, 12dvh); min-width: 0; min-height: 0; }
+.fixed-session .activity-slot-wrap { gap: 2px; }
+.fixed-session .activity-slot-title { font-size: 11px; line-height: 1.3; }
+.fixed-session .activity-slot-dot { width: 7px; height: 7px; }
+.fixed-session .game-choices { margin: 0 auto; gap: 6px; width: min(100%, 480px); }
+.fixed-session .game-choice { min-height: 44px; padding: 4px; gap: 2px; }
+.fixed-session .game-choice img { height: clamp(32px, 9dvh, 80px); min-height: 0; aspect-ratio: auto; }
+.fixed-session .game-choice span { font-size: 11px; line-height: 1.3; }
+.fixed-session .activity-controls, .fixed-session .word-score-row { margin: 2px 0; gap: 6px; flex-wrap: nowrap; }
+.fixed-session .word-score-dot { width: 44px; height: 44px; flex-shrink: 0; }
+.fixed-session .activity-status { flex-shrink: 0; margin: 0; min-height: 20px; font-size: 12px; line-height: 1.4; }
+@media (max-height: 500px) and (orientation: landscape) {
+    .fixed-session .activity-top h2 { font-size: 16px; }
+    .fixed-session .activity-top p { font-size: 11px; }
+    .fixed-session .activity-progress-label { font-size: 11px; }
+    .fixed-session #activityStage { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto auto auto; }
+    .fixed-session .activity-feature { grid-column: 1; grid-row: 1 / -1; }
+    .fixed-session #activityStage > :not(.activity-feature) { grid-column: 2; }
+    .fixed-session .activity-slot { max-width: 56px; }
+    .fixed-session .game-choice img { height: 34px; }
+}
