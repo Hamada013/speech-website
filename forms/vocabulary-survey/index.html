@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#153e40">
+    <meta name="description" content="Offline clinical vocabulary checklists, receptive trials, expressive grading and longitudinal reports.">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Vocabulary Clinic">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="format-detection" content="telephone=no">
+    <title>Vocabulary Clinic · Assessment workspace</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="icons/mark.svg">
+    <link rel="stylesheet" href="assets/cairo.css">
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="app.js"></script>
+    <script defer src="offline.js"></script>
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to workspace</a>
+    <header class="app-header no-print">
+        <a href="./" class="brand" aria-label="Vocabulary Clinic home"><img src="icons/mark.svg" width="42" height="42" alt=""><span>Vocabulary Clinic<small>Speech & language assessment</small></span></a>
+        <nav aria-label="Workspace"><button data-route="dashboard" aria-current="page">Overview</button><button data-route="history">Reports</button><button data-route="validation">Word bank</button></nav>
+        <a class="back-link" href="../language/index.html">Language forms ↗</a>
+    </header>
+    <div id="message" class="message no-print" role="status" aria-live="polite" hidden></div>
+    <main id="main" tabindex="-1">
+        <section id="dashboard-view" class="view">
+            <div class="hero"><div><p class="eyebrow">A CLEARER PICTURE, ONE WORD AT A TIME</p><h1>A focused space for<br>vocabulary assessment.</h1><p class="lede">Listen, observe and document. Explore comprehension and naming with your Arabic word bank, then track change over time.</p></div><div class="hero-note"><span class="status-dot"></span><strong>Built for the clinic. Ready for the field.</strong><p>Records stay on this device. Download the word bank once to work without a connection.</p><span id="bank-count" class="pill">Reading word bank…</span></div></div>
+            <div class="module-grid">
+                <button class="module-card receptive" data-start="receptive"><span class="module-symbol" aria-hidden="true">◉</span><span class="eyebrow">01 / LISTEN & CHOOSE</span><strong>Receptive language</strong><span>Four pictures. One spoken word. Record target and distractor selections.</span><span class="module-link">Set up comprehension test <span aria-hidden="true">→</span></span></button>
+                <button class="module-card expressive" data-start="expressive"><span class="module-symbol" aria-hidden="true">✦</span><span class="eyebrow">02 / NAME & OBSERVE</span><strong>Expressive language</strong><span>One picture at a time. Grade not mastered, emergent or mastered.</span><span class="module-link">Set up naming test <span aria-hidden="true">→</span></span></button>
+                <button class="module-card history-card" data-route="history"><span class="module-symbol" aria-hidden="true">▥</span><span class="eyebrow">03 / COMPARE & REPORT</span><strong>Progress over time</strong><span>Revisit local sessions, import a baseline and print a clinical worksheet.</span><span class="module-link">Open historical reports <span aria-hidden="true">→</span></span></button>
+            </div>
+            <div id="draft-card" class="panel resume-panel" hidden><div><h2>An assessment is in progress</h2><p id="draft-summary"></p></div><button id="resume-draft" class="primary">Resume assessment</button></div>
+            <div class="dashboard-bottom">
+                <section class="panel offline-card" data-offline-card aria-labelledby="offline-title"><p class="eyebrow">YOUR OFFLINE WORKSPACE</p><h2 id="offline-title">Take the word bank with you.</h2><p data-offline-status role="status" aria-live="polite">Preparing offline access…</p><progress max="1" value="0" aria-label="Media download progress"></progress><div class="button-row"><button class="primary" data-offline-download disabled>Download all content</button><button class="secondary" data-offline-install hidden>Install app</button></div><p class="small">Keep the app open while downloading. Saved files are reused when you return. iPhone/iPad: Share → Add to Home Screen.</p></section>
+                <aside class="panel context-card"><p class="eyebrow">CLINICAL CONTEXT</p><h2>Checklists with a visible basis.</h2><p>Age cohorts are provisional, editable clinical checklists. Milestones do not establish acquisition ages for these individual Arabic words.</p><p>A complete run can show a criterion-based attainment band. A standardized language-age equivalent requires a validated normative assessment.</p><button data-route="validation" class="text-button">Review assignments & references →</button></aside>
+            </div>
+        </section>
+
+        <section id="setup-view" class="view" hidden>
+            <div class="page-heading"><p class="eyebrow">ASSESSMENT SETUP</p><h1 id="setup-title">Receptive language</h1><p>Choose the child record, checklist coverage and presentation condition.</p></div>
+            <form id="setup-form" class="panel">
+                <fieldset><legend>Child & clinician</legend><div class="form-grid">
+                    <label>Child identifier <span class="required">required</span><input name="childId" required maxlength="100" autocomplete="off" placeholder="e.g. CL-024"></label>
+                    <label>Child name <span class="optional">optional</span><input name="childName" maxlength="150" autocomplete="off"></label>
+                    <label>Date of birth<input name="birthDate" type="date"></label>
+                    <label>Evaluation date<input name="assessmentDate" type="date" required></label>
+                    <label>Examiner<input name="examiner" maxlength="150" autocomplete="off"></label>
+                    <label>Languages / dialect<input name="languages" maxlength="200" value="Arabic / Syrian dialect"></label>
+                </div></fieldset>
+                <fieldset><legend>Checklist & presentation</legend><div class="form-grid">
+                    <label>Age cohort<select name="scope"><option value="full">Run full test — all four cohorts</option><option value="A">A · 2–3 years</option><option value="B">B · 3–4 years</option><option value="C">C · 4–5 years</option><option value="D">D · 6+ years</option></select></label>
+                    <label>Items per cohort<select name="sampling"><option value="all">All eligible items</option><option value="5">5-item sample</option><option value="10">10-item sample</option><option value="20">20-item sample</option></select></label>
+                    <label id="audio-mode-field" hidden>Naming condition<select name="audioMode"><option value="modeled">Audio-modeled naming — play before grading</option><option value="unprompted">Unprompted naming — no automatic model</option></select></label>
+                </div><p id="module-instructions" class="instruction"></p><p class="small">Targets without all four distinct distractor roles are omitted from receptive testing. A short sample produces descriptive scores, not a full-checklist attainment band.</p></fieldset>
+                <label>Clinical notes<textarea name="notes" rows="3" maxlength="5000" placeholder="Hearing, attention, language exposure, assistance or context…"></textarea></label>
+                <p id="plan-summary" class="instruction" aria-live="polite">Preparing checklist…</p>
+                <div class="button-row"><button type="submit" id="begin-test" class="primary" disabled>Begin assessment</button><button type="button" data-route="dashboard" class="secondary">Back to overview</button></div>
+            </form>
+        </section>
+
+        <section id="trial-view" class="view trial-view" hidden aria-labelledby="trial-heading">
+            <div class="trial-top"><div><p class="eyebrow" id="trial-cohort">COHORT A</p><h1 id="trial-heading" tabindex="-1">Listen and choose the matching picture.</h1><p id="trial-count"></p></div><button id="pause-test" class="secondary">Pause</button></div>
+            <progress id="trial-progress" max="1" value="0" aria-label="Assessment progress"></progress>
+            <div class="audio-controls"><button id="replay-audio" class="primary">▶ Play word</button><span id="audio-status" role="status" aria-live="polite"></span></div>
+            <div id="workspace" class="workspace" role="group" aria-label="Picture workspace"></div>
+            <div id="grading-toolbar" class="grading-toolbar" role="group" aria-label="Clinician grading" hidden><button data-grade="notMastered" class="grade-red" disabled>× Not mastered</button><button data-grade="learning" class="grade-orange" disabled>◐ Learning / emergent</button><button data-grade="mastered" class="grade-green" disabled>✓ Mastered</button></div>
+            <div class="trial-bottom"><p id="trial-condition" class="small"></p><button id="skip-item" class="text-button">Not assessable / skip</button></div>
+            <audio id="word-audio" preload="none"></audio>
+        </section>
+
+        <section id="paused-view" class="view" hidden><div class="panel paused-panel"><p class="eyebrow">ASSESSMENT PAUSED</p><h1>Your place is saved.</h1><p id="paused-summary"></p><div class="button-row"><button id="continue-test" class="primary">Continue assessment</button><button id="finish-partial" class="secondary">Finish with a partial report</button><button data-route="dashboard" class="text-button">Back to overview</button></div></div></section>
+
+        <section id="history-view" class="view" hidden><div class="page-heading"><p class="eyebrow">LOCAL SESSION LIBRARY</p><h1>History with context.</h1><p>Open a report or import a previous export. Records remain on this device; keep an export for your clinical record.</p></div><div class="panel"><label class="file-label">Import a previous session (JSON / CSV, up to 5 MB)<input id="history-import" type="file" accept=".json,.csv,application/json,text/csv"></label><p class="small">Imports use this app’s trial-level export schema. Summary-only spreadsheets cannot establish matched-item progress.</p></div><div id="session-list" class="session-list"></div></section>
+
+        <section id="report-view" class="view" hidden><div class="report-controls no-print panel"><div><h2>Clinical worksheet</h2><p>Compare matching items under the same test and audio conditions.</p></div><div class="button-row"><button id="export-json" class="secondary">Export JSON</button><button id="export-csv" class="secondary">Export CSV</button><button id="print-report" class="primary">Print / Save PDF</button></div><label>Historical baseline<select id="baseline-select"><option value="">No baseline</option></select></label><label>Import baseline<input id="baseline-import" type="file" accept=".json,.csv,application/json,text/csv"></label></div><div id="report-content"></div></section>
+
+        <section id="validation-view" class="view" hidden><div class="page-heading"><p class="eyebrow">WORD BANK & CLINICAL REVIEW</p><h1>See how each word is assigned.</h1><p>Exact labels and numbered media come from the existing vocabulary app. Folder and word rules are proposals; clinician assignments are recorded separately.</p></div><div class="panel"><h2>References and interpretation</h2><p>ASHA and Kid Sense describe general development. They do not provide a validated acquisition age or phonemic profile for each item in this Arabic bank. Review picture meaning, dialect and recordings before use. The 6+ cohort is a local extension.</p><ul id="reference-list"></ul><details><summary>Default folder mapping</summary><div id="folder-mapping"></div></details></div><div class="panel"><div class="form-grid"><label>Search word or item ID<input id="bank-search" type="search" placeholder="Arabic word, folder or ID"></label><label>Receptive cohort filter<select id="bank-filter"><option value="">All cohorts</option><option>A</option><option>B</option><option>C</option><option>D</option></select></label></div><p id="review-count" class="small"></p><datalist id="sound-pair-options"></datalist><div id="word-review" class="word-review"></div><div class="button-row"><button id="bank-prev" class="secondary">Previous</button><button id="bank-next" class="secondary">Next</button></div><p class="small">A reviewed sound pair replaces the automatic spelling-based candidate for that target. Choose a different word and semantic cluster. Cohort changes affect future sessions; completed sessions retain their original assignments.</p></div><div class="panel"><h2>Missing source media</h2><p id="excluded-list"></p></div></section>
+    </main>
+    <footer class="app-footer no-print"><span>Vocabulary Clinic · Ahmad Ghanem SLP</span><span>Arabic word bank · On-device records · Provisional clinical checklists</span></footer>
+    <noscript><p>This assessment needs JavaScript. Enable it to use trials and local reports.</p></noscript>
+</body>
+</html>

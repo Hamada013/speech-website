@@ -1,0 +1,12 @@
+{
+  "name": "clinical-vocabulary-assessment",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build-data.cjs && node scripts/build-pwa.cjs",
+    "test": "node tests/model.mjs",
+    "test:browser": "node tests/browser.cjs"
+  },
+  "devDependencies": { "playwright": "1.56.1" }
+}

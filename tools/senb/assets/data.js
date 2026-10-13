@@ -1222,7 +1222,7 @@ const ADVANCED_REFERENCE_DB = {
             title: "شرطي يمسك",
             slots: [
                 getDbItem('01 subject', 24, 'شرطي'),
-                getDbItem('02 verbs', 75, 'يساعد', { verbTense: 'present', conjugation: 'he' })
+                getDbItem('02 verbs', 31, 'يمسك', { verbTense: 'present', conjugation: 'he' })
             ]
         },
         17: {

@@ -5,65 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>تطبيق حمادة للتواصل AAC - Hamada App</title>
     
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts: Cairo -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Cairo', 'sans-serif'],
-                    },
-                    colors: {
-                        baby: {
-                            blueLight: '#EBF8FF',  /* sky-50 */
-                            blue: '#E0F2FE',       /* sky-100 */
-                            blueMed: '#38BDF8',    /* sky-400 */
-                            blueDark: '#0284C7',   /* sky-600 */
-                            mintLight: '#ECFDF5',  /* emerald-50 */
-                            mint: '#D1FAE5',       /* emerald-100 */
-                            mintMed: '#34D399',    /* emerald-400 */
-                            mintDark: '#059669',   /* emerald-600 */
-                            bg: '#F8FAFC',         /* slate-50 */
-                            textDark: '#0F172A',   /* slate-900 */
-                        }
-                    },
-                    boxShadow: {
-                        'soft': '0 4px 14px 0 rgba(2, 132, 199, 0.12)',
-                        'soft-mint': '0 4px 14px 0 rgba(5, 150, 105, 0.12)',
-                        'glow-gold': '0 0 25px rgba(251, 191, 36, 0.6)',
-                    },
-                    animation: {
-                        'pop-card': 'popCard 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                        'pulse-hint': 'pulseHint 1.2s infinite',
-                        'star-celebrate': 'starCelebrate 0.8s ease-in-out infinite alternate',
-                    },
-                    keyframes: {
-                        popCard: {
-                            '0%': { transform: 'scale(1)' },
-                            '50%': { transform: 'scale(1.06)' },
-                            '100%': { transform: 'scale(1)' },
-                        },
-                        pulseHint: {
-                            '0%, 100%': { boxShadow: '0 0 0 0 rgba(52, 211, 153, 0.8)' },
-                            '50%': { boxShadow: '0 0 0 12px rgba(52, 211, 153, 0)' },
-                        },
-                        starCelebrate: {
-                            '0%': { transform: 'scale(1) rotate(-5deg)' },
-                            '100%': { transform: 'scale(1.15) rotate(5deg)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- PWA: keep these relative URLs inside tools/voc on subpath hosting. -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0284C7">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="حمادة">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="stylesheet" href="assets/utilities.css">
+    <link rel="stylesheet" href="assets/vendor/fontawesome.css">
+    <link rel="stylesheet" href="assets/vendor/cairo.css">
+    <link rel="stylesheet" href="assets/pwa.css">
+    <script defer src="assets/pwa.js"></script>
 
     <style>
         body {
@@ -122,18 +78,6 @@
 </head>
 <body class="text-baby-textDark font-sans h-full w-full flex flex-col antialiased bg-slate-50">
 
-    <!-- Preloader Screen -->
-    <div id="preloader" class="fixed inset-0 z-[200] bg-gradient-to-b from-baby-blueLight via-white to-baby-mintLight flex flex-col items-center justify-center p-6 transition-opacity duration-500">
-        <div class="relative w-36 h-36 sm:w-44 sm:h-44 mx-auto mb-6 bg-white rounded-3xl shadow-soft flex items-center justify-center border-4 border-baby-mintMed overflow-hidden p-3 animate-pulse">
-            <img src="images/logo.png" alt="حمادة Logo" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/200x200/E0F2FE/0284C7?text=حمادة';">
-        </div>
-        <h2 class="text-2xl sm:text-3xl font-black text-baby-blueDark mb-4 tracking-tight">جاري تجهيز وتحميل التطبيق...</h2>
-        <div class="w-full max-w-xs bg-slate-200 rounded-full h-4 overflow-hidden shadow-inner p-0.5 border border-slate-300">
-            <div id="progress-bar-fill" class="bg-gradient-to-r from-baby-blueMed to-baby-mintMed h-full rounded-full transition-all duration-200" style="width: 0%"></div>
-        </div>
-        <p id="progress-text" class="text-sm font-bold text-slate-500 mt-3">0%</p>
-    </div>
-
     <div id="toast-container" class="fixed top-3 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-[90%] max-w-sm pointer-events-none"></div>
 
     <div id="home-view" class="h-full w-full flex flex-col items-center justify-between p-4 sm:p-6 bg-gradient-to-b from-baby-blueLight via-white to-baby-mintLight transition-opacity duration-300 overflow-y-auto">
@@ -141,7 +85,7 @@
             
             <header class="text-center mb-8">
                 <div class="relative w-32 h-32 sm:w-40 sm:h-40 mx-auto mb-4 bg-white rounded-3xl shadow-soft flex items-center justify-center border-4 border-baby-mintMed overflow-hidden p-3">
-                    <img src="images/logo.png" alt="حمادة Logo" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/200x200/E0F2FE/0284C7?text=حمادة';">
+                    <img src="images/logo.webp" alt="حمادة Logo" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='images/placeholder.svg';">
                 </div>
                 <h1 class="text-4xl sm:text-5xl font-black text-baby-blueDark tracking-tight">
                     المفاهيم مع حمادة
@@ -170,6 +114,18 @@
                     <span>معلومات</span>
                 </button>
             </div>
+            <!-- Downloading is optional; no mass preload blocks the home screen. -->
+            <section class="offline-card" data-offline-card data-state="idle" aria-labelledby="offline-title">
+                <h2 id="offline-title">التطبيق دون اتصال</h2>
+                <p data-offline-status role="status" aria-live="polite" aria-atomic="true">جاري التحقق من المحتوى المحفوظ…</p>
+                <progress value="0" max="1" aria-label="تقدم تنزيل المحتوى"></progress>
+                <div class="offline-actions">
+                    <button type="button" data-offline-download disabled>تنزيل كل المحتوى دون اتصال</button>
+                    <button type="button" data-offline-install hidden>تثبيت التطبيق</button>
+                </div>
+                <p>اترك التطبيق مفتوحاً أثناء التنزيل. إذا توقف أو أُغلق، سيستكمل الملفات المتبقية عند العودة.</p>
+                <p>على iPhone وiPad: من قائمة المشاركة اختر «إضافة إلى الشاشة الرئيسية» ثم «فتح كتطبيق ويب» إن ظهر.</p>
+            </section>
         </div>
 
         <footer class="text-center py-2 text-xs font-bold text-slate-400">
@@ -735,8 +691,8 @@
                 id: i + 1,
                 catId: id,
                 name: itemName,
-                image: `images/${id}/${i + 1}.png`,
-                audio: `sounds/${id}/${i + 1}.wav`
+                image: `images/${id}/${i + 1}.webp`,
+                audio: `sounds/${id}/${i + 1}.m4a`
             }));
 
             return { id, name, items };
@@ -884,7 +840,7 @@
                         slotEl.innerHTML = `
                             <div class="w-full h-full p-2 md:p-4 flex items-center justify-center overflow-hidden">
                                 <img src="${slotData.item.image}" alt="${displayName}" class="w-full h-full object-contain pointer-events-none" 
-                                    onerror="this.onerror=null; this.src='https://placehold.co/300x300/E0F2FE/0284C7?text=${encodeURIComponent(displayName)}';">
+                                    onerror="this.onerror=null; this.src='images/placeholder.svg';">
                             </div>
                             <div class="w-full bg-slate-800 bg-opacity-80 text-white text-center tracking-wide truncate px-1 ${textClass}">
                                 ${displayName}
@@ -1250,7 +1206,8 @@
                     container.appendChild(btn);
                 });
 
-                this.selectCategory(1);
+                // Populate images only when the picker is opened, not in the
+                // hidden modal during startup (hidden images still download).
             },
 
             selectCategory(catId) {
@@ -1283,7 +1240,7 @@
                     itemEl.innerHTML = `
                         <div class="w-full h-full p-1 flex items-center justify-center overflow-hidden">
                             <img src="${item.image}" alt="${item.name}" class="w-full h-full object-contain pointer-events-none" 
-                                onerror="this.onerror=null; this.src='https://placehold.co/200x200/E0F2FE/0284C7?text=${encodeURIComponent(item.name)}';">
+                                onerror="this.onerror=null; this.src='images/placeholder.svg';">
                         </div>
                         <div class="w-full text-center text-xs sm:text-sm font-bold text-slate-700 truncate px-1 py-0.5 bg-slate-100 rounded-lg">
                             ${item.name}
@@ -1330,6 +1287,9 @@
                 open(id) {
                     const el = document.getElementById(id);
                     if (!el) return;
+                    if (id === 'category-modal' && !document.getElementById('items-grid').children.length) {
+                        app.selectCategory(app.state.activeCategory || 1);
+                    }
                     el.classList.remove('hidden');
                     setTimeout(() => {
                         el.classList.remove('opacity-0');
@@ -1346,67 +1306,8 @@
             }
         };
 
-        // Preloader Assets Loading Logic
-        async function preloadAppAssets(onProgress) {
-            const urls = ['images/logo.png'];
-            CATEGORIES.forEach(cat => {
-                cat.items.forEach(item => {
-                    if (item.image) urls.push(item.image);
-                    if (item.audio) urls.push(item.audio);
-                });
-            });
-
-            const total = urls.length;
-            let loaded = 0;
-
-            const updateProgress = () => {
-                loaded++;
-                const percent = Math.min(100, Math.round((loaded / total) * 100));
-                onProgress(percent, loaded, total);
-            };
-
-            const promises = urls.map(url => {
-                return new Promise((resolve) => {
-                    if (url.endsWith('.png') || url.endsWith('.jpg') || url.endsWith('.jpeg')) {
-                        const img = new Image();
-                        img.onload = () => { updateProgress(); resolve(); };
-                        img.onerror = () => { updateProgress(); resolve(); };
-                        img.src = url;
-                    } else if (url.endsWith('.wav') || url.endsWith('.mp3')) {
-                        fetch(url).then(() => {
-                            updateProgress();
-                            resolve();
-                        }).catch(() => {
-                            updateProgress();
-                            resolve();
-                        });
-                    } else {
-                        updateProgress();
-                        resolve();
-                    }
-                });
-            });
-
-            await Promise.all(promises);
-        }
-
-        window.onload = async () => {
-            const progressBarFill = document.getElementById('progress-bar-fill');
-            const progressText = document.getElementById('progress-text');
-            const preloader = document.getElementById('preloader');
-
-            await preloadAppAssets((percent, loaded, total) => {
-                progressBarFill.style.width = percent + '%';
-                progressText.innerText = `${percent}% (${loaded}/${total})`;
-            });
-
-            // Fade out preloader screen smoothly
-            preloader.classList.add('opacity-0');
-            setTimeout(() => {
-                preloader.style.display = 'none';
-                app.init();
-            }, 500);
-        };
+        // Start immediately. Offline media downloads are explicitly user initiated.
+        document.addEventListener('DOMContentLoaded', () => app.init());
     </script>
 </body>
 </html>

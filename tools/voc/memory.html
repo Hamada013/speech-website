@@ -1,584 +1,90 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" class="h-full">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>لعبة الذاكرة - تطبيق حمادة</title>
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts: Cairo -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Cairo', 'sans-serif'],
-                    },
-                    colors: {
-                        baby: {
-                            blueLight: '#EBF8FF',
-                            blue: '#E0F2FE',
-                            blueMed: '#38BDF8',
-                            blueDark: '#0284C7',
-                            mintLight: '#ECFDF5',
-                            mint: '#D1FAE5',
-                            mintMed: '#34D399',
-                            mintDark: '#059669',
-                            bg: '#F8FAFC',
-                            textDark: '#0F172A',
-                        }
-                    },
-                    boxShadow: {
-                        'soft': '0 4px 14px 0 rgba(2, 132, 199, 0.12)',
-                        'soft-mint': '0 4px 14px 0 rgba(5, 150, 105, 0.12)',
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        body {
-            background-color: #F8FAFC;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            overflow: hidden;
-            height: 100vh;
-            height: 100dvh;
-            touch-action: none;
-        }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .memory-card {
-            perspective: 1000px;
-            cursor: pointer;
-        }
-
-        .memory-card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.5s;
-            transform-style: preserve-3d;
-        }
-
-        .memory-card.flipped .memory-card-inner {
-            transform: rotateY(180deg);
-        }
-
-        .memory-card-front, .memory-card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            border-radius: 1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .memory-card-back {
-            background: linear-gradient(135deg, #0284C7, #38BDF8);
-            color: white;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
-        }
-
-        .memory-card-front {
-            background: white;
-            transform: rotateY(180deg);
-            border: 2px solid #34D399;
-        }
-    </style>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0284C7">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="حمادة">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="stylesheet" href="assets/utilities.css">
+    <link rel="stylesheet" href="assets/vendor/fontawesome.css">
+    <link rel="stylesheet" href="assets/vendor/cairo.css">
+    <link rel="stylesheet" href="assets/pwa.css">
+    <link rel="stylesheet" href="assets/games.css">
+    <script defer src="assets/pwa.js"></script>
+    <script defer src="assets/game-data.js"></script>
+    <script defer src="assets/game-model.js"></script>
+    <script defer src="assets/games.js"></script>
 </head>
-<body class="text-baby-textDark font-sans h-full w-full flex flex-col items-center justify-center antialiased bg-slate-50 overflow-hidden">
-
-    <div class="w-full h-full max-w-7xl mx-auto flex flex-col shadow-xl bg-white relative overflow-hidden">
-
-        <div id="toast-container" class="fixed top-3 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-[90%] max-w-sm pointer-events-none"></div>
-
-        <!-- شاشة إعدادات لعبة الذاكرة -->
-        <div id="category-select-view" class="h-full w-full flex flex-col bg-slate-50 overflow-hidden">
-            <header class="flex items-center justify-between px-4 py-2.5 border-b border-slate-200 bg-white flex-shrink-0">
-                <div class="flex items-center gap-3">
-                    <a href="games.html" class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition active:scale-95 flex-shrink-0">
-                        <i class="fas fa-home text-base"></i>
-                    </a>
-                    <h1 class="text-sm sm:text-lg font-black text-baby-blueDark">لعبة الذاكرة</h1>
+<body class="game-page" data-game="memory">
+    <a class="skip-link" href="#game-main">انتقل إلى اللعبة</a>
+    <header class="game-header">
+        <div class="game-brand"><img src="images/logo.webp" alt="" width="54" height="54"><h1>لعبة الذاكرة</h1></div>
+        <a class="game-back" href="games.html" aria-label="العودة إلى قائمة الألعاب"><i class="fas fa-arrow-right" aria-hidden="true"></i><span>الألعاب</span></a>
+    </header>
+    <main id="game-main" class="game-shell">
+        <div id="game-alert" class="game-alert" role="status" aria-live="polite" hidden></div>
+        <section id="setup-view" aria-labelledby="setup-title">
+            <div class="game-intro"><h2 id="setup-title">اختر الكلمات، ثم ابدأ اللعب</h2><p>اقلب بطاقتين وابحث عن الصور المتطابقة.</p></div>
+            <section id="resume-card" class="game-panel game-resume" hidden><div><h2>لديك جلسة محفوظة</h2><p id="resume-description" class="game-note"></p></div><button id="resume-saved" class="game-button green">استكمال الجلسة</button></section>
+            <section class="game-panel" aria-labelledby="options-title">
+                <h2 id="options-title">إعدادات تناسب الطفل</h2>
+                <div class="game-settings">
+                    <fieldset id="level-field" class="choice-field"><legend id="level-title">عدد الصور</legend><div class="choice-options">
+                        <label class="setting-choice"><input type="radio" name="game-level" value="2"><span><strong>٢</strong><small data-level-unit>صور · بداية سهلة</small></span></label>
+                        <label class="setting-choice"><input type="radio" name="game-level" value="4" checked><span><strong>٤</strong><small data-level-unit>صور · تحدٍّ أكبر</small></span></label>
+                        <label class="setting-choice"><input type="radio" name="game-level" value="6"><span><strong>٦</strong><small data-level-unit>صور · متقدم</small></span></label>
+                    </div></fieldset>
+                    <fieldset id="length-field" class="choice-field"><legend>طول الجلسة</legend><div class="choice-options">
+                        <label class="setting-choice"><input type="radio" name="game-length" value="6"><span><strong>٦</strong><small>كلمات · قصيرة</small></span></label>
+                        <label class="setting-choice"><input type="radio" name="game-length" value="10" checked><span><strong>١٠</strong><small>كلمات · متوسطة</small></span></label>
+                        <label class="setting-choice"><input type="radio" name="game-length" value="20"><span><strong>٢٠</strong><small>كلمة · مطوّلة</small></span></label>
+                    </div></fieldset>
+                    <fieldset id="duration-field" class="choice-field" hidden><legend>وقت ملاحظة الصورة</legend><div class="choice-options four-options">
+                        <label class="setting-choice"><input type="radio" name="game-duration" value="0"><span><strong>∞</strong><small>بلا مؤقت</small></span></label>
+                        <label class="setting-choice"><input type="radio" name="game-duration" value="2" checked><span><strong>٢</strong><small>ثانية</small></span></label>
+                        <label class="setting-choice"><input type="radio" name="game-duration" value="4"><span><strong>٤</strong><small>ثوانٍ</small></span></label>
+                        <label class="setting-choice"><input type="radio" name="game-duration" value="6"><span><strong>٦</strong><small>ثوانٍ</small></span></label>
+                    </div></fieldset>
                 </div>
-
-                <div class="flex items-center gap-2 sm:gap-4">
-                    <div class="relative w-32 sm:w-60">
-                        <input type="text" id="card-search-input" oninput="memoryApp.handleSearch(this.value)" placeholder="ابحث..." 
-                               class="w-full bg-slate-50 border border-slate-200 rounded-xl py-1 pr-7 sm:pr-8 pl-3 text-xs sm:text-sm font-bold text-slate-700 focus:outline-none focus:border-baby-blueDark transition">
-                        <i class="fas fa-search absolute right-2.5 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs"></i>
-                    </div>
-
-                    <div class="hidden sm:flex items-center gap-1.5">
-                        <button onclick="memoryApp.selectAllCategories(true)" class="text-xs font-bold bg-baby-blue text-baby-blueDark px-2.5 py-1 rounded-xl hover:bg-sky-200 transition">تحديد الكل</button>
-                        <button onclick="memoryApp.selectAllCategories(false)" class="text-xs font-bold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-xl hover:bg-slate-200 transition">إلغاء الكل</button>
-                    </div>
-                </div>
-            </header>
-
-            <div class="flex-grow flex overflow-hidden min-h-0">
-                <aside class="w-40 sm:w-64 bg-white border-l border-slate-200 flex flex-col flex-shrink-0 overflow-y-auto no-scrollbar" id="sidebar-categories">
-                </aside>
-
-                <main class="flex-grow flex flex-col bg-slate-50 overflow-hidden min-h-0">
-                    <div class="bg-white px-3 sm:px-4 py-2 border-b border-slate-200 flex items-center justify-between flex-shrink-0 shadow-sm">
-                        <h2 id="active-category-title" class="text-xs sm:text-base font-black text-baby-blueDark truncate max-w-[130px] sm:max-w-none">جميع البطاقات</h2>
-                        <div class="flex items-center gap-1.5">
-                            <button onclick="memoryApp.selectCurrentCategoryItems(true)" class="text-[11px] sm:text-xs font-bold bg-baby-mintLight text-baby-mintDark px-2 py-1 rounded-xl hover:bg-emerald-100 transition">حدد الكل</button>
-                            <button onclick="memoryApp.selectCurrentCategoryItems(false)" class="text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-600 px-2 py-1 rounded-xl hover:bg-slate-200 transition">إلغاء</button>
-                        </div>
-                    </div>
-
-                    <div class="flex-grow overflow-y-auto p-3 sm:p-5 no-scrollbar min-h-0" id="active-category-items-grid">
-                    </div>
-                </main>
-            </div>
-
-            <footer class="bg-white px-4 sm:px-6 py-2 border-t border-slate-200 flex items-center justify-between flex-shrink-0">
-                <div class="text-xs sm:text-sm font-bold text-slate-600">
-                    المحدد: <span id="selected-count-badge" class="text-baby-mintDark font-black">0</span> عناصر
-                </div>
-
-                <button onclick="memoryApp.startMemoryGame()" class="bg-baby-mintMed hover:bg-emerald-500 text-white font-black px-6 sm:px-8 py-2 rounded-2xl shadow-soft-mint text-xs sm:text-sm transition transform active:scale-95 flex items-center gap-2">
-                    <i class="fas fa-play"></i>
-                    <span>ابدأ اللعبة</span>
-                </button>
-            </footer>
-        </div>
-
-        <!-- شاشة اللعب الفعلي -->
-        <div id="game-play-view" class="h-full w-full flex flex-col hidden bg-gradient-to-b from-baby-blueLight via-white to-baby-mintLight overflow-hidden">
-            <header class="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between z-20 shadow-sm flex-shrink-0">
-                <div class="flex items-center gap-3">
-                    <button onclick="memoryApp.endGame()" class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition active:scale-95" title="العودة للإعدادات">
-                        <i class="fas fa-arrow-right text-base"></i>
-                    </button>
-                    <span class="font-bold text-slate-700 text-xs sm:text-sm">لعبة الذاكرة - جولة (<span id="current-round-num">1</span>)</span>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="text-xs sm:text-sm font-bold text-slate-600">
-                        الأزواج المطابقة: <span id="matched-pairs-display" class="text-baby-mintDark font-black">0</span> / <span id="total-pairs-display">4</span>
-                    </div>
-                </div>
-            </header>
-
-            <main class="flex-grow flex flex-col items-center justify-center p-4 sm:p-6 overflow-y-auto no-scrollbar relative min-h-0">
-                <div class="w-full h-full flex items-center justify-center">
-                    <div id="memory-board" class="grid gap-3 sm:gap-4 justify-items-center items-center mx-auto">
-                    </div>
-                </div>
-
-                <div id="success-overlay" class="absolute inset-0 bg-white/80 z-50 flex flex-col items-center justify-center hidden opacity-0 transition-opacity duration-300">
-                    <div class="text-6xl text-baby-mintMed mb-4 animate-bounce"><i class="fas fa-star"></i></div>
-                    <h2 class="text-2xl font-black text-slate-800">أحسنت! أنهيت اللعبة بنجاح</h2>
-                </div>
-            </main>
-        </div>
-
-    </div>
-
-    <script>
-        const RAW_CATEGORIES = [
-            "01 الكلمات الأساسية", "02 الأفعال", "03 أجزاء الجسم", "04 المشاعر", "05 الطعام", "06 الفواكه",
-            "07 الخضراوات", "08 المشروبات", "09 العائلة", "10 الألعاب", "11 أشياء شائعة", "12 حروف الجر",
-            "13 الحواس", "14 الصفات", "15 الحيوانات الأليفة", "16 الطيور", "17 الكائنات البحرية", "18 الحشرات",
-            "19 الزواحف", "20 الغابة", "21 المزرعة", "22 الملابس", "23 وسائل النقل", "24 الأثاث",
-            "25 الطقس", "26 الملعب", "27 الحديقة", "28 الغرف", "29 بالداخل", "30 بالخارج",
-            "31 المدينة", "32 الألوان", "33 المتضادات", "34 المدرسة", "35 الموسيقى", "36 الإلكترونيات",
-            "37 المهن", "38 الأشكال", "39 الحروف", "40 الأرقام"
-        ];
-
-        const CATEGORY_MAPS = {
-            1: ["خطأ", "استراحة", "تحت", "اشرب", "اكل", "روح", "صح", "مرحبا", "ساعدني", "جوا", "لسا", "برا", "وقف", "شكرا", "فوق", "بدي", "انا", "خلصنا", "انت"],
-            2: ["ياكل", "يشرب", "يغسل", "يمشط", "يلبس", "يشلح", "ينام", "يفيق", "يتحمم", "يفرشي", "يقعد", "يوقف", "يمشي", "يركض", "يعطي", "يضحك", "يبكي", "يدق", "يلعب", "يسمع", "يشوف", "يلمس", "يشم", "يدوق", "يشوط", "يحكي", "يطلع", "ينزل", "ينط", "يفتح", "يسكر", "يدفش", "يسحب", "يرسم", "يكتب", "يقرا", "يسوق", "يشتري", "يسلم", "ينظف"],
-            3: ["اصبع", "لسان", "اصابع", "ذراع", "ظهر", "بطن", "اعضاء الجسم", "وجه ولد", "خد", "صدر", "ذقن", "اذن", "كوع", "عين", "حاجب", "حواجب", "رموش", "قدم", "وجه بنت", "شعر", "يد", "ركبة", "رجلين", "فم", "اسنان", "رقبة", "انف", "كتف"],
-            4: ["معصبة", "معصبين", "مالل", "مالة", "بيبي تبكي", "بيبي يبكي", "ولد يبكي", "بنت تبكي", "ما تعرف", "ما يعرف", "ما بدو", "ولد سعيد", "بنت سعيدة", "ولد يعيط", "بنت تعيط", "بيبي مبسوط", "بيبي مبسوط", "ولد سعيد", "وجه سعيد", "بنت سعيدة", "ولد يحب", "ولد حزين", "وجه حزين", "بنت حزينة", "بنت خايفة ولد يصرخ", "ولد خايف", "بنت خايفة", "خايف من الكلب", "بنت تصرخ", "ولد يصرخ", "ولد وجه مضحك", "بنت وجها مضحك", "بابا معصب", "ولد متفاجئ", "بنت متفاجئة", "ولدين معصبين", "وجه غضبان"],
-            5: ["كبب مشوي", "بسكويت", "خبز", "كعكة", "دجاج", "شبيس", "قهوة", "بسكوت", "مقرمشات", "كب كيك", "دونات", "بيض", "همبرغر", "سمك", "بطاطا", "فواكه", "عصير جبس", "عصير", "مصاصة", "لحم", "حليب", "زيت", "بيتزا", "فشار", "بوظة", "ارز", "سلطة", "ملح", "سندويشة", "شاورما", "كولا", "شوربة", "معكرونة", "تونا", "خضار", "ماء"],
-            6: ["تفاحة", "افوكادو", "موزة", "موز", "توت", "كرز", "حامض", "تين", "فواكه", "عنب", "كيوي", "ليمون", "مانجا", "بطيخ", "برتقال", "دراق", "خوخ", "اجاص", "اناناس", "فريز", "جبسة"],
-            7: ["باذنجان", "فاصوليا", "شمندر", "بروكلي", "ملفوف", "جزر", "قرنبيط", "ذرة", "خيار", "ثوم", "فاصوليا خضراء", "بصل اخضر", "خس", "نعناع", "فطر", "بامية", "بصل", "بقدونس", "بازلاء", "فليفلة", "بطاطا", "قرع", "فجل", "سبانخ", "كوسا", "بطاطا حلوة", "بندورة", "خضار", "هليون"],
-            8: ["حليب", "قنينة مي", "كولا", "عصير", "عصير جبس", "عصير برتقال", "ليمونادة", "كاسة مي", "عصير فريز وتوت", "عصير جزر", "عصير كيوي", "عصير توت", "كوكتيل موز", "كوكتيل فواكه", "شاي", "قهوة"],
-            9: ["بابا وماما", "بابا يلعب مع ابنو", "بابا", "عيلة ياكلوا", "عائلة", "تاتا", "جدو و تاتا", "جدو", "بنت تساعد ماما", "ماما", "اخت", "اخ"],
-            10: ["سيارة اسعاف", "كرة", "خرز", "بسكليت", "مكعبات", "كتاب", "فقاعات صابون", "دلو", "سيارة", "دمية", "سيارة اطفاء", "منزل", "طائرة ورقية", "ليغو", "ميكروفون", "معجون", "سيارة شرطة", "مضارب", "سكوتر", "مجرفة", "حبل نط", "نابض", "عرباية", "دبدوب", "العاب", "قطار"],
-            11: ["شنتة", "بالون", "بلاستر", "سلة", "حمام", "قنينة", "كرتونة", "كاتو", "شمعة", "قبعة", "كرسي", "مشط", "باب", "كريك", "مروحة", "هدية", "كاسة", "نظارات", "مكنسة", "مفاتيح", "سكين", "ضو", "مصاري", "موبايل", "صحن", "خاتم", "شامبو", "صابونة", "ملعقة", "طاولة", "محارم", "محارم تواليت", "تواليت", "فرشاة اسنان", "معجون اسنان", "زبالة", "كنزة", "شمسية", "مكنسة كهربا", "جزدان", "ساعة"],
-            12: ["وراء", "بين", "اسفل", "بعيد", "امام", "جوا", "قريب", "جنب", "فوق", "تحت", "اعلى"],
-            13: ["اسمع", "شوف", "شم", "دوق", "المس", "منبه", "دب", "جرس", "عصفور", "مكعبات", "صبار", "قط", "فليفلة حدة", "ايس كريم شوكولاتة", "بارد", "طبل", "رجلين", "سمك", "زهرة", "اضواء", "موسيقى", "بليل", "رسمة", "عطر", "بيتزا", "معجون", "ارنب", "قوس قزح", "يقرا", "وردات", "ظربان", "حامض", "ايس كريم فراولة", "غروب", "حلو", "تلفون", "زبالة", "شاحنة", "ايس كريم حليب", "بطيخ"],
-            14: ["ضجة", "هدوء", "نايم", "فايق", "كبير", "صغير", "نظيف", "وسخ", "مسكر", "مفتوح", "بارد", "ساخن", "نهار", "ليل", "يموت", "يعيش", "انزل", "اطلع", "ناشف", "مبلول", "فاضي", "مليان", "قاسي", "ناعم", "ثقيل", "خفيف", "جوا", "برا", "بالداخل", "بالخارج", "ضيق", "واسع", "جديد", "قديم", "قصير", "طويل", "يجلس", "يقف", "رفيع", "سميك", "تحت", "فوق"],
-            15: ["عصفور", "قطة", "دجاجة", "كلب", "بطة", "سمكة", "هامستر", "ببغاء", "حيوانات اليفة", "ارنب", "سلحفاة"],
-            16: ["صقر", "عصفور", "طيور", "دجاجة", "ديك", "غراب", "بطة", "فلامنجو", "وزة", "نعامة", "بومة", "طاووس", "بطريق", "حمامة", "دوري", "نسر"],
-            17: ["سمكة مهرج", "سلطعون", "دلفين", "سمكة", "ضفدع", "قنديل بحر", "أخطبوط", "بطريق", "سمكة بالون", "حصان بحر", "فقمة", "قرش", "حبار", "نجمة البحر", "سلحفاة البحر", "حوت"],
-            18: ["فرس النبي", "نملة", "خنفساء", "نحلة", "فراشة", "صرصور", "يعسوب", "ذبابة", "جندب", "حشرات", "بعوضة", "عقرب", "حلزون", "عنكبوت", "دبور", "دودة"],
-            19: ["تمساح", "حرباء", "سحلية", "سحالي", "ثعبان", "سلحفاة"],
-            20: ["تمساح", "دب", "فيل", "فلامنجو", "ثعلب", "غزال", "زرافة", "غوريلا", "ضبع", "حيوانات الغابة", "كنغر", "فهد", "اسد", "قرد", "بومة", "بانダ", "ببغاء", "راكون", "وحيد قرن", "افعى", "سنجاب", "نمر", "حمار وحش"],
-            21: ["ثور", "قطة", "صوص", "دجاجة", "ديك", "بقرة", "كلب", "حمار", "بطة", "حيوانات المزرعة", "ماعز", "اوزة", "حصان", "فار", "حمامة", "خنزير", "ارنب", "خروف"],
-            22: ["طاقية", "قشاط", "جزمة صفرا", "ثياب", "حفاض", "فستان", "شحاط", "نظارات", "كفوف", "كعب عالي", "جاكيت", "غسيل", "قناع", "بيجاما", "بنطال", "شال", "بوط", "شورت", "تنورة", "جرابات", "كنزة", "تي شيرت", "كرافيت", "كيلوت"],
-            23: ["منطاد", "بسكليت", "قارب", "باص", "سيارة", "هليكوبتر", "طائرة", "سكة حديد", "صاروخ", "بحر", "سفينة", "سماء", "شارع", "غواصة", "صهريج", "تكسي", "تركتور", "قطار", "مواصلات", "شاحنة"],
-            24: ["بانيو", "تخت", "بطانية", "ابريق", "كرسي", "ساعة", "خزانة", "مشط", "فنجان", "دف تقطيع", "مكتب", "جرس الباب", "باب", "مروحة", "شوكة", "براد", "غاز شغال", "بيت", "مكواة", "مطبخ", "سكين", "سلة غسيل", "ضو", "مراية", "فرن", "مخدة", "صحن", "صحون", "طنجرة", "دوش", "مغسلة", "صابون", "صوفا", "ملعقة", "غاز", "طاولة", "حنفية", "محارم", "مرحاض", "فرشاة أسنان", "منشفة", "تلفزيون", "مغسلة", "غسالة ملابس", "شباك"],
-            25: ["قبعة صوف", "جزمة", "بوط", "فستان", "شحاط", "نظارات", "كفوف", "طاقية", "جاكيت", "بنطال", "صندل", "شال", "كنزة نص كم", "شورت", "جرابات", "كنزة كم", "كنزة وشورت", "مظلة", "بارد", "حار", "قوس قزح", "شمس وغيم", "غائم", "مطر", "ثلج", "عاصفة", "مشمس", "رعد", "إعصار", "هوا", "خريف", "ربيع", "صيف", "شتاء"],
-            26: ["مقعد", "سياج", "شرفة", "سلم", "التسلق", "ملعب", "رمل", "زحليطة", "درج", "مرجوحة", "ميزان", "نفق"],
-            27: ["حديقة", "بيت طيور", "شجيرة", "انفخ وردة", "تراب", "سياج", "زهرة", "طريق الحديقة", "بوابة", "عشب", "مرجوحة", "خرطوم", "جزازة عشب", "ورقة شجرة", "نبته", "مسبح", "بركة ماء", "شوكة", "رفش", "مرشة", "عصاية", "شارع", "ترامبولين", "زبالة", "بيت الشجرة", "شجرة"],
-            28: ["بلكونة", "غرفة نوم", "حمام", "سجادة", "سقف", "باب", "ارضية", "رواق", "مطبخ", "مسكة باب", "غرفة غسيل", "غرفة صالون", "مكتب", "مدخل البيت", "غرفة فاضية"],
-            29: ["قبو", "حمام", "غرفة نوم", "كراج", "غرفة صف", "مطبخ", "غرفة صالون", "صيدلية", "ملعب", "درج", "مخزن", "غرفة انتظار"],
-            30: ["جسر", "موقف حافلات", "صحراء", "مزرعة", "بستان", "مرج", "جبل", "موقف سيارات", "بركة", "نهر", "رصيف", "شارع", "نفق", "وادي", "شلال"],
-            31: ["مطار", "حوض سمك", "مخبز", "مخيم", "مدينة", "محل ملابس", "محطة اطفاء", "محل ورد", "حديقة", "كازية", "مستشفى", "سجن", "مكتبة", "سوق", "شرطة", "مدرسة", "ملعب", "حديقة حيوانات"],
-            32: ["اسود", "ازرق", "بني", "الوان", "رمادي", "اخضر", "برتقالي", "وردي", "بنفسجي", "احمر", "ابيض", "اصفر"],
-            33: ["كثير", "قليل", "نشيط", "متعب", "بالغ", "طفل", "متل بعض", "مختلفين", "وحيد", "مع بعض", "ملاك", "شرير", "جواب", "سؤال", "من ورا", "من قدام", "سيء", "جيد", "خلف", "أمام", "خارج", "داخل", "كبير", "صغير", "ضجر", "متحمس", "شجاع", "خوف", "هادئ", "محبط", "رخيص", "غالي", "نظيف", "قذر", "يتسلق", "ينزل", "مغلق", "مفتوح", "بارد", "ساخن", "يأتي", "يذهب", "صحيح", "خطأ", "يبكي", "يضحك", "متفقين", "مختلفين", "أسفل", "أعلى", "جاف", "مبلل", "فارغ", "ممتلئ", "سريع", "بطيء", "سمين", "نحيف", "يحب", "يعطي", "يأخذ", "سعيد", "حزين", "يكره", "صحة", "مريض", "ثقيل", "خفيف", "ضخم", "صغير جداً", "جائع", "شبعان", "يسار", "يمين", "فوضى", "مرتب", "بين", "بجانب", "ضجيج", "هادئ", "على", "تحت", "فقير", "غني", "يسحب", "يدفع", "قصير", "طويل", "يجلس", "يقف", "قوي", "ضعيف", "سميك", "رفيع", "يطفئ", "يشغل", "عكس"],
-            34: ["حقيبة ظهر", "لوح طباشير", "كتاب", "كتب", "حافلة", "كرسي", "فصل", "الوان", "مكتب", "رفقات", "صندوق غذاء", "ارقام", "ورقة", "اقلام", "يلعبوا", "اشكال", "نحكي قصة", "انسة وطالب", "طالب مدرسة", "طالبة مدرسة", "انسة مدرسة"],
-            35: ["جرس", "كلارينت", "طبل", "طبول", "ناي", "جيتار", "بوق", "ماراكاس", "عود", "بيانو", "ساكسفون", "عصاية طبل", "دف", "كمان", "صفارة", "إكسليفون"],
-            36: ["كاميرا", "مقبض تحكم", "وصلة شاحن", "سماعة رأس", "ايباد", "كيبورد", "لابتوب", "فأرة", "مقبس كهربا", "شاحن هاتف", "هاتف", "فيش كهربا", "جهاز تحكم", "تلفزيون"],
-            37: ["رائد فضاء", "راقصة باليه", "قبطان", "طباخة", "طباخ", "مهرجة", "مهرج", "طبيبة", "طبيب", "جنية اسنان", "مزارعة", "مزارع", "اطفائية", "اطفائي", "بطل", "صيادة", "صياد", "موسيقية", "موسيقي", "رسامة", "رسام", "مصورة", "مصور", "طيار", "لاعبة", "لاعب", "شرطي", "شرطية", "امير", "اميرة", "مغنية", "مغني", "معلمة", "معلم", "ساحرة"],
-            38: ["اشكال", "نجمة", "شبه منحرف", "سداسي", "معين", "مستطيل", "مربع", "خماسي", "قمر", "قلب", "زائد", "دائرة", "بيضوي", "مثلث"],
-            39: ["ا", "ب", "ت", "ث", "ج", "ح", "خ", "د", "ذ", "ر", "ز", "س", "ش", "ص", "ض", "ط", "ظ", "ع", "غ", "ف", "ق", "ك", "م", "ن", "ل", "و", "ي", "ه", "ء", "ة"],
-            40: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"]
-        };
-
-        const CATEGORIES = RAW_CATEGORIES.map((rawName, index) => {
-            const id = index + 1;
-            const name = rawName.substring(3).trim();
-            const rawItems = CATEGORY_MAPS[id] || [];
-            const items = rawItems.map((itemName, i) => ({
-                id: i + 1,
-                catId: id,
-                uniqueKey: `${id}_${i + 1}`,
-                name: itemName,
-                image: `images/${id}/${i + 1}.png`,
-                audio: `sounds/${id}/${i + 1}.wav`
-            }));
-            return { id, name, items };
-        });
-
-        const memoryApp = {
-            state: {
-                selectedCardKeys: [],
-                activeCategoryIndex: 0,
-                searchQuery: '',
-                matchedPairs: 0,
-                totalPairs: 0,
-                roundNumber: 1,
-                isLocked: false,
-                firstCard: null
-            },
-
-            init() {
-                this.renderSidebar();
-                this.renderActiveCategoryContent();
-            },
-
-            showToast(message, type = 'info') {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                let bgColor = 'bg-slate-800';
-                if(type === 'success') bgColor = 'bg-baby-mintDark';
-                if(type === 'warning') bgColor = 'bg-amber-500';
-
-                toast.className = `${bgColor} text-white px-4 py-2 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs sm:text-sm font-bold transition-all duration-300 transform translate-y-[-10px] opacity-0 pointer-events-auto`;
-                toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i><span>${message}</span>`;
-                container.appendChild(toast);
-
-                setTimeout(() => {
-                    toast.classList.remove('translate-y-[-10px]', 'opacity-0');
-                    toast.classList.add('translate-y-0', 'opacity-100');
-                }, 10);
-
-                setTimeout(() => {
-                    toast.classList.remove('translate-y-0', 'opacity-100');
-                    toast.classList.add('translate-y-[-10px]', 'opacity-0');
-                    setTimeout(() => toast.remove(), 300);
-                }, 2500);
-            },
-
-            renderSidebar() {
-                const sidebar = document.getElementById('sidebar-categories');
-                sidebar.innerHTML = '';
-
-                CATEGORIES.forEach((cat, index) => {
-                    const isActive = index === this.state.activeCategoryIndex;
-                    const catSelectedCount = cat.items.filter(item => this.state.selectedCardKeys.includes(item.uniqueKey)).length;
-
-                    const itemEl = document.createElement('div');
-                    itemEl.className = `flex items-center justify-between px-3 py-2.5 cursor-pointer transition border-b border-slate-100 ${
-                        isActive 
-                            ? 'bg-baby-blueLight text-baby-blueDark font-black border-r-4 border-baby-blueDark' 
-                            : 'hover:bg-slate-50 text-slate-700 font-bold'
-                    }`;
-
-                    itemEl.innerHTML = `
-                        <div class="flex items-center gap-2 truncate">
-                            <span class="text-xs truncate">${cat.name}</span>
-                        </div>
-                        <div class="flex items-center gap-1 flex-shrink-0">
-                            ${catSelectedCount > 0 ? `<span class="bg-baby-mintMed text-white text-[10px] px-1.5 py-0.2 rounded-full font-black">${catSelectedCount}</span>` : ''}
-                            <i class="fas fa-chevron-left text-[9px] opacity-50"></i>
-                        </div>
-                    `;
-
-                    itemEl.onclick = () => {
-                        this.state.activeCategoryIndex = index;
-                        this.renderSidebar();
-                        this.renderActiveCategoryContent();
-                    };
-
-                    sidebar.appendChild(itemEl);
-                });
-            },
-
-            renderActiveCategoryContent() {
-                const cat = CATEGORIES[this.state.activeCategoryIndex];
-                document.getElementById('active-category-title').textContent = cat.name;
-
-                const grid = document.getElementById('active-category-items-grid');
-                grid.innerHTML = '';
-
-                const itemsGrid = document.createElement('div');
-                itemsGrid.className = 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5 sm:gap-3';
-
-                let itemsToShow = cat.items;
-                const query = this.state.searchQuery.trim().toLowerCase();
-                if (query) {
-                    itemsToShow = cat.items.filter(item => item.name.toLowerCase().includes(query));
-                }
-
-                if (itemsToShow.length === 0) {
-                    grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 font-bold text-xs">لا توجد بطاقات مطابقة</div>`;
-                    document.getElementById('selected-count-badge').innerText = this.state.selectedCardKeys.length;
-                    return;
-                }
-
-                itemsToShow.forEach(item => {
-                    const isSelected = this.state.selectedCardKeys.includes(item.uniqueKey);
-
-                    const cardEl = document.createElement('div');
-                    cardEl.className = `flex flex-col items-center justify-center p-2.5 aspect-square rounded-xl border-2 cursor-pointer transition select-none bg-white relative ${
-                        isSelected 
-                            ? 'border-baby-mintMed shadow-sm' 
-                            : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                    }`;
-
-                    cardEl.innerHTML = `
-                        <div class="absolute top-1.5 right-1.5 w-4 h-4 rounded-full border-2 flex items-center justify-center transition ${
-                            isSelected ? 'bg-baby-mintMed border-baby-mintMed text-white' : 'border-slate-300 bg-transparent'
-                        }">
-                            ${isSelected ? '<i class="fas fa-check text-[8px]"></i>' : ''}
-                        </div>
-                        <img src="${item.image}" alt="${item.name}" class="h-9 w-9 sm:h-11 sm:w-11 object-contain mb-1.5 pointer-events-none">
-                        <span class="text-[10px] sm:text-xs font-bold text-slate-700 text-center w-full truncate">${item.name}</span>
-                    `;
-
-                    cardEl.onclick = () => {
-                        if (isSelected) {
-                            this.state.selectedCardKeys = this.state.selectedCardKeys.filter(k => k !== item.uniqueKey);
-                        } else {
-                            this.state.selectedCardKeys.push(item.uniqueKey);
-                        }
-                        this.renderSidebar();
-                        this.renderActiveCategoryContent();
-                    };
-
-                    itemsGrid.appendChild(cardEl);
-                });
-
-                grid.appendChild(itemsGrid);
-                document.getElementById('selected-count-badge').innerText = this.state.selectedCardKeys.length;
-            },
-
-            handleSearch(val) {
-                this.state.searchQuery = val;
-                this.renderActiveCategoryContent();
-            },
-
-            selectCurrentCategoryItems(select) {
-                const cat = CATEGORIES[this.state.activeCategoryIndex];
-                let itemsToCheck = cat.items;
-                const query = this.state.searchQuery.trim().toLowerCase();
-                if (query) {
-                    itemsToCheck = cat.items.filter(item => item.name.toLowerCase().includes(query));
-                }
-
-                itemsToCheck.forEach(item => {
-                    if (select) {
-                        if (!this.state.selectedCardKeys.includes(item.uniqueKey)) {
-                            this.state.selectedCardKeys.push(item.uniqueKey);
-                        }
-                    } else {
-                        this.state.selectedCardKeys = this.state.selectedCardKeys.filter(k => k !== item.uniqueKey);
-                    }
-                });
-                this.renderSidebar();
-                this.renderActiveCategoryContent();
-            },
-
-            selectAllCategories(select) {
-                if (select) {
-                    let allKeys = [];
-                    CATEGORIES.forEach(cat => {
-                        cat.items.forEach(item => {
-                            allKeys.push(item.uniqueKey);
-                        });
-                    });
-                    this.state.selectedCardKeys = allKeys;
-                } else {
-                    this.state.selectedCardKeys = [];
-                }
-                this.renderSidebar();
-                this.renderActiveCategoryContent();
-            },
-
-            startMemoryGame() {
-                if (this.state.selectedCardKeys.length < 2) {
-                    this.showToast('الرجاء اختيار عنصرين على الأقل للبدء بلعبة الذاكرة', 'warning');
-                    return;
-                }
-
-                document.getElementById('category-select-view').classList.add('hidden');
-                document.getElementById('game-play-view').classList.remove('hidden');
-                
-                this.state.roundNumber = 1;
-                this.loadRound();
-            },
-
-            endGame() {
-                document.getElementById('game-play-view').classList.add('hidden');
-                document.getElementById('category-select-view').classList.remove('hidden');
-            },
-
-            loadRound() {
-                let pool = [];
-                CATEGORIES.forEach(cat => {
-                    cat.items.forEach(item => {
-                        if (this.state.selectedCardKeys.includes(item.uniqueKey)) {
-                            pool.push(item);
-                        }
-                    });
-                });
-
-                pool.sort(() => 0.5 - Math.random());
-                const pairCount = Math.min(6, pool.length);
-                const selectedPairs = pool.slice(0, pairCount);
-
-                let gameCards = [];
-                selectedPairs.forEach(item => {
-                    gameCards.push({...item, cardId: Math.random()});
-                    gameCards.push({...item, cardId: Math.random()});
-                });
-
-                gameCards.sort(() => 0.5 - Math.random());
-
-                this.state.matchedPairs = 0;
-                this.state.totalPairs = selectedPairs.length;
-                this.state.isLocked = false;
-                this.state.firstCard = null;
-
-                document.getElementById('current-round-num').innerText = this.state.roundNumber;
-                document.getElementById('matched-pairs-display').innerText = '0';
-                document.getElementById('total-pairs-display').innerText = this.state.totalPairs;
-
-                const board = document.getElementById('memory-board');
-                board.innerHTML = '';
-
-                let colsClass = 'grid-cols-3 sm:grid-cols-4';
-                if (gameCards.length > 8) colsClass = 'grid-cols-4 sm:grid-cols-6';
-                if (gameCards.length <= 4) colsClass = 'grid-cols-2 sm:grid-cols-4';
-                board.className = `grid ${colsClass} gap-3 sm:gap-4 justify-items-center items-center mx-auto`;
-
-                gameCards.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'memory-card w-24 h-24 sm:w-32 sm:h-32 rounded-2xl shadow-sm';
-                    card.setAttribute('data-key', item.uniqueKey);
-
-                    card.innerHTML = `
-                        <div class="memory-card-inner">
-                            <div class="memory-card-back">
-                                <i class="fas fa-question text-2xl sm:text-3xl"></i>
-                            </div>
-                            <div class="memory-card-front p-2">
-                                <img src="${item.image}" alt="${item.name}" class="h-10 w-10 sm:h-14 sm:w-14 object-contain mb-1 pointer-events-none">
-                                <span class="text-[9px] sm:text-xs font-bold text-slate-800 text-center w-full truncate">${item.name}</span>
-                            </div>
-                        </div>
-                    `;
-
-                    card.onclick = () => this.handleCardClick(card, item);
-                    board.appendChild(card);
-                });
-            },
-
-            handleCardClick(cardEl, item) {
-                if (this.state.isLocked) return;
-                if (cardEl.classList.contains('flipped') || cardEl.classList.contains('matched')) return;
-
-                cardEl.classList.add('flipped');
-
-                if (!this.state.firstCard) {
-                    this.state.firstCard = { el: cardEl, item: item };
-                    return;
-                }
-
-                const first = this.state.firstCard;
-                this.state.firstCard = null;
-
-                if (first.item.uniqueKey === item.uniqueKey) {
-                    // Match!
-                    first.el.classList.add('matched');
-                    cardEl.classList.add('matched');
-
-                    try {
-                        const audio = new Audio(item.audio);
-                        audio.play().catch(e => console.log('تعذر تشغيل الصوت', e));
-                    } catch(e) {}
-
-                    this.state.matchedPairs++;
-                    document.getElementById('matched-pairs-display').innerText = this.state.matchedPairs;
-
-                    if (this.state.matchedPairs === this.state.totalPairs) {
-                        setTimeout(() => this.handleGameSuccess(), 600);
-                    }
-                } else {
-                    // No match
-                    this.state.isLocked = true;
-                    setTimeout(() => {
-                        first.el.classList.remove('flipped');
-                        cardEl.classList.remove('flipped');
-                        this.state.isLocked = false;
-                    }, 1000);
-                }
-            },
-
-            handleGameSuccess() {
-                const overlay = document.getElementById('success-overlay');
-                overlay.classList.remove('hidden');
-                setTimeout(() => {
-                    overlay.classList.remove('opacity-0');
-                    overlay.classList.add('opacity-100');
-                }, 10);
-
-                setTimeout(() => {
-                    overlay.classList.remove('opacity-100');
-                    overlay.classList.add('opacity-0');
-                    setTimeout(() => {
-                        overlay.classList.add('hidden');
-                        this.state.roundNumber++;
-                        this.loadRound();
-                    }, 300);
-                }, 2000);
-            }
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            memoryApp.init();
-        });
-    </script>
+                <div class="game-checks"><label id="labels-field" class="check-label"><input id="show-labels" type="checkbox" checked>إظهار أسماء الصور</label><label id="sound-field" class="check-label"><input id="sound-hint" type="checkbox" checked>تشغيل صوت الكلمة للتعلّم</label></div>
+                <p id="settings-help" class="game-note"></p>
+            </section>
+            <section class="game-panel" aria-labelledby="word-bank-title">
+                <div class="selection-heading"><h2 id="word-bank-title">بطاقات الجلسة</h2><span id="selected-count" class="game-note"></span></div>
+                <section class="category-browser" aria-labelledby="category-title">
+                    <div class="category-heading"><div><h3 id="category-title">استكشف الفئات</h3><p id="current-category" class="game-note"></p></div><button id="toggle-categories" class="game-button soft" aria-expanded="false" aria-controls="category-panel">كل الفئات <i class="fas fa-th-large" aria-hidden="true"></i></button></div>
+                    <div id="category-rail" class="category-rail" role="group" aria-label="فئات الكلمات؛ مرّر لعرض المزيد"></div>
+                    <div id="category-panel" class="category-panel" hidden><label>ابحث عن فئة<input id="category-search" type="search" placeholder="مثلاً: الحيوانات…" autocomplete="off"></label><div id="category-grid" class="category-grid" role="group" aria-label="كل فئات الكلمات"></div><p id="category-empty" class="game-note" hidden>لا توجد فئة بهذا الاسم.</p></div>
+                </section>
+                <label class="word-search-field">ابحث عن كلمة في كل الفئات<input id="word-search" type="search" placeholder="اكتب كلمة…" autocomplete="off"></label>
+                <div class="game-buttons"><button id="select-category" class="game-button soft">تحديد النتائج</button><button id="clear-category" class="game-button">إلغاء النتائج</button><button id="select-everything" class="game-button">تحديد كل الفئات</button><button id="clear-everything" class="game-button">إلغاء الكل</button></div>
+                <div id="selection-grid" class="selection-grid" role="group" aria-label="اختيار بطاقات الجلسة"></div>
+                <div class="game-pagination"><button id="page-previous" class="game-button" aria-label="صفحة البطاقات السابقة">السابق</button><span id="page-info" class="game-note" aria-live="polite"></span><button id="page-next" class="game-button" aria-label="صفحة البطاقات التالية">التالي</button></div>
+                <div class="game-footer"><span id="session-preview" class="game-note" aria-live="polite">جاري تجهيز البطاقات…</span><button id="start-game" class="game-button primary" disabled>ابدأ جلسة جديدة</button></div>
+            </section>
+        </section>
+        <section id="play-view" hidden aria-labelledby="play-title">
+            <div class="game-play-header"><h2 id="play-title" tabindex="-1">اقلب بطاقتين وابحث عن الصور المتطابقة.</h2><div class="game-buttons"><button id="pause-game" class="game-button">إيقاف مؤقت</button><button id="finish-game" class="game-button">إنهاء الجلسة</button></div></div>
+            <progress id="session-progress" value="0" max="1" aria-label="تقدم الجلسة"></progress>
+            <div class="game-stats"><span id="session-counter"></span><span id="attempt-counter"></span><span id="mistake-counter"></span></div>
+            <div class="game-buttons"><button id="play-word" class="game-button primary">▶ أعد سماع الكلمة</button><button id="reload-media" class="game-button" hidden>إعادة تحميل الصور</button><button id="skip-word" class="game-button" hidden>تجاوز هذه الكلمة</button></div>
+            <p id="game-feedback" class="game-status" role="status" aria-live="polite" aria-atomic="true"></p>
+            <div class="game-workspace"><div id="game-board" class="game-board" role="group" aria-label="مساحة اللعب"></div><div id="active-match"></div></div>
+            <section id="rapid-controls" hidden aria-label="تقييم الاستجابة"><progress id="observation-progress" value="0" max="1" aria-label="وقت ملاحظة الصورة"></progress><div class="game-buttons"><button id="show-grading" class="game-button">أظهر التقييم الآن</button></div><div id="rapid-grading" class="rapid-toolbar"><button data-grade="notMastered" class="grade-no" disabled>× لم يتقن</button><button data-grade="learning" class="grade-learning" disabled>◐ يتعلّم</button><button data-grade="mastered" class="grade-yes" disabled>✓ أتقن</button></div></section>
+            <div class="game-buttons"><button id="next-round" class="game-button green" hidden>الجولة التالية</button></div>
+        </section>
+        <section id="pause-view" class="game-panel paused-panel" hidden aria-labelledby="pause-title"><h2 id="pause-title">استراحة قصيرة</h2><p id="pause-description" class="game-note"></p><div class="game-buttons"><button id="continue-game" class="game-button green">متابعة اللعب</button><button id="change-cards" class="game-button">تغيير البطاقات والإعدادات</button><button id="finish-paused" class="game-button">عرض نتيجة الجلسة الحالية</button></div></section>
+        <section id="results-view" class="game-panel results-panel" hidden aria-labelledby="results-title"><h2 id="results-title" tabindex="-1">أحسنت! انتهت الجلسة</h2><p id="results-description" class="game-note"></p><div id="result-metrics" class="result-metrics"></div><p id="result-details" class="game-note"></p><div class="game-buttons"><button id="review-missed" class="game-button green" hidden>مراجعة الكلمات التي تحتاج تدريباً</button><button id="play-again" class="game-button primary">جلسة جديدة بنفس البطاقات</button><button id="return-setup" class="game-button">اختيار بطاقات أخرى</button><a class="game-back" href="games.html">قائمة الألعاب</a></div></section>
+        <audio id="game-audio" preload="none"></audio>
+        <noscript><p class="game-alert">فعّل JavaScript لتشغيل الألعاب وحفظ التقدم على الجهاز.</p></noscript>
+    </main>
 </body>
 </html>
