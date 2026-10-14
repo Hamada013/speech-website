@@ -1,0 +1,5 @@
+{
+  "name":"vb-mapp-assessment", "version":"2.1.0", "private":true,
+  "scripts":{"build":"node scripts/build-pwa.cjs","build:icons":"node scripts/build-icons.cjs","test":"node tests/model.cjs","test:browser":"node tests/browser.cjs"},
+  "devDependencies":{"playwright":"1.56.1"}
+}

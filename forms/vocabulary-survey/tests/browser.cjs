@@ -57,7 +57,7 @@ async function readyForResponse(page, mode) {
     // Playback must come from a real user gesture when autoplay is blocked.
     for (let i = 0; i < 60; i++) {
         if (await page.locator(selector).first().isEnabled()) return;
-        if ((await page.locator('#audio-status').textContent()).startsWith('Tap Play')) await page.locator('#replay-audio').click();
+        if ((await page.locator('#audio-status').textContent()).startsWith('اضغط تشغيل')) await page.locator('#replay-audio').click();
         await page.waitForTimeout(100);
     }
     throw new Error(`Responses never enabled: ${await page.locator('#audio-status').textContent()}`);
@@ -70,7 +70,7 @@ async function setup(page, mode, condition = 'modeled') {
     await page.locator('[name=scope]').selectOption('A');
     await page.locator('[name=sampling]').selectOption('5');
     if (mode === 'expressive') await page.locator('[name=audioMode]').selectOption(condition);
-    await page.waitForFunction(() => document.getElementById('plan-summary').textContent.startsWith('5 planned'));
+    await page.waitForFunction(() => document.getElementById('plan-summary').textContent.startsWith('5 كلمة'));
     await page.locator('#begin-test').click();
     await readyForResponse(page, mode);
 }
@@ -95,7 +95,29 @@ async function run(name, engine, origin) {
         await page.waitForFunction(() => !!navigator.serviceWorker.controller);
         await page.waitForFunction(() => !document.querySelector('[data-start]').disabled);
         assert.equal(requests.filter(p => /\/voc\/(images|sounds)\/\d+\//.test(p)).length, 0, 'No automatic media preload');
-        assert.match(await page.locator('#bank-count').textContent(), /979/);
+        assert.equal(await page.locator('html').getAttribute('lang'), 'ar');
+        assert.equal(await page.locator('html').getAttribute('dir'), 'rtl');
+        assert.equal(await page.locator('#dashboard-view button').count(), 3);
+        assert.equal(await page.locator('#dashboard-view p').count(), 0);
+        assert.equal(await page.locator('.brand img').getAttribute('src'), '../../tools/voc/images/logo.webp');
+        // Manual shortcut help leads to the separate, opt-in offline prompt.
+        await page.locator('[data-offline-install]').click();
+        await page.locator('[data-install-help]').waitFor({ state: 'visible' });
+        await page.locator('[data-install-confirm]').click();
+        await page.locator('[data-download-panel]').waitFor({ state: 'visible' });
+        assert.equal((await rpc(page, 'SURVEY_STATUS')).wanted, false);
+        await page.locator('[data-offline-close]').click();
+        // Native installation should open the same offline prompt.
+        await page.evaluate(() => {
+            const event = new Event('beforeinstallprompt', { cancelable: true });
+            event.prompt = async () => { window.installPromptCalled = true; };
+            event.userChoice = Promise.resolve({ outcome: 'accepted' });
+            dispatchEvent(event);
+        });
+        await page.locator('[data-offline-install]').click();
+        await page.locator('[data-download-panel]').waitFor({ state: 'visible' });
+        assert.equal(await page.evaluate(() => window.installPromptCalled), true);
+        await page.locator('[data-offline-close]').click();
         assert.equal((await rpc(page, 'SURVEY_STATUS')).ready, false);
         await page.screenshot({ path: `/private/tmp/survey-${name}-desktop.png`, fullPage: true });
         await page.setViewportSize({ width: 390, height: 844 });
@@ -119,7 +141,7 @@ async function run(name, engine, origin) {
         const previous = structuredClone(current); previous.id = 'qa-previous'; previous.metadata.assessmentDate = '2026-09-01';
         previous.records[1].outcome = 'target'; previous.records[1].selectedId = previous.records[1].targetId; previous.records[1].selectedLabel = previous.records[1].label;
         await page.locator('#baseline-import').setInputFiles({ name: 'baseline.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ session: previous })) });
-        await page.waitForFunction(() => document.querySelector('#report-content').textContent.includes('-20.0 pp'));
+        await page.waitForFunction(() => document.querySelector('#report-content').textContent.includes('-20.0 نقطة مئوية'));
         assert.equal(await page.locator('.bar-previous').count(), 1, 'Only the assessed cohort has a historical baseline');
         await page.screenshot({ path: `/private/tmp/survey-${name}-report.png`, fullPage: true });
         await page.evaluate(() => { window.print = () => { window.printCalled = true; dispatchEvent(new Event('afterprint')); }; });
@@ -150,9 +172,10 @@ async function run(name, engine, origin) {
         await page.waitForFunction(() => document.getElementById('word-audio').currentTime > 0);
         await page.locator('#pause-test').click();
         await page.reload();
+        await page.locator('nav [data-route=history]').click();
         await page.locator('#resume-draft').click();
         await readyForResponse(page, 'expressive');
-        assert.match(await page.locator('#trial-count').textContent(), /Item 2 of 5/);
+        assert.match(await page.locator('#trial-count').textContent(), /الكلمة 2 من 5/);
         for (const outcome of ['learning', 'mastered', 'mastered', 'notMastered']) await respond(page, 'expressive', outcome);
         const expressive = (await sessions(page)).find(s => s.mode === 'expressive' && s.status === 'complete');
         assert.equal(expressive.records.filter(r => r.audioPlayed).length, 1, 'The manually modeled trial retains its prompt condition across reload');
@@ -160,26 +183,45 @@ async function run(name, engine, origin) {
         // CSV import round-trip, malformed history and clinician item overrides.
         await page.locator('nav [data-route=history]').click();
         await page.locator('#history-import').setInputFiles(`/private/tmp/survey-${name}-session.csv`);
-        await page.waitForFunction(() => document.getElementById('message').textContent.includes('Session imported'));
+        await page.waitForFunction(() => document.getElementById('message').textContent.includes('تم استيراد التقييم'));
         await page.locator('#history-import').setInputFiles({ name: 'bad.json', mimeType: 'application/json', buffer: Buffer.from('{"hello":"world"}') });
         await page.waitForFunction(() => document.getElementById('message').classList.contains('error'));
         await page.locator('nav [data-route=validation]').click();
-        await page.locator('#bank-search').fill('1-1');
-        const review = page.locator('.review-row').first();
-        await review.locator('select').nth(0).selectOption('D'); await review.getByRole('button', { name: 'Save', exact: true }).click();
-        await page.waitForFunction(() => document.getElementById('message').textContent.includes('Assignment saved'));
-        console.log(`${name}: both test engines, audio, resume, scoring, imports, deltas, review and print checks passed`);
+        await page.locator('.word-bank-table[data-mode=expressive]').waitFor();
+        assert.equal(await page.locator('.word-bank-table').count(), 2);
+        assert.equal(await page.locator('#validation-view input, #validation-view select').count(), 0);
+        const expected = await page.evaluate(async () => {
+            const { createIndex, buildChecklist } = await import('./validation.js');
+            const data = await (await fetch('data/vocabulary.json')).json();
+            const index = createIndex(data.items), plans = {};
+            for (const mode of ['receptive', 'expressive']) plans[mode] = (await buildChecklist(index, mode, 'full', 'all')).plan.map(({ id, cohort }) => ({ id, cohort }));
+            return plans;
+        });
+        for (const mode of ['receptive', 'expressive']) {
+            const rows = await page.locator(`.word-bank-table[data-mode=${mode}] tbody tr`).evaluateAll(rows => rows.flatMap(row =>
+                [...row.querySelectorAll('[data-item]')].map(word => ({ id: word.dataset.item, cohort: row.dataset.cohort }))));
+            assert.deepEqual(rows.sort((a,b) => a.id.localeCompare(b.id)), expected[mode].sort((a,b) => a.id.localeCompare(b.id)));
+        }
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+        await page.screenshot({ path: `/private/tmp/survey-${name}-word-bank.png`, fullPage: true });
+        console.log(`${name}: Arabic home, shortcut flow, both assessments, audio, resume, scoring, imports, deltas, exact word-table coverage and print checks passed`);
         if (process.env.SURVEY_SMOKE === '1') { assert.equal(errors.length, 0, errors.join('\n')); return; }
 
         await page.locator('nav [data-route=dashboard]').click();
         await page.evaluate(async () => { const other = await caches.open('another-app-qa'); await other.put('/unrelated-data', new Response('preserve')); });
         mediaMax = 0;
+        await page.locator('[data-offline-install]').click();
+        if (await page.locator('[data-install-help]').isVisible()) await page.locator('[data-install-confirm]').click();
         await page.locator('[data-offline-download]').click();
         const monitor = setInterval(async () => { try { console.log(`${name}: ${await page.locator('[data-offline-status]').textContent()}`); } catch {} }, 30000);
         try { await page.waitForFunction(() => document.querySelector('[data-offline-card]').dataset.state === 'ready', null, { timeout: 240000 }); }
         finally { clearInterval(monitor); }
         const status = await rpc(page, 'SURVEY_STATUS');
-        assert.equal(status.done, 1975); assert.equal(status.ready, true); assert.equal(mediaMax, 1);
+        const release = await page.evaluate(async () => {
+            const text = await (await fetch('assets/pwa-release.js')).text();
+            return JSON.parse(text.slice(text.indexOf('=') + 1).trim().replace(/;$/, '')).media.flat().length;
+        });
+        assert.equal(status.done, release); assert.equal(status.ready, true); assert.equal(mediaMax, 1);
         assert.equal(await page.evaluate(async () => !!(await (await caches.open('another-app-qa')).match('/unrelated-data'))), true);
         await offline(context, name, true);
         await page.reload();
@@ -190,7 +232,7 @@ async function run(name, engine, origin) {
         await respond(page, 'expressive', 'mastered');
         await page.locator('#pause-test').click(); await page.locator('#finish-partial').click();
         await page.locator('#report-view').waitFor({ state: 'visible' });
-        assert.match(await page.locator('#report-content').textContent(), /partial session/);
+        assert.match(await page.locator('#report-content').textContent(), /جزئي/);
         const range = await page.evaluate(async () => {
             const response = await fetch('../../tools/voc/sounds/1/1.m4a', { headers: { Range: 'bytes=0-99' } });
             return { status: response.status, length: (await response.arrayBuffer()).byteLength };
@@ -198,7 +240,7 @@ async function run(name, engine, origin) {
         assert.deepEqual(range, { status: 206, length: 100 });
         await offline(context, name, false);
         assert.equal(errors.length, 0, errors.join('\n'));
-        console.log(`${name}: all 1975 shared media cached sequentially; real offline assessment, M4A playback/ranges, persisted reports and cache isolation passed`);
+        console.log(`${name}: all shared media cached sequentially; real offline assessment, M4A playback/ranges, persisted reports and cache isolation passed`);
     } catch (error) {
         console.error(name, 'UI:', await page.locator('#message').textContent().catch(() => 'unavailable'));
         await page.screenshot({ path: `/private/tmp/survey-${name}-failure.png`, fullPage: true }).catch(() => {});

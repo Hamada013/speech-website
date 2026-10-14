@@ -6,7 +6,19 @@
     const statusText = card?.querySelector('[data-offline-status]');
     const progress = card?.querySelector('progress');
     const button = card?.querySelector('[data-offline-download]');
-    const installButton = card?.querySelector('[data-offline-install]');
+    const installButton = document.querySelector('[data-offline-install]');
+    const dialog = document.querySelector('[data-offline-dialog]');
+    const standalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    let installed = standalone();
+    let offered = false;
+    function openDialog(download) {
+        if (!dialog) return;
+        dialog.querySelector('[data-install-help]').hidden = download;
+        dialog.querySelector('[data-download-panel]').hidden = !download;
+        if (!dialog.open) dialog.showModal();
+    }
+    document.querySelector('[data-offline-close]')?.addEventListener('click', () => dialog.close());
+    document.querySelector('[data-install-confirm]')?.addEventListener('click', () => openDialog(true));
     let registration;
     let status;
     let running = false;
@@ -19,30 +31,34 @@
         card.dataset.state = 'error';
         statusText.textContent = message;
         button.disabled = false;
-        button.textContent = 'Retry / resume download';
+        button.textContent = 'إعادة المحاولة / استكمال التنزيل';
     }
 
     function render(next) {
         if (next.error) {
             showError(next.error === 'storage'
-                ? 'Storage is unavailable or full. Free device space and retry; saved files are reused.'
-                : 'Download paused by an error. Check your connection and retry; saved files are reused.');
+                ? 'تعذر حفظ المحتوى. وفر مساحة على الجهاز ثم أعد المحاولة؛ المحتوى المحفوظ سيُستخدم مجدداً.'
+                : 'توقف التنزيل. تحقق من الاتصال ثم استكمل؛ الملفات المحفوظة لن تُنزّل مجدداً.');
             return;
         }
         status = next;
         fault = false;
         if (!card) return;
+        if (installed && !offered) {
+            offered = true;
+            if (!status.ready && !status.wanted) openDialog(true);
+        }
         progress.max = Math.max(1, status.total);
         progress.value = status.done;
         progress.setAttribute('aria-valuetext', `${status.done} / ${status.total}`);
         card.dataset.state = status.ready ? 'ready' : status.wanted ? 'downloading' : 'idle';
-        if (status.ready) statusText.textContent = 'Ready for offline use ✔';
-        else if (status.wanted && !navigator.onLine) statusText.textContent = `Waiting for connection — saved ${status.done} of ${status.total}`;
-        else if (status.wanted) statusText.textContent = `Downloading asset ${status.done} of ${status.total}…`;
-        else statusText.textContent = `Saved ${status.done} of ${status.total} — Media size ${(status.bytes / 1e6).toFixed(1)} MB`;
+        if (status.ready) statusText.textContent = 'جاهز للاستخدام دون اتصال ✔';
+        else if (status.wanted && !navigator.onLine) statusText.textContent = `بانتظار الاتصال — محفوظ ${status.done} من ${status.total}`;
+        else if (status.wanted) statusText.textContent = `جاري تنزيل المحتوى ${status.done} من ${status.total}…`;
+        else statusText.textContent = `محفوظ ${status.done} من ${status.total} — حجم المحتوى ${(status.bytes / 1e6).toFixed(1)} ميغابايت`;
         button.disabled = status.ready;
-        button.textContent = status.ready ? 'All content downloaded' : status.wanted
-            ? 'Pause download' : status.done ? 'Resume download' : 'Download all content';
+        button.textContent = status.ready ? 'تم تنزيل جميع الملفات' : status.wanted
+            ? 'إيقاف التنزيل مؤقتاً' : status.done ? 'استكمال التنزيل دون اتصال' : 'تنزيل كل المحتوى دون اتصال';
     }
 
     function worker() {
@@ -84,7 +100,7 @@
                 await new Promise(resolve => setTimeout(resolve, 50));
             }
         } catch {
-            showError('Download interrupted. Tap Resume; cached files are preserved.');
+            showError('توقف التنزيل مؤقتاً. اضغط استكمال التنزيل؛ الملفات المحفوظة لن تضيع.');
         } finally {
             running = false;
         }
@@ -93,22 +109,24 @@
     async function sync() {
         if (!worker() || running) return;
         try { render(await send('SURVEY_STATUS')); void pump(); }
-        catch { showError('Could not verify saved files. Tap Retry.'); }
+        catch { showError('تعذر التحقق من الملفات. اضغط إعادة المحاولة.'); }
     }
 
     window.addEventListener('beforeinstallprompt', event => {
         event.preventDefault();
         installPrompt = event;
-        if (installButton) installButton.hidden = false;
     });
     installButton?.addEventListener('click', async () => {
-        if (!installPrompt) return;
-        await installPrompt.prompt();
-        await installPrompt.userChoice;
-        installPrompt = null;
-        installButton.hidden = true;
+        if (installed || standalone()) { openDialog(true); return; }
+        if (!installPrompt) { openDialog(false); return; }
+        try {
+            await installPrompt.prompt();
+            const choice = await installPrompt.userChoice;
+            installPrompt = null;
+            if (choice.outcome === 'accepted') { installed = true; offered = true; openDialog(true); }
+        } catch { installPrompt = null; openDialog(false); }
     });
-    window.addEventListener('appinstalled', () => { if (installButton) installButton.hidden = true; });
+    window.addEventListener('appinstalled', () => { installed = true; offered = true; openDialog(true); });
 
     button?.addEventListener('click', async () => {
         button.disabled = true;
@@ -125,13 +143,13 @@
             render(await send(pause ? 'SURVEY_PAUSE' : 'SURVEY_START'));
             void pump();
         } catch {
-            showError('Could not start the download. Check your connection and retry.');
+            showError('تعذر بدء التنزيل. تحقق من الاتصال ثم أعد المحاولة.');
         }
     });
 
     async function initialize() {
         if (!('serviceWorker' in navigator) || !window.isSecureContext) {
-            if (statusText) statusText.textContent = 'Offline downloads require HTTPS or localhost.';
+            if (statusText) statusText.textContent = 'يتطلب التنزيل دون اتصال فتح التطبيق عبر HTTPS أو localhost.';
             if (button) button.disabled = true;
             return;
         }
@@ -152,7 +170,7 @@
             }
             await sync();
         } catch {
-            showError('Offline setup failed. Check your connection and retry.');
+            showError('تعذر تجهيز التطبيق دون اتصال. تحقق من الاتصال وأعد المحاولة.');
         }
     }
 

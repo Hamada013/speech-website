@@ -1,13 +1,15 @@
-import { COHORTS, CONFIG_VERSION, FOLDER_COHORTS, REFERENCES, assignCohort, createIndex, buildChecklist } from './validation.js';
+import { COHORTS, CONFIG_VERSION, createIndex, buildChecklist } from './validation.js';
 import { saveSession, getSessions, getSetting, saveSetting } from './storage.js';
 import { analyze, renderReport, parseHistory, downloadSession, printReport, formatPercent } from './reporting.js';
 
 const $ = selector => document.querySelector(selector);
 const all = selector => [...document.querySelectorAll(selector)];
 const state = { data: null, index: null, overrides: {}, sessions: [], mode: 'receptive', session: null,
-    phase: 'idle', prepared: null, report: null, baseline: null, trial: null, generation: 0, planning: 0, reviewPage: 0 };
+    phase: 'idle', prepared: null, report: null, baseline: null, trial: null, generation: 0, planning: 0 };
 const audio = $('#word-audio');
 const form = $('#setup-form');
+const modeLabel = mode => mode === 'receptive' ? 'اللغة الاستقبالية' : 'اللغة التعبيرية';
+const statusLabel = status => ({ draft: 'قيد التنفيذ', complete: 'مكتمل', partial: 'جزئي' })[status] || status;
 const today = () => new Intl.DateTimeFormat('sv-SE').format(new Date());
 function message(text, error = false) {
     $('#message').textContent = text; $('#message').hidden = false; $('#message').classList.toggle('error', error);
@@ -21,13 +23,13 @@ function view(name) {
     $('#main').focus({ preventScroll: true });
 }
 function guard(action) {
-    return (...args) => Promise.resolve().then(() => action(...args)).catch(error => message(error.message || 'The action could not be completed. Your saved records remain available.', true));
+    return (...args) => Promise.resolve().then(() => action(...args)).catch(error => message(/[\u0600-\u06ff]/.test(error.message || '') ? error.message : 'تعذر إتمام العملية. تحقق من الملف أو الاتصال وأعد المحاولة. السجلات المحفوظة ما زالت متاحة.', true));
 }
 function currentItem() { return state.index.byId.get(state.session?.plan[state.session.records.length]?.id); }
 function updateDraftCard() {
     const draft = state.sessions.find(session => session.status === 'draft' && session.plan.length > session.records.length);
     $('#draft-card').hidden = !draft;
-    if (draft) $('#draft-summary').textContent = `${draft.metadata.childId} · ${draft.mode} · ${draft.records.length} of ${draft.plan.length} items recorded`;
+    if (draft) $('#draft-summary').textContent = `${draft.metadata.childId} · ${modeLabel(draft.mode)} · ${draft.records.length} من ${draft.plan.length} استجابة`;
 }
 async function refreshSessions() {
     state.sessions = (await getSessions()).sort((a, b) => (b.updatedAt || b.startedAt).localeCompare(a.updatedAt || a.startedAt));
@@ -43,20 +45,20 @@ async function route(name) {
     if (state.phase === 'trial' || state.phase === 'loading') await pause();
     $('#message').hidden = true;
     if (name === 'history') { await refreshSessions(); renderHistory(); }
-    if (name === 'validation') renderReview();
+    if (name === 'validation') await renderWordTables();
     if (name === 'dashboard') { await refreshSessions(); }
     view(name);
 }
 
 async function setup(mode) {
-    if (!state.data) throw new Error('Wait for the word bank to finish loading.');
+    if (!state.data) throw new Error('يرجى انتظار تحميل بنك الكلمات.');
     if (state.phase === 'trial' || state.phase === 'loading') await pause();
     state.mode = mode;
-    $('#setup-title').textContent = mode === 'receptive' ? 'Receptive comprehension' : 'Expressive naming';
+    $('#setup-title').textContent = mode === 'receptive' ? 'اللغة الاستقبالية' : 'اللغة التعبيرية';
     $('#audio-mode-field').hidden = mode !== 'expressive';
     $('#module-instructions').textContent = mode === 'receptive'
-        ? 'Play the word, then let the child select one of four pictures. No target label or correctness feedback is shown to the child.'
-        : 'Audio-modeled naming plays the word before grading. Choose unprompted naming if you need to observe independent naming; replaying audio is recorded as a model.';
+        ? 'شغّل الكلمة، ثم دع الطفل يختار صورة من أربع صور.'
+        : 'اختر التسمية بعد سماع الكلمة أو التسمية المستقلة. يُسجّل تشغيل الصوت كنموذج للطفل.';
     form.elements.assessmentDate.value = today();
     view('setup');
     await preparePlan();
@@ -64,20 +66,20 @@ async function setup(mode) {
 async function preparePlan() {
     const ticket = ++state.planning;
     state.prepared = null; $('#begin-test').disabled = true;
-    $('#plan-summary').textContent = 'Checking distractor coverage and preparing the checklist…';
+    $('#plan-summary').textContent = 'جاري إعداد الكلمات والصور…';
     const result = await buildChecklist(state.index, state.mode, form.elements.scope.value, form.elements.sampling.value, state.overrides);
     if (ticket !== state.planning) return;
     state.prepared = result;
-    $('#plan-summary').textContent = `${result.plan.length} planned trials · ${COHORTS.map(c => `${c.id}: ${result.eligible[c.id]} eligible`).join(' · ')}. ${result.omitted.length} targets omitted for incomplete four-card matrices.`;
+    $('#plan-summary').textContent = `${result.plan.length} كلمة للاختبار · ${COHORTS.map(c => `${c.label}: ${result.eligible[c.id]}`).join(' · ')}`;
     $('#begin-test').disabled = !result.plan.length;
 }
 async function begin(event) {
     event.preventDefault();
     if (!form.reportValidity() || !state.prepared?.plan.length) return;
     const metadata = Object.fromEntries(['childId', 'childName', 'birthDate', 'assessmentDate', 'examiner', 'languages', 'notes'].map(key => [key, form.elements[key].value.trim()]));
-    if (!metadata.childId) throw new Error('Enter a child identifier.');
-    if (metadata.assessmentDate > today()) throw new Error('Evaluation date cannot be in the future.');
-    if (metadata.birthDate && metadata.birthDate > metadata.assessmentDate) throw new Error('Date of birth must be on or before the evaluation date.');
+    if (!metadata.childId) throw new Error('أدخل رمز الطفل.');
+    if (metadata.assessmentDate > today()) throw new Error('لا يمكن أن يكون تاريخ التقييم في المستقبل.');
+    if (metadata.birthDate && metadata.birthDate > metadata.assessmentDate) throw new Error('يجب أن يسبق تاريخ الميلاد تاريخ التقييم أو يوافقه.');
     $('#begin-test').disabled = true;
     // Preserve any previous draft; starting another assessment never erases it.
     const now = new Date().toISOString();
@@ -111,20 +113,20 @@ async function showTrial() {
     state.phase = 'loading';
     const entry = state.session.plan[state.session.records.length];
     const item = state.index.byId.get(entry.id);
-    if (!item) throw new Error('This saved trial is not in the current word bank. Finish a partial report and begin a new assessment.');
+    if (!item) throw new Error('الكلمة المحفوظة غير موجودة في البنك الحالي. أنهِ التقرير الجزئي وابدأ تقييماً جديداً.');
     const previous = state.session.current?.targetId === item.id ? state.session.current : null;
     const options = previous?.options || (state.session.mode === 'receptive' ? state.index.matrix(item.id) : [{ id: item.id, role: 'target' }]);
-    if (!options) throw new Error('This target has no complete distractor matrix. Review the word bank before continuing.');
+    if (!options) throw new Error('لا تتوفر أربع صور مناسبة لهذه الكلمة. راجع بنك الكلمات.');
     state.trial = { targetId: item.id, options, audioPlays: previous?.audioPlays || 0,
         elapsedMs: previous?.elapsedMs || 0, started: performance.now(), imagesReady: false, busy: false, playPending: false };
     state.session.current = { targetId: item.id, options, audioPlays: state.trial.audioPlays, elapsedMs: state.trial.elapsedMs };
-    $('#trial-heading').textContent = state.session.mode === 'receptive' ? 'Listen and choose the matching picture.' : 'Name the picture. Clinician: record the response.';
-    $('#trial-cohort').textContent = `COHORT ${entry.cohort} · ${COHORTS.find(c => c.id === entry.cohort).label.toUpperCase()}`;
-    $('#trial-count').textContent = `Item ${state.session.records.length + 1} of ${state.session.plan.length}`;
+    $('#trial-heading').textContent = state.session.mode === 'receptive' ? 'استمع واختر الصورة المناسبة.' : 'سمِّ الصورة. سجّل استجابة الطفل.';
+    $('#trial-cohort').textContent = COHORTS.find(c => c.id === entry.cohort).label;
+    $('#trial-count').textContent = `الكلمة ${state.session.records.length + 1} من ${state.session.plan.length}`;
     $('#trial-progress').max = state.session.plan.length; $('#trial-progress').value = state.session.records.length;
-    $('#trial-condition').textContent = state.session.mode === 'receptive' ? 'Four distinct pictures · Positions randomized · No correctness cues'
-        : state.session.audioMode === 'modeled' ? 'Audio-modeled naming · Score describes performance after a spoken model' : 'Unprompted naming · Playing the word will be recorded as a model';
-    $('#audio-status').textContent = 'Loading pictures…';
+    $('#trial-condition').textContent = state.session.mode === 'receptive' ? 'أربع صور بترتيب عشوائي'
+        : state.session.audioMode === 'modeled' ? 'تسمية بعد سماع نموذج صوتي' : 'تسمية مستقلة · يُسجّل تشغيل الكلمة كنموذج صوتي';
+    $('#audio-status').textContent = 'جاري تحميل الصور…';
     $('#grading-toolbar').hidden = state.session.mode !== 'expressive';
     $('#workspace').classList.toggle('expressive-workspace', state.session.mode === 'expressive');
     $('#workspace').replaceChildren();
@@ -134,7 +136,7 @@ async function showTrial() {
         const card = document.createElement(state.session.mode === 'receptive' ? 'button' : 'div');
         card.className = 'picture-card';
         if (card.tagName === 'BUTTON') {
-            card.type = 'button'; card.disabled = true; card.setAttribute('aria-label', `Picture ${position + 1}: ${cardItem.label}`);
+            card.type = 'button'; card.disabled = true; card.setAttribute('aria-label', `الصورة ${position + 1}: ${cardItem.label}`);
             card.addEventListener('click', guard(() => answer(option.role, option.id, generation)));
         }
         const image = document.createElement('img'); image.alt = cardItem.label; image.lang = 'ar'; image.decoding = 'async';
@@ -151,11 +153,11 @@ async function showTrial() {
     const results = await Promise.all(loaded); // At most four images, never the word bank.
     if (generation !== state.generation || state.phase === 'paused') return;
     state.phase = 'trial'; state.trial.imagesReady = results.every(Boolean); state.trial.started = performance.now();
-    if (!state.trial.imagesReady) $('#audio-status').textContent = 'A picture could not load. Reconnect, pause and retry, or mark this item not assessable.';
+    if (!state.trial.imagesReady) $('#audio-status').textContent = 'تعذر تحميل صورة. تحقق من الاتصال وأعد المحاولة، أو تخطَّ الكلمة.';
     else if (state.session.audioMode !== 'unprompted') await playWord(generation);
     else $('#audio-status').textContent = state.trial.audioPlays
-        ? `A spoken model was previously played for this item (${state.trial.audioPlays} play(s)).`
-        : 'No model played. Observe independent naming.';
+        ? `سبق تشغيل النموذج الصوتي لهذه الكلمة (${state.trial.audioPlays} مرة).`
+        : 'لم يُشغّل نموذج صوتي. راقب التسمية المستقلة.';
     enableResponses();
 }
 async function playWord(generation = state.generation) {
@@ -170,9 +172,9 @@ async function playWord(generation = state.generation) {
         trial.audioPlays++;
         state.session.current.audioPlays = trial.audioPlays;
         await persist(); // A manual cue must survive reload even in unprompted mode.
-        $('#audio-status').textContent = `Word playing · ${trial.audioPlays} play${trial.audioPlays === 1 ? '' : 's'}`;
+        $('#audio-status').textContent = `جاري تشغيل الكلمة · ${trial.audioPlays} مرة`;
     } catch {
-        if (generation === state.generation) { audio.pause(); $('#audio-status').textContent = 'Tap Play word to begin. If audio is unavailable, pause/reconnect or mark the item not assessable.'; }
+        if (generation === state.generation) { audio.pause(); $('#audio-status').textContent = 'اضغط تشغيل الكلمة للبدء. إذا تعذر الصوت، تحقق من الاتصال أو تخطَّ الكلمة.'; }
     } finally {
         clearTimeout(timer);
         trial.playPending = false;
@@ -191,7 +193,7 @@ async function answer(outcome, selectedId = '', generation = state.generation) {
         audioPlays: trial.audioPlays, audioPlayed: trial.audioPlays > 0, options: trial.options };
     state.session.records.push(record); state.session.current = null;
     try { await persist(); }
-    catch (error) { state.session.records.pop(); trial.busy = false; enableResponses(); throw new Error(`Response not saved: ${error.message}. Free device storage and try again.`); }
+    catch (error) { state.session.records.pop(); trial.busy = false; enableResponses(); throw new Error(`لم تُحفظ الاستجابة. وفر مساحة على الجهاز وأعد المحاولة. ${error.message}`); }
     if (state.phase === 'paused') return;
     await showTrial();
 }
@@ -201,11 +203,11 @@ async function pause() {
     state.phase = 'paused'; ++state.generation; stopAudio();
     if (trial && !trial.busy) state.session.current = { targetId: trial.targetId, options: trial.options,
         audioPlays: trial.audioPlays, elapsedMs: trial.elapsedMs + performance.now() - trial.started };
-    $('#paused-summary').textContent = `${state.session.records.length} of ${state.session.plan.length} responses saved for ${state.session.metadata.childId}.`;
+    $('#paused-summary').textContent = `تم حفظ ${state.session.records.length} من ${state.session.plan.length} استجابة للطفل ${state.session.metadata.childId}.`;
     view('paused'); await persist(); await refreshSessions();
 }
 async function resume(session) {
-    if (session.dataVersion !== state.data.version) throw new Error('The vocabulary bank has changed. Open this session’s partial report and begin a new assessment rather than mixing revisions.');
+    if (session.dataVersion !== state.data.version) throw new Error('تم تحديث بنك الكلمات. افتح التقرير الجزئي لهذا التقييم وابدأ تقييماً جديداً.');
     state.session = session; await showTrial();
 }
 async function finish(status) {
@@ -217,17 +219,17 @@ async function finish(status) {
 
 function renderHistory() {
     $('#session-list').replaceChildren();
-    if (!state.sessions.length) { const p = document.createElement('p'); p.className = 'panel'; p.textContent = 'No local assessments yet. Start a test or import an exported session.'; $('#session-list').append(p); }
+    if (!state.sessions.length) { const p = document.createElement('p'); p.className = 'panel'; p.textContent = 'لا توجد تقييمات محفوظة بعد.'; $('#session-list').append(p); }
     for (const session of state.sessions) {
         const row = document.createElement('article'); row.className = 'session-row';
         const content = document.createElement('div'), title = document.createElement('h2'), detail = document.createElement('p');
-        title.textContent = `${session.metadata.childId} · ${session.mode === 'receptive' ? 'Receptive comprehension' : 'Expressive naming'}`;
-        detail.textContent = `${session.metadata.assessmentDate} · ${session.status} · ${session.records.length} recorded · ${formatPercent(analyze(session).overall.accuracy)}`; detail.className = 'small';
+        title.textContent = `${session.metadata.childId} · ${session.mode === 'receptive' ? 'اللغة الاستقبالية' : 'اللغة التعبيرية'}`;
+        detail.textContent = `${session.metadata.assessmentDate} · ${statusLabel(session.status)} · ${session.records.length} استجابة · ${formatPercent(analyze(session).overall.accuracy)}`; detail.className = 'small';
         content.append(title, detail); row.append(content);
         const actions = document.createElement('div'); actions.className = 'button-row';
-        const open = document.createElement('button'); open.className = 'secondary'; open.textContent = 'Open report'; open.addEventListener('click', guard(() => openReport(session))); actions.append(open);
+        const open = document.createElement('button'); open.className = 'secondary'; open.textContent = 'فتح التقرير'; open.addEventListener('click', guard(() => openReport(session))); actions.append(open);
         if (session.status === 'draft') {
-            const continueButton = document.createElement('button'); continueButton.className = 'primary'; continueButton.textContent = 'Resume'; continueButton.addEventListener('click', guard(() => resume(session))); actions.append(continueButton);
+            const continueButton = document.createElement('button'); continueButton.className = 'primary'; continueButton.textContent = 'استكمال'; continueButton.addEventListener('click', guard(() => resume(session))); actions.append(continueButton);
         }
         row.append(actions); $('#session-list').append(row);
     }
@@ -235,9 +237,9 @@ function renderHistory() {
 async function openReport(session) {
     state.report = session; state.baseline = null;
     await refreshSessions();
-    const select = $('#baseline-select'); select.replaceChildren(new Option('No baseline', ''));
+    const select = $('#baseline-select'); select.replaceChildren(new Option('دون مقارنة', ''));
     for (const previous of state.sessions.filter(s => s.id !== session.id && s.status !== 'draft')) {
-        select.append(new Option(`${previous.metadata.assessmentDate} · ${previous.metadata.childId} · ${previous.mode}`, previous.id));
+        select.append(new Option(`${previous.metadata.assessmentDate} · ${previous.metadata.childId} · ${modeLabel(previous.mode)}`, previous.id));
     }
     drawReport(); view('report');
 }
@@ -249,76 +251,64 @@ function drawReport() {
 async function importFile(input, baseline = false) {
     const file = input.files[0]; if (!file) return;
     try {
-        if (file.size > 5 * 1024 * 1024) throw new Error('File exceeds the 5 MB limit.');
+        if (file.size > 5 * 1024 * 1024) throw new Error('حجم الملف يتجاوز ٥ ميغابايت.');
         const session = parseHistory(await file.text(), file.name);
-        if (!session.records.length) throw new Error('Import needs at least one recorded trial.');
+        if (!session.records.length) throw new Error('يجب أن يحتوي الملف على استجابة مسجلة واحدة على الأقل.');
         if (session.status === 'draft') { session.status = 'partial'; session.finishedAt ||= session.updatedAt; }
         const existing = state.sessions.find(s => s.id === session.id);
-        if (existing && JSON.stringify(existing.records) !== JSON.stringify(session.records)) throw new Error('A different local record already uses this session ID. Import a file with its original unique session ID.');
+        if (existing && JSON.stringify(existing.records) !== JSON.stringify(session.records)) throw new Error('يوجد تقييم مختلف يحمل المعرف نفسه. استورد الملف بمعرفه الأصلي.');
         if (!existing) await saveSession(session);
         await refreshSessions();
         if (baseline && state.report) {
-            if (session.id === state.report.id) throw new Error('Select a different session as the historical baseline.');
+            if (session.id === state.report.id) throw new Error('اختر تقييماً آخر للمقارنة.');
             const current = state.report; await openReport(current); state.baseline = session;
             $('#baseline-select').value = session.id; drawReport();
         } else renderHistory();
-        message('Session imported. Comparisons use matching scored items and compatible test conditions.');
+        message('تم استيراد التقييم. تعتمد المقارنة على الكلمات وشروط الاختبار المتطابقة.');
     } finally { input.value = ''; }
 }
 
-function renderReview() {
-    // One shared suggestion list, rather than hundreds of options per row.
-    const suggestions = $('#sound-pair-options'); suggestions.replaceChildren();
-    for (const item of state.index.items) suggestions.append(new Option(item.label, item.id));
-    $('#reference-list').replaceChildren();
-    for (const reference of REFERENCES) {
-        const li = document.createElement('li'), link = document.createElement('a'); link.href = reference.url; link.target = '_blank'; link.rel = 'noopener'; link.textContent = reference.title;
-        li.append(link, document.createTextNode(` — ${reference.note}`)); $('#reference-list').append(li);
-    }
-    $('#folder-mapping').replaceChildren();
-    for (const [mode, mapping] of Object.entries(FOLDER_COHORTS)) for (const cohort of COHORTS) {
-        const p = document.createElement('p'); p.textContent = `${mode} · ${cohort.id} (${cohort.label}): folders ${mapping[cohort.id].join(', ')}`; $('#folder-mapping').append(p);
-    }
-    $('#excluded-list').textContent = state.data.excluded.map(item => `${item.id} (${item.label}): ${item.missing.join(', ')}`).join(' · ') || 'All listed items have source media.';
-    renderReviewRows();
-}
-function renderReviewRows() {
-    const query = $('#bank-search').value.trim().toLowerCase(), filter = $('#bank-filter').value;
-    const items = state.index.items.filter(item => (!query || `${item.id} ${item.label} ${item.category}`.toLowerCase().includes(query)) &&
-        (!filter || assignCohort(item, 'receptive', state.overrides).cohort === filter));
-    const pageSize = 12, pages = Math.max(1, Math.ceil(items.length / pageSize)); state.reviewPage = Math.min(state.reviewPage, pages - 1);
-    $('#review-count').textContent = `${items.length} matching words · Page ${state.reviewPage + 1} of ${pages} · ${Object.keys(state.overrides).length} clinician-reviewed entries`;
-    $('#bank-prev').disabled = state.reviewPage === 0; $('#bank-next').disabled = state.reviewPage >= pages - 1;
-    $('#word-review').replaceChildren();
-    for (const item of items.slice(state.reviewPage * pageSize, (state.reviewPage + 1) * pageSize)) {
-        const row = document.createElement('article'); row.className = 'review-row';
-        const word = document.createElement('div'), label = document.createElement('span'), basis = document.createElement('small');
-        label.textContent = item.label; label.lang = 'ar'; label.dir = 'rtl'; label.className = 'review-word';
-        basis.textContent = `${item.id} · ${item.category} · ${assignCohort(item, 'receptive', state.overrides).basis}`; word.append(label, basis); row.append(word);
-        const controls = {};
-        for (const mode of ['receptive', 'expressive']) {
-            const field = document.createElement('label'); field.textContent = mode;
-            const select = document.createElement('select'); select.setAttribute('aria-label', `${mode} cohort for ${item.label}`);
-            select.append(new Option(`Automatic (${assignCohort(item, mode).cohort})`, ''));
-            for (const cohort of COHORTS) select.append(new Option(`${cohort.id} · ${cohort.label}`, cohort.id));
-            select.value = state.overrides[item.id]?.[mode] || ''; field.append(select); row.append(field); controls[mode] = select;
+async function renderWordTables() {
+    const container = $('#word-tables');
+    container.replaceChildren();
+    if (!state.index) return;
+    for (const mode of ['receptive', 'expressive']) {
+        // Use the same full checklist as assessment setup, including saved
+        // assignments and receptive targets with a complete distractor matrix.
+        const checklist = await buildChecklist(state.index, mode, 'full', 'all', state.overrides);
+        const cohorts = new Map(checklist.plan.map(entry => [entry.id, entry.cohort]));
+        const panel = document.createElement('section'); panel.className = 'panel table-scroll';
+        const table = document.createElement('table'); table.className = 'word-bank-table'; table.dataset.mode = mode;
+        const caption = table.createCaption(); caption.textContent = mode === 'receptive' ? 'اللغة الاستقبالية' : 'اللغة التعبيرية';
+        const header = table.createTHead().insertRow();
+        for (const title of ['المجموعة الفرعية', 'العمر', 'الكلمات المختبرة']) {
+            const th = document.createElement('th'); th.scope = 'col'; th.textContent = title; header.append(th);
         }
-        const field = document.createElement('label'); field.textContent = 'Reviewed sound pair (item ID)';
-        const pairInput = document.createElement('input'); pairInput.setAttribute('aria-label', `Phonological pair for ${item.label}`);
-        pairInput.setAttribute('list', 'sound-pair-options'); pairInput.placeholder = 'Automatic / e.g. 15-3'; pairInput.maxLength = 8;
-        pairInput.value = state.overrides[item.id]?.phonological || ''; field.append(pairInput); row.append(field);
-        const save = document.createElement('button'); save.className = 'secondary'; save.textContent = 'Save';
-        save.addEventListener('click', guard(async () => {
-            const pair = pairInput.value.trim(), candidate = state.index.byId.get(pair);
-            if (pair && (!candidate || candidate.cluster === item.cluster || candidate.word === item.word || candidate.imageRevision === item.imageRevision)) throw new Error('Choose an existing, distinct word from a different semantic cluster with different artwork.');
-            const value = { receptive: controls.receptive.value, expressive: controls.expressive.value, phonological: pair, reviewedAt: new Date().toISOString() };
-            const overrides = { ...state.overrides }, revision = (state.reviewRevision || 0) + 1;
-            if (value.receptive || value.expressive || value.phonological) overrides[item.id] = value; else delete overrides[item.id];
-            await saveSetting('review', { overrides, revision });
-            state.overrides = overrides; state.reviewRevision = revision;
-            state.index = createIndex(state.data.items, state.overrides); renderReviewRows(); message('Assignment saved for future assessments.');
-        }));
-        row.append(save); $('#word-review').append(row);
+        const body = table.createTBody();
+        for (const cohort of COHORTS) {
+            const groups = new Map();
+            for (const item of state.index.items) {
+                if (cohorts.get(item.id) !== cohort.id) continue;
+                if (!groups.has(item.category)) groups.set(item.category, []);
+                groups.get(item.category).push(item);
+            }
+            for (const [category, items] of groups) {
+                const row = body.insertRow(); row.dataset.cohort = cohort.id;
+                const group = document.createElement('th'); group.scope = 'row'; group.textContent = category; row.append(group);
+                row.insertCell().textContent = cohort.label;
+                const words = row.insertCell(); words.className = 'bank-words';
+                items.forEach((item, i) => {
+                    if (i) words.append(document.createTextNode('، '));
+                    const word = document.createElement('span'); word.textContent = item.label; word.dataset.item = item.id; words.append(word);
+                });
+            }
+            if (!groups.size) {
+                const row = body.insertRow(); row.dataset.cohort = cohort.id;
+                row.insertCell().textContent = '—'; row.insertCell().textContent = cohort.label;
+                row.insertCell().textContent = 'لا توجد كلمات متاحة للاختبار';
+            }
+        }
+        panel.append(table); container.append(panel);
     }
 }
 
@@ -327,7 +317,7 @@ all('[data-start]').forEach(button => { button.disabled = true; button.addEventL
 form.addEventListener('submit', event => { event.preventDefault(); void guard(begin)(event); });
 for (const name of ['scope', 'sampling']) form.elements[name].addEventListener('change', guard(preparePlan));
 $('#replay-audio').addEventListener('click', guard(() => playWord()));
-audio.addEventListener('ended', () => { if (state.phase === 'trial') $('#audio-status').textContent = `Word played · ${state.trial.audioPlays} play(s)`; });
+audio.addEventListener('ended', () => { if (state.phase === 'trial') $('#audio-status').textContent = `تم تشغيل الكلمة · ${state.trial.audioPlays} مرة`; });
 all('[data-grade]').forEach(button => button.addEventListener('click', guard(() => answer(button.dataset.grade))));
 $('#skip-item').addEventListener('click', guard(() => answer('skip')));
 $('#pause-test').addEventListener('click', guard(pause));
@@ -340,15 +330,12 @@ $('#baseline-select').addEventListener('change', () => { state.baseline = state.
 $('#export-json').addEventListener('click', () => downloadSession(state.report, 'json'));
 $('#export-csv').addEventListener('click', () => downloadSession(state.report, 'csv'));
 $('#print-report').addEventListener('click', guard(printReport));
-for (const selector of ['#bank-search', '#bank-filter']) $(selector).addEventListener('input', () => { state.reviewPage = 0; renderReviewRows(); });
-$('#bank-prev').addEventListener('click', () => { state.reviewPage--; renderReviewRows(); });
-$('#bank-next').addEventListener('click', () => { state.reviewPage++; renderReviewRows(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) void guard(pause)(); });
 window.addEventListener('pagehide', () => { audio.pause(); });
 
 async function initialize() {
     const response = await fetch('data/vocabulary.json');
-    if (!response.ok) throw new Error('The word bank could not load. Open the app online once and download the content.');
+    if (!response.ok) throw new Error('تعذر تحميل بنك الكلمات. افتح التطبيق مع الاتصال بالإنترنت ونزّل المحتوى.');
     state.data = await response.json();
     const review = await getSetting('review');
     state.overrides = review?.overrides || {}; state.reviewRevision = review?.revision || 0;
@@ -357,7 +344,6 @@ async function initialize() {
     if (clinician) for (const key of ['examiner', 'languages']) form.elements[key].value = clinician[key] || '';
     form.elements.assessmentDate.value = today();
     await refreshSessions();
-    $('#bank-count').textContent = `${state.data.items.length} available words · 40 source folders`;
     all('[data-start]').forEach(button => { button.disabled = false; });
 }
 void guard(initialize)();

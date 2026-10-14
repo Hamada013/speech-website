@@ -1,14 +1,14 @@
 import { COHORTS } from './validation.js';
 
 export const OUTCOMES = {
-    target: 'Target', phonological: 'Phonological distractor', semantic: 'Semantic distractor', unrelated: 'Unrelated distractor',
-    notMastered: 'Not mastered', learning: 'Learning / emergent', mastered: 'Mastered', skip: 'Not assessed'
+    target: 'الكلمة المستهدفة', phonological: 'مشتت صوتي', semantic: 'مشتت دلالي', unrelated: 'مشتت غير مرتبط',
+    notMastered: 'غير متقن', learning: 'قيد التعلم', mastered: 'متقن', skip: 'لم يُقيّم'
 };
 const scoreOf = record => record.outcome === 'target' || record.outcome === 'mastered' ? 1 : record.outcome === 'learning' ? .5 : 0;
 const percent = (part, total) => total ? Math.round(part / total * 1000) / 10 : null;
 export const formatPercent = value => value === null ? '—' : `${value.toFixed(1)}%`;
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-const deltaText = value => value === null ? '—' : `${value > 0 ? '+' : ''}${value.toFixed(1)} pp`;
+const deltaText = value => value === null ? '—' : `${value > 0 ? '+' : ''}${value.toFixed(1)} نقطة مئوية`;
 
 function metric(records) {
     const scored = records.filter(r => r.outcome !== 'skip');
@@ -27,29 +27,29 @@ export function analyze(session) {
     for (const error of errors) error.percentage = percent(error.count, errorTotal);
     // A transparent criterion band, never a manufactured age in months. Samples,
     // partial sessions, skipped items, or single-cohort tests cannot establish it.
-    let attainment = 'Not estimated — complete every eligible item in all four cohorts without skips.';
+    let attainment = 'غير مقدّر — يلزم إكمال جميع الكلمات في الفئات الأربع دون تخطي.';
     if (session.scope === 'full' && session.sampling === 'all' && session.status === 'complete' &&
         brackets.every(b => b.assessed >= 5 && b.assessed === b.eligible && b.skipped === 0)) {
         let highest = null;
         for (const bracket of brackets) { if (bracket.accuracy < 80) break; highest = bracket; }
-        attainment = highest ? `${highest.label} checklist band (≥80% in every preceding cohort)` : 'No cohort met the ≥80% consecutive criterion.';
+        attainment = highest ? `${highest.label} (٨٠٪ على الأقل في هذه الفئة وكل الفئات السابقة)` : 'لم تحقق أي فئة معيار ٨٠٪ المتتالي.';
     }
     return { overall, brackets, errors, errorTotal, attainment, languageAgeEquivalent: null,
         prompted: session.records.filter(r => r.audioPlayed).length };
 }
 
 export function compare(current, previous) {
-    if (!previous) return { compatible: false, reason: 'No baseline selected.' };
-    if (current.metadata.childId.trim().toLowerCase() !== previous.metadata.childId.trim().toLowerCase()) return { compatible: false, reason: 'Different child identifiers: scores are not compared.' };
-    if (current.mode !== previous.mode) return { compatible: false, reason: 'Different test modules: compare receptive with receptive, or expressive with expressive.' };
-    if (current.audioMode !== previous.audioMode) return { compatible: false, reason: 'Different audio conditions: modeled and unprompted naming are not comparable.' };
-    if (previous.metadata.assessmentDate > current.metadata.assessmentDate) return { compatible: false, reason: 'The selected baseline is dated after this assessment.' };
+    if (!previous) return { compatible: false, reason: 'لم يُحدد تقييم سابق للمقارنة.' };
+    if (current.metadata.childId.trim().toLowerCase() !== previous.metadata.childId.trim().toLowerCase()) return { compatible: false, reason: 'رمز الطفل مختلف؛ لا يمكن مقارنة النتائج.' };
+    if (current.mode !== previous.mode) return { compatible: false, reason: 'نوع التقييم مختلف؛ قارن تقييمين من النوع نفسه.' };
+    if (current.audioMode !== previous.audioMode) return { compatible: false, reason: 'شروط الصوت مختلفة؛ لا يمكن مقارنة التسمية المستقلة بالتسمية بعد النموذج.' };
+    if (previous.metadata.assessmentDate > current.metadata.assessmentDate) return { compatible: false, reason: 'التقييم المحدد للمقارنة أحدث من التقييم الحالي.' };
     const prior = new Map(previous.records.filter(r => r.outcome !== 'skip').map(r => [r.targetId, r]));
     const shared = current.records.filter(r => r.outcome !== 'skip' && prior.has(r.targetId)).filter(r => {
         const old = prior.get(r.targetId);
         return r.cohort === old.cohort && r.itemRevision === old.itemRevision && r.audioPlayed === old.audioPlayed;
     });
-    if (!shared.length) return { compatible: false, reason: 'No scored items share the same identity, media revision, cohort and audio-prompt condition.' };
+    if (!shared.length) return { compatible: false, reason: 'لا توجد كلمات مشتركة تتطابق في الفئة العمرية والصور وشروط الصوت.' };
     const rows = COHORTS.map(cohort => {
         const now = shared.filter(r => r.cohort === cohort.id);
         const before = now.map(r => prior.get(r.targetId));
@@ -65,51 +65,51 @@ export function compare(current, previous) {
 }
 
 function bar(label, current, previous = null) {
-    return `<div class="chart-row"><div class="chart-label">${escape(label)} <span>${formatPercent(current)}${previous === null ? '' : ` / ${formatPercent(previous)} baseline`}</span></div>
+    return `<div class="chart-row"><div class="chart-label">${escape(label)} <span>${formatPercent(current)}${previous === null ? '' : ` / ${formatPercent(previous)} سابقاً`}</span></div>
         <div class="bar-track"><div class="bar-current" style="width:${current ?? 0}%"></div></div>
         ${previous === null ? '' : `<div class="bar-track baseline"><div class="bar-previous" style="width:${previous}%"></div></div>`}</div>`;
 }
 function chronologicalAge(metadata) {
-    if (!metadata.birthDate) return 'Not provided';
+    if (!metadata.birthDate) return 'غير مسجل';
     const birth = new Date(`${metadata.birthDate}T12:00:00`), evaluation = new Date(`${metadata.assessmentDate}T12:00:00`);
     let months = (evaluation.getFullYear() - birth.getFullYear()) * 12 + evaluation.getMonth() - birth.getMonth();
     if (evaluation.getDate() < birth.getDate()) months--;
-    return `${Math.floor(months / 12)} years, ${months % 12} months`;
+    return `${Math.floor(months / 12)} سنة و${months % 12} شهر`;
 }
 export function renderReport(container, session, baseline = null, companion = null) {
     const result = analyze(session), comparison = compare(session, baseline);
-    const name = session.mode === 'receptive' ? 'Receptive comprehension' : 'Expressive naming';
-    const heading = session.mode === 'receptive' ? 'Correct target choices' : 'Mastered items';
+    const name = session.mode === 'receptive' ? 'اللغة الاستقبالية' : 'اللغة التعبيرية';
+    const heading = session.mode === 'receptive' ? 'الاختيارات الصحيحة' : 'الكلمات المتقنة';
     container.innerHTML = `<article class="clinical-report">
-        <header class="report-heading"><div><p class="eyebrow">VOCABULARY ASSESSMENT • CLINICAL WORKSHEET</p><h1>${name}</h1><p>${escape(session.metadata.assessmentDate)} · ${escape(session.status)} session · ${escape(session.id)}</p></div><span class="report-badge">Descriptive assessment</span></header>
+        <header class="report-heading"><div><p class="eyebrow">تقييم المفردات</p><h1>${name}</h1><p>${escape(session.metadata.assessmentDate)} · ${escape(({ complete: "مكتمل", partial: "جزئي", draft: "قيد التنفيذ" })[session.status])} · ${escape(session.id)}</p></div><span class="report-badge">تقييم وصفي</span></header>
         <dl class="metadata-grid">
-            <div><dt>Child / identifier</dt><dd>${escape(session.metadata.childName || 'Not provided')} / ${escape(session.metadata.childId)}</dd></div>
-            <div><dt>Chronological age</dt><dd>${escape(chronologicalAge(session.metadata))}</dd></div>
-            <div><dt>Examiner</dt><dd>${escape(session.metadata.examiner || 'Not provided')}</dd></div>
-            <div><dt>Languages / dialect</dt><dd>${escape(session.metadata.languages || 'Not provided')}</dd></div>
-            <div><dt>Scope / sampling</dt><dd>${escape(session.scope === 'full' ? 'All four cohorts' : COHORTS.find(c => c.id === session.scope)?.label)} / ${escape(session.sampling === 'all' ? 'All eligible items' : `${session.sampling} per cohort sample`)}</dd></div>
-            <div><dt>Audio condition</dt><dd>${escape(session.audioMode)} · ${result.prompted} items with audio model</dd></div>
+            <div><dt>الطفل / الرمز</dt><dd>${escape(session.metadata.childName || 'غير مسجل')} / ${escape(session.metadata.childId)}</dd></div>
+            <div><dt>العمر الزمني</dt><dd>${escape(chronologicalAge(session.metadata))}</dd></div>
+            <div><dt>الفاحص</dt><dd>${escape(session.metadata.examiner || 'غير مسجل')}</dd></div>
+            <div><dt>اللغة / اللهجة</dt><dd>${escape(session.metadata.languages || 'غير مسجل')}</dd></div>
+            <div><dt>الفئة / العينة</dt><dd>${escape(session.scope === 'full' ? 'جميع الفئات' : COHORTS.find(c => c.id === session.scope)?.label)} / ${escape(session.sampling === 'all' ? 'جميع الكلمات' : `${session.sampling} كلمة لكل فئة`)}</dd></div>
+            <div><dt>شروط الصوت</dt><dd>${escape(({ modeled: "بعد نموذج صوتي", unprompted: "تسمية مستقلة", "spoken-prompt": "كلمة مسموعة" })[session.audioMode])} · ${result.prompted} كلمة مع نموذج صوتي</dd></div>
         </dl>
-        <section class="report-section"><h2>Session overview</h2><div class="metric-grid">
+        <section class="report-section"><h2>نتائج التقييم</h2><div class="metric-grid">
             <div><strong>${formatPercent(result.overall.accuracy)}</strong><span>${heading}</span></div>
-            <div><strong>${result.overall.assessed}</strong><span>Scored / ${session.plan.length} planned</span></div>
-            <div><strong>${result.overall.skipped}</strong><span>Not assessed (excluded from accuracy)</span></div>
-            ${session.mode === 'expressive' ? `<div><strong>${formatPercent(result.overall.weighted)}</strong><span>Weighted index: mastered 1, emergent 0.5</span></div>` : ''}
+            <div><strong>${result.overall.assessed}</strong><span>كلمات مقيّمة / ${session.plan.length} مخططة</span></div>
+            <div><strong>${result.overall.skipped}</strong><span>لم تُقيّم (لا تدخل في الدقة)</span></div>
+            ${session.mode === 'expressive' ? `<div><strong>${formatPercent(result.overall.weighted)}</strong><span>المؤشر الموزون: متقن ١، قيد التعلم ٠٫٥</span></div>` : ''}
         </div>
-        ${companion ? `<p>Other module on this date: ${escape(companion.mode)} — ${formatPercent(analyze(companion).overall.accuracy)} (${analyze(companion).overall.assessed} scored items; separate session).</p>` : ''}
-        <div class="interpretation"><strong>Checklist attainment band:</strong> ${escape(result.attainment)}<br><strong>Standardized language-age equivalent:</strong> unavailable. The Arabic word bank and cohort rules have no item-level normative calibration. Cohort D is a local extension; ages 5–6 are not separately represented. Audio-modeled expressive scores do not measure independent naming.</div></section>
-        <section class="report-section"><h2>Performance by provisional age cohort</h2><p>Current bars show all scored items. Accuracy uses fully mastered/correct items; emergent items are reported separately.</p>
-        <div class="charts" aria-label="Performance by age cohort">${result.brackets.map(b => bar(b.label, b.accuracy)).join('')}</div>
-        <div class="table-scroll"><table><caption>Checklist scores and coverage</caption><thead><tr><th>Cohort</th><th>Scored / eligible</th><th>Correct / mastered</th><th>Emergent</th><th>Not assessed</th><th>${heading} %</th></tr></thead><tbody>${result.brackets.map(b => `<tr><th>${b.label}</th><td>${b.assessed} / ${b.eligible}</td><td>${b.mastered}</td><td>${b.learning}</td><td>${b.skipped}</td><td>${formatPercent(b.accuracy)}</td></tr>`).join('')}</tbody></table></div></section>
-        <section class="report-section error-profile"><h2>${session.mode === 'receptive' ? 'Choice-pattern analysis' : 'Expressive grading profile'}</h2>
-        ${session.mode === 'receptive' ? `<p>${result.errorTotal} incorrect selections. Percentages below use incorrect selections as the denominator; they describe choices, not a diagnosis. Phonological candidates are spelling-derived unless reviewed.</p>${result.errors.map(error => bar(`${OUTCOMES[error.type]}: ${error.count}`, error.percentage)).join('')}`
-            : `<p>Mastered: ${result.overall.mastered} · Emergent: ${result.overall.learning} · Not mastered: ${result.overall.assessed - result.overall.mastered - result.overall.learning}. Scoring is clinician-entered.</p>`}</section>
-        <section class="report-section"><h2>Historical comparison</h2>${baseline ? `<p>Baseline: ${escape(baseline.metadata.assessmentDate)} · ${escape(baseline.id)}</p>` : ''}
-        ${comparison.compatible ? `<p><strong>${deltaText(comparison.delta)}</strong> over ${comparison.days} days on ${comparison.count} shared, comparable items. Changes are absolute percentage-point differences, not percentage growth.</p><div class="legend"><span>● Current matched items</span><span>▰ Historical matched items</span></div>${comparison.rows.map(row => bar(`${row.label} · n=${row.count} · ${deltaText(row.delta)}`, row.current, row.previous)).join('')}
-            <table><caption>Matched-item progress</caption><thead><tr><th>Cohort</th><th>Shared items</th><th>Baseline</th><th>Current</th><th>Change</th></tr></thead><tbody>${comparison.rows.map(row => `<tr><th>${row.label}</th><td>${row.count}</td><td>${formatPercent(row.previous)}</td><td>${formatPercent(row.current)}</td><td>${deltaText(row.delta)}</td></tr>`).join('')}</tbody></table>` : `<p>${escape(comparison.reason)}</p>`}</section>
-        <section class="report-section"><h2>Clinical notes and provenance</h2><p class="preserve-lines">${escape(session.metadata.notes || 'No notes recorded.')}</p><p>Vocabulary revision: ${escape(session.dataVersion)}. Cohort rules: ${escape(session.configVersion)}. ${session.omitted.length} targets omitted because a complete receptive matrix was unavailable. ${session.missingMediaCount} word-bank entries excluded for missing source media.</p><p>General references: ASHA communication milestones and Kid Sense language development chart. Neither validates ages for these individual Arabic items. Review vocabulary, picture validity, recordings, dialect and sound relationships before clinical interpretation.</p></section>
-        <section class="report-section item-records"><h2>Item-level tracking</h2><table><caption>Each administered trial</caption><thead><tr><th>#</th><th>Word / ID</th><th>Cohort</th><th>Response</th><th>Selected word</th><th>Audio plays</th><th>Time (s)</th></tr></thead><tbody>${session.records.map((r, i) => `<tr><td>${i + 1}</td><td lang="ar" dir="rtl">${escape(r.label)} <small><bdi dir="ltr">${escape(r.targetId)}</bdi></small></td><td>${escape(r.cohort)}</td><td>${escape(OUTCOMES[r.outcome])}</td><td lang="ar" dir="rtl">${escape(r.selectedLabel || '—')}</td><td>${r.audioPlays}</td><td>${(r.latencyMs / 1000).toFixed(1)}</td></tr>`).join('')}</tbody></table></section>
-        <footer class="report-footer">Generated locally · ${escape(new Date().toISOString())} · No standardized language-age or diagnosis is inferred.</footer>
+        ${companion ? `<p>التقييم الآخر في هذا التاريخ: ${companion.mode === "receptive" ? "اللغة الاستقبالية" : "اللغة التعبيرية"} — ${formatPercent(analyze(companion).overall.accuracy)} (${analyze(companion).overall.assessed} كلمة مقيّمة؛ تقييم منفصل).</p>` : ''}
+        <div class="interpretation"><strong>الفئة المحققة في القائمة:</strong> ${escape(result.attainment)}<br><strong>العمر اللغوي المعياري:</strong> غير متاح. هذه قوائم وصفية وليست اختباراً معيارياً للعمر اللغوي. التسمية بعد سماع الكلمة لا تقيس التسمية المستقلة.</div></section>
+        <section class="report-section"><h2>الأداء حسب الفئة العمرية</h2><p>تُحسب الدقة من الكلمات الصحيحة أو المتقنة. تُعرض الكلمات قيد التعلم بشكل منفصل.</p>
+        <div class="charts" aria-label="الأداء حسب العمر">${result.brackets.map(b => bar(b.label, b.accuracy)).join('')}</div>
+        <div class="table-scroll"><table><caption>النتائج وتغطية الاختبار</caption><thead><tr><th>الفئة العمرية</th><th>المقيّم / المتاح</th><th>صحيح / متقن</th><th>قيد التعلم</th><th>لم يُقيّم</th><th>${heading} %</th></tr></thead><tbody>${result.brackets.map(b => `<tr><th>${b.label}</th><td>${b.assessed} / ${b.eligible}</td><td>${b.mastered}</td><td>${b.learning}</td><td>${b.skipped}</td><td>${formatPercent(b.accuracy)}</td></tr>`).join('')}</tbody></table></div></section>
+        <section class="report-section error-profile"><h2>${session.mode === 'receptive' ? 'تحليل الاختيارات' : 'درجات اللغة التعبيرية'}</h2>
+        ${session.mode === 'receptive' ? `<p>${result.errorTotal} اختيار غير صحيح. تُحسب النسب التالية من الأخطاء فقط وهي وصف للاختيارات. المشتتات الصوتية التلقائية مبنية على التشابه الكتابي.</p>${result.errors.map(error => bar(`${OUTCOMES[error.type]}: ${error.count}`, error.percentage)).join('')}`
+            : `<p>متقن: ${result.overall.mastered} · قيد التعلم: ${result.overall.learning} · غير متقن: ${result.overall.assessed - result.overall.mastered - result.overall.learning}. يُسجل الفاحص الدرجات.</p>`}</section>
+        <section class="report-section"><h2>المقارنة بالتقييم السابق</h2>${baseline ? `<p>التقييم السابق: ${escape(baseline.metadata.assessmentDate)} · ${escape(baseline.id)}</p>` : ''}
+        ${comparison.compatible ? `<p><strong>${deltaText(comparison.delta)}</strong> خلال ${comparison.days} يوم على ${comparison.count} كلمة مشتركة قابلة للمقارنة. التغير محسوب بالنقاط المئوية.</p><div class="legend"><span>● الكلمات المشتركة الحالية</span><span>▰ الكلمات المشتركة السابقة</span></div>${comparison.rows.map(row => bar(`${row.label} · العدد ${row.count} · ${deltaText(row.delta)}`, row.current, row.previous)).join('')}
+            <table><caption>تقدم الكلمات المشتركة</caption><thead><tr><th>الفئة العمرية</th><th>الكلمات المشتركة</th><th>السابق</th><th>الحالي</th><th>التغير</th></tr></thead><tbody>${comparison.rows.map(row => `<tr><th>${row.label}</th><td>${row.count}</td><td>${formatPercent(row.previous)}</td><td>${formatPercent(row.current)}</td><td>${deltaText(row.delta)}</td></tr>`).join('')}</tbody></table>` : `<p>${escape(comparison.reason)}</p>`}</section>
+        <section class="report-section"><h2>ملاحظات التقييم</h2><p class="preserve-lines">${escape(session.metadata.notes || 'لا توجد ملاحظات.')}</p><p>إصدار المفردات: ${escape(session.dataVersion)}. قواعد الفئات: ${escape(session.configVersion)}. ${session.omitted.length} كلمة غير متاحة للاختبار الاستقبالي لعدم اكتمال صور الخيارات. ${session.missingMediaCount} كلمة مستبعدة لنقص الصور أو الأصوات.</p></section>
+        <section class="report-section item-records"><h2>تتبع الكلمات</h2><table><caption>الكلمات التي تم اختبارها</caption><thead><tr><th>#</th><th>الكلمة / الرمز</th><th>الفئة العمرية</th><th>الاستجابة</th><th>الكلمة المختارة</th><th>مرات تشغيل الصوت</th><th>الوقت (ث)</th></tr></thead><tbody>${session.records.map((r, i) => `<tr><td>${i + 1}</td><td lang="ar" dir="rtl">${escape(r.label)} <small><bdi dir="ltr">${escape(r.targetId)}</bdi></small></td><td>${escape(COHORTS.find(c => c.id === r.cohort)?.label)}</td><td>${escape(OUTCOMES[r.outcome])}</td><td lang="ar" dir="rtl">${escape(r.selectedLabel || '—')}</td><td>${r.audioPlays}</td><td>${(r.latencyMs / 1000).toFixed(1)}</td></tr>`).join('')}</tbody></table></section>
+        <footer class="report-footer">أُنشئ على هذا الجهاز · ${escape(new Date().toISOString())} · لا يُستنتج عمر لغوي معياري أو تشخيص من هذا التقرير.</footer>
     </article>`;
     return { result, comparison };
 }
@@ -181,7 +181,7 @@ export function validateSession(raw) {
     const cohort = value => { if (!['A', 'B', 'C', 'D'].includes(value)) throw new Error('Invalid cohort.'); return value; };
     const id = value => { if (!/^([1-9]|[1-3]\d|40)-[1-9]\d{0,2}$/.test(value)) throw new Error('Invalid vocabulary item identifier.'); return value; };
     const numeric = (value, max) => { const n = Number(value); if (!Number.isFinite(n) || n < 0 || n > max) throw new Error('Invalid numeric field.'); return n; };
-    if (raw.mode === 'receptive' && raw.audioMode !== 'spoken-prompt' || raw.mode === 'expressive' && raw.audioMode === 'spoken-prompt') throw new Error('Audio condition does not match the test module.');
+    if (raw.mode === 'receptive' && raw.audioMode !== 'spoken-prompt' || raw.mode === 'expressive' && raw.audioMode === 'spoken-prompt') throw new Error('شروط الصوت does not match the test module.');
     const plan = raw.plan.map(item => ({ id: id(item.id), cohort: cohort(item.cohort),
         ...(item.basis ? { basis: string(item.basis), reviewed: item.reviewed === true, validated: false } : {}) }));
     if (new Set(plan.map(item => item.id)).size !== plan.length) throw new Error('Duplicate planned items.');

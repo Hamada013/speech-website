@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#246b86">
   <meta name="description" content="Bilingual VB-MAPP assessment workspace, milestones profile, stimulus mapping and PDF reports by Ahmad Ghanem.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="VB-MAPP">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/mark.svg">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <title>VB-MAPP · Ahmad Ghanem</title>
   <link rel="stylesheet" href="assets/styles.css">
 </head>
@@ -13,7 +20,7 @@
   <header class="app-header">
     <div class="header-line">
       <div><p class="eyebrow">AHMAD GHANEM · SLP</p><h1>VB-MAPP</h1><p data-en="Assessment, learning profile and planning" data-ar="التقييم وملف المهارات والتخطيط">التقييم وملف المهارات والتخطيط</p></div>
-      <div class="header-actions"><button id="language" type="button">English</button><button type="button" data-page="report" class="primary" data-en="Review report" data-ar="مراجعة التقرير">مراجعة التقرير</button></div>
+      <div class="header-actions"><button type="button" class="install-icon" data-install aria-label="إضافة إلى الشاشة الرئيسية" title="إضافة إلى الشاشة الرئيسية"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v4h16v-4"/></svg></button><button id="language" type="button">English</button><button type="button" data-page="report" class="primary" data-en="Review report" data-ar="مراجعة التقرير">مراجعة التقرير</button></div>
     </div>
     <nav id="navigation" aria-label="Assessment sections"></nav>
   </header>
@@ -28,10 +35,13 @@
   <dialog id="imageDialog" class="image-dialog" aria-label="Child-facing stimulus"><div class="dialog-header"><span id="stimulusCounter"></span><button type="button" data-close="imageDialog" data-en="Close" data-ar="إغلاق">إغلاق</button></div><div id="imageBody"></div><div id="imageControls"></div></dialog>
   <dialog id="importDialog" aria-labelledby="importTitle"><div class="dialog-header"><h2 id="importTitle" data-en="Review previous assessment" data-ar="مراجعة التقييم السابق">مراجعة التقييم السابق</h2><button type="button" data-close="importDialog" data-en="Cancel" data-ar="إلغاء">إلغاء</button></div><div id="importBody"></div></dialog>
   <p id="appStatus" class="app-status" role="status" aria-live="polite"></p>
+  <dialog id="installDialog" aria-labelledby="installTitle"><div class="dialog-header"><h2 id="installTitle">VB-MAPP</h2><button type="button" data-install-close aria-label="إغلاق">×</button></div><p data-install-help></p><p data-install-status role="status" aria-live="polite"></p></dialog>
   <div id="printArea" class="report-document"></div>
   <script src="assets/data.js"></script>
   <script src="assets/stimuli.js"></script>
   <script src="assets/review.js"></script>
+  <script src="assets/manual-data.js"></script>
+  <script src="assets/manual.js"></script>
   <script src="assets/model.js"></script>
   <script src="assets/report.js"></script>
   <script src="assets/pdf-data.js"></script>
@@ -40,5 +50,6 @@
   <script src="assets/html2canvas.min.js" defer></script>
   <script src="assets/pdf.js" defer></script>
   <script src="assets/app.js" defer></script>
+  <script src="assets/install.js" defer></script>
 </body>
 </html>

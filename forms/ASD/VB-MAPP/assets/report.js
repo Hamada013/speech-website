@@ -52,170 +52,85 @@
     return `<div class="grid-legend" style="${levelStyle(3)}">${[['cell-full', '1', 'Met', 'متحقق'], ['cell-half', '½', 'Emerging', 'ناشئ'], ['cell-zero', '0', 'Not met', 'غير متحقق'], ['cell-unassessed', '·', 'Not assessed', 'غير مقيم']].map(([cls, symbol, en, ar]) => `<span><i class="${cls}">${symbol}</i>${pick(lang, en, ar)}</span>`).join('')}</div>`;
   }
   function make(s, data) {
-    const lang = s.reportLang, tr = (en, ar) => pick(lang, en, ar);
-    const blocks = [];
-    const add = (html, text) => blocks.push({ html: `<div class="report-block">${html}</div>`, text });
-    const heading = (en, ar) => add(`<h2>${tr(en, ar)}</h2>`, '\n' + tr(en, ar));
-    const table = (headers, rows, css = '') => {
-      // Bounded table blocks keep rows together and repeat labels on new pages.
-      for (let at=0;at<rows.length;at+=8) {
-        const chunk=rows.slice(at,at+8);
-        add(`<div class="report-table-scroll"><table class="report-table ${css}"><thead><tr>${headers.map(h=>`<th scope="col">${esc(h)}</th>`).join('')}</tr></thead><tbody>${chunk.map(row=>`<tr>${row.map(cell=>`<td><bdi dir="${valueDirection(cell)}">${esc(cell)}</bdi></td>`).join('')}</tr>`).join('')}</tbody></table></div>`,[headers.join(' | '),...chunk.map(row=>row.join(' | '))].join('\n'));
+    const lang = s.reportLang, tr = (en, ar) => pick(lang, en, ar), old = M.previous(s), blocks = [];
+    const all = M.allMilestones(data), types = Object.keys(s.reportScope).filter(type => s.reportScope[type]);
+    const typeNames = { milestones:['Milestones','المعالم'], barriers:['Barriers','العوائق'], transitions:['Transition','الانتقال'], eesa:['EESA','التقليد الصوتي المبكر'], tasks:['Supporting skills','المهارات الداعمة'] };
+    const add = (html, text, sheet = false) => blocks.push({ html:`<div class="report-block${sheet ? ' milestone-sheet-block' : ''}">${html}</div>`, text, pageBreakAfter:sheet });
+    const heading = (en, ar) => add(`<h2>${tr(en, ar)}</h2>`, tr(en, ar));
+    function table(headers, rows) {
+      for (let at=0; at<rows.length; at+=8) {
+        const part=rows.slice(at,at+8);
+        add(`<div class="report-table-scroll"><table class="report-table"><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${part.map(row=>`<tr>${row.map(cell=>`<td><bdi dir="${valueDirection(cell)}">${esc(cell)}</bdi></td>`).join('')}</tr>`).join('')}</tbody></table></div>`,[headers.join(' | '),...part.map(row=>row.join(' | '))].join('\n'));
       }
-    };
-    const paragraph = (title, value, related = null) => {
-      const content = String(value || tr('Not recorded', 'غير مسجل'));
-      // Keep user-entered notes in bounded blocks so long notes paginate safely.
-      const chunks = content.match(/[\s\S]{1,700}(?:\s|$)|[\s\S]{1,700}/g) || [content];
-      chunks.forEach((part, index) => {
-        // Keep the previous result with its item description, including at page breaks.
-        const tail = related && index === chunks.length - 1 ? related : null;
-        add(`<p><strong>${esc(title)}${index ? ' ' + tr('(continued)', '(تابع)') : ''}:</strong> <bdi dir="${valueDirection(part)}">${esc(part)}</bdi></p>${tail ? `<p><strong>${esc(tail.title)}:</strong> <bdi dir="${valueDirection(tail.value)}">${esc(tail.value)}</bdi></p>` : ''}`, `${title}${index ? ' ' + tr('(continued)', '(تابع)') : ''}: ${part}${tail ? '\n\n' + tail.title + ': ' + tail.value : ''}`);
-      });
-    };
-    const groupShortRecord = start => {
-      const parts=blocks.slice(start), text=parts.map(block=>block.text).join('\n\n');
-      // Keep short plans and item evidence together; long notes retain bounded chunks.
-      if(parts.length>1 && text.length<=1400)blocks.splice(start,parts.length,{html:`<div class="report-block goal-plan">${parts.map(block=>block.html).join('')}</div>`,text});
-    };
-    // Separate direction runs so the canvas exporter retains Arabic shaping in the title.
-    const reportTitle = lang === 'ar' ? '<span dir="rtl">تقرير تقييم</span><span dir="ltr">VB-MAPP</span>' : '<span>VB-MAPP Assessment Report</span>';
-    add(`<header class="report-heading"><p>Ahmad Ghanem · ${tr('Speech and Language Pathology', 'اختصاص النطق واللغة')}</p><h1>${reportTitle}</h1></header>`, tr('VB-MAPP Assessment Report', 'تقرير تقييم VB-MAPP'));
-    heading('Child and assessment information', 'معلومات الطفل والتقييم');
-    const fields = { name: ['Child name', 'اسم الطفل'], dob: ['Date of birth', 'تاريخ الميلاد'], tester: ['Assessor', 'الفاحص'], guardian: ['Parent / caregiver', 'ولي الأمر / مقدم الرعاية'], language: ['Language / dialect and communication modes', 'اللغة / اللهجة ووسائل التواصل'], reason: ['Reason for assessment', 'سبب التقييم'], setting: ['Setting and sources of information', 'البيئة ومصادر المعلومات'], relevant: ['Relevant background / supports', 'الخلفية ذات الصلة / الدعم المستخدم'] };
-    table([tr('Field','البيان'),tr('Details','التفاصيل')], [
-      [tr('Child name','اسم الطفل'), s.child.name || tr('Not recorded','غير مسجل')],
-      [tr('Date of birth','تاريخ الميلاد'), s.child.dob || tr('Not recorded','غير مسجل')],
-      [tr('Assessment date / number','تاريخ التقييم / رقمه'), `${s.date} / ${s.number}`],
-      [tr('Assessor','الفاحص'), s.child.tester || tr('Not recorded','غير مسجل')],
-      [tr('Parent / caregiver','ولي الأمر / مقدم الرعاية'), s.child.guardian || tr('Not recorded','غير مسجل')],
-      [tr('Language / communication modes','اللغة / وسائل التواصل'), s.child.language || tr('Not recorded','غير مسجل')]
-    ],'child-table');
-    for(const key of ['reason','setting','relevant']) if(s.child[key])paragraph(tr(...fields[key]),s.child[key]);
-    const age = M.ageOn(s.child.dob, s.date);
-    if (age !== null) paragraph(tr('Chronological age at assessment', 'العمر الزمني عند التقييم'), tr(`${Math.floor(age / 12)} years, ${age % 12} months`, `${Math.floor(age / 12)} سنة و${age % 12} شهر`));
-    heading('Scope and completion', 'نطاق التقييم واكتماله');
-    const typeNames = { milestones: ['Milestones', 'المعالم النمائية'], barriers: ['Barriers', 'العوائق'], transitions: ['Transition', 'الانتقال'], eesa: ['EESA', 'التقليد الصوتي المبكر EESA'], tasks: ['Supporting skills', 'المهارات الداعمة'] };
-    const types = Object.keys(typeNames).filter(type => s.reportScope[type]);
-    const old=M.previous(s);
-    paragraph(tr('Sections included', 'الأقسام المشمولة'), types.length ? types.map(type => tr(...typeNames[type])).join(' / ') : tr('None selected', 'لم يُحدد أي قسم'));
-    for (const type of types) {
-      const st = M.stats(s, M.records(data, type), type);
-      paragraph(tr(...typeNames[type]), tr(`${st.assessed}/${st.total} assessed; ${st.unassessed + st.missing} unassessed. Recorded score: ${st.assessed ? st.score : 'Not assessed'}.`, `مقيم: ${st.assessed}/${st.total}؛ غير مقيم: ${st.unassessed + st.missing}. مجموع الدرجات المسجلة: ${st.assessed ? st.score : 'غير مقيم'}.`));
-      if (st.pending) paragraph(tr('Preserved results needing review', 'نتائج محفوظة تحتاج إلى مراجعة'), tr(`${st.pending} previous results are excluded from totals, current goals, and interpretation until re-scored under valid criteria.`, `لا تدخل ${st.pending} نتيجة سابقة في المجاميع والأهداف الحالية والتفسير حتى إعادة تسجيلها وفق معايير صالحة.`));
     }
-    if(old) {
-      heading('Follow-up and comparison','المتابعة والمقارنة');
-      paragraph(tr('Previous assessment','التقييم السابق'), `${old.date} / ${old.number}`);
-      paragraph(tr('Current assessment','التقييم الحالي'), `${s.date} / ${s.number}`);
-      paragraph(tr('Comparison scope','نطاق المقارنة'),tr('Previous marks are reference results. Items not re-tested have no current score. Score changes are compared only when both assessments use the same item criterion.','الدرجات السابقة نتائج مرجعية. لا توجد درجة حالية للبنود التي لم تُعد معاينتها. تُقارن تغيّرات الدرجات عندما يستخدم التقييمان معيار البند نفسه.'));
-      if(types.includes('milestones')) {
-        const p=M.progress(s,data);
-        table([tr('Measure','المؤشر'),tr('Count / score','العدد / الدرجة')],[
-          [tr('Higher score','درجة أعلى'), String(p.higher)],
-          [tr('Lower score','درجة أدنى'), String(p.lower)],
-          [tr('Same score','درجة ثابتة'), String(p.same)],
-          [tr('Newly assessed','مقيم لأول مرة'), String(p.new)],
-          [tr('Awaiting retest','بانتظار إعادة التقييم'), String(p.retest)],
-          [tr('Different criteria - not compared','معايير مختلفة - دون مقارنة'), String(p['criteria-changed'])],
-          [tr('Same-item total: previous','مجموع البنود المشتركة: التقييم السابق'), String(p.pairedPrevious)],
-          [tr('Same-item total: current','مجموع البنود المشتركة: التقييم الحالي'), String(p.pairedCurrent)]
-        ]);
-      }
-      table([tr('Previous visit','الزيارة السابقة'),tr('Assessment','التقييم'),tr('Milestones recorded','المعالم المسجلة')],s.history.map(record=>[record.date,record.number,types.includes('milestones')?String(M.stats(record,M.allMilestones(data),'milestones').assessed):tr('Outside report scope','خارج نطاق التقرير')]));
+    function note(title, value) {
+      if (!value?.trim()) return;
+      const parts=value.match(/[\s\S]{1,650}(?:\s|$)|[\s\S]{1,650}/g) || [value];
+      parts.forEach((part,i)=>add(`<p><strong>${esc(title)}${i ? ' '+tr('(continued)','(تابع)') : ''}:</strong> <bdi dir="auto">${esc(part)}</bdi></p>`,`${title}: ${part}`));
     }
-    paragraph(tr('Assessment status', 'حالة التقييم'), tr('A focused or partial assessment is permitted. Unassessed records are not zero scores. Only the selected sections are interpreted below.', 'يمكن إجراء تقييم جزئي أو لقسم واحد. البنود غير المقيمة لا تُعد درجات صفرية. يقتصر التحليل أدناه على الأقسام المحددة.'));
-    if (types.includes('tasks')) paragraph(tr('Supporting-skills coverage', 'تغطية المهارات الداعمة'), tr('Only the five supporting-skill entries present in the original file are available; this is not the full task-analysis inventory.', 'تتوفر البنود الخمسة الموجودة في الملف الأصلي فقط؛ ولا تمثل القائمة الكاملة لتحليل المهام.'));
-    if (s.migration) paragraph(tr('Imported results', 'النتائج المستوردة'), tr('Imported results require review against current observations.', 'تحتاج النتائج المستوردة إلى مراجعة وفق الملاحظات الحالية.'));
-    heading('Clinical observations', 'الملاحظات السريرية'); paragraph(tr('Observation summary', 'ملخص الملاحظات'), s.clinical);
+    const child = `${tr('Child','الطفل')}: ${s.child.name || tr('Not recorded','غير مسجل')}`;
+    const visit = `${tr('Date','التاريخ')}: ${s.date} · ${tr('Assessment','التقييم')}: ${s.number}`;
+    const age=M.ageOn(s.child.dob,s.date);
+    const caseLine=[s.child.dob ? `${tr('Birth','الميلاد')}: ${s.child.dob}` : '',age===null?'':tr(`Age: ${Math.floor(age/12)}y ${age%12}m`,`العمر: ${Math.floor(age/12)} سنة و${age%12} شهر`),s.child.tester ? `${tr('Assessor','الفاحص')}: ${s.child.tester}` : ''].filter(Boolean).join(' · ');
+    const caseHTML=[
+      s.child.dob ? `<span>${tr('Birth','الميلاد')}: <bdi dir="ltr">${esc(s.child.dob)}</bdi></span>` : '',
+      age===null ? '' : `<span>${tr('Age','العمر')}: <bdi dir="ltr">${Math.floor(age/12)}</bdi> ${tr('y','سنة')} <bdi dir="ltr">${age%12}</bdi> ${tr('m','شهر')}</span>`,
+      s.child.tester ? `<span>${tr('Assessor','الفاحص')}: <bdi dir="auto">${esc(s.child.tester)}</bdi></span>` : ''
+    ].filter(Boolean).join('');
     if (types.includes('milestones')) {
-      heading('Milestones master grid', 'جدول المعالم النمائية الرئيسي');
-      add(legend(lang, s.color) + (old ? `<p class="comparison-key">${tr('Large mark = current score. P = previous score; ! = previous result requires re-scoring. A dot means no score recorded at this visit.','العلامة الكبيرة = الدرجة الحالية. P = الدرجة السابقة؛ ! = نتيجة سابقة تحتاج إلى إعادة التسجيل. النقطة تعني عدم تسجيل درجة في هذه الزيارة.')}</p>` : ''), tr('Grid: 1 = met; 0.5 = emerging; 0 = not met; dot = not assessed.', 'الجدول: 1 متحقق؛ 0.5 ناشئ؛ 0 غير متحقق؛ النقطة غير مقيم.'));
-      grid(s, data, lang).forEach((html, i) => add(html, tr(`Level ${3 - i} grid`, `جدول المستوى ${3 - i}`)));
-      for (const cat of data.categories) {
-        const st = M.stats(s, M.allMilestones(data).filter(i => i.category === cat), 'milestones');
-        add(`<div class="profile-row"><span>${esc(label(data, cat, lang))}</span><div class="profile-track"><i style="width:${st.score / st.total * 100}%;background:#6c99bd"></i></div><b dir="ltr">${st.assessed ? st.score : '-'} / ${st.total}</b><small>${st.assessed} ${tr('assessed', 'مقيم')}</small></div>`, `${label(data, cat, lang)}: ${st.assessed ? st.score : tr('Not assessed', 'غير مقيم')}/${st.total}; ${st.assessed} ${tr('assessed', 'مقيم')}`);
-      }
-      if(old) {
-        heading('Milestone changes and items to re-test','تغيرات المعالم والبنود التي تحتاج إلى إعادة التقييم');
-        const statusLabels={higher:['Higher score','درجة أعلى'],lower:['Lower score','درجة أدنى'],same:['Same score','درجة ثابتة'],new:['Newly assessed','مقيم لأول مرة'],retest:['Awaiting retest','بانتظار إعادة التقييم'],'criteria-changed':['Different criteria','معايير مختلفة'],unassessed:['Not assessed','غير مقيم']};
-        const rows=M.allMilestones(data).filter(item=>M.own(old.scores.milestones,item.id)||M.own(s.scores.milestones,item.id)).map(item=>{
-          const c=M.comparison(s,'milestones',item),raw=old.scores.milestones[item.id];
-          return [`${item.id} · ${label(data,item.category,lang)} ${item.milestone}`,c.before===null?raw===undefined?'-':`${raw} !`:String(c.before),c.current===null?'-':String(c.current),tr(...statusLabels[c.status])];
-        });
-        if(rows.length)table([tr('Item','البند'),tr('Previous','السابق'),tr('Current','الحالي'),tr('Status','الحالة')],rows,'comparison-table');
-        else paragraph(tr('Comparison','المقارنة'),tr('No milestone scores available for comparison.','لا تتوفر درجات معالم للمقارنة.'));
-      }
+      const st=M.stats(s,all,'milestones'), p=old ? M.progress(s,data) : null;
+      const summary=tr(`Score: ${st.assessed ? st.score : '-'} / 170 · Assessed: ${st.assessed}/170`,`الدرجة: ${st.assessed ? st.score : '-'} / 170 · المقيم: ${st.assessed}/170`);
+      const comparison=old ? tr(`Previous: ${old.date} · P = previous; large mark = current; ! = review needed.`,`السابق: ${old.date} · P = السابق؛ العلامة الكبيرة = الحالي؛ ! = يحتاج إلى مراجعة.`) : '';
+      const changes=old ? tr(`Higher ${p.higher} · Lower ${p.lower} · Same ${p.same} · New ${p.new} · Awaiting retest ${p.retest}`,`أعلى ${p.higher} · أدنى ${p.lower} · ثابتة ${p.same} · جديدة ${p.new} · بانتظار إعادة التقييم ${p.retest}`) : '';
+      const text=[tr('VB-MAPP milestones','معالم VB-MAPP'),child,visit,caseLine,summary,comparison,changes,...all.map(item=>`${item.id} ${label(data,item.category,lang)} ${item.milestone}: ${M.hasScore(s,'milestones',item) ? s.scores.milestones[item.id] : '-'}${old ? ' / P: '+(M.hasScore(old,'milestones',item)?old.scores.milestones[item.id]:'-') : ''}`)].filter(Boolean).join('\n');
+      add(`<section class="milestone-sheet" aria-label="${tr('All milestone levels','جميع مستويات المعالم')}"><header class="sheet-header"><h1><span dir="ltr">VB-MAPP</span><span dir="${lang==='ar'?'rtl':'ltr'}">${tr('Milestones','المعالم النمائية')}</span></h1><div class="sheet-case"><strong dir="auto">${esc(child)}</strong><span>${tr('Date','التاريخ')}: <bdi dir="ltr">${esc(s.date)}</bdi> · ${tr('Assessment','التقييم')}: <bdi dir="ltr">${esc(s.number)}</bdi></span></div>${caseHTML?`<div class="sheet-meta">${caseHTML}</div>`:''}<p class="sheet-score"><span>${tr('Score','الدرجة')}:</span> <bdi dir="ltr">${st.assessed ? st.score : '-'} / 170</bdi><span>${tr('Assessed','المقيم')}:</span> <bdi dir="ltr">${st.assessed} / 170</bdi></p>${old?`<p class="comparison-key"><span>${tr('Previous','السابق')}: <bdi dir="ltr">${esc(old.date)}</bdi></span><span>${tr('White strip: previous score.','الدرجة السابقة في الشريط الأبيض')}</span></p>`:''}</header>${legend(lang)}${grid(s,data,lang).join('')}${old?`<p class="sheet-changes">${[['Higher','أعلى',p.higher],['Lower','أدنى',p.lower],['Same','ثابتة',p.same],['New','جديدة',p.new],['Awaiting retest','بانتظار إعادة التقييم',p.retest]].map(([en,ar,value])=>`<span>${tr(en,ar)} <bdi dir="ltr">${value}</bdi></span>`).join('')}</p>`:''}${st.pending?`<p class="sheet-changes"><span>${tr('Saved scores requiring re-scoring','درجات محفوظة تحتاج إلى إعادة التسجيل')}: <bdi dir="ltr">${st.pending}</bdi></span></p>`:''}<div class="sheet-contact" dir="ltr">Ahmad Ghanem · SLP · Latakia - Syria · slp.ahmadghanem@gmail.com · +963 988 451 245</div></section>`,text,true);
+    } else {
+      add(`<header class="report-heading"><h1><span dir="ltr">VB-MAPP</span><span dir="${lang==='ar'?'rtl':'ltr'}">${tr('Assessment','التقييم')}</span></h1><p dir="auto">${esc(child)}</p><p dir="auto">${esc(visit)}</p>${caseHTML?`<div class="sheet-meta">${caseHTML}</div>`:''}</header>`,[child,visit,caseLine].join('\n'));
     }
-    for (const type of ['barriers', 'transitions', 'eesa']) {
+    if (!types.length) note(tr('Report','التقرير'),tr('No sections selected.','لم يُحدد أي قسم.'));
+    // Only recorded sections and entered notes appear in the concise report.
+    for (const type of ['barriers','transitions','eesa','tasks']) {
       if (!types.includes(type)) continue;
-      heading(`${typeNames[type][0]} - recorded profile`, `${typeNames[type][1]} - الملف المسجل`);
-      if (type === 'eesa') {
-        for (const group of [1, 2, 3, 4, 5]) {
-          const st = M.stats(s, data.eesa.filter(i => i.group === group), 'eesa');
-          const name = data.eesaGroups[group][lang];
-          add(`<div class="profile-row"><span>${esc(name)}</span><div class="profile-track"><i style="width:${st.score / st.total * 100}%;background:#6a5685"></i></div><b dir="ltr">${st.assessed ? st.score : '-'} / ${st.total}</b><small>${st.assessed} ${tr('assessed', 'مقيم')}</small></div>`, `${name}: ${st.assessed ? st.score : tr('Not assessed', 'غير مقيم')}/${st.total}; ${st.assessed} ${tr('assessed', 'مقيم')}`);
+      const items=M.records(data,type).filter(item=>M.hasScore(s,type,item));
+      if (!items.length) continue;
+      heading(...typeNames[type]);
+      if (type==='eesa') {
+        const rows=[1,2,3,4,5].map(group=>{const stats=M.stats(s,data.eesa.filter(item=>item.group===group),'eesa');return [data.eesaGroups[group][lang],`${stats.assessed?stats.score:'-'} / ${stats.total}`,String(stats.assessed)];});
+        table([tr('Group','المجموعة'),tr('Score','الدرجة'),tr('Assessed','المقيم')],rows);
+      } else table([tr('Item','البند'),tr('Score','الدرجة')],items.map(item=>[M.itemText(item,s,lang),String(s.scores[type][item.id])]));
+    }
+    for (const [title,value] of [[tr('Language / communication','اللغة / التواصل'),s.child.language],[tr('Parent / caregiver','ولي الأمر / مقدم الرعاية'),s.child.guardian],[tr('Reason for assessment','سبب التقييم'),s.child.reason],[tr('Setting and sources','البيئة ومصادر المعلومات'),s.child.setting],[tr('Relevant background','الخلفية ذات الصلة'),s.child.relevant]]) note(title,value);
+    for (const [title,value] of [[tr('Observations','الملاحظات'),s.clinical],[tr('Recommendations','التوصيات'),s.recommendations]]) note(title,value);
+    const plans=types.includes('milestones') ? Object.entries(s.goals).filter(([id,plan])=>plan.selected&&all.some(item=>item.id===id)) : [];
+    if (plans.length) {
+      heading('Goals','الأهداف');
+      for (const [id,plan] of plans) {
+        const item=all.find(item=>item.id===id), valid=M.currentPlan(s,item,plan), start=blocks.length;
+        note(`${label(data,item.category,lang)} ${item.milestone}${valid?'':' - '+tr('previous plan; review needed','خطة سابقة تحتاج إلى مراجعة')}`,plan.goal||M.itemText(item,s,lang));
+        note(tr('Criterion','المعيار'),plan.criterion); note(tr('Support','الدعم'),plan.support); note(tr('Review date','تاريخ المراجعة'),plan.review);
+        const parts=blocks.slice(start), length=parts.reduce((n,b)=>n+b.text.length,0);
+        if(parts.length>1&&length<1100)blocks.splice(start,parts.length,{html:`<div class="report-block goal-plan">${parts.map(b=>b.html).join('')}</div>`,text:parts.map(b=>b.text).join('\n')});
+      }
+    }
+    if (s.reportDetails || s.includeUnassessed) {
+      for (const type of types) {
+        const items=M.records(data,type).filter(item=>s.includeUnassessed||M.own(s.scores[type],item.id)||s.comments[item.id]||(old&&M.own(old.scores[type],item.id)));
+        if (!items.length) continue;
+        heading(`${typeNames[type][0]} - details`,`${typeNames[type][1]} - التفاصيل`);
+        for(const item of items) {
+          const score=M.hasScore(s,type,item)?s.scores[type][item.id]:null;
+          const status=score===null?tr('Not assessed','غير مقيم'):type==='milestones'?scoreName(score,lang):String(score);
+          note(`${item.id} · ${status}`,M.itemText(item,s,lang));
+          if(old&&M.own(old.scores[type],item.id))note(tr('Previous result','النتيجة السابقة'),`${old.date}: ${old.scores[type][item.id]}`);
+          if(M.own(s.scores[type],item.id)&&score===null)note(tr('Saved score requiring review','درجة محفوظة تحتاج إلى مراجعة'),String(s.scores[type][item.id]));
+          note(tr('Response note','ملاحظة الاستجابة'),s.comments[item.id]);
         }
-      } else {
-        const max = type === 'barriers' ? 4 : 5;
-        for (const item of data[type]) {
-          const value = M.hasScore(s, type, item) ? s.scores[type][item.id] : null;
-          const name = item.name[lang];
-          add(`<div class="profile-row"><span>${esc(name)}</span><div class="profile-track"><i style="width:${(value || 0) / max * 100}%;background:${type === 'barriers' ? '#a94747' : '#477d62'}"></i></div><b dir="ltr">${value === null ? '-' : value} / ${max}</b><small>${value === null ? tr('Not assessed', 'غير مقيم') : tr('Recorded', 'مسجل')}</small></div>`, `${name}: ${value === null ? tr('Not assessed', 'غير مقيم') : value + '/' + max}`);
-        }
       }
     }
-    heading('Data-informed priorities and draft goals', 'أولويات وأهداف مقترحة مستندة إلى النتائج');
-    const targets = M.goals(s, data);
-    if (!targets.length) paragraph(tr('Priorities', 'الأولويات'), tr('No assessed milestone gap available within the report scope. Do not infer a deficit from unassessed items.', 'لا توجد صعوبة مقيمة في المعالم ضمن نطاق التقرير. لا تستنتج صعوبة من البنود غير المقيمة.'));
-    for (const target of targets) {
-      const planStart=blocks.length;
-      const item = target.item, plan = s.goals[item.id];
-      const name = `${label(data, item.category, lang)} ${item.milestone}`;
-      if (target.nextProbe) { paragraph(tr('Next assessment probe', 'بند مقترح للفحص التالي'), `${name}: ${M.itemText(item, s, lang)}`); continue; }
-      paragraph(tr('Recorded priority', 'أولوية مسجلة'), `${name}: ${scoreName(target.baseline, lang)} - ${M.itemText(item, s, lang)}`);
-      if (plan?.selected && M.currentPlan(s, item, plan)) {
-        paragraph(tr('Selected goal', 'الهدف المختار'), plan.goal || M.itemText(item, s, lang));
-        paragraph(tr('Measurement / mastery criterion', 'معيار القياس / الإتقان'), plan.criterion || M.itemScoring(item, s, lang));
-        paragraph(tr('Support and generalization plan', 'خطة الدعم والتعميم'), plan.support);
-        paragraph(tr('Review date', 'تاريخ المراجعة'), plan.review);
-        groupShortRecord(planStart);
-      }
-    }
-    for (const [id, plan] of Object.entries(s.goals)) {
-      const item = M.allMilestones(data).find(i => i.id === id);
-      if (!item || !plan.selected || !s.reportScope.milestones || (targets.some(t => t.item.id === id && !t.nextProbe) && M.currentPlan(s, item, plan))) continue;
-      const planStart=blocks.length;
-      paragraph(!M.currentPlan(s, item, plan) ? tr('Historical goal - changed criteria; not a current recommendation', 'هدف سابق - تغيّرت المعايير؛ لا يُعد توصية حالية') : tr('Previously selected goal - reassess baseline', 'هدف مختار سابقاً - راجع خط الأساس'), plan.goal || M.itemText(item, s, lang)); paragraph(tr('Previously recorded goal criterion', 'معيار الهدف المسجل سابقاً'), plan.criterion); paragraph(tr('Support plan / review date', 'خطة الدعم / تاريخ المراجعة'), [plan.support, plan.review].filter(Boolean).join(' / '));
-      groupShortRecord(planStart);
-    }
-    heading('Recommendations and follow-up', 'التوصيات والمتابعة');
-    M.suggestedActions(s, data, lang).forEach(value => paragraph(tr('Suggested follow-up', 'متابعة مقترحة'), value));
-    paragraph(tr('Assessor recommendations / placement decision', 'توصيات الفاحص / قرار البيئة التعليمية'), s.recommendations);
-    paragraph(tr('Planning note', 'ملاحظة التخطيط'), tr('Priorities and goals are based on recorded results and require assessor / team review.', 'تستند الأولويات والأهداف إلى النتائج المسجلة وتحتاج إلى مراجعة الفاحص / الفريق.'));
-    for (const type of types) {
-      heading(`${typeNames[type][0]} - item results`, `${typeNames[type][1]} - نتائج البنود`);
-      for (const item of M.records(data, type)) {
-        const scored = M.hasScore(s, type, item), pending = M.own(s.scores[type], item.id) && !scored, comment = s.comments[item.id];
-        const previousRecorded=old&&M.own(old.scores[type],item.id);
-        if (!scored && !pending && !previousRecorded && !comment && !s.includeUnassessed) continue;
-        const itemStart=blocks.length;
-        const value = scored ? s.scores[type][item.id] : null;
-        const name = type === 'milestones' ? `${label(data, item.category, lang)} ${item.milestone}` : item.id;
-        const status = pending ? tr('Previous result requires review', 'نتيجة سابقة تحتاج إلى مراجعة') : type === 'milestones' ? scoreName(value, lang) : value === null ? tr('Not assessed', 'غير مقيم') : type === 'tasks' ? value === 1 ? tr('Demonstrated', 'متحقق') : tr('Not demonstrated', 'غير متحقق') : String(value);
-        const previousLine = previousRecorded ? {title:tr('Previous result / date','النتيجة السابقة / التاريخ'),value:`${old.scores[type][item.id]} / ${old.date}${!M.hasScore(old,type,item)?' ! '+tr('Re-scoring required','تحتاج إلى إعادة التسجيل'):''}`} : null;
-        paragraph(`${name} - ${status} [${item.id}]`, M.itemText(item, s, lang), previousLine);
-        if (pending) paragraph(tr('Preserved previous score - excluded', 'الدرجة السابقة المحفوظة - مستبعدة'), String(s.scores[type][item.id]));
-        if (pending && item.original) paragraph(tr('Previous task wording', 'صياغة المهمة السابقة'), item.original.text?.[lang] || item.original.name?.[lang]);
-        if (M.needsCriteria(item) && s.customCriteria[item.id]) paragraph(`${tr('Assessor-entered criterion', 'معيار أدخله الفاحص')} [${item.id}]`, s.customCriteria[item.id].scoring);
-        if (type !== 'milestones' && pending && data.contentReview[item.id]) paragraph(tr('Scoring note', 'ملاحظة التسجيل'), data.contentReview[item.id][lang]);
-        if (comment) paragraph(`${tr('Response, prompts and evidence', 'الاستجابة والتلميحات والأدلة')} [${item.id}]`, comment);
-        groupShortRecord(itemStart);
-      }
-    }
-    if (types.includes('eesa')) paragraph(tr('Echoic stimulus language', 'لغة مثيرات التقليد الصوتي'), tr('The original English stimuli and supplied Arabic equivalents are retained. A translation changes sound and syllable patterns; record the administered language and interpret using the appropriate scoring guide.', 'احتُفظ بالمثيرات الإنجليزية الأصلية والمقابلات العربية المرفقة. تغيّر الترجمة أنماط الأصوات والمقاطع؛ سجّل لغة التطبيق وفسّر النتائج وفق دليل التصحيح المناسب.'));
-    add(`<footer class="report-footer">SPEECH AND LANGUAGE PATHOLOGY · Ahmad Ghanem<br>${tr('Latakia - Syria', 'اللاذقية - سوريا')}<br><span dir="ltr">slp.ahmadghanem@gmail.com · +963 988 451 245</span></footer>`, 'SPEECH AND LANGUAGE PATHOLOGY · Ahmad Ghanem · Latakia - Syria\nslp.ahmadghanem@gmail.com · +963 988 451 245');
-    return { blocks, html: blocks.map(b => b.html).join(''), text: blocks.map(b => b.text).join('\n\n') };
+    // The sheet uses the repeated PDF footer; avoid an extra page for a footer.
+    if(blocks.length>1)blocks[0].pageBreakAfter=types.includes('milestones');
+    else blocks[0].pageBreakAfter=false;
+    return {blocks,html:blocks.map(b=>b.html).join(''),text:blocks.map(b=>b.text).join('\n\n')};
   }
   root.VBReport = { esc, label, grid, legend, make, levelStyle, levelColors };
 })(window);

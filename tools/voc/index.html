@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>تطبيق حمادة للتواصل AAC - Hamada App</title>
+    <title>كلماتي مع حمادة</title>
     
     <!-- PWA: keep these relative URLs inside tools/voc on subpath hosting. -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0284C7">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="حمادة">
+    <meta name="apple-mobile-web-app-title" content="كلماتي مع حمادة">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="format-detection" content="telephone=no">
     <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
@@ -64,7 +64,12 @@
             .grid-template-7, .grid-template-8, .grid-template-9 { max-width: min(70vw, 880px); }
         }
 
-        .star-active { color: #38BDF8; text-shadow: 0 0 6px rgba(56, 189, 248, 0.4); }
+        @media (min-width: 640px) {
+            #workspace-content-wrapper { container-type: size; min-height: 0; }
+            .grid-template-7, .grid-template-8, .grid-template-9 { max-width: min(85vw, 720px, 100cqh); }
+        }
+
+        .star-active { color: #FACC15; text-shadow: 0 0 6px rgba(250, 204, 21, 0.4); }
         .star-inactive { color: #E2E8F0; }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -81,14 +86,18 @@
     <div id="toast-container" class="fixed top-3 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-[90%] max-w-sm pointer-events-none"></div>
 
     <div id="home-view" class="h-full w-full flex flex-col items-center justify-between p-4 sm:p-6 bg-gradient-to-b from-baby-blueLight via-white to-baby-mintLight transition-opacity duration-300 overflow-y-auto">
+        <nav class="home-tools" aria-label="أدوات التطبيق">
+            <button type="button" class="home-icon" onclick="app.modals.open('info-modal')" aria-label="معلومات التطبيق" title="معلومات التطبيق"><i class="fas fa-info-circle" aria-hidden="true"></i></button>
+            <button type="button" class="home-icon" data-offline-install aria-label="إضافة التطبيق إلى الشاشة الرئيسية" title="إضافة التطبيق إلى الشاشة الرئيسية"><i class="fas fa-download" aria-hidden="true"></i></button>
+        </nav>
         <div class="my-auto flex flex-col items-center w-full max-w-md">
             
             <header class="text-center mb-8">
-                <div class="relative w-32 h-32 sm:w-40 sm:h-40 mx-auto mb-4 bg-white rounded-3xl shadow-soft flex items-center justify-center border-4 border-baby-mintMed overflow-hidden p-3">
+                <div class="w-32 h-32 sm:w-40 sm:h-40 mx-auto mb-4 flex items-center justify-center">
                     <img src="images/logo.webp" alt="حمادة Logo" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='images/placeholder.svg';">
                 </div>
                 <h1 class="text-4xl sm:text-5xl font-black text-baby-blueDark tracking-tight">
-                    المفاهيم مع حمادة
+                    كلماتي مع حمادة
                 </h1>
                 <p class="text-baby-mintDark text-lg sm:text-xl font-bold mt-2">تعلم المفاهيم والكلمات بطريقة تفاعلية</p>
             </header>
@@ -104,35 +113,34 @@
                     <span>الألعاب</span>
                 </a>
                 
-                <a href="res/1.pdf" download class="flex items-center justify-center gap-3 p-4 bg-white border-2 border-baby-blueMed text-baby-blueDark hover:bg-baby-blueLight text-lg font-bold rounded-2xl shadow-sm transition transform active:scale-95">
-                    <i class="fas fa-file-pdf text-2xl text-baby-blueDark"></i>
-                    <span>المصادر</span>
-                </a>
-                
-                <button onclick="app.modals.open('info-modal')" class="flex items-center justify-center gap-3 p-4 bg-white border-2 border-baby-mintMed text-baby-mintDark hover:bg-baby-mintLight text-lg font-bold rounded-2xl shadow-sm transition transform active:scale-95">
-                    <i class="fas fa-info-circle text-2xl text-baby-mintDark"></i>
-                    <span>معلومات</span>
-                </button>
             </div>
-            <!-- Downloading is optional; no mass preload blocks the home screen. -->
+        </div>
+
+        <footer class="text-center py-2 text-xs font-bold text-slate-400">
+             SPEECH AND LANGUAGE PATHOLOGY - Ahmad Ghanem / Latakia - Syria / email :  slp.ahmadghanem@gmail.com
+        </footer>
+    </div>
+
+    <dialog class="offline-dialog" data-offline-dialog aria-labelledby="offline-dialog-title">
+        <div class="offline-dialog-header"><h2 id="offline-dialog-title">كلماتي مع حمادة</h2><button type="button" data-offline-close aria-label="إغلاق"><i class="fas fa-times" aria-hidden="true"></i></button></div>
+        <section data-install-help hidden>
+            <p>لإضافة التطبيق إلى الشاشة الرئيسية، افتح قائمة المشاركة على iPhone وiPad، أو قائمة المتصفح على Android، ثم اختر «إضافة إلى الشاشة الرئيسية» أو «تثبيت التطبيق».</p>
+            <p>بعد إضافة الاختصار يمكنك تنزيل الصور والأصوات لاستخدامها دون اتصال.</p>
+            <button type="button" class="offline-confirm" data-install-confirm>تمت إضافة الاختصار — تنزيل المحتوى</button>
+        </section>
+        <section data-download-panel hidden>
+            <p>هل تريد تنزيل الصور والأصوات لاستخدام التطبيق دون اتصال؟</p>
             <section class="offline-card" data-offline-card data-state="idle" aria-labelledby="offline-title">
                 <h2 id="offline-title">التطبيق دون اتصال</h2>
                 <p data-offline-status role="status" aria-live="polite" aria-atomic="true">جاري التحقق من المحتوى المحفوظ…</p>
                 <progress value="0" max="1" aria-label="تقدم تنزيل المحتوى"></progress>
                 <div class="offline-actions">
                     <button type="button" data-offline-download disabled>تنزيل كل المحتوى دون اتصال</button>
-                    <button type="button" data-offline-install hidden>تثبيت التطبيق</button>
                 </div>
                 <p>اترك التطبيق مفتوحاً أثناء التنزيل. إذا توقف أو أُغلق، سيستكمل الملفات المتبقية عند العودة.</p>
-                <p>على iPhone وiPad: من قائمة المشاركة اختر «إضافة إلى الشاشة الرئيسية» ثم «فتح كتطبيق ويب» إن ظهر.</p>
             </section>
-        </div>
-
-        <footer class="text-center py-2 text-xs font-bold text-slate-400">
-             SPEECH AND LANGUAGE PATHOLOGY - Ahmad Ghanem / Latakia - Syria / email :  slp.ahmadghanem@gmail.com
-
-        </footer>
-    </div>
+        </section>
+    </dialog>
 
     <div id="workplace-view" class="h-full w-full flex flex-col hidden bg-slate-50">
         
@@ -207,7 +215,7 @@
             <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-2">
                 <h2 class="text-2xl font-bold text-baby-blueDark flex items-center gap-2">
                     <i class="fas fa-info-circle text-baby-blueMed"></i>
-                    عن تطبيق المفاهيم مع حمادة
+                    عن تطبيق كلماتي مع حمادة
                 </h2>
                 <button onclick="app.modals.close('info-modal')" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-slate-200">
                     <i class="fas fa-times"></i>
@@ -710,20 +718,22 @@
                 testState: {
                     active: false,
                     trialsLeft: 0,
+                    completedTrials: 0,
+                    trialToken: 0,
+                    answering: false,
                     targetItem: null
                 }
             },
 
             init() {
                 this.resetSlots();
-                this.renderStars();
                 this.populateCategoryList();
                 
                 const savedStars = localStorage.getItem('hamada_stars');
                 if (savedStars) {
-                    this.state.stars = Math.min(10, Math.max(0, parseInt(savedStars)));
-                    this.renderStars();
+                    this.state.stars = Math.max(0, (parseInt(savedStars) || 0) % 10);
                 }
+                this.renderStars();
             },
 
             switchView(viewName) {
@@ -1019,6 +1029,8 @@
 
                 if (this.state.stars === 10) {
                     setTimeout(() => {
+                        this.state.stars = 0;
+                        this.renderStars();
                         this.openStarCelebration();
                     }, 400);
                 }
@@ -1026,9 +1038,6 @@
 
             openStarCelebration() {
                 this.modals.open('star-celebration-modal');
-                if (this.state.testState.active) {
-                    this.exitTestMode(false);
-                }
             },
 
             closeStarCelebration() {
@@ -1051,6 +1060,7 @@
                 this.state.mode = type;
                 this.state.testState.active = true;
                 this.state.testState.trialsLeft = 10;
+                this.state.testState.completedTrials = 0;
                 
                 this.updateModeButtonUI();
 
@@ -1082,6 +1092,8 @@
             exitTestMode(showMessage = true) {
                 this.state.mode = 'normal';
                 this.state.testState.active = false;
+                this.state.testState.trialToken++;
+                this.state.testState.answering = false;
                 this.state.testState.targetItem = null;
                 
                 this.updateModeButtonUI();
@@ -1103,11 +1115,16 @@
             },
 
             nextTrial() {
+                if (!this.state.testState.active) return;
+                this.state.testState.answering = false;
+                const ticket = ++this.state.testState.trialToken;
                 if (this.state.testState.trialsLeft <= 0) {
                     this.showToast('ممتاز! أنجزت ١٠ محاولات بنجاح 🎉', 'success');
                     this.exitTestMode(false);
                     return;
                 }
+
+                if (this.state.testState.completedTrials > 0 && this.state.testState.completedTrials % 3 === 0) this.executeShuffle();
 
                 const filledSlots = this.state.slotsData.filter(s => s.item);
                 const randomSlot = filledSlots[Math.floor(Math.random() * filledSlots.length)];
@@ -1125,17 +1142,20 @@
                 }
 
                 setTimeout(() => {
-                    this.replayPromptSound();
+                    if (ticket === this.state.testState.trialToken) this.replayPromptSound();
                 }, 400);
             },
 
             evaluateTestAnswer(selectedIndex) {
+                if (!this.state.testState.active || this.state.testState.answering) return;
+                const ticket = this.state.testState.trialToken;
                 const targetItem = this.state.testState.targetItem;
                 const selectedSlot = this.state.slotsData[selectedIndex];
                 const overlay = document.getElementById(`overlay-${selectedIndex}`);
                 const icon = document.getElementById(`icon-${selectedIndex}`);
                 
                 if (!overlay || !icon || !selectedSlot || !selectedSlot.item || !targetItem) return;
+                this.state.testState.answering = true;
                 overlay.classList.remove('hidden');
 
                 if (selectedSlot.item.id === targetItem.id && selectedSlot.item.catId === targetItem.catId) {
@@ -1143,10 +1163,11 @@
                     icon.className = 'fas fa-check text-emerald-600 text-5xl md:text-7xl drop-shadow-md';
                     this.setStars(this.state.stars + 1);
                     this.state.testState.trialsLeft--;
+                    this.state.testState.completedTrials++;
                     
                     setTimeout(() => {
                         overlay.classList.add('hidden');
-                        if (this.state.stars < 10) {
+                        if (ticket === this.state.testState.trialToken) {
                             this.nextTrial();
                         }
                     }, 1000);
@@ -1157,6 +1178,7 @@
 
                     setTimeout(() => {
                         overlay.classList.add('hidden');
+                        if (ticket === this.state.testState.trialToken) this.state.testState.answering = false;
                     }, 1000);
                 }
             },
@@ -1179,6 +1201,9 @@
                     [filledItems[i], filledItems[j]] = [filledItems[j], filledItems[i]];
                 }
 
+                if (filledItems.every((item, i) => item === this.state.slotsData[filledIndexes[i]].item)) {
+                    filledItems.push(filledItems.shift());
+                }
                 filledIndexes.forEach((slotIdx, i) => {
                     this.state.slotsData[slotIdx].item = filledItems[i];
                 });

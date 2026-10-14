@@ -57,6 +57,10 @@ function rpc(page, type) {
     }), type);
 }
 
+async function openDownloads(page) {
+    if (!await page.locator('[data-offline-dialog]').evaluate(dialog => dialog.open)) await page.locator('[data-offline-install]').click();
+    if (await page.locator('[data-install-confirm]').isVisible()) await page.locator('[data-install-confirm]').click();
+}
 async function testBrowser(name, engine, origin) {
     mediaRequests = 0;
     maxActiveMedia = 0;
@@ -72,6 +76,10 @@ async function testBrowser(name, engine, origin) {
         await page.waitForFunction(() => !document.querySelector('[data-offline-download]').disabled);
         assert.equal(mediaRequests, 0, 'Install/startup must never preload media');
         assert.equal(await page.locator('#home-view').isVisible(), true);
+        assert.equal(await page.locator('[data-offline-card]').isVisible(), false, 'No offline card on the home screen');
+        await page.evaluate(() => window.dispatchEvent(new Event('appinstalled')));
+        assert.equal(await page.locator('[data-download-panel]').isVisible(), true, 'Installation offers offline download in a popup');
+        await page.locator('[data-offline-close]').click();
         const initial = await rpc(page, 'VOC_STATUS');
         assert.equal(initial.done, 0);
         assert.equal(initial.ready, false);
@@ -109,8 +117,10 @@ async function testBrowser(name, engine, origin) {
         }
 
         // The real button starts the pump, then pause survives navigation/reload.
+        await openDownloads(page);
         await page.locator('[data-offline-download]').click();
         await page.waitForFunction(saved => Number(document.querySelector('progress').value) > saved, paused.done);
+        await openDownloads(page);
         await page.locator('[data-offline-download]').click();
         await page.waitForFunction(() => document.querySelector('[data-offline-card]').dataset.state === 'idle');
         await page.waitForTimeout(300);
@@ -122,6 +132,7 @@ async function testBrowser(name, engine, origin) {
         await page.screenshot({ path: `/private/tmp/voc-${name}-phone.png`, fullPage: true });
 
         // Start, interrupt by navigation, and let the next page resume from cache.
+        await openDownloads(page);
         await page.locator('[data-offline-download]').click();
         await page.waitForFunction(() => document.querySelector('[data-offline-card]').dataset.state === 'downloading');
         await page.goto(`${origin}/tools/voc/games.html`);
@@ -209,5 +220,5 @@ async function testBrowser(name, engine, origin) {
     try {
         if (process.env.VOC_ENGINE !== 'webkit') await testBrowser('chromium', chromium, origin);
         if (process.env.VOC_ENGINE !== 'chromium') await testBrowser('webkit', webkit, origin);
-    } finally { server.close(); server.closeAllConnections(); }
+    } finally { server.close(); server.closeAllConnections(); server.unref(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

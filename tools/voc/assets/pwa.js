@@ -6,7 +6,19 @@
     const statusText = card?.querySelector('[data-offline-status]');
     const progress = card?.querySelector('progress');
     const button = card?.querySelector('[data-offline-download]');
-    const installButton = card?.querySelector('[data-offline-install]');
+    const installButton = document.querySelector('[data-offline-install]');
+    const dialog = document.querySelector('[data-offline-dialog]');
+    const standalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    let installed = standalone();
+    let offered = false;
+    function openDialog(download) {
+        if (!dialog) return;
+        dialog.querySelector('[data-install-help]').hidden = download;
+        dialog.querySelector('[data-download-panel]').hidden = !download;
+        if (!dialog.open) dialog.showModal();
+    }
+    document.querySelector('[data-offline-close]')?.addEventListener('click', () => dialog.close());
+    document.querySelector('[data-install-confirm]')?.addEventListener('click', () => openDialog(true));
     let registration;
     let status;
     let running = false;
@@ -32,6 +44,10 @@
         status = next;
         fault = false;
         if (!card) return;
+        if (installed && !offered) {
+            offered = true;
+            if (!status.ready && !status.wanted) openDialog(true);
+        }
         progress.max = Math.max(1, status.total);
         progress.value = status.done;
         progress.setAttribute('aria-valuetext', `${status.done} / ${status.total}`);
@@ -99,16 +115,18 @@
     window.addEventListener('beforeinstallprompt', event => {
         event.preventDefault();
         installPrompt = event;
-        if (installButton) installButton.hidden = false;
     });
     installButton?.addEventListener('click', async () => {
-        if (!installPrompt) return;
-        await installPrompt.prompt();
-        await installPrompt.userChoice;
-        installPrompt = null;
-        installButton.hidden = true;
+        if (installed || standalone()) { openDialog(true); return; }
+        if (!installPrompt) { openDialog(false); return; }
+        try {
+            await installPrompt.prompt();
+            const choice = await installPrompt.userChoice;
+            installPrompt = null;
+            if (choice.outcome === 'accepted') { installed = true; offered = true; openDialog(true); }
+        } catch { installPrompt = null; openDialog(false); }
     });
-    window.addEventListener('appinstalled', () => { if (installButton) installButton.hidden = true; });
+    window.addEventListener('appinstalled', () => { installed = true; offered = true; openDialog(true); });
 
     button?.addEventListener('click', async () => {
         button.disabled = true;

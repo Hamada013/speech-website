@@ -47,12 +47,13 @@
         const total = session.mode === 'memory' ? session.order.length : session.records.length;
         const mastered = session.records.filter(record => record.result === 'mastered').length;
         const learning = session.records.filter(record => record.result === 'learning').length;
-        const scored = session.records.filter(record => record.result !== 'skip').length;
+        const scored = session.records.filter(record => record.result !== 'skip' && record.result !== 'viewed').length;
         const percentage = session.mode === 'memory' ? (session.moves ? Math.round(session.matched.length / session.moves * 100) : null)
             : session.mode === 'rapid' ? (scored ? Math.round(mastered / scored * 100) : null)
                 : (scored ? Math.round(session.firstCorrect / scored * 100) : null);
         return { mode: session.mode, percentage, total, scored, mastered, learning, mistakes: session.mistakes,
             skipped: session.records.filter(record => record.result === 'skip').length,
+            viewed: session.records.filter(record => record.result === 'viewed').length,
             moves: session.moves, matched: session.matched.length, elapsedMs: session.elapsedMs,
             partial, review: session.review, date: new Date().toISOString(), planned: session.order.length };
     }

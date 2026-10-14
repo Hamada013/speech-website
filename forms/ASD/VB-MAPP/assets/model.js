@@ -16,7 +16,7 @@
       scores: { milestones: {}, barriers: {}, transitions: {}, eesa: {}, tasks: {} },
       comments: {}, clinical: '', recommendations: '', goals: {}, customCriteria: {}, scoreReviews: {},
       reportScope: { milestones: true, barriers: true, transitions: true, eesa: true, tasks: true },
-      includeUnassessed: false, migration: '', legacy: null,
+      includeUnassessed: false, reportDetails: false, migration: '', legacy: null,
       assessmentId: newId(), caseId: newId(), baselineId: '', history: [], importSource: '' };
   }
   function normalizeRecord(raw) {
@@ -38,7 +38,7 @@
     for (const [id, value] of Object.entries(raw.customCriteria || {})) if (value && typeof value === 'object') s.customCriteria[id] = { text: safeText(value.text), scoring: safeText(value.scoring) };
     for (const [id, value] of Object.entries(raw.goals || {})) if (value && typeof value === 'object') s.goals[id] = { selected: value.selected === true, goal: safeText(value.goal), criterion: safeText(value.criterion), review: safeText(value.review), support: safeText(value.support), criteriaReview: safeText(value.criteriaReview) };
     for (const [id, value] of Object.entries(raw.scoreReviews || {})) if (typeof value === 'string') s.scoreReviews[id] = value;
-    s.includeUnassessed = raw.includeUnassessed === true; s.legacy = raw.legacy && typeof raw.legacy === 'object' ? raw.legacy : null;
+    s.includeUnassessed = raw.includeUnassessed === true; s.reportDetails = raw.reportDetails === true; s.legacy = raw.legacy && typeof raw.legacy === 'object' ? raw.legacy : null;
     return s;
   }
   function snapshot(raw) { const copy = normalizeRecord(raw); delete copy.history; delete copy.baselineId; return copy; }
@@ -113,16 +113,21 @@
   function needsCriteria(item) { return Boolean(item.missing || item.requiresCriteria); }
   function eligible(item, s) { return !needsCriteria(item) || Boolean(s.customCriteria[item.id]?.text.trim() && s.customCriteria[item.id]?.scoring.trim()); }
   function reviewKey(item, s) {
+    if (item.manualRevision) return JSON.stringify([item.manualRevision, item.scoring.en]);
     if (!needsCriteria(item)) return '';
     const criterion = s.customCriteria[item.id] || {};
     return JSON.stringify([item.revision || 'guide-criteria-v1', criterion.text || '', criterion.scoring || '']);
   }
-  function currentPlan(s, item, plan) { return !needsCriteria(item) || Boolean(hasScore(s, 'milestones', item) && plan?.criteriaReview === reviewKey(item, s)); }
+  function currentPlan(s, item, plan) {
+    if (!reviewKey(item, s)) return true;
+    const legacy = !plan?.criteriaReview && !s.scoreReviews?.[item.id] && item.legacyScores?.includes(s.scores.milestones[item.id]);
+    return Boolean(hasScore(s, 'milestones', item) && (plan?.criteriaReview === reviewKey(item, s) || legacy));
+  }
   function validScore(type, item, value) {
     return Boolean(item && allowed[type]?.includes(value) && !(value === .5 && ((type === 'milestones' && !halfAllowed(item)) || (type === 'eesa' && item.group === 5))));
   }
   function hasScore(s, type, item) {
-    return own(s.scores[type], item.id) && eligible(item, s) && validScore(type, item, s.scores[type][item.id]) && (!needsCriteria(item) || s.scoreReviews?.[item.id] === reviewKey(item, s));
+    return own(s.scores[type], item.id) && eligible(item, s) && validScore(type, item, s.scores[type][item.id]) && (!reviewKey(item, s) || s.scoreReviews?.[item.id] === reviewKey(item, s) || (item.manualRevision && !s.scoreReviews?.[item.id] && item.legacyScores?.includes(s.scores[type][item.id])));
   }
   function stats(s, list, type) {
     const result = { total: list.length, available: 0, assessed: 0, score: 0, full: 0, half: 0, zero: 0, unassessed: 0, missing: 0, pending: 0 };
@@ -146,11 +151,11 @@
     return item.text?.[lang] || item.name?.[lang] || item.id;
   }
   function itemScoring(item, s, lang) { return needsCriteria(item) ? s.customCriteria[item.id]?.scoring || '' : item.scoring?.[lang] || ''; }
-  function halfAllowed(item) { return !/no (?:1\/2|half)/i.test(item.scoring?.en || ''); }
+  function halfAllowed(item) { return typeof item.allowHalf === 'boolean' ? item.allowHalf : !/no (?:1\/2|half)/i.test(item.scoring?.en || ''); }
   function setScore(s, type, item, value) {
     if (!validScore(type, item, value) || !eligible(item, s)) throw Error('Invalid score for item');
     s.scores[type][item.id] = value;
-    if (needsCriteria(item)) s.scoreReviews[item.id] = reviewKey(item, s);
+    if (reviewKey(item, s)) s.scoreReviews[item.id] = reviewKey(item, s);
   }
   function clearScore(s, type, id) { delete s.scores[type][id]; delete s.scoreReviews[id]; }
   function goals(s, data) {

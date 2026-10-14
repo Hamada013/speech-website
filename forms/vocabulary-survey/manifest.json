@@ -1,20 +1,41 @@
 {
   "id": "./",
-  "name": "Vocabulary Clinic — Clinical Assessment",
-  "short_name": "Vocabulary Clinic",
-  "description": "Offline receptive and expressive vocabulary checklists with local clinical reports.",
-  "lang": "en",
+  "name": "تقييم المفردات",
+  "short_name": "تقييم المفردات",
+  "description": "تقييم المفردات الاستقبالية والتعبيرية ومتابعة التقدم دون اتصال.",
+  "lang": "ar",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["standalone"],
+  "display_override": [
+    "standalone"
+  ],
   "orientation": "any",
   "theme_color": "#153e40",
   "background_color": "#f6f7f3",
-  "categories": ["education", "medical"],
+  "categories": [
+    "education",
+    "medical"
+  ],
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ]
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "dir": "rtl"
 }

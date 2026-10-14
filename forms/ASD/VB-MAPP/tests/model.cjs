@@ -1,0 +1,62 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto');
+const root=path.resolve(__dirname,'..'),context={console,crypto};context.window=context;vm.createContext(context);
+for(const file of ['data','stimuli','review','manual-data','manual','model','report','pdf-data'])vm.runInContext(fs.readFileSync(path.join(root,`assets/${file}.js`),'utf8'),context);
+const {VBModel:M,VB_DATA:D,VBReport:R,VBPDFData:P}=context,items=M.allMilestones(D),state=M.blank();
+assert.equal(items.length,170);assert.equal(new Set(items.map(i=>i.id)).size,170);
+assert.deepEqual([1,2,3].map(level=>items.filter(i=>i.level===level).length),[45,60,65]);
+const noHalf=new Set(['l1-2','i2-10','iv2-7','r3-14']);
+for(const item of items){
+ assert.equal(M.eligible(item,state),true,`${item.id} must be immediately scoreable`);
+ assert.equal(M.needsCriteria(item),false);
+ for(const key of ['objective','application','scoring'])for(const lang of ['ar','en'])assert.ok(item.guide[key][lang]?.trim(),`${item.id} ${key} ${lang}`);
+ assert.ok(item.sourcePages.length);
+ assert.equal(M.halfAllowed(item),!noHalf.has(item.id),item.id);
+ M.setScore(state,'milestones',item,0);assert.equal(M.hasScore(state,'milestones',item),true);
+ M.clearScore(state,'milestones',item.id);assert.equal(M.hasScore(state,'milestones',item),false);
+ if(M.halfAllowed(item)){M.setScore(state,'milestones',item,.5);assert.equal(M.hasScore(state,'milestones',item),true);}
+ else assert.throws(()=>M.setScore(state,'milestones',item,.5));
+ M.setScore(state,'milestones',item,1);
+}
+assert.equal(M.stats(state,items,'milestones').score,170);
+const byId=id=>items.find(i=>i.id===id);
+assert.match(byId('l2-9').scoring.en,/1:.*50/);assert.match(byId('l2-9').scoring.en,/0.5:.*25/);
+assert.match(byId('l2-10').scoring.en,/0.5:.*150/);
+assert.match(byId('lr2-9').application.en,/3 different/);
+assert.match(byId('i2-8').scoring.en,/0.5:.*5.*two-action/);
+assert.match(byId('e2-6').scoring.en,/50.*20.*Group 2/);
+assert.match(byId('e2-10').scoring.en,/85.*10.*Groups 4 and 5/);
+assert.match(byId('vp3-13').scoring.en,/0.5:.*20.*4 pieces/);
+assert.match(byId('w3-12').scoring.en,/0.5:.*1\/2 inch/);
+assert.ok(byId('s2-8').sourceNote&&byId('vp2-8').sourceNote);
+const compatible=M.blank();compatible.scores.milestones['m1-1']=1;assert.equal(M.hasScore(compatible,'milestones',byId('m1-1')),true);
+compatible.scores.milestones['e2-6']=1;assert.equal(M.hasScore(compatible,'milestones',byId('e2-6')),false);
+compatible.scores.milestones['e2-7']=1;assert.equal(M.hasScore(compatible,'milestones',byId('e2-7')),true);
+compatible.scores.milestones['e2-7']=.5;assert.equal(M.hasScore(compatible,'milestones',byId('e2-7')),false);
+compatible.scores.milestones['iv2-8']=.5;assert.equal(M.hasScore(compatible,'milestones',byId('iv2-8')),true);compatible.scores.milestones['iv2-8']=0;assert.equal(M.hasScore(compatible,'milestones',byId('iv2-8')),false);
+compatible.goals['m1-1']={selected:true,goal:'Retained goal',criterion:'Retained criterion'};assert.equal(M.currentPlan(compatible,byId('m1-1'),compatible.goals['m1-1']),true);
+const compatibleNext=M.startFollowup(compatible);M.setScore(compatibleNext,'milestones',byId('m1-1'),.5);assert.equal(M.comparison(compatibleNext,'milestones',byId('m1-1')).change,-.5);
+const old=M.blank();old.scores.milestones['l2-9']=.5;old.comments['l2-9']='retained';old.customCriteria['l2-9']={text:'Earlier task',scoring:'Earlier criterion'};
+const normalized=M.normalize(JSON.parse(JSON.stringify(old)));
+assert.equal(normalized.scores.milestones['l2-9'],.5);assert.equal(M.hasScore(normalized,'milestones',byId('l2-9')),false);
+assert.equal(M.eligible(byId('l2-9'),normalized),true);assert.equal(normalized.comments['l2-9'],'retained');
+assert.equal(M.stats(normalized,items,'milestones').pending,1);
+M.setScore(normalized,'milestones',byId('l2-9'),.5);assert.equal(M.stats(normalized,items,'milestones').pending,0);
+const next=M.startFollowup(normalized,'2026-10-15');assert.equal(next.scores.milestones['l2-9'],undefined);
+M.setScore(next,'milestones',byId('l2-9'),1);assert.equal(M.comparison(next,'milestones',byId('l2-9')).change,.5);
+assert.equal(M.previous(next).scores.milestones['l2-9'],.5);
+assert.equal(M.hasScore(M.normalize(JSON.parse(JSON.stringify(next))),'milestones',byId('l2-9')),true);
+state.child.name='<img src=x onerror=alert(1)>';state.reportScope={milestones:true,barriers:false,transitions:false,eesa:false,tasks:false};
+for(const lang of ['ar','en']){
+ state.reportLang=lang;const report=R.make(state,D);
+ assert.equal(report.blocks.length,1,'Concise milestone-only report is one sheet');
+ assert.equal((report.html.match(/data-milestone-level=/g)||[]).length,3);
+ assert.equal((report.html.match(/class="cell-full/g)||[]).length,171,'170 scores plus the legend');
+ assert.ok(report.html.includes('&lt;img'));assert.ok(!report.html.includes('<img src=x'));
+ assert.ok(!report.html.includes('profile-row'));
+}
+state.child.language='Arabic / Syrian dialect';assert.ok(R.make(state,D).text.includes(state.child.language));
+state.clinical='Observed independent responses. '.repeat(150);state.reportDetails=true;const detail=R.make(state,D);assert.ok(detail.blocks.length>170);
+const packed=P.pack(state,D);assert.equal(packed.assessment.reportDetails,true);assert.equal(Object.keys(packed.assessment.scores.barriers).length,0);
+const relContext={self:{}};vm.runInNewContext(fs.readFileSync(path.join(root,'assets/pwa-release.js'),'utf8'),relContext);
+for(const file of relContext.self.VBMAPP_RELEASE.files)assert.equal(file.integrity,'sha256-'+crypto.createHash('sha256').update(fs.readFileSync(path.join(root,file.url))).digest('base64'));
+console.log('PASS: all 170 complete and scoreable milestones, precise full/half constraints, protected old scores, follow-up, concise/detail reports, selected-section payloads and offline integrity.');

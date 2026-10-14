@@ -11,7 +11,10 @@
       body = document.createElement('div'); body.className = 'pdf-body'; page.append(body); stage.append(page); pages.push(page);
     }
     newPage();
+    let forceNextPage = false;
     for (let index = 0; index < report.blocks.length; index++) {
+      if (forceNextPage && body.children.length) newPage();
+      forceNextPage = Boolean(report.blocks[index].pageBreakAfter);
       const wrapper = document.createElement('div'); wrapper.innerHTML = report.blocks[index].html; const block = wrapper.firstElementChild;
       // PDF pages already repeat the complete contact footer below their content.
       if(block.firstElementChild?.classList.contains('report-footer'))continue;

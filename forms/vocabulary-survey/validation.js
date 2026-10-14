@@ -6,10 +6,10 @@ export const CONFIG_VERSION = 'cohorts-1';
 // Keep this strict: a missing cross-folder match excludes the target.
 export const REQUIRE_CROSS_FOLDER_SEMANTIC = true;
 export const COHORTS = [
-    { id: 'A', label: '2–3 years', description: 'Familiar nouns, actions and everyday concepts' },
-    { id: 'B', label: '3–4 years', description: 'Descriptors, shapes and broader everyday vocabulary' },
-    { id: 'C', label: '4–5 years', description: 'Spatial, temporal and category concepts' },
-    { id: 'D', label: '6+ years', description: 'Extended, abstract and less familiar vocabulary' }
+    { id: 'A', label: '٢–٣ سنوات', description: 'Familiar nouns, actions and everyday concepts' },
+    { id: 'B', label: '٣–٤ سنوات', description: 'Descriptors, shapes and broader everyday vocabulary' },
+    { id: 'C', label: '٤–٥ سنوات', description: 'Spatial, temporal and category concepts' },
+    { id: 'D', label: '٦ سنوات فأكثر', description: 'Extended, abstract and less familiar vocabulary' }
 ];
 // Every folder is mapped once. Individual word rules below take precedence.
 // Receptive and expressive configurations remain independently editable.

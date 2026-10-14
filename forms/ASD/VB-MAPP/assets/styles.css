@@ -101,3 +101,52 @@ dialog.fallback[open] { position:fixed; z-index:1001; top:50%; left:50%; transfo
 @media(max-width:700px) { .app-header { padding:18px 14px; } #main { padding:20px 12px; } .form-grid,.cards-grid { grid-template-columns:1fr; } .panel,.assessment-card { padding:17px; } nav button { flex:1 1 130px; } .report-document { padding:16px; } .profile-row { grid-template-columns:1.4fr 1.2fr 52px; } .profile-row small { grid-column:1/-1; } .header-actions { width:100%; } .header-actions button { flex:1; } dialog { padding:18px; } }
 @media(prefers-reduced-motion:reduce) { * { scroll-behavior:auto !important; } }
 @media print { @page { size:A4; margin:14mm; } body > * { display:none !important; } body > #printArea { display:block !important; padding:0; border:0; border-radius:0; font-size:10pt; } .report-block { break-inside:avoid; } h2,h3 { break-after:avoid; } .profile-row { grid-template-columns:minmax(130px,1.3fr) 2fr 70px 85px; } .milestone-level { break-inside:avoid; } .milestone-grid th { font-size:8pt; } .cell-full,.cell-half,.profile-track i { print-color-adjust:exact; -webkit-print-color-adjust:exact; } }
+
+/* One bounded A4 sheet keeps every milestone level together. */
+.milestone-sheet-block { max-width:100%; overflow-x:auto; }
+.milestone-sheet { min-width:680px; color:#213b4a; }
+.sheet-header { border-bottom:2px solid var(--brand); padding-bottom:8px; }
+.sheet-header h1 { font-size:21px; line-height:1.4; margin:0 0 7px; }
+.sheet-case { display:flex; flex-wrap:wrap; gap:4px 20px; justify-content:space-between; font-size:13px; }
+.sheet-header p { margin:3px 0; font-size:11px; line-height:1.5; }
+.sheet-header .sheet-score { font-size:13px; font-weight:bold; }
+.milestone-sheet .grid-legend { margin:8px 0; gap:14px; font-size:11px; }
+.milestone-sheet .grid-legend i { width:20px; height:20px; }
+.milestone-sheet .milestone-level { margin:9px 0; }
+.milestone-sheet .milestone-level h3 { font-size:14px; margin:5px 0; line-height:1.5; }
+.milestone-sheet .age-band { font-size:10px; }
+.milestone-sheet .grid-table-scroll { overflow:visible; }
+.milestone-sheet .milestone-grid { border-spacing:3px 2px; }
+.milestone-sheet .milestone-grid th { font-size:10px; line-height:1.35; padding:3px 1px; }
+.milestone-sheet .milestone-grid td { height:27px; font-size:12px; }
+.milestone-sheet .milestone-grid td>span { line-height:1; }
+.milestone-sheet .milestone-grid .grid-value { line-height:24px; }
+.milestone-sheet .milestone-grid .grid-before { font-size:9px; line-height:10px; }
+.milestone-sheet .milestone-grid .has-previous { height:36px; }
+.milestone-sheet .sheet-changes { font-size:10px; line-height:1.5; margin:5px 0 0; }
+.manual-note { font-size:13px; color:var(--muted); }
+.scoring-zero { font-size:13px; color:var(--muted); margin-top:12px; }
+.install-icon { flex:0 0 46px!important; display:grid; place-items:center; width:46px; padding:10px; }
+#installDialog { max-width:520px; }
+#installDialog p { font-size:15px; }
+@media print {
+  .milestone-sheet-block { overflow:visible; break-inside:avoid; break-after:page; }
+  .milestone-sheet-block:last-child { break-after:auto; }
+  .milestone-sheet { min-width:0; }
+  .milestone-sheet .milestone-grid { min-width:0; }
+  .milestone-sheet .grid-table-scroll { overflow:visible; }
+  .milestone-sheet .milestone-grid th { font-size:8pt; }
+  .milestone-sheet * { print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+}
+.milestone-sheet .milestone-grid .has-previous { height:30px; }
+.milestone-sheet .milestone-grid .has-previous .grid-value { line-height:18px; }
+.sheet-header h1 { display:flex; flex-wrap:wrap; align-items:baseline; gap:10px; }
+.sheet-score { display:flex; flex-wrap:wrap; gap:5px; align-items:center; }
+.sheet-contact { border-top:1px solid var(--line); margin-top:10px; padding-top:6px; font-size:9px; line-height:1.5; text-align:center; }
+.pdf-page .sheet-contact { display:none; }
+@media print { html,body { background:#fff!important; } }
+/* Letter spacing breaks Arabic shaping in the canvas PDF exporter. */
+.sheet-header h1 { letter-spacing:normal; }
+.sheet-meta,.milestone-sheet .comparison-key,.sheet-changes { display:flex; flex-wrap:wrap; gap:3px 12px; font-size:11px; line-height:1.5; }
+.sheet-meta { margin:3px 0; }
+.pdf-stage .pdf-page { font-family:Arial,sans-serif; }

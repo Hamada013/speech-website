@@ -7,14 +7,7 @@
     const $ = selector => document.querySelector(selector);
     const all = selector => [...document.querySelectorAll(selector)];
     const read = key => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
-    if (mode === 'hub') {
-        for (const card of all('[data-game-link]')) {
-            const last = read(`hamada-game-${card.dataset.gameLink}-last`);
-            const note = card.querySelector('[data-last-result]');
-            if (last && Number.isFinite(last.percentage)) note.textContent = `آخر جلسة: ${last.percentage}٪ · ${last.partial ? 'غير مكتملة' : 'مكتملة'}${last.review ? ' · مراجعة' : ''}`;
-        }
-        return;
-    }
+    if (mode === 'hub') return;
     const bank = window.VOC_GAME_DATA;
     const meta = M.MODES[mode];
     if (!bank || !meta) return;
@@ -60,6 +53,7 @@
         collectTime(); ++generation;
         for (const timer of timers) clearTimeout(timer);
         timers.clear(); stopAudio(); ready = false; deadline = null;
+        $('#play-view').classList.remove('listening-replay');
     }
     function later(action, delay) {
         const ticket = generation;
@@ -68,6 +62,7 @@
     }
     function show(view) {
         for (const id of ['setup', 'play', 'pause', 'results']) $(`#${id}-view`).hidden = id !== view;
+        $('#rapid-autoplay').hidden = mode !== 'rapid' || view !== 'play';
     }
     function settings() {
         return { level: Number(picked('game-level')), length: Number(picked('game-length')), duration: Number(picked('game-duration')),
@@ -137,6 +132,9 @@
         updatePreview();
     }
     function updatePreview() {
+        const visible = filteredItems();
+        $('#select-category').setAttribute('aria-pressed', String(visible.length > 0 && visible.every(item => selected.has(item.key))));
+        $('#select-everything').setAttribute('aria-pressed', String(selected.size === items.length));
         const unique = M.uniqueItems(items.filter(item => selected.has(item.key)));
         const config = settings();
         const count = mode === 'memory' ? Math.min(config.level, unique.length) : Math.min(config.length, unique.length);
@@ -168,7 +166,7 @@
     function updateStats() {
         $('#session-progress').max = session.order.length; $('#session-progress').value = session.position;
         $('#session-counter').textContent = `${mode === 'memory' ? 'الأزواج' : 'الكلمات'}: ${session.position} / ${session.order.length}${session.review ? ' · مراجعة' : ''}`;
-        $('#attempt-counter').textContent = mode === 'memory' ? `المحاولات: ${session.moves}` : mode === 'rapid' ? `تم تقييم: ${session.records.length}` : `الاختيارات: ${session.attempts}`;
+        $('#attempt-counter').textContent = mode === 'memory' ? `المحاولات: ${session.moves}` : mode === 'rapid' ? `تم تقييم: ${session.records.filter(record => record.result !== 'viewed' && record.result !== 'skip').length}` : `الاختيارات: ${session.attempts}`;
         $('#mistake-counter').textContent = `تحتاج تدريباً: ${session.missed.length}`;
     }
     function enableControls() {
@@ -176,8 +174,8 @@
         for (const button of all('#game-board > button, #active-match > button')) {
             button.disabled = !active || button.classList.contains('matched') || (mode === 'test' && heardKey !== session.order[session.position]);
         }
-        for (const button of all('[data-grade]')) button.disabled = !active || !gradeReady;
-        $('#play-word').disabled = !lastKey || !ready || !['active', 'feedback'].includes(phase) || (mode === 'matching' && phase === 'feedback');
+        for (const button of all('[data-grade]')) button.disabled = !active || !gradeReady || session.autoPlay;
+        $('#play-word').disabled = !lastKey || !ready || !['active', 'feedback'].includes(phase) || (['matching', 'test'].includes(mode) && phase === 'feedback') || session.autoPlay;
         $('#show-grading').disabled = !active || gradeReady;
         $('#skip-word').disabled = !active;
     }
@@ -185,6 +183,7 @@
         const element = document.createElement(tag); element.className = className; element.dataset.key = item.key;
         if (tag === 'button') { element.type = 'button'; element.disabled = true; element.setAttribute('aria-label', item.name); }
         const image = document.createElement('img'); image.alt = item.name; image.decoding = 'async';
+        image.draggable = false;
         const loaded = new Promise(resolve => {
             const timer = setTimeout(() => resolve(false), 12000);
             image.onload = () => { clearTimeout(timer); resolve(true); };
@@ -200,11 +199,12 @@
         phase = 'loading'; gradeReady = false; heardKey = null;
         const ticket = generation;
         show('play'); updateStats();
-        $('#play-title').textContent = meta.description;
+        $('#play-title').textContent = session.autoPlay ? 'استمع وشاهد البطاقات.' : meta.description;
         $('#game-board').className = `game-board${mode === 'memory' ? ' memory-board' : ''}`;
         $('#game-board').replaceChildren(); $('#active-match').replaceChildren();
-        $('#rapid-controls').hidden = mode !== 'rapid'; $('#next-round').hidden = true; $('#reload-media').hidden = true;
-        $('#skip-word').hidden = !['rapid', 'test'].includes(mode);
+        $('#rapid-autoplay').setAttribute('aria-pressed', String(!!session.autoPlay));
+        $('#rapid-controls').hidden = mode !== 'rapid' || session.autoPlay; $('#next-round').hidden = true; $('#reload-media').hidden = true;
+        $('#skip-word').hidden = !['rapid', 'test'].includes(mode) || session.autoPlay;
         feedback('جاري تحميل الصور…');
         const loading = [];
         const target = byKey.get(session.order[session.position]);
@@ -251,6 +251,7 @@
         if (session.between) { feedback('أحسنت! أكملت هذه المجموعة. تابع عندما تكون مستعداً.'); $('#next-round').hidden = false; enableControls(); return; }
         feedback(mode === 'test' ? 'استمع إلى الكلمة ثم المس صورتها.' : meta.description);
         if (mode === 'memory' && session.pendingMismatch) { phase = 'feedback'; later(closeMismatch, 800); }
+        if (mode === 'rapid' && session.autoPlay) { enableControls(); void autoAdvance(ticket); return; }
         if (mode === 'rapid') startObservation(session.rapidRemaining ?? session.settings.duration * 1000);
         enableControls();
         if (mode === 'test' || (mode === 'rapid' && session.settings.sound)) await playWord(target.key, mode === 'test');
@@ -306,7 +307,19 @@
         if (key !== target) {
             session.mistakes++; session.trialMistakes++; missed(target); button.classList.add('wrong');
             feedback('حاول مرة أخرى. يمكنك سماع الكلمة مجدداً.', true);
-            later(() => button.classList.remove('wrong'), 450); save(); updateStats(); return;
+            if (mode === 'test') {
+                phase = 'feedback'; heardKey = null; enableControls();
+                later(async () => {
+                    button.classList.remove('wrong'); $('#play-view').classList.add('listening-replay');
+                    const played = await playWord(target, true, true);
+                    if (ticket !== generation) return;
+                    $('#play-view').classList.remove('listening-replay');
+                    phase = 'active';
+                    if (!played) heardKey = null;
+                    enableControls();
+                }, 450);
+            } else later(() => button.classList.remove('wrong'), 450);
+            save(); updateStats(); return;
         }
         phase = 'feedback';
         if (!session.trialMistakes) session.firstCorrect++;
@@ -332,11 +345,13 @@
         let origin = null, moved = false;
         card.addEventListener('pointerdown', event => {
             if (phase !== 'active' || !ready || event.button !== 0) return;
+            event.preventDefault();
             origin = { x: event.clientX, y: event.clientY }; moved = false;
             card.setPointerCapture(event.pointerId); card.classList.add('dragging');
         });
         card.addEventListener('pointermove', event => {
             if (!origin) return;
+            event.preventDefault();
             const x = event.clientX - origin.x, y = event.clientY - origin.y;
             moved ||= Math.hypot(x, y) > 8; card.style.transform = `translate(${x}px,${y}px)`;
         });
@@ -395,8 +410,22 @@
         $('#show-grading').hidden = gradeReady; $('#observation-progress').value = gradeReady ? $('#observation-progress').max : session.settings.duration * 1000 - remaining;
         if (!gradeReady) tick(); else feedback('سجّل الاستجابة عندما تكون مستعداً.');
     }
+    async function autoAdvance(ticket) {
+        feedback('عرض تلقائي دون تقييم');
+        if (session.settings.sound && !await playWord(session.order[session.position], false, true)) {
+            if (ticket === generation) {
+                session.autoPlay = false; save(); void renderCurrent();
+            }
+            return;
+        }
+        if (ticket !== generation || phase !== 'active' || !session.autoPlay) return;
+        later(() => {
+            session.records.push({ key: session.order[session.position], result: 'viewed' });
+            session.position++; session.rapidRemaining = null; save(); void renderCurrent();
+        }, (session.settings.duration || 2) * 1000);
+    }
     function grade(result) {
-        if (phase !== 'active' || !ready || !gradeReady || !['notMastered', 'learning', 'mastered'].includes(result)) return;
+        if (phase !== 'active' || !ready || !gradeReady || session.autoPlay || !['notMastered', 'learning', 'mastered'].includes(result)) return;
         const key = session.order[session.position]; phase = 'feedback';
         session.records.push({ key, result }); if (result !== 'mastered') missed(key);
         session.position++; session.rapidRemaining = null; feedback('تم تسجيل الاستجابة.'); enableControls(); save(); updateStats(); later(() => { void renderCurrent(); }, 250);
@@ -421,11 +450,12 @@
         $('#result-metrics').replaceChildren();
         const percentage = summary.percentage === null ? '—' : `${summary.percentage}٪`;
         const metrics = mode === 'memory' ? [[percentage, 'أزواج صحيحة / محاولات'], [session.moves, 'محاولات'], [session.matched.length, 'أزواج مكتملة']]
-            : mode === 'rapid' ? [[percentage, 'أتقن من الكلمات المقيّمة'], [summary.mastered, 'أتقن'], [summary.learning, 'يتعلّم']]
+            : mode === 'rapid' ? (summary.viewed && !summary.scored ? [[summary.viewed, 'بطاقات عُرضت دون تقييم'], [session.order.length, 'بطاقات الجلسة']]
+                : [[percentage, 'أتقن من الكلمات المقيّمة'], [summary.mastered, 'أتقن'], [summary.learning, 'يتعلّم']])
                 : [[percentage, 'صحيح من أول محاولة'], [session.firstCorrect, 'صحيح من أول محاولة'], [session.mistakes, 'اختيارات تحتاج تصحيحاً']];
         for (const [value, label] of metrics) { const box = document.createElement('div'), strong = document.createElement('strong'), span = document.createElement('span'); strong.textContent = value; span.textContent = label; box.append(strong, span); $('#result-metrics').append(box); }
         const seconds = Math.round(summary.elapsedMs / 1000);
-        $('#result-details').textContent = `وقت اللعب: ${Math.floor(seconds / 60)} د و${seconds % 60} ث · كلمات للمراجعة: ${session.missed.length} · تم تجاوز: ${summary.skipped}. النتيجة للتدريب وليست تقييماً تشخيصياً.`;
+        $('#result-details').textContent = `وقت اللعب: ${Math.floor(seconds / 60)} د و${seconds % 60} ث · كلمات للمراجعة: ${session.missed.length} · تم تجاوز: ${summary.skipped}${summary.viewed ? ` · عُرضت دون تقييم: ${summary.viewed}` : ''}. النتيجة للتدريب وليست تقييماً تشخيصياً.`;
         $('#review-missed').hidden = !session.missed.length || session.pool.length < meta.minimum;
         show('results'); $('#results-title').focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: 'instant' });
     }
@@ -439,7 +469,7 @@
         $('#labels-field').hidden = true; $('#sound-field').hidden = true;
         $('input[name="game-level"][value="6"]').closest('label').remove(); $('#level-field .choice-options').classList.add('two-options');
     }
-    $('#settings-help').textContent = mode === 'rapid' ? 'الصوت نموذج للتعلّم ويمكن إيقافه لتدريب التسمية دون نموذج. المؤقت لا يسجّل فشلاً ولا يقدّم البطاقة تلقائياً.'
+    $('#settings-help').textContent = mode === 'rapid' ? 'الصوت نموذج للتعلّم ويمكن إيقافه. زر الأرنب في رأس الصفحة يعرض البطاقات تلقائياً دون تقييم؛ اضغطه مجدداً للعودة إلى التقييم اليدوي.'
         : mode === 'memory' ? 'ابدأ بزوجين، ثم زد العدد تدريجياً. الصور المخفية لا تظهر أسماؤها لقارئ الشاشة.'
             : mode === 'test' ? 'يجب تشغيل الكلمة قبل الإجابة. تُحتسب الدقة من أول اختيار، حتى لو نجح الطفل بعد المحاولة مجدداً.' : 'يمكن المطابقة باللمس أو بالسحب أو بلوحة المفاتيح. كل جلسة تنتهي بنتيجة واضحة.';
     const preferences = read(`${prefix}-preferences`);
@@ -457,10 +487,15 @@
     $('#toggle-categories').addEventListener('click', () => toggleCategories($('#category-panel').hidden));
     $('#category-search').addEventListener('input', renderCategoryGrid);
     $('#word-search').addEventListener('input', () => { page = 0; refreshSelection(); });
-    $('#select-category').addEventListener('click', () => { filteredItems().forEach(item => selected.add(item.key)); refreshSelection(); selectionPreferences(); });
-    $('#clear-category').addEventListener('click', () => { filteredItems().forEach(item => selected.delete(item.key)); refreshSelection(); selectionPreferences(); });
-    $('#select-everything').addEventListener('click', () => { selected = new Set(items.map(item => item.key)); refreshSelection(); selectionPreferences(); });
-    $('#clear-everything').addEventListener('click', () => { selected.clear(); refreshSelection(); selectionPreferences(); });
+    $('#select-category').addEventListener('click', () => {
+        const visible = filteredItems(), clear = visible.every(item => selected.has(item.key));
+        visible.forEach(item => clear ? selected.delete(item.key) : selected.add(item.key)); refreshSelection(); selectionPreferences();
+    });
+    $('#select-everything').addEventListener('click', () => { selected = selected.size === items.length ? new Set() : new Set(items.map(item => item.key)); refreshSelection(); selectionPreferences(); });
+    $('#rapid-autoplay').addEventListener('click', () => {
+        if (mode !== 'rapid' || !session || !['active', 'loading', 'feedback'].includes(phase)) return;
+        session.autoPlay = !session.autoPlay; session.rapidRemaining = null; save(); void renderCurrent();
+    });
     $('#page-previous').addEventListener('click', () => { page--; refreshSelection(); });
     $('#page-next').addEventListener('click', () => { page++; refreshSelection(); });
     $('#start-game').addEventListener('click', () => begin());

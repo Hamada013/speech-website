@@ -56,4 +56,10 @@ assert.equal(M.summarize(rapid).percentage, 33); assert.equal(M.summarize(rapid)
 const test = M.createSession('test', pool, config, data.version);
 test.records = [{ result: 'correct' }, { result: 'correct' }, { result: 'skip' }]; test.firstCorrect = 1;
 assert.equal(M.summarize(test).percentage, 50, 'Retries must not inflate first-choice accuracy; skips are excluded');
+
+const autoplay = M.createSession('rapid', items.slice(0, 3), { level: 2, length: 6, duration: 2 }, 'test');
+autoplay.records = autoplay.order.map(key => ({ key, result: 'viewed' }));
+assert.equal(M.summarize(autoplay).percentage, null);
+assert.equal(M.summarize(autoplay).scored, 0);
+assert.equal(M.summarize(autoplay).viewed, autoplay.order.length);
 console.log(`PASS: ${items.length} shared words, unique artwork/labels, finite sessions, balanced memory decks, bounded choices, scores and skip denominators.`);

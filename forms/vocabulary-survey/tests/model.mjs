@@ -66,7 +66,7 @@ assert.equal(analyze(current).overall.skipped, 1);
 assert.equal(analyze(current).errorTotal, 3);
 assert.equal(analyze(current).errors[0].percentage, 33.3);
 assert.equal(analyze(current).languageAgeEquivalent, null);
-assert.match(analyze(current).attainment, /Not estimated/);
+assert.match(analyze(current).attainment, /غير مقدّر/);
 const json = parseHistory(JSON.stringify({ session: current }), 'history.json');
 const csv = parseHistory(toCSV(current), 'history.csv');
 assert.deepEqual(csv.records, json.records);

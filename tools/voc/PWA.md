@@ -2,7 +2,7 @@
 
 Implemented directly in `tools/voc/`. Serve this directory with HTTPS (or use localhost for development). Deploy all HTML, `sw.js`, `manifest.json`, `assets/`, `icons/`, `images/`, and `sounds/` together; no server-side code is required.
 
-The home screen opens immediately. Its Arabic offline card starts or pauses downloads, reports actual cached files, and shows “جاهز للاستخدام دون اتصال ✔” only after verification. The catalog currently contains **1,975 existing media files, 29.6 MB**, across folders 1–40. Folder sizes vary and contain gaps; the catalog includes existing filenames rather than guessing 19 per folder.
+The home screen opens immediately. Its header has information and install icons. After installation, an Arabic popup offers offline downloads. The install icon also reopens the download controls in the installed app. The popup starts or pauses downloads, reports actual cached files, and shows “جاهز للاستخدام دون اتصال ✔” only after verification. The catalog currently contains **1,975 existing media files, 29.6 MB**, across folders 1–40. Folder sizes vary and contain gaps; the catalog includes existing filenames rather than guessing 19 per folder.
 
 Downloads use three sequential files per message, eight-second per-file timeouts, SHA-256 verification, and revisioned Cache Storage keys. Navigating between app pages resumes an unfinished download; an explicit pause persists. Two windows share a batch and pending requests. Completed files are reused across revisits and unchanged media is reused across releases. Installation only saves the local app shell. All CSS, icon fonts, and Arabic fonts are local. Cached M4A responses implement 206 byte ranges and 416 errors for Safari audio.
 
@@ -10,7 +10,7 @@ Keep the app visible while downloading. The OS may suspend or terminate workers;
 
 ## Install and branding
 
-Android/Chromium can expose the “تثبيت التطبيق” button when the browser offers installation. On iPhone/iPad, use Share → Add to Home Screen; on versions that offer it, enable Open as Web App. Installation and media download are separate actions. The manifest uses relative start/scope/id values so subpath hosting works.
+The header install icon uses the Android/Chromium install prompt when the browser offers installation, or shows manual instructions. On iPhone/iPad, use Share → Add to Home Screen; on versions that offer it, enable Open as Web App. Installation and media download are separate actions; accepted installation or the first standalone launch opens the offline download popup. The app name is “كلماتي مع حمادة”. The manifest uses relative start/scope/id values so subpath hosting works.
 
 Real PNG install icons were generated from `images/logo.webp`: 192px and 512px general icons, a 512px opaque maskable icon with safe padding, and a 180px Apple touch icon. These paths are the customization points for replacing branding; they are working assets rather than missing placeholders. Run `npm run build:icons` if the logo changes. The Apple status bar uses `black-translucent` with CSS safe-area padding; change it to `default` for an opaque status bar. Device-specific Apple splash images are optional and intentionally not linked to nonexistent files.
 
@@ -26,7 +26,7 @@ Updates activate after existing app windows close, avoiding mixed shell releases
 
 These referenced images were already absent from the converted assets: `images/7/11.webp`, `images/7/12.webp`, `images/16/4.webp`, `images/16/14.webp`, `images/33/30.webp`, and `images/33/88.webp` through `images/33/97.webp`. They display a local placeholder. Add the missing images and rebuild the catalog to restore the intended artwork. The downloader verifies all files actually supplied; it cannot recreate missing source images.
 
-The existing Resources link targets `res/1.pdf`, which is absent from this project. It is not included in the offline catalog. Add that PDF and add its path to the shell list in `scripts/build-pwa.cjs` if it should be downloadable offline. `test.html` now runs the “استمع واختر” listening game. Games exclude items whose images or sounds are absent, instead of asking children to identify a placeholder.
+The unused Resources link has been removed. `test.html` now runs the “استمع واختر” listening game. Games exclude items whose images or sounds are absent, instead of asking children to identify a placeholder.
 
 ## Requested code blocks
 
@@ -37,8 +37,8 @@ The following blocks show the installed source. The worker depends on the genera
 ```json
 {
   "id": "./",
-  "name": "المفاهيم مع حمادة",
-  "short_name": "حمادة",
+  "name": "كلماتي مع حمادة",
+  "short_name": "كلماتي مع حمادة",
   "description": "تعلم المفاهيم والكلمات العربية مع صور وأصوات وألعاب تعمل دون اتصال بعد تنزيل المحتوى.",
   "lang": "ar",
   "dir": "rtl",
@@ -70,7 +70,7 @@ The following blocks show the installed source. The worker depends on the genera
     <meta name="theme-color" content="#0284C7">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="حمادة">
+    <meta name="apple-mobile-web-app-title" content="كلماتي مع حمادة">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="format-detection" content="telephone=no">
     <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
@@ -341,7 +341,19 @@ self.addEventListener('fetch', event => {
     const statusText = card?.querySelector('[data-offline-status]');
     const progress = card?.querySelector('progress');
     const button = card?.querySelector('[data-offline-download]');
-    const installButton = card?.querySelector('[data-offline-install]');
+    const installButton = document.querySelector('[data-offline-install]');
+    const dialog = document.querySelector('[data-offline-dialog]');
+    const standalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    let installed = standalone();
+    let offered = false;
+    function openDialog(download) {
+        if (!dialog) return;
+        dialog.querySelector('[data-install-help]').hidden = download;
+        dialog.querySelector('[data-download-panel]').hidden = !download;
+        if (!dialog.open) dialog.showModal();
+    }
+    document.querySelector('[data-offline-close]')?.addEventListener('click', () => dialog.close());
+    document.querySelector('[data-install-confirm]')?.addEventListener('click', () => openDialog(true));
     let registration;
     let status;
     let running = false;
@@ -367,6 +379,10 @@ self.addEventListener('fetch', event => {
         status = next;
         fault = false;
         if (!card) return;
+        if (installed && !offered) {
+            offered = true;
+            if (!status.ready && !status.wanted) openDialog(true);
+        }
         progress.max = Math.max(1, status.total);
         progress.value = status.done;
         progress.setAttribute('aria-valuetext', `${status.done} / ${status.total}`);
@@ -434,16 +450,18 @@ self.addEventListener('fetch', event => {
     window.addEventListener('beforeinstallprompt', event => {
         event.preventDefault();
         installPrompt = event;
-        if (installButton) installButton.hidden = false;
     });
     installButton?.addEventListener('click', async () => {
-        if (!installPrompt) return;
-        await installPrompt.prompt();
-        await installPrompt.userChoice;
-        installPrompt = null;
-        installButton.hidden = true;
+        if (installed || standalone()) { openDialog(true); return; }
+        if (!installPrompt) { openDialog(false); return; }
+        try {
+            await installPrompt.prompt();
+            const choice = await installPrompt.userChoice;
+            installPrompt = null;
+            if (choice.outcome === 'accepted') { installed = true; offered = true; openDialog(true); }
+        } catch { installPrompt = null; openDialog(false); }
     });
-    window.addEventListener('appinstalled', () => { if (installButton) installButton.hidden = true; });
+    window.addEventListener('appinstalled', () => { installed = true; offered = true; openDialog(true); });
 
     button?.addEventListener('click', async () => {
         button.disabled = true;
@@ -506,18 +524,4 @@ self.addEventListener('fetch', event => {
 })();
 ```
 
-The home-screen component used by this script:
-
-```html
-<section class="offline-card" data-offline-card data-state="idle" aria-labelledby="offline-title">
-                <h2 id="offline-title">التطبيق دون اتصال</h2>
-                <p data-offline-status role="status" aria-live="polite" aria-atomic="true">جاري التحقق من المحتوى المحفوظ…</p>
-                <progress value="0" max="1" aria-label="تقدم تنزيل المحتوى"></progress>
-                <div class="offline-actions">
-                    <button type="button" data-offline-download disabled>تنزيل كل المحتوى دون اتصال</button>
-                    <button type="button" data-offline-install hidden>تثبيت التطبيق</button>
-                </div>
-                <p>اترك التطبيق مفتوحاً أثناء التنزيل. إذا توقف أو أُغلق، سيستكمل الملفات المتبقية عند العودة.</p>
-                <p>على iPhone وiPad: من قائمة المشاركة اختر «إضافة إلى الشاشة الرئيسية» ثم «فتح كتطبيق ويب» إن ظهر.</p>
-            </section>
-```
+The install icon opens the native prompt or manual instructions. The download card lives inside a modal `<dialog>` in `index.html`; it is hidden on the home screen. The native install event or a standalone launch opens the download panel automatically. On iOS, users can also confirm the manual instructions to open the panel. Closing the dialog preserves downloads and saved progress.
