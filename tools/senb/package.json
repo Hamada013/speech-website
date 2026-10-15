@@ -6,10 +6,12 @@
     "build:css": "tailwindcss -c tailwind.config.cjs -i assets/tailwind.css -o assets/utilities.css --minify",
     "build:pwa": "node scripts/build-pwa.cjs",
     "test": "node tests/regression.cjs && node tests/verb-context.cjs && node tests/audio.cjs && node tests/activities-model.cjs && node tests/offline.cjs",
-    "test:browser": "node tests/browser.cjs && node tests/activities-browser.cjs && node tests/pwa-browser.cjs"
+    "test:browser": "node tests/browser.cjs && node tests/activities-browser.cjs && node tests/pwa-browser.cjs",
+    "build:icons": "node scripts/build-icons.cjs"
   },
   "devDependencies": {
     "playwright": "1.50.1",
-    "tailwindcss": "3.4.17"
+    "tailwindcss": "3.4.17",
+    "sharp": "0.34.5"
   }
 }

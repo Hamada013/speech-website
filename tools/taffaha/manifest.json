@@ -1,0 +1,12 @@
+{
+ "id":"./", "name":"تف فا حة", "short_name":"تف فا حة",
+ "description":"نلعب بالمقاطع، نستمع، ونسجّل أصواتنا. تدريب عربي للأطفال.",
+ "lang":"ar", "dir":"rtl", "start_url":"./index.html", "scope":"./",
+ "display":"standalone", "background_color":"#f8fafc", "theme_color":"#0284c7",
+ "categories":["education","kids"],
+ "icons":[
+  {"src":"assets/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+  {"src":"assets/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+  {"src":"assets/icons/maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+ ]
+}

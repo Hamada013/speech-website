@@ -6,7 +6,7 @@ const root = path.resolve(__dirname, '..');
 const shell = [
   'index.html', 'manifest.webmanifest', 'assets/app.js', 'assets/vendor.js',
   'assets/practice.js', 'assets/recording.js', 'assets/dialog.js', 'assets/pwa.js',
-  'assets/index-B-ZKx10f.css', 'assets/responsive.css', 'assets/icons/icon.svg',
+  'assets/index-B-ZKx10f.css', 'assets/responsive.css', 'assets/icons/logo.webp',
   'assets/icons/icon-192.png', 'assets/icons/icon-512.png',
   'assets/icons/icon-maskable-512.png', 'assets/icons/apple-touch-icon.png'
 ];

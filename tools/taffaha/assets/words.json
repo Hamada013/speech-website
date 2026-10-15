@@ -1,0 +1,488 @@
+{
+  "words": [
+    {
+      "id": "voc-6-1",
+      "label": "تفاحة",
+      "syllableCount": 3,
+      "sourceCategory": "الفواكه",
+      "syllables": [
+        "تُفْ",
+        "فا",
+        "حة"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/6/1.webp",
+        "revision": "2ae10847f00b0fb92de788f08052eab2716f6df512c2883d37ce735b8b82fd53"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/6/1.m4a"
+      }
+    },
+    {
+      "id": "voc-6-3",
+      "label": "موزة",
+      "syllableCount": 2,
+      "sourceCategory": "الفواكه",
+      "syllables": [
+        "مو",
+        "زة"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/6/3.webp",
+        "revision": "77e6f736cd4dc286706bd4d60d40a3b6af3947038bcf77c774a9f804b255726b"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/6/3.m4a"
+      }
+    },
+    {
+      "id": "voc-6-12",
+      "label": "ليمون",
+      "syllableCount": 2,
+      "sourceCategory": "الفواكه",
+      "syllables": [
+        "لي",
+        "مون"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/6/12.webp",
+        "revision": "09344f51297127b0a7cc910e3868ca291c876d6cab10a21529860caebf9ed344"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/6/12.m4a"
+      }
+    },
+    {
+      "id": "voc-6-14",
+      "label": "بطيخ",
+      "syllableCount": 2,
+      "sourceCategory": "الفواكه",
+      "syllables": [
+        "بَطْ",
+        "طيخ"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/6/14.webp",
+        "revision": "3cf2de394b277223802ec6d6fa969680874fd80d6cadc91c7a74343ed6abceb3"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/6/14.m4a"
+      }
+    },
+    {
+      "id": "voc-6-11",
+      "label": "كيوي",
+      "syllableCount": 2,
+      "sourceCategory": "الفواكه",
+      "syllables": [
+        "كي",
+        "وي"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/6/11.webp",
+        "revision": "43e978ae4c8fcc811b56fed9187c3b14dace0dd4c792fa570488d68a13b9af8e"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/6/11.m4a"
+      }
+    },
+    {
+      "id": "voc-6-10",
+      "label": "عنب",
+      "syllableCount": 2,
+      "sourceCategory": "الفواكه",
+      "syllables": [
+        "عِ",
+        "نَب"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/6/10.webp",
+        "revision": "604dffd3e18be1941865addd82ff3c4a6caf6690812673e12dfcb541ffac8403"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/6/10.m4a"
+      }
+    },
+    {
+      "id": "voc-6-19",
+      "label": "اناناس",
+      "syllableCount": 3,
+      "sourceCategory": "الفواكه",
+      "syllables": [
+        "أَ",
+        "نا",
+        "ناس"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/6/19.webp",
+        "revision": "ef25b5cb4cc8ad0aae590f14affb712a670888d2ec9c06f0123a903d4327700d"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/6/19.m4a"
+      }
+    },
+    {
+      "id": "voc-6-13",
+      "label": "مانجا",
+      "syllableCount": 2,
+      "sourceCategory": "الفواكه",
+      "syllables": [
+        "مانْ",
+        "جا"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/6/13.webp",
+        "revision": "2c16fdfb35bbcd20c3a3b8547053f01d8392145e5693152bc6ecaeed56f6a218"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/6/13.m4a"
+      }
+    },
+    {
+      "id": "voc-5-15",
+      "label": "بطاطا",
+      "syllableCount": 3,
+      "sourceCategory": "الطعام",
+      "syllables": [
+        "بَ",
+        "طا",
+        "طا"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/5/15.webp",
+        "revision": "ec6fabd46a291e45f939cda1daf8842b4f6c80a13d5e384b53250fa483b59494"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/5/15.m4a"
+      }
+    },
+    {
+      "id": "voc-5-21",
+      "label": "حليب",
+      "syllableCount": 2,
+      "sourceCategory": "الطعام",
+      "syllables": [
+        "حَ",
+        "ليب"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/5/29.webp",
+        "revision": "1b0bd1974b6938930d783aa3e6745fb373d20057b7baf41d34dbf208a55c912c"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/5/21.m4a"
+      }
+    },
+    {
+      "id": "voc-5-23",
+      "label": "بيتزا",
+      "syllableCount": 2,
+      "sourceCategory": "الطعام",
+      "syllables": [
+        "بيتْ",
+        "زا"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/5/27.webp",
+        "revision": "fcd5f84448d97a8b1360f20e807c5866c7d9878d8ba7fe3b4a52135ed70c31c8"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/5/23.m4a"
+      }
+    },
+    {
+      "id": "voc-5-25",
+      "label": "بوظة",
+      "syllableCount": 2,
+      "sourceCategory": "الطعام",
+      "syllables": [
+        "بو",
+        "ظة"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/5/23.webp",
+        "revision": "fe349871b240ee71ea722d88f23879ee7e3b88e2c42f726c644c4dc4067bfa26"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/5/25.m4a"
+      }
+    },
+    {
+      "id": "voc-5-33",
+      "label": "معكرونة",
+      "syllableCount": 4,
+      "sourceCategory": "الطعام",
+      "syllables": [
+        "مَعْ",
+        "كَ",
+        "رو",
+        "نة"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/5/35.webp",
+        "revision": "70b5f1769cba30cff4fee463a6d76c843f93d99a957e54f7e989c53dc6343f6f"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/5/33.m4a"
+      }
+    },
+    {
+      "id": "voc-5-32",
+      "label": "شوربة",
+      "syllableCount": 2,
+      "sourceCategory": "الطعام",
+      "syllables": [
+        "شورْ",
+        "بة"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/5/34.webp",
+        "revision": "6b8748167fd014cb5cf0531cffc5edb33942eeddf8b1f01a12c36d99fbc5512c"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/5/32.m4a"
+      }
+    },
+    {
+      "id": "voc-7-27",
+      "label": "بندورة",
+      "syllableCount": 3,
+      "sourceCategory": "الخضراوات",
+      "syllables": [
+        "بَنْ",
+        "دو",
+        "رة"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/7/27.webp",
+        "revision": "5e188ef43a5eb3b1dac6ba44697e9b2c169d847f21d0e7c6dfbae3c47f19baa2"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/7/27.m4a"
+      }
+    },
+    {
+      "id": "voc-7-9",
+      "label": "خيار",
+      "syllableCount": 2,
+      "sourceCategory": "الخضراوات",
+      "syllables": [
+        "خِ",
+        "يار"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/7/9.webp",
+        "revision": "a37cfbacf565a76e353ff7459f699f282487eefce4b369754fd077a6d5f4528c"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/7/9.m4a"
+      }
+    },
+    {
+      "id": "voc-7-6",
+      "label": "جزر",
+      "syllableCount": 2,
+      "sourceCategory": "الخضراوات",
+      "syllables": [
+        "جَ",
+        "زَر"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/7/6.webp",
+        "revision": "99942c0b47d7ddfb6449463acd92baf7c7e2a423094a31ff525e0dc7cc8f33dd"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/7/6.m4a"
+      }
+    },
+    {
+      "id": "voc-7-8",
+      "label": "ذرة",
+      "syllableCount": 2,
+      "sourceCategory": "الخضراوات",
+      "syllables": [
+        "ذُرْ",
+        "رة"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/7/8.webp",
+        "revision": "ac82ec5b4fbaa7f76a0cd44060335ca6c48bf1f9dd74009b5aae8c1ce2bbe152"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/7/8.m4a"
+      }
+    },
+    {
+      "id": "voc-7-25",
+      "label": "كوسا",
+      "syllableCount": 2,
+      "sourceCategory": "الخضراوات",
+      "syllables": [
+        "كو",
+        "سا"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/7/25.webp",
+        "revision": "569e822862edc522b3c254b7a9573996924907f292a802c164f88502cb5608cc"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/7/25.m4a"
+      }
+    },
+    {
+      "id": "voc-7-17",
+      "label": "بصل",
+      "syllableCount": 2,
+      "sourceCategory": "الخضراوات",
+      "syllables": [
+        "بَ",
+        "صَل"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/7/17.webp",
+        "revision": "a7673692487429c95067f23e4d4e71a67bb6cf0c39ecadfb80cff7ec94bdcdad"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/7/17.m4a"
+      }
+    },
+    {
+      "id": "voc-5-3",
+      "label": "خبز",
+      "syllableCount": 1,
+      "sourceCategory": "الطعام",
+      "syllables": [
+        "خُبْز"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/5/3.webp",
+        "revision": "896f20cf6b3bd4419b5665e74092688d41edb898572f344d4a9ba0faa22c0376"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/5/3.m4a"
+      }
+    },
+    {
+      "id": "voc-5-36",
+      "label": "ماء",
+      "syllableCount": 1,
+      "sourceCategory": "الطعام",
+      "syllables": [
+        "ماء"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/5/36.webp",
+        "revision": "359ce7206144cd82095c7bd9f51cf1dfcee7970c2da6ca4c158ecac18148ac51"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/5/36.m4a"
+      }
+    },
+    {
+      "id": "voc-6-5",
+      "label": "توت",
+      "syllableCount": 1,
+      "sourceCategory": "الفواكه",
+      "syllables": [
+        "توت"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/6/5.webp",
+        "revision": "26df561c72b8e668907164e0839d0a3668326ae4aa3ba46ae6e3b9f56b1a3cf0"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/6/5.m4a"
+      }
+    },
+    {
+      "id": "voc-7-26",
+      "label": "بطاطا حلوة",
+      "syllableCount": 5,
+      "sourceCategory": "الخضراوات",
+      "syllables": [
+        "بَ",
+        "طا",
+        "طا",
+        "حِلْ",
+        "وة"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/7/26.webp",
+        "revision": "592eb6a745bcc686708ce99c395f2e850c48fc50f7c910e24f93c925ef96f20f"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/7/26.m4a"
+      }
+    },
+    {
+      "id": "voc-8-6",
+      "label": "عصير برتقال",
+      "syllableCount": 5,
+      "sourceCategory": "المشروبات",
+      "syllables": [
+        "عَ",
+        "صير",
+        "بُرْ",
+        "تُ",
+        "قال"
+      ],
+      "image": {
+        "library": "voc",
+        "path": "images/8/6.webp",
+        "revision": "16d786b851ed7cc20c0198b037ab80b8807cfab74438a40514cfd96127e5f43a"
+      },
+      "audio": {
+        "library": "voc",
+        "path": "sounds/8/6.m4a"
+      }
+    }
+  ]
+}

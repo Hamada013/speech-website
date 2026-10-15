@@ -1,26 +1,16 @@
-// Rasterize the code-native SVG. No external images or fonts are needed.
-const fs = require('node:fs');
+// Generate install icons from the app's WebP logo. Requires Sharp.
+const sharp = require(process.env.FLUENCY_SHARP || 'sharp');
 const path = require('node:path');
-const { chromium } = require(process.env.FLUENCY_PLAYWRIGHT || 'playwright');
 (async () => {
   const dir = path.resolve(__dirname, '../assets/icons');
-  const source = fs.readFileSync(path.join(dir, 'icon.svg'), 'utf8');
-  const chrome = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-  const browser = await chromium.launch({ headless: true, ...(fs.existsSync(chrome) ? { executablePath: chrome } : {}) });
-  try {
-    const page = await browser.newPage();
-    for (const [filename, size, maskable] of [['icon-192.png', 192, false], ['icon-512.png', 512, false], ['apple-touch-icon.png', 180, true], ['icon-maskable-512.png', 512, true]]) {
-      const svg = maskable ? source.replace('rx="112"', 'rx="0"') : source;
-      const data = await page.evaluate(async ({ svg, size }) => {
-        const image = new Image();
-        image.src = 'data:image/svg+xml;base64,' + btoa(svg);
-        await image.decode();
-        const canvas = document.createElement('canvas'); canvas.width = canvas.height = size;
-        canvas.getContext('2d').drawImage(image, 0, 0, size, size);
-        return canvas.toDataURL('image/png').split(',')[1];
-      }, { svg, size });
-      fs.writeFileSync(path.join(dir, filename), Buffer.from(data, 'base64'));
-    }
-    console.log('Generated 192px, 512px, maskable and Apple touch icons.');
-  } finally { await browser.close(); }
+  for (const [filename, size, scale] of [
+    ['icon-192.png', 192, .85], ['icon-512.png', 512, .85],
+    ['apple-touch-icon.png', 180, .85], ['icon-maskable-512.png', 512, .65]
+  ]) {
+    const inset = Math.round(size * scale);
+    const logo = await sharp(path.join(dir, 'logo.webp')).resize(inset, inset, { fit: 'inside' }).png().toBuffer();
+    await sharp({ create: { width: size, height: size, channels: 3, background: '#f8fafc' } })
+      .composite([{ input: logo, gravity: 'center' }]).png().toFile(path.join(dir, filename));
+  }
+  console.log('Generated app install icons.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

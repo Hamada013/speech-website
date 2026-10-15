@@ -25,13 +25,13 @@ node scripts/build-pwa.cjs --check
 
 Upload the entire app folder together to your HTTPS host. Keep `sw.js`, `assets/pwa-release.js`, and all listed assets from the same release. The hash-based cache installs a complete, verified release before activation; a failed download leaves the previous release working. New versions wait until existing app windows close, or the user chooses **Update & reload**. The update button is disabled while practicing or requesting/using the microphone; reloading clears the current session and its recordings.
 
-App icons are generated from the local SVG. If you change it, run `node scripts/build-icons.cjs` in a development environment with Playwright, then rebuild the PWA release.
+App icons are generated from `assets/icons/logo.webp`. If you change it, run `node scripts/build-icons.cjs` with Sharp installed (`npm install --no-save sharp@0.34.5`), then rebuild the PWA release.
 
 ## Files
 
 - `manifest.webmanifest`, `sw.js`, and generated `assets/pwa-release.js`: install metadata and versioned offline cache.
 - `assets/pwa.js`: bilingual install guidance, offline readiness and controlled update UI.
-- `assets/icons/`: SVG source, Android icons, maskable icon and Apple touch icon.
+- `assets/icons/`: WebP logo, Android icons, maskable icon and Apple touch icon.
 - `assets/app.js`: editable React views, translations, exercise content, and session timing.
 - `assets/practice.js`: shared category, pagination, phrase, and navigation helpers.
 - `assets/recording.js`: local recording lifecycle and permission/error handling.
