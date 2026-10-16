@@ -1,43 +1,55 @@
 # تف فا حة
 
-Arabic syllable cards in five groups: **1, 2, 3, 4, 5 syllables**. The current bank has 25 cards. Serve the repository root over HTTPS or localhost, then open `/tools/taffaha/`. Keep the shared VOC media at its existing relative paths.
+Arabic syllable practice with **75 cards: 15 in each of the 1, 2, 3, 4 and 5 syllable groups**. Longer groups include familiar compound names. The original two-syllable bank is retained. Whole-word audio and pictures come from VOC and SENB; no source assets are modified.
 
-## Controls
+Serve the repository root over HTTPS or localhost and open `/tools/taffaha/`.
 
-- Choose a syllable-count group from the header's card-library icon. Previous/next/shuffle remain within the selected word's group.
-- Tap a circle to hear its latest saved take, or the Arabic device voice when no take exists.
-- Press the **header microphone icon** to reveal one recording button below each circle. Press a recording button to start, and press it again or the checkmark to stop/save. The cancel icon discards the current take. Recording stops automatically after 15 seconds.
-- The speaker icon plays the existing whole-word recording. The sequence icon plays the syllables right to left, using saved takes wherever available; the square icon stops playback.
+The home screen has two large icon buttons: **ابدأ** opens practice and **اختبار** opens the test workspace. The logo or header home icon returns home. `#practice` and `#test` also support direct links and browser back/forward navigation. Card selection is shared between the two workspaces; previous, next and shuffle stay in the selected syllable-count group.
 
-There is no settings modal, no per-syllable playback button, and no long-press recording gesture. Recording controls start hidden on each launch. Icons have accessible Arabic names and titles. The footer contains Ahmad Ghanem's supplied contact details.
+In practice, tap the image for the original whole word, an individual circle for its syllable, or the surrounding syllable frame for the full right-to-left sequence. The title has its own row below the image. There are no separate playback buttons. The header music icon switches to rhythm practice: spoken syllables move into a frame beneath the image, and blank colored metronome circles occupy the larger frame. Tap that frame for one beat per syllable, or a single circle for one beat. Both layouts retain image and syllable playback, fit the viewport, and remember the music setting locally. Recording and pause/stop controls are removed.
 
-## Image/title/audio synchronization
+## Tests
 
-`scripts/build-data.cjs` reads VOC's `CATEGORIES` directly and preserves each original word ID, label and audio path. A visual audit found five food pictures whose supplied image numbers differ from their matching word/audio numbers:
+The test header has a syllable-category button, one mode button, and the difficulty selector. The category popup contains only five circular number buttons (1–5), with no word search or individual picture selection; choosing a number starts that category. Practice retains its searchable word library. Downloads and contact details appear only on the home screen. Practice and test layouts fit the available viewport, including navigation.
 
-| Word | Audio remains | Reviewed image |
+The mode popup shows two visual previews:
+
+- **المقاطع والصورة:** tap the blank colored-circle prompt to hear the syllables. Two image cards appear underneath; tapping an image plays its word and checks the answer. Easy distractors differ by at least two syllables, Moderate by one, and Hard have the same count. Duplicate artwork is excluded and choices are shuffled.
+- **الصورة وعدد المقاطع:** tap the word image to hear the whole word, then select one of two colored-circle cards. Each circle produces one locally generated metronome click and highlights in order. Easy uses a large count difference, Moderate two, and Hard neighboring counts, such as 2 versus 3. All cards have equal sizes and single-row circles. For a target of 3, the largest available difference is two, so Easy uses that difference.
+
+Correct answers show an animated green tick over a blurred background and **always advance** to the next word in the selected category. Wrong answers show a red cross and stay on the same word for another attempt. There is no automatic-advance toggle, separate prompt switch, or separate audio button in tests; cards play their own audio. Previous, next and shuffle remain available. Navigation, mode/category changes and backgrounding cancel playback and pending feedback timers. The selected word, mode, difficulty and practice playback pace are saved locally; no answers or scores are collected. Removed preference values cannot disable automatic advance.
+
+## Prepare syllable audio
+
+The folders `assets/sounds/1/` through `assets/sounds/5/` contain a `mapping.txt` each. The complete UTF-8 audio mapping is **[assets/sounds/mapping.txt](assets/sounds/mapping.txt)**. All 15 one-syllable cards reuse their existing whole-word audio from VOC, with the same source folder and number as their picture. For example, عين uses `../voc/images/3/14.webp` and `../voc/sounds/3/14.m4a`. Their image, syllable circle and sequence frame all play the same recording. The `1/mapping.txt` file lists those existing paths; no new recordings are needed for that group.
+
+For groups 2–5, supply one spoken syllable per numbered `.m4a` file. Numbering is continuous within each count group, independent of other groups. For example:
+
+- `assets/sounds/2/1.m4a` → مو, from موزة.
+- `assets/sounds/2/2.m4a` → زة, from موزة.
+
+Groups 2–5 need **30, 45, 60 and 75 files**, respectively, for **210 new files total**. Repeated syllables have separate positional files. Keep the filenames and card order in `scripts/build-data.cjs` stable after preparing the recordings. Pronounce the listed syllables according to the displayed divisions, without letter names or grammatical case endings.
+
+The current bank includes all **210 local syllable recordings** for groups 2–5. Missing or undecodable clips display a concise unavailable message. Whole-word audio and the one-syllable group work from the source libraries. There is no device-speech fallback that could mispronounce an isolated syllable.
+
+After adding or replacing M4A files, rebuild the data and release. The build discovers local clips, hashes them and includes them in the optional offline download catalog under «المقاطع الصوتية». Only existing clips are cataloged, so the app can install before the recordings are ready.
+
+## Artwork and audio references
+
+Whole-word audio keeps its source ID. The lunchbox card (`voc-34-11`) is titled «صندوق اكل», with syllables «صُنْ / دوق / أَ / كل». Its VOC catalog label is «صندوق غذاء»; the original picture and whole-word recording are retained. Reviewed VOC artwork corrections:
+
+| Word | Original audio | Reviewed picture |
 | --- | --- | --- |
 | حليب | `sounds/5/21.m4a` | `images/5/29.webp` |
 | بيتزا | `sounds/5/23.m4a` | `images/5/27.webp` |
 | بوظة | `sounds/5/25.m4a` | `images/5/23.webp` |
 | معكرونة | `sounds/5/33.m4a` | `images/5/35.webp` |
 | شوربة | `sounds/5/32.m4a` | `images/5/34.webp` |
+| بطاطا | `sounds/5/15.m4a` | `images/7/21.webp` |
 
-These are explicit Taffaha artwork corrections; source VOC files are not changed. The remaining cards retain their VOC image references. Matching pictures were checked visually, rather than inferred from filenames alone. Three one-syllable cards and two five-syllable utterances provide content in all five groups.
+The source picture for بطاطا showed fries; the reviewed picture shows whole potatoes. The other 69 pictures use their source mappings. `assetsManager.js` clears the previous picture immediately and ignores stale image results during rapid navigation. Picture revisions invalidate ordinary HTTP image caches.
 
-`assetsManager.js` clears old artwork to the local placeholder before loading the next image, and ignores late results from previous requests. This prevents a new title appearing with a previous card's decoded picture during slow/rapid navigation. Generated image revision queries invalidate ordinary HTTP image caches after artwork changes. Missing art uses the placeholder.
-
-Syllable examples reflect the current Arabic training bank and may vary with dialect. Existing custom divisions of 1–5 segments remain honored for compatibility, without exposing the removed settings screen. The entire-word recording stays paired with its original title; recorded syllable takes independently replace device speech.
-
-## Saved recordings and PWA storage
-
-The existing IndexedDB database `taffaha-recordings` is preserved. Audio bytes, actual MIME type and metadata commit locally; no recordings are uploaded. Old child/model takes remain available, with the latest take for a word/segment taking playback priority. New recordings use stable original word/segment IDs and replace only that segment's previous child take.
-
-A full browser close/reopen retains recordings in the same browser/profile, including when offline. Audio is loaded on demand rather than all at once. The app requests persistent storage from the record-header gesture and after saving, where supported. A browser/OS can still evict website storage or a user can clear it. Clearing this app's downloaded libraries does **not** delete recordings. If a write fails, an explicit error and emergency download icon appear; the current take stays usable in memory for the session and is not falsely reported as saved.
-
-`audio.js` resumes suspended/interrupted AudioContexts on a user gesture for iOS, negotiates MediaRecorder codecs, and provides a PCM/WAV fallback. Microphone tracks and nodes are stopped on completion, cancel and errors. Backgrounding attempts to finish/save an active recording. Native permission denial gives an actionable message. Arabic device voices can require Internet; saved takes and downloaded whole-word audio do not.
-
-The scoped worker installs a verified local shell, including icons. The download dialog optionally saves all existing shared VOC/SENB/Arabic-sound assets (currently 6,938 files, about 140.5 MB) with hashes, timeout, pause/resume, quota feedback and revisioned keys. Other apps' caches are independent. Cached audio answers Safari byte-range requests. New releases wait for older windows to close, avoiding mixed app versions.
+The supplied portrait with three numbered apples is the app logo and the source for the favicon, Apple touch icon, regular installed icons and maskable icon. The icon builder reads `assets/icons/logo.webp` and requires Sharp 0.34.5.
 
 ## Build and verify
 
@@ -47,10 +59,12 @@ From the repository root:
 node tools/taffaha/scripts/build-data.cjs
 node tools/taffaha/scripts/build-pwa.cjs
 node tools/taffaha/tests/static.cjs
+node tools/taffaha/tests/test-model.cjs
+node tools/taffaha/tests/browser.cjs
+node tools/taffaha/tests/activities-browser.cjs
+node tools/taffaha/tests/persistence.cjs
 ```
 
-Rebuild data after labels, syllable divisions or artwork mappings change; rebuild the release after any shipped code or shared media changes. `node scripts/build-pwa.cjs --check` checks release freshness. The icon builder reads `assets/icons/logo.webp` and requires Sharp 0.34.5. Production requires no npm dependency or CDN.
+Browser checks require Playwright (`TAFFAHA_PLAYWRIGHT` can point to an existing installation) and installed Google Chrome. `TAFFAHA_ENGINE=webkit` selects Playwright WebKit. The tests cover every card, complete-word decoding, numbered syllable playback order, duplicate syllables, unavailable clips, cancellation, 320px layouts, image races, offline installation, byte ranges and cache isolation. The activity suite checks home routing, the five-number category picker, the visual mode picker, all difficulty rules, both test types, real metronome playback, feedback, correct-only automatic advance, cancellation and responsive layouts. `npm run test:practice` verifies direct image/frame/circle playback, keyboard use, the music layout, single and sequenced beats, cancellation, saved rhythm settings and title spacing on phone and landscape screens. The pure model suite checks all 75 words at every difficulty with multiple random seeds. The persistence test checks card selection across a complete browser restart, including offline reopening. Browser artifacts are written to `/private/tmp/taffaha-qa`.
 
-`tests/static.cjs` verifies all title/audio IDs against VOC, permits only the five reviewed image corrections, checks image revisions, all five groups, icons and shell/media integrity. Browser tests require Playwright 1.56.1 (`TAFFAHA_PLAYWRIGHT` can point to an existing installation). Chrome uses the installed Google Chrome; `TAFFAHA_ENGINE=webkit` selects Playwright WebKit. The tests visit every card, exercise request-race guards, header recording controls, native and WAV capture, recorded-circle/sequence playback, legacy recordings and 320px layout. Chrome checks a full browser restart with the server offline. WebKit checks offline page reopening in a regular context; `tests/persistence.cjs` separately checks recording retention across its full browser restart. This separation is necessary because this workstation's Playwright persistent WebKit profile silently discards Cache API writes even on a minimal unrelated page. The app detects downloads that make no storage progress and shows an error instead of retrying indefinitely. The WebKit microphone uses a generated input stream to test encoding rather than physical hardware. Artifacts go to `/private/tmp/taffaha-qa` on this workstation.
-
-For isolated WebKit storage checks, run `tests/persistence.cjs` with `TAFFAHA_ENGINE=webkit`; add `TAFFAHA_WEBKIT_OFFLINE=1` to check complete library download and offline reopening without the generated microphone fixture.
+Rebuild the PWA release after shipped code or shared media changes. `node tools/taffaha/scripts/build-pwa.cjs --check` verifies release freshness. The worker is scoped to this app and leaves other apps' caches alone. Existing legacy recording storage is no longer opened or used; this update does not delete browser data.

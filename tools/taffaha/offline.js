@@ -1,4 +1,4 @@
-const $=id=>document.getElementById(id),names={voc:'بطاقات المفردات',senb:'بناء الجمل',arabicsounds:'أصوات الحروف'};
+const $=id=>document.getElementById(id),names={taffaha:'المقاطع الصوتية',voc:'بطاقات المفردات',senb:'بناء الجمل',arabicsounds:'أصوات الحروف'};
 let registration,downloading=false,cancelled=false,promptEvent;
 export function rpc(type,extra={}){
  return new Promise((resolve,reject)=>{

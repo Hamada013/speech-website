@@ -1,6 +1,6 @@
 {
  "id":"./", "name":"تف فا حة", "short_name":"تف فا حة",
- "description":"نلعب بالمقاطع، نستمع، ونسجّل أصواتنا. تدريب عربي للأطفال.",
+ "description":"نلعب بالمقاطع ونستمع للكلمات. تدريب عربي للأطفال.",
  "lang":"ar", "dir":"rtl", "start_url":"./index.html", "scope":"./",
  "display":"standalone", "background_color":"#f8fafc", "theme_color":"#0284c7",
  "categories":["education","kids"],

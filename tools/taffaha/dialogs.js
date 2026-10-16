@@ -1,5 +1,4 @@
-/** Native <dialog> arrived later than audio recording on iOS. Keep settings,
- * offline controls and deletion usable on older Safari without a CDN polyfill.
+/** Keep the library and offline dialogs usable on older Safari without a CDN polyfill.
  */
 export function installDialogFallback(){
  if(typeof HTMLDialogElement!=='undefined'&&HTMLDialogElement.prototype.showModal)return;

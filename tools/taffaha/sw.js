@@ -62,7 +62,7 @@ self.addEventListener('fetch',event=>{
   })().catch(()=>new Response('',{status:503})));return;
  }
  // Stale-while-revalidate is limited to optional same-origin app assets.
- // Recordings live in IndexedDB; unknown shared files are not silently cached.
+ // Unknown shared files are not silently cached.
  if(canonical.startsWith(absolute('assets/'))){
   event.respondWith((async()=>{
    const cache=await caches.open(RUNTIME),cached=await cache.match(request);
@@ -91,7 +91,7 @@ self.addEventListener('message',event=>{
    const {type,libraries}=event.data||{};let result;
    if(type==='STATUS')result=await status();
    else if(type==='BATCH'){
-    if(!Array.isArray(libraries)||libraries.some(x=>!['voc','senb','arabicsounds'].includes(x)))throw Error('اختر مكتبة للتنزيل.');
+    if(!Array.isArray(libraries)||libraries.some(x=>!['voc','senb','arabicsounds','taffaha'].includes(x)))throw Error('اختر مكتبة للتنزيل.');
     if(!batch)batch=download(libraries).finally(()=>{batch=null;});result=await batch;
    }else if(type==='PAUSE'){paused=true;result={paused:true};}
    else if(type==='CLEAR'){

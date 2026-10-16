@@ -1,19 +1,53 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto'),assert=require('node:assert/strict');
-const root=path.resolve(__dirname,'..'),voc=path.resolve(root,'../voc'),ctx={self:{}};
+const root=path.resolve(__dirname,'..'),voc=path.resolve(root,'../voc'),senb=path.resolve(root,'../senb'),ctx={self:{}};
 vm.runInNewContext(fs.readFileSync(path.join(root,'assets/pwa-release.js'),'utf8'),ctx);
 const release=ctx.self.TAFFAHA_RELEASE,hash=b=>crypto.createHash('sha256').update(b).digest('hex');
 for(const [file,revision]of Object.entries(release.integrity))assert.equal(hash(fs.readFileSync(path.join(root,file))),revision,file);
 const unique=new Set();for(const a of release.media){assert.ok(!unique.has(a.url));unique.add(a.url);const body=fs.readFileSync(path.resolve(root,a.url));assert.equal(body.length,a.bytes);assert.equal(hash(body),a.revision);}
 const {words}=JSON.parse(fs.readFileSync(path.join(root,'assets/words.json'))),source=fs.readFileSync(path.join(voc,'index.html'),'utf8'),start=source.indexOf('const RAW_CATEGORIES ='),end=source.indexOf('const app =',start);
 const categories=vm.runInNewContext(source.slice(start,end)+';JSON.parse(JSON.stringify(CATEGORIES))',{}, {timeout:1000});
-const corrections={'voc-5-21':'images/5/29.webp','voc-5-23':'images/5/27.webp','voc-5-25':'images/5/23.webp','voc-5-33':'images/5/35.webp','voc-5-32':'images/5/34.webp'};
-assert.equal(new Set(words.map(w=>w.id)).size,words.length);assert.deepEqual([...new Set(words.map(w=>w.syllables.length))].sort(),[1,2,3,4,5]);
-for(const word of words){
- const [,folder,number]=word.id.split('-').map((v,i)=>i?v*1:v),item=categories.find(c=>c.id===folder).items.find(w=>w.id===number);
- assert.equal(word.label,item.name);assert.equal(word.audio.path,item.audio,'Title/audio retain their source ID');assert.equal(word.image.path,corrections[word.id]||item.image,'Only reviewed artwork references differ');assert.equal(word.syllableCount,word.syllables.length);
- for(const a of [word.image,word.audio])assert.ok(fs.existsSync(path.join(voc,a.path)));assert.equal(word.image.revision,hash(fs.readFileSync(path.join(voc,word.image.path))));
+const ss=fs.readFileSync(path.join(senb,'assets/data.js'),'utf8'),subjects=vm.runInNewContext(ss.slice(0,ss.indexOf('const VERB_CONJUGATIONS'))+';JSON.parse(JSON.stringify(ITEMS_DATABASE["01 subject"]))',{}, {timeout:1000});
+const corrections={'voc-5-21':'images/5/29.webp','voc-5-23':'images/5/27.webp','voc-5-25':'images/5/23.webp','voc-5-33':'images/5/35.webp','voc-5-32':'images/5/34.webp','voc-5-15':'images/7/21.webp'};
+const titleCorrections={'voc-34-11':'صندوق اكل'};
+assert.equal(words.length,75);assert.equal(new Set(words.map(w=>w.id)).size,75);
+const mapping=fs.readFileSync(path.join(root,'assets/sounds/mapping.txt'),'utf8'),allClips=new Set();
+for(let n=1;n<=5;n++){
+ const group=words.filter(w=>w.syllableCount===n);assert.equal(group.length,15);
+ const folderMapping=fs.readFileSync(path.join(root,`assets/sounds/${n}/mapping.txt`),'utf8');let clip=0;
+ for(const word of group){
+  assert.equal(word.syllables.length,n);assert.equal(word.syllableAudio.length,n);
+  let item,base;
+  if(word.id.startsWith('voc-')){
+   const [,folder,number]=word.id.split('-');item=categories.find(c=>c.id===Number(folder)).items.find(w=>w.id===Number(number));base=voc;
+  }else{
+   const subject=subjects.find(w=>w.id===Number(word.id.split('-')[2]));item={name:subject.title,image:`images/01 subject/${subject.id}.webp`,audio:`sounds/subject/${subject.id}.m4a`};base=senb;
+  }
+  assert.equal(word.label,titleCorrections[word.id]||item.name);assert.equal(word.audio.path,item.audio,'Title/audio retain source ID');assert.equal(word.image.path,corrections[word.id]||item.image,'Only reviewed artwork may differ');
+  for(const a of [word.image,word.audio])assert.ok(fs.existsSync(path.join(base,a.path)));
+  assert.equal(word.image.revision,hash(fs.readFileSync(path.join(base,word.image.path))));
+  for(const [i,part]of word.syllables.entries()){
+   assert.ok(part.trim().length>0);const a=word.syllableAudio[i];clip++;
+   if(n===1){
+    assert.deepEqual(a,word.audio,'One-syllable audio reuses the whole word');
+    assert.equal(a.library,word.image.library);
+    assert.equal(a.path,word.image.path.replace(/^images\//,'sounds/').replace(/\.webp$/,'.m4a'),'One-syllable picture/audio share their source number');
+   }else{
+    assert.equal(a.library,'taffaha');assert.equal(a.path,`assets/sounds/${n}/${clip}.m4a`);
+   }
+   const key=a.library+'/'+a.path;assert.ok(!allClips.has(key));allClips.add(key);
+   const audioPath=a.library==='taffaha'?a.path:`../${a.library}/${a.path}`;
+   const line=`${audioPath} = ${part} | الكلمة: ${word.label} | المقطع: ${i+1}/${n}`;
+   for(const list of [mapping,folderMapping])assert.ok(list.split('\n').includes(line),line);
+   if(a.library==='taffaha'&&fs.existsSync(path.join(root,a.path))){assert.equal(a.revision,hash(fs.readFileSync(path.join(root,a.path))));assert.ok(release.media.some(m=>m.url===a.path&&m.library==='taffaha'));}
+  }
+ }
+ assert.equal(clip,15*n);
 }
+assert.equal(allClips.size,225);assert.match(mapping,/assets\/sounds\/2\/1\.m4a = مو/);assert.match(mapping,/assets\/sounds\/2\/2\.m4a = زة/);
+for(const file of release.shell.filter(f=>f.endsWith('.js')))require('node:child_process').execFileSync(process.execPath,['--check',path.join(root,file)]);
 const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.json')));assert.equal(manifest.dir,'rtl');assert.equal(manifest.scope,'./');
-for(const icon of manifest.icons){const bytes=fs.readFileSync(path.join(root,icon.src)),[w,h]=icon.sizes.split('x').map(Number);assert.equal(bytes.readUInt32BE(16),w);assert.equal(bytes.readUInt32BE(20),h);}
-const html=fs.readFileSync(path.join(root,'index.html'),'utf8');assert.ok(html.includes('lang="ar" dir="rtl"'));assert.ok(!/open-settings|settings-dialog|record-target|محاولتك محفوظة|خطوة صغيرة، كلمة كبيرة|أهلًا بك!/.test(html));assert.ok(html.includes('slp.ahmadghanem@gmail.com'));
-console.log(`PASS: ${words.length} title/audio mappings, five corrected artwork references, syllable groups 1–5, ${release.shell.length} shell hashes and ${release.media.length} shared media hashes.`);
+for(const icon of [...manifest.icons,{src:'assets/icons/apple-touch-icon.png',sizes:'180x180'}]){const bytes=fs.readFileSync(path.join(root,icon.src)),[w,h]=icon.sizes.split('x').map(Number);assert.equal(bytes.readUInt32BE(16),w);assert.equal(bytes.readUInt32BE(20),h);}
+const html=fs.readFileSync(path.join(root,'index.html'),'utf8');assert.ok(html.includes('lang="ar" dir="rtl"'));assert.ok(html.includes('slp.ahmadghanem@gmail.com'));
+for(const text of ['لنقلها معًا!','مقطع… مقطع','toggle-recording','recording-bar','save-copy','stop-audio'])assert.ok(!html.includes(text));
+for(const name of ['index.html','app.js','audio.js','storage.js','icons.js','styles.css'])assert.ok(!/getUserMedia|MediaRecorder|VoiceRecorder|recordingID|listRecordings|indexedDB|microphone|record-button|recording-bar/.test(fs.readFileSync(path.join(root,name),'utf8')),name+' has recording code');
+console.log(`PASS: 75 source title/audio mappings, 15 cards per group, 15 reused one-syllable recordings, 210 positional M4A mappings, recording removal, icons and ${release.media.length} media hashes.`);
