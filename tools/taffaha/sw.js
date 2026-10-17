@@ -1,7 +1,6 @@
-/* Scoped to this app. A controlled page can request sibling media without a
- * root-scoped worker: other apps' service workers and caches stay independent.
- * Versioned keys reuse unchanged shared media across releases. No bulk addAll:
- * only the small shell installs automatically; library downloads are opt-in.
+/* Scoped to this app; every catalog entry belongs to Taffaha.
+ * Versioned keys reuse unchanged media across releases. Only the small shell
+ * installs automatically; pictures and audio downloads are opt-in.
  */
 importScripts('./assets/pwa-release.js');
 const RELEASE=self.TAFFAHA_RELEASE,BASE=new URL('./',self.location.href);
@@ -78,21 +77,21 @@ async function status(){
  for(const a of RELEASE.media){const g=groups[a.library]||={total:0,count:0,bytes:0};g.total++;g.bytes+=a.bytes;if(stored.has(key(a)))g.count++;}
  return {version:RELEASE.version,groups,running:!!batch};
 }
-async function download(libraries){
+async function download(){
  paused=false;const cache=await caches.open(MEDIA),stored=await inventory();
- const pending=RELEASE.media.filter(a=>libraries.includes(a.library)&&!stored.has(key(a))).slice(0,3);
+ const pending=RELEASE.media.filter(a=>!stored.has(key(a))).slice(0,3);
  for(const a of pending){if(paused)break;const response=await verified(absolute(a.url),a.revision);await cache.put(key(a),response);}
  return status();
 }
 self.addEventListener('message',event=>{
+ if(event.data?.type==='SKIP_WAITING'){event.waitUntil(self.skipWaiting());return;}
  const port=event.ports[0];if(!port)return;
  event.waitUntil((async()=>{
   try{
-   const {type,libraries}=event.data||{};let result;
+   const {type}=event.data||{};let result;
    if(type==='STATUS')result=await status();
    else if(type==='BATCH'){
-    if(!Array.isArray(libraries)||libraries.some(x=>!['voc','senb','arabicsounds','taffaha'].includes(x)))throw Error('اختر مكتبة للتنزيل.');
-    if(!batch)batch=download(libraries).finally(()=>{batch=null;});result=await batch;
+    if(!batch)batch=download().finally(()=>{batch=null;});result=await batch;
    }else if(type==='PAUSE'){paused=true;result={paused:true};}
    else if(type==='CLEAR'){
     paused=true;if(batch)await batch.catch(()=>{});await caches.delete(MEDIA);await caches.delete(RUNTIME);result=await status();

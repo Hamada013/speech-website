@@ -16,6 +16,7 @@ let practiceRhythm=preferences.practiceRhythm===true;
 const current=()=>words[index],digits=n=>String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
 const countLabel=count=>count===1?'مقطع واحد':count===2?'مقطعان':digits(count)+' مقاطع';
 const group=()=>words.filter(word=>word.syllableCount===current().syllableCount);
+const syllablePause=()=>[250,600,1000].includes(Number(preferences.pace))?Number(preferences.pace):600;
 const feedbackOpen=()=>$('answer-feedback').hasAttribute('open');
 function say(text){$('status').textContent=text;}
 function persist(){
@@ -75,7 +76,7 @@ async function playSyllables(container,button,word,signal){
  for(let i=0;i<word.syllableCount;i++){
   if(signal.aborted)throw new DOMException('Cancelled','AbortError');
   const circle=container.querySelector(`[data-index="${i}"]`);circle.classList.add('lit');await playSegment(word,i,signal);circle.classList.remove('lit');
-  if(i<word.syllableCount-1)await gap([250,600,1000].includes(Number(preferences.pace))?Number(preferences.pace):600,signal);
+  if(i<word.syllableCount-1)await gap(syllablePause(),signal);
  }
 }
 function cancelFeedback(){clearTimeout(feedbackTimer);feedbackTimer=null;document.body.classList.remove('feedback-visible');if(feedbackOpen())$('answer-feedback').close();}
@@ -100,12 +101,23 @@ function beatDots(count){
  const dots=document.createElement('span');dots.className='beat-dots';dots.dataset.count=count;dots.setAttribute('aria-hidden','true');
  for(let i=0;i<count;i++){const dot=document.createElement('span');dot.className='beat-dot';dots.append(dot);}return dots;
 }
-async function playBeats(count,card,signal){
+async function playBeats(count,card,signal,word=null){
  const dots=card.querySelectorAll('.beat-dot,.metronome-circle');
+ // Each practice beat occupies its spoken syllable's duration, then uses the
+ // same pause as the syllable frame. Short clicks alone ran too quickly.
+ const durations=word?await Promise.all(word.syllableAudio.map(async asset=>{
+  try{return 1000*await engine.duration(assetURL(asset),{signal});}
+  catch(e){if(e.name==='AbortError')throw e;return 350;}
+ })):null;
  for(let i=0;i<count;i++){
   if(signal.aborted)throw new DOMException('Cancelled','AbortError');
-  dots[i].classList.add('lit');try{await engine.beat({signal});}finally{dots[i].classList.remove('lit');}
-  if(i<count-1)await gap(440,signal);
+  const started=performance.now();
+  dots[i].classList.add('lit');try{
+   await engine.beat({signal});
+   const remaining=(durations?.[i]||0)-(performance.now()-started);
+   if(remaining>0)await gap(remaining,signal);
+  }finally{dots[i].classList.remove('lit');}
+  if(i<count-1)await gap(word?syllablePause():440,signal);
  }
 }
 async function selectCount(count,card){
@@ -173,7 +185,7 @@ function navigate(step){
 $('previous').onclick=()=>navigate(-1);$('next').onclick=()=>navigate(1);$('random').onclick=()=>navigate(1+Math.floor(Math.random()*(group().length-1)));
 $('original').onclick=()=>runPlayback(async signal=>{$('original').classList.add('is-playing');$('original').setAttribute('aria-busy','true');await engine.play(assetURL(current().audio),{signal});});
 $('sequence').onclick=()=>runPlayback(signal=>playSyllables($('syllables'),$('sequence'),current(),signal));
-$('rhythm-sequence').onclick=()=>runPlayback(async signal=>{$('rhythm-sequence').classList.add('is-playing');$('rhythm-sequence').setAttribute('aria-busy','true');await playBeats(current().syllableCount,$('practice-beats'),signal);});
+$('rhythm-sequence').onclick=()=>runPlayback(async signal=>{$('rhythm-sequence').classList.add('is-playing');$('rhythm-sequence').setAttribute('aria-busy','true');const word=current();await playBeats(word.syllableCount,$('practice-beats'),signal,word);});
 $('toggle-rhythm').onclick=()=>{practiceRhythm=!practiceRhythm;renderCurrent();};
 function playTest(){return runPlayback(async signal=>{
  if(testKind==='count'){$('test-prompt').classList.add('is-playing');$('test-prompt').setAttribute('aria-busy','true');await engine.play(assetURL(current().audio),{signal});}

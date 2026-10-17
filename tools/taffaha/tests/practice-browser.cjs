@@ -31,11 +31,32 @@ async function fits(on){
   const banana=words.find(w=>w.label==='موزة');await choose(banana);
   // Verify native image audio and synthesized rhythm before observing positional playback.
   await page.locator('#word-image').click();await done();await rhythm(true);await frame('rhythm-sequence');await rhythm(false);
+  // Compare real onset intervals, including metronome-first playback before
+  // speech has populated any recording durations. Both frames must agree.
+  await page.evaluate(async()=>{
+   const {AudioEngine}=await import('./audio.js'),play=AudioEngine.prototype.play,beat=AudioEngine.prototype.beat;
+   window.timing={speech:[],beat:[]};
+   AudioEngine.prototype.play=function(source,options){if(typeof source==='string')window.timing.speech.push(performance.now());return play.call(this,source,options);};
+   AudioEngine.prototype.beat=function(options){window.timing.beat.push(performance.now());return beat.call(this,options);};
+  });
+  for(const count of [2,3,5]){
+   await choose(words.find(w=>w.syllableCount===count));await rhythm(true);
+   await page.evaluate(()=>window.timing={speech:[],beat:[]});
+   await frame('rhythm-sequence');await frame('sequence');
+   const timing=await page.evaluate(()=>window.timing);
+   assert.equal(timing.speech.length,count);assert.equal(timing.beat.length,count);
+   for(let i=1;i<count;i++){
+    const spoken=timing.speech[i]-timing.speech[i-1],beat=timing.beat[i]-timing.beat[i-1];
+    assert.ok(Math.abs(spoken-beat)<100,`Group ${count}, interval ${i}: speech ${spoken.toFixed(0)} ms, metronome ${beat.toFixed(0)} ms`);
+   }
+  }
+  await choose(banana);await rhythm(false);
   await page.evaluate(async()=>{
    const {AudioEngine}=await import('./audio.js');window.calls=[];window.cancelled=0;
    const wait=signal=>new Promise((resolve,reject)=>{const finish=()=>{signal?.removeEventListener('abort',abort);resolve();},timer=setTimeout(finish,100),abort=()=>{clearTimeout(timer);window.cancelled++;reject(new DOMException('Cancelled','AbortError'));};signal?.addEventListener('abort',abort,{once:true});});
    AudioEngine.prototype.play=function(source,{signal}={}){window.calls.push({kind:'speech',path:new URL(source).pathname,lit:[...document.querySelectorAll('#syllables .lit')].map(c=>Number(c.dataset.index))});return wait(signal);};
    AudioEngine.prototype.beat=function({signal}={}){window.calls.push({kind:'beat',lit:[...document.querySelectorAll('#practice-beats .lit')].map(c=>Number(c.dataset.index))});return wait(signal);};
+   AudioEngine.prototype.duration=async()=>.1;
   });
   for(const on of [false,true]){
    await rhythm(on);await clear();await page.locator('#word-image').click();await done();assert.deepEqual((await page.evaluate(()=>window.calls)).map(c=>c.path),['/tools/'+banana.audio.library+'/'+banana.audio.path]);
@@ -56,7 +77,7 @@ async function fits(on){
   }
   await page.reload();await page.waitForFunction(()=>!document.getElementById('original').disabled);assert.ok(await page.locator('#rhythm-frame').isVisible());assert.equal(await page.locator('#toggle-rhythm').getAttribute('aria-pressed'),'true');
   await page.locator('#go-home').click();await page.waitForFunction(()=>document.body.dataset.screen==='home');assert.ok(await page.locator('#toggle-rhythm').isHidden());await page.locator('#start-test').click();await page.waitForFunction(()=>document.body.dataset.screen==='test');assert.ok(await page.locator('#toggle-rhythm').isHidden());assert.deepEqual(errors,[]);
-  console.log(`PASS ${engine}: tap image, frame and individual syllables; keyboard playback; rhythm toggle, 1–5 sequence/single beats, cancellation and persistence; separate titles; no-scroll phone/landscape layouts.`);
+  console.log(`PASS ${engine}: matching real speech/metronome intervals; tap image, frame and individual syllables; keyboard playback; rhythm toggle, 1–5 sequence/single beats, cancellation and persistence; separate titles; no-scroll phone/landscape layouts.`);
  }catch(e){if(page)await page.screenshot({path:out+'/'+engine+'-practice-error.png',fullPage:true}).catch(()=>{});throw e;}
  finally{await context?.close();await browser?.close();if(server?.listening)await new Promise(r=>{server.close(r);server.closeAllConnections();});}
 })().catch(e=>{console.error(e);process.exitCode=1;});

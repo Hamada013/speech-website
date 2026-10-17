@@ -9,18 +9,20 @@
         "عَيْن"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/3/14.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/3/14.webp",
         "revision": "388f5fb23bee4652b1c38b78957d82bae70fc65566eca27cafbadfe211f8fd4f"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/3/14.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/3/14.m4a",
+        "revision": "364bc45e382c33d1be307d5a150b649d9f66183690039daa06439d26d1af445c"
       },
       "syllableAudio": [
         {
-          "library": "voc",
-          "path": "sounds/3/14.m4a"
+          "library": "taffaha",
+          "path": "assets/sounds/words/voc/3/14.m4a",
+          "revision": "364bc45e382c33d1be307d5a150b649d9f66183690039daa06439d26d1af445c"
         }
       ]
     },
@@ -33,18 +35,20 @@
         "ماء"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/5/36.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/5/36.webp",
         "revision": "359ce7206144cd82095c7bd9f51cf1dfcee7970c2da6ca4c158ecac18148ac51"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/5/36.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/5/36.m4a",
+        "revision": "41de33b63f775fafb9de7fe3a3a0152c5249056d621d49e8a4b655a586f8cc16"
       },
       "syllableAudio": [
         {
-          "library": "voc",
-          "path": "sounds/5/36.m4a"
+          "library": "taffaha",
+          "path": "assets/sounds/words/voc/5/36.m4a",
+          "revision": "41de33b63f775fafb9de7fe3a3a0152c5249056d621d49e8a4b655a586f8cc16"
         }
       ]
     },
@@ -57,18 +61,20 @@
         "توت"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/6/5.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/6/5.webp",
         "revision": "26df561c72b8e668907164e0839d0a3668326ae4aa3ba46ae6e3b9f56b1a3cf0"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/6/5.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/6/5.m4a",
+        "revision": "4d884372843318b9f15ea5a81b72078d7a07118593b157b34565cffedde60f0a"
       },
       "syllableAudio": [
         {
-          "library": "voc",
-          "path": "sounds/6/5.m4a"
+          "library": "taffaha",
+          "path": "assets/sounds/words/voc/6/5.m4a",
+          "revision": "4d884372843318b9f15ea5a81b72078d7a07118593b157b34565cffedde60f0a"
         }
       ]
     },
@@ -81,18 +87,20 @@
         "موز"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/6/4.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/6/4.webp",
         "revision": "1c94327df64630032cc8d3762bf0aded2acfbee3bf49ffafdbdafdeb9813da25"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/6/4.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/6/4.m4a",
+        "revision": "1b6249f3f48cb9853118570c1a5c001ebc2163873c65fe1b0b81dd29ff6584eb"
       },
       "syllableAudio": [
         {
-          "library": "voc",
-          "path": "sounds/6/4.m4a"
+          "library": "taffaha",
+          "path": "assets/sounds/words/voc/6/4.m4a",
+          "revision": "1b6249f3f48cb9853118570c1a5c001ebc2163873c65fe1b0b81dd29ff6584eb"
         }
       ]
     },
@@ -105,18 +113,20 @@
         "تين"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/6/8.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/6/8.webp",
         "revision": "791abf2b2bea6dfdce551d83a39d87085326b9be749ccf1c95f3d428ee0d65e2"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/6/8.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/6/8.m4a",
+        "revision": "9ce07283c427a60b803394c3fa808af8f3c8389933ca53287a7bcb021eb00cfc"
       },
       "syllableAudio": [
         {
-          "library": "voc",
-          "path": "sounds/6/8.m4a"
+          "library": "taffaha",
+          "path": "assets/sounds/words/voc/6/8.m4a",
+          "revision": "9ce07283c427a60b803394c3fa808af8f3c8389933ca53287a7bcb021eb00cfc"
         }
       ]
     },
@@ -129,18 +139,20 @@
         "خوخ"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/6/17.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/6/17.webp",
         "revision": "75a0463bdeb3fb33dbdd06c9c60e443915a93dc413c6c166b3f3b06516d4b7d3"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/6/17.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/6/17.m4a",
+        "revision": "234617695225dea6523f06537461a268bed47fc7bfcab3627c173d96e2f51758"
       },
       "syllableAudio": [
         {
-          "library": "voc",
-          "path": "sounds/6/17.m4a"
+          "library": "taffaha",
+          "path": "assets/sounds/words/voc/6/17.m4a",
+          "revision": "234617695225dea6523f06537461a268bed47fc7bfcab3627c173d96e2f51758"
         }
       ]
     },
@@ -153,18 +165,20 @@
         "ثوم"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/7/10.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/7/10.webp",
         "revision": "2ed8938517dccb0b498a37ec71f2871e0cf6c251c71867f585b42ddb3e3c9fee"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/7/10.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/7/10.m4a",
+        "revision": "f419272e8cc0046708b6cd82c593abbc5a107249ca200552a0974e43b2e1c9e9"
       },
       "syllableAudio": [
         {
-          "library": "voc",
-          "path": "sounds/7/10.m4a"
+          "library": "taffaha",
+          "path": "assets/sounds/words/voc/7/10.m4a",
+          "revision": "f419272e8cc0046708b6cd82c593abbc5a107249ca200552a0974e43b2e1c9e9"
         }
       ]
     },
@@ -177,18 +191,20 @@
         "خَس"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/7/13.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/7/13.webp",
         "revision": "5c2de7f5acdd18d345ae7c812db72307452f070b153b85631a86988cc160d0a5"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/7/13.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/7/13.m4a",
+        "revision": "ebc6cc07cb12c72b581cf96807cd97089e1b115bb5e4ae6a170d6ff49feef6da"
       },
       "syllableAudio": [
         {
-          "library": "voc",
-          "path": "sounds/7/13.m4a"
+          "library": "taffaha",
+          "path": "assets/sounds/words/voc/7/13.m4a",
+          "revision": "ebc6cc07cb12c72b581cf96807cd97089e1b115bb5e4ae6a170d6ff49feef6da"
         }
       ]
     },
@@ -201,18 +217,20 @@
         "فيل"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/20/3.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/20/3.webp",
         "revision": "2959b2548b0a380d6c94d9dd282c6145f268cb0ed8fdb71fd897ef36a0f050db"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/20/3.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/20/3.m4a",
+        "revision": "09a50ca0c70fc0e8c1a798dbcd909554174524f2b313bbeaaa94c3b90add549e"
       },
       "syllableAudio": [
         {
-          "library": "voc",
-          "path": "sounds/20/3.m4a"
+          "library": "taffaha",
+          "path": "assets/sounds/words/voc/20/3.m4a",
+          "revision": "09a50ca0c70fc0e8c1a798dbcd909554174524f2b313bbeaaa94c3b90add549e"
         }
       ]
     },
@@ -225,18 +243,20 @@
         "دُب"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/20/2.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/20/2.webp",
         "revision": "cf36166f9ecdb0d598fc184a1e3a948560cc1130ba66d0535daa9a400cc7730a"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/20/2.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/20/2.m4a",
+        "revision": "e23e1a20dd557a0bb912a0e916e476b17b8759e4377c7e11c137c3fbfba9360e"
       },
       "syllableAudio": [
         {
-          "library": "voc",
-          "path": "sounds/20/2.m4a"
+          "library": "taffaha",
+          "path": "assets/sounds/words/voc/20/2.m4a",
+          "revision": "e23e1a20dd557a0bb912a0e916e476b17b8759e4377c7e11c137c3fbfba9360e"
         }
       ]
     },
@@ -249,18 +269,20 @@
         "فَم"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/3/24.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/3/24.webp",
         "revision": "fae5080683b5f38e7e40a65ba9bd709b6d821e7c12719751e07b32ed0139540a"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/3/24.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/3/24.m4a",
+        "revision": "6730b896cdba0eea79ef06d36f9855e2881837fe751f69947c506dbfd99b6361"
       },
       "syllableAudio": [
         {
-          "library": "voc",
-          "path": "sounds/3/24.m4a"
+          "library": "taffaha",
+          "path": "assets/sounds/words/voc/3/24.m4a",
+          "revision": "6730b896cdba0eea79ef06d36f9855e2881837fe751f69947c506dbfd99b6361"
         }
       ]
     },
@@ -273,18 +295,20 @@
         "ديك"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/16/5.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/16/5.webp",
         "revision": "461fcdf67f5b3962b356af36150667525eba18c6f16cffc18b44c168ef7a63f1"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/16/5.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/16/5.m4a",
+        "revision": "78ca11c09eafe82b3b9caaeab4dc1353e349ee5aaa2498ec42f33f3510df17c3"
       },
       "syllableAudio": [
         {
-          "library": "voc",
-          "path": "sounds/16/5.m4a"
+          "library": "taffaha",
+          "path": "assets/sounds/words/voc/16/5.m4a",
+          "revision": "78ca11c09eafe82b3b9caaeab4dc1353e349ee5aaa2498ec42f33f3510df17c3"
         }
       ]
     },
@@ -297,18 +321,20 @@
         "حوت"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/17/16.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/17/16.webp",
         "revision": "17a80822b0698d46667e9f3c1eb3dde55bf2fcc80e7c3a33d798e312ffe2bf3a"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/17/16.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/17/16.m4a",
+        "revision": "51b7f41b4dff97c0d1d5462ffcebd383478032e411271e831b40b86588d0ae2a"
       },
       "syllableAudio": [
         {
-          "library": "voc",
-          "path": "sounds/17/16.m4a"
+          "library": "taffaha",
+          "path": "assets/sounds/words/voc/17/16.m4a",
+          "revision": "51b7f41b4dff97c0d1d5462ffcebd383478032e411271e831b40b86588d0ae2a"
         }
       ]
     },
@@ -321,18 +347,20 @@
         "باب"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/24/13.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/24/13.webp",
         "revision": "20783a9b3be5b6fcd81331f13493d2930c6794de07c80583b0265fcf9e0d673b"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/24/13.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/24/13.m4a",
+        "revision": "b8900e167a56fdded9dd1a68be45ea1f0bf41173cd8f9a483dff862aea56cc98"
       },
       "syllableAudio": [
         {
-          "library": "voc",
-          "path": "sounds/24/13.m4a"
+          "library": "taffaha",
+          "path": "assets/sounds/words/voc/24/13.m4a",
+          "revision": "b8900e167a56fdded9dd1a68be45ea1f0bf41173cd8f9a483dff862aea56cc98"
         }
       ]
     },
@@ -345,18 +373,20 @@
         "بَيْت"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/24/18.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/24/18.webp",
         "revision": "db465ca6f8756d450e65e45778095ee6f5d00f549e3cb72ebb9d9555a76f0591"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/24/18.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/24/18.m4a",
+        "revision": "7cc700d013e6e601036d81875b7ee4e8f33e624279fce9541b43cc4df2137671"
       },
       "syllableAudio": [
         {
-          "library": "voc",
-          "path": "sounds/24/18.m4a"
+          "library": "taffaha",
+          "path": "assets/sounds/words/voc/24/18.m4a",
+          "revision": "7cc700d013e6e601036d81875b7ee4e8f33e624279fce9541b43cc4df2137671"
         }
       ]
     },
@@ -370,13 +400,14 @@
         "زة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/6/3.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/6/3.webp",
         "revision": "77e6f736cd4dc286706bd4d60d40a3b6af3947038bcf77c774a9f804b255726b"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/6/3.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/6/3.m4a",
+        "revision": "5212cfe438d0bcc287444c174825a2e6a2a4d0c814df7ba720f184251069482c"
       },
       "syllableAudio": [
         {
@@ -401,13 +432,14 @@
         "مون"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/6/12.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/6/12.webp",
         "revision": "09344f51297127b0a7cc910e3868ca291c876d6cab10a21529860caebf9ed344"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/6/12.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/6/12.m4a",
+        "revision": "5709ccca09d798f1567d15285f43b9542b877bec0a206d6631c2158658e32d12"
       },
       "syllableAudio": [
         {
@@ -432,13 +464,14 @@
         "طيخ"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/6/14.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/6/14.webp",
         "revision": "3cf2de394b277223802ec6d6fa969680874fd80d6cadc91c7a74343ed6abceb3"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/6/14.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/6/14.m4a",
+        "revision": "8947bdeccbd3a802762aea9fb1bab0b8b9eafb81e34484f9b441b96788d7f895"
       },
       "syllableAudio": [
         {
@@ -463,13 +496,14 @@
         "وي"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/6/11.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/6/11.webp",
         "revision": "43e978ae4c8fcc811b56fed9187c3b14dace0dd4c792fa570488d68a13b9af8e"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/6/11.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/6/11.m4a",
+        "revision": "27f0d38a0415dbbf7d09d8d4fffe68e362f8eae71e25794b9a80b50beef99273"
       },
       "syllableAudio": [
         {
@@ -494,13 +528,14 @@
         "نَب"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/6/10.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/6/10.webp",
         "revision": "604dffd3e18be1941865addd82ff3c4a6caf6690812673e12dfcb541ffac8403"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/6/10.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/6/10.m4a",
+        "revision": "cf657002d904d2e6191b593d38114d8df450a09932d63e6ccaa78bb9b960f81c"
       },
       "syllableAudio": [
         {
@@ -525,13 +560,14 @@
         "جا"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/6/13.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/6/13.webp",
         "revision": "2c16fdfb35bbcd20c3a3b8547053f01d8392145e5693152bc6ecaeed56f6a218"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/6/13.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/6/13.m4a",
+        "revision": "a4cc86c68b6fa01ef1f88fc6e28c35b9668f5cbce44d37b427479627c9f1739f"
       },
       "syllableAudio": [
         {
@@ -556,13 +592,14 @@
         "ليب"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/5/29.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/5/29.webp",
         "revision": "1b0bd1974b6938930d783aa3e6745fb373d20057b7baf41d34dbf208a55c912c"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/5/21.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/5/21.m4a",
+        "revision": "3494dca27adba0a25adc9aafe96d6599bb39499fc13f4f42e8a1c87ff2010361"
       },
       "syllableAudio": [
         {
@@ -587,13 +624,14 @@
         "زا"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/5/27.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/5/27.webp",
         "revision": "fcd5f84448d97a8b1360f20e807c5866c7d9878d8ba7fe3b4a52135ed70c31c8"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/5/23.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/5/23.m4a",
+        "revision": "4e542e9012997b352b7ccb95853357ffde7d881a8dc424e9375237d9e520e32e"
       },
       "syllableAudio": [
         {
@@ -618,13 +656,14 @@
         "ظة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/5/23.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/5/23.webp",
         "revision": "fe349871b240ee71ea722d88f23879ee7e3b88e2c42f726c644c4dc4067bfa26"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/5/25.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/5/25.m4a",
+        "revision": "d79f16a7fc48774ca1ddb87e8b4ba9efbb957442e8293d9e9f9795c20146a3d1"
       },
       "syllableAudio": [
         {
@@ -649,13 +688,14 @@
         "بة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/5/34.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/5/34.webp",
         "revision": "6b8748167fd014cb5cf0531cffc5edb33942eeddf8b1f01a12c36d99fbc5512c"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/5/32.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/5/32.m4a",
+        "revision": "ada378ea5603812dc0c58dc7110202b811828b9ef0f8da60226d09f6de202671"
       },
       "syllableAudio": [
         {
@@ -680,13 +720,14 @@
         "يار"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/7/9.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/7/9.webp",
         "revision": "a37cfbacf565a76e353ff7459f699f282487eefce4b369754fd077a6d5f4528c"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/7/9.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/7/9.m4a",
+        "revision": "6c66e3708456f7f9d5d665fe0170f170fbb8eea467595d3fab6bc9ec5c24b71d"
       },
       "syllableAudio": [
         {
@@ -711,13 +752,14 @@
         "زَر"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/7/6.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/7/6.webp",
         "revision": "99942c0b47d7ddfb6449463acd92baf7c7e2a423094a31ff525e0dc7cc8f33dd"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/7/6.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/7/6.m4a",
+        "revision": "6131973342c291c54561b64a4996571ba41518be090ac758cbd8b3e6931e23c3"
       },
       "syllableAudio": [
         {
@@ -742,13 +784,14 @@
         "رة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/7/8.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/7/8.webp",
         "revision": "ac82ec5b4fbaa7f76a0cd44060335ca6c48bf1f9dd74009b5aae8c1ce2bbe152"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/7/8.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/7/8.m4a",
+        "revision": "ffcaee6dc38304d836c7044accda5aee7726ebab6d9179dbc64f77d9fd35fdf2"
       },
       "syllableAudio": [
         {
@@ -773,13 +816,14 @@
         "سا"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/7/25.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/7/25.webp",
         "revision": "569e822862edc522b3c254b7a9573996924907f292a802c164f88502cb5608cc"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/7/25.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/7/25.m4a",
+        "revision": "a711e5e0c3d42ce56a34225745e27fd3b9a70b48087c6c12ff67234e02182dd4"
       },
       "syllableAudio": [
         {
@@ -804,13 +848,14 @@
         "صَل"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/7/17.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/7/17.webp",
         "revision": "a7673692487429c95067f23e4d4e71a67bb6cf0c39ecadfb80cff7ec94bdcdad"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/7/17.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/7/17.m4a",
+        "revision": "012bca922998c7f55878e62f9a59124e5ee754adbac7f1e67b14cd7f4c610e1d"
       },
       "syllableAudio": [
         {
@@ -836,13 +881,14 @@
         "حة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/6/1.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/6/1.webp",
         "revision": "2ae10847f00b0fb92de788f08052eab2716f6df512c2883d37ce735b8b82fd53"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/6/1.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/6/1.m4a",
+        "revision": "e18137a284c5796b2ae893bc61ce77a94c0b2be510f4ada2cfb64ea5c03e662b"
       },
       "syllableAudio": [
         {
@@ -873,13 +919,14 @@
         "طا"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/7/21.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/7/21.webp",
         "revision": "7b6ccebe8e5ff0b3e0a07859ecbb7280e4c0acf10367bfadcdebfecd90c75b87"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/5/15.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/5/15.m4a",
+        "revision": "68f6efcd2d2dce345f8dd96e4c24049d98b3ef250fffd483a9e2148ff5543238"
       },
       "syllableAudio": [
         {
@@ -910,13 +957,14 @@
         "ناس"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/6/19.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/6/19.webp",
         "revision": "ef25b5cb4cc8ad0aae590f14affb712a670888d2ec9c06f0123a903d4327700d"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/6/19.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/6/19.m4a",
+        "revision": "0c5315e853153d52061356979411b4176e69527b89c3376eb085855e0b89f5d2"
       },
       "syllableAudio": [
         {
@@ -947,13 +995,14 @@
         "رة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/7/27.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/7/27.webp",
         "revision": "5e188ef43a5eb3b1dac6ba44697e9b2c169d847f21d0e7c6dfbae3c47f19baa2"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/7/27.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/7/27.m4a",
+        "revision": "4bbd5342c314c823ad227987ccf76f3770743707c3069448b292adc6bf96322f"
       },
       "syllableAudio": [
         {
@@ -984,13 +1033,14 @@
         "قال"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/6/15.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/6/15.webp",
         "revision": "f736d1a9fbd5e7626157547d1f9a4e6ff8414cee7694d75815088d618d325c2c"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/6/15.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/6/15.m4a",
+        "revision": "3261da873264c01b9b31859d8ea86d13d48765fdf23dd9ed9ca554641975c1b9"
       },
       "syllableAudio": [
         {
@@ -1021,13 +1071,14 @@
         "جان"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/7/1.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/7/1.webp",
         "revision": "10241912ef69f1e49557de142f77a7f7bdce582f5125355ce9c7daf83637f482"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/7/1.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/7/1.m4a",
+        "revision": "de8d6dc70eb89fbb0a981466a53f866e96c235faab7bf9455bfd9ebd5d82ffca"
       },
       "syllableAudio": [
         {
@@ -1058,13 +1109,14 @@
         "لي"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/7/4.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/7/4.webp",
         "revision": "d5d951f932dadb1b3c2a8531d47fcf55a25208a344250758493693ad31768805"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/7/4.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/7/4.m4a",
+        "revision": "5ae740cb752ace57747f018b75408d145426bb10a1c0a489d5c4305c4c6bd7fe"
       },
       "syllableAudio": [
         {
@@ -1095,13 +1147,14 @@
         "مة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/16/14.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/16/14.webp",
         "revision": "615eb6e3842321bf7af0bb2be093d043cbbbf7b805d5d51f337cb47336d6c9d9"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/16/14.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/16/14.m4a",
+        "revision": "715df820e564b288d4cb905c52f0d09582fd7bdc7bda79e60a4fffaf4f1550a6"
       },
       "syllableAudio": [
         {
@@ -1132,13 +1185,14 @@
         "جة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/15/3.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/15/3.webp",
         "revision": "d7faa52b772b8f430be997df148684f02e6e6670a0131cae59c3df533cd2ee26"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/15/3.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/15/3.m4a",
+        "revision": "c6a571539dc36b2f34535da13da9b42983cf8076805e69e467e5d426a9c9bb51"
       },
       "syllableAudio": [
         {
@@ -1169,13 +1223,14 @@
         "شة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/18/5.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/18/5.webp",
         "revision": "e83d6af2b0dbc7e019bf76d136ce1f62f00de9aeaec47214babd5df88b1a2df9"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/18/5.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/18/5.m4a",
+        "revision": "7b10e950da802dd5839c96a688f49d301ca13f3705b209b770b5f5998f7912f5"
       },
       "syllableAudio": [
         {
@@ -1206,13 +1261,14 @@
         "فة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/20/7.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/20/7.webp",
         "revision": "b803995b0115ff0ea761c76482e8310dba98d23337aae2e58985ef7e71e74dfd"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/20/7.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/20/7.m4a",
+        "revision": "49d404986ca7de8cc10dcf83dc3e6f08905e986915aea7456ec5ca64e0716123"
       },
       "syllableAudio": [
         {
@@ -1243,13 +1299,14 @@
         "ما"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/22/14.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/22/14.webp",
         "revision": "d9d2a1600302886e007bbf72b03adba7dcd960ff6a9ba918b00e8d40408ed692"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/22/14.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/22/14.m4a",
+        "revision": "c487e01ee379339ce0d670ff7c789446bc15bd980fa64f3375ad1598cc627131"
       },
       "syllableAudio": [
         {
@@ -1280,13 +1337,14 @@
         "رة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/23/5.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/23/5.webp",
         "revision": "0fe0b021b01ce43548681ad0c72eaff4dd1e46b348d4a6cf535b9dab0e9f9e01"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/23/5.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/23/5.m4a",
+        "revision": "a18745bc072987c9b3f476b662f6cad603087b13ed983e704790d4c630670151"
       },
       "syllableAudio": [
         {
@@ -1317,13 +1375,14 @@
         "قة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/27/1.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/27/1.webp",
         "revision": "f972607dd697eb22b6036c4a5e4e7f19b63f8ef33327a0f8107dc9fe7327e0fe"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/27/1.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/27/1.m4a",
+        "revision": "d7edc74e6eb7fb4b1be90bd92d87745fca35608dc3bdae3fb37b1fe81f900a6c"
       },
       "syllableAudio": [
         {
@@ -1354,13 +1413,14 @@
         "بة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/31/13.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/31/13.webp",
         "revision": "46d81d6e8654cf1a75efe3edc2af0cfa7d390589daea10bc500e3bb57804fb5e"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/31/13.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/31/13.m4a",
+        "revision": "257add4ee40ca8b1d6310f7a28e0eb6de66b20cbab72923f6b7bfceccee2b37d"
       },
       "syllableAudio": [
         {
@@ -1392,13 +1452,14 @@
         "نة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/5/35.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/5/35.webp",
         "revision": "70b5f1769cba30cff4fee463a6d76c843f93d99a957e54f7e989c53dc6343f6f"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/5/33.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/5/33.m4a",
+        "revision": "e067547f121f9d8ca19a8e6f4db37e5e1ad5c11a9d744a13eb1a33802e91fdbd"
       },
       "syllableAudio": [
         {
@@ -1435,13 +1496,14 @@
         "دو"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/6/2.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/6/2.webp",
         "revision": "2771ff1183ba79b5dd41e7a087a8431cf01526aacb470a1b862063bedae73996"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/6/2.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/6/2.m4a",
+        "revision": "4e34bd6b83d081ab770848bd86b86a1a8cfcfccd24445853f37e2c4d42bd3c33"
       },
       "syllableAudio": [
         {
@@ -1478,13 +1540,14 @@
         "دة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/8/7.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/8/7.webp",
         "revision": "9b7762d6372f7647b458c36cd2909946925ddc7375a3c5ec81d37eac78ca3547"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/8/7.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/8/7.m4a",
+        "revision": "17e6363490713b0597831a56b50ffe0400f198ad59bb4a8554b20ff40c26cd5a"
       },
       "syllableAudio": [
         {
@@ -1521,13 +1584,14 @@
         "تَر"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/23/6.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/23/6.webp",
         "revision": "17cd9852b5b17f108e4f1f8421150356f826da606ea3497d42c7bfdd3016bc29"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/23/6.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/23/6.m4a",
+        "revision": "c58c5dd6f2afee0b081574b36d6e2d80893f630dfcf90539c90a6df56619a0b1"
       },
       "syllableAudio": [
         {
@@ -1564,13 +1628,14 @@
         "لي"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/32/7.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/32/7.webp",
         "revision": "1a49d05209e6a50a20007e5c0a8ff7692a2da4f65d08e6270dc38db5a672b2b1"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/32/7.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/32/7.m4a",
+        "revision": "3675080735168ef113e4067f300d73ab697f6796b7b766b5b08e788418b48bc9"
       },
       "syllableAudio": [
         {
@@ -1607,13 +1672,14 @@
         "طَبْل"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/35/12.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/35/12.webp",
         "revision": "313b5baaa9e30322182b36a5d4054e89d679e9f7ffd25a347e3c496f4ec9ea70"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/35/12.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/35/12.m4a",
+        "revision": "8954cd30e7915d95f0d2d0995204c7b65b43c75ee54beef1a4316a3aaed9504e"
       },
       "syllableAudio": [
         {
@@ -1650,13 +1716,14 @@
         "ظَهْر"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/34/1.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/34/1.webp",
         "revision": "03430c070b6c0e10880fd76493c716993c0f872e88d9510eb4de7c7ae4d7ea94"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/34/1.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/34/1.m4a",
+        "revision": "7817be85ac6cf4a8759b94fe8b1509c5a29f062bae8023a96b01e3f488d9dd29"
       },
       "syllableAudio": [
         {
@@ -1693,13 +1760,14 @@
         "كل"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/34/11.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/34/11.webp",
         "revision": "c63cc4b80aecb66a5286a71d0b174f29b46a47ceae66ec6a4e12a348ec90c9c4"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/34/11.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/34/11.m4a",
+        "revision": "800c077e9ecfee9049be9a3c89ebe3de98ceb581ed5357970d718509971c65c2"
       },
       "syllableAudio": [
         {
@@ -1736,13 +1804,14 @@
         "رَأْس"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/36/4.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/36/4.webp",
         "revision": "eb816e538e64cb176992364f37b0338ad9d183949b0db5c4dea41a273f9b3d92"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/36/4.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/36/4.m4a",
+        "revision": "c5ddd85c3fb142e438605379ed704469b4ce87fc8d8dd2206a4d75fd1f438a38"
       },
       "syllableAudio": [
         {
@@ -1779,13 +1848,14 @@
         "شير"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/34/2.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/34/2.webp",
         "revision": "4b3d84b2e684f1f637df32d5d8975e4d098bba9bfe4f75ac9ffc02391969b0f0"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/34/2.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/34/2.m4a",
+        "revision": "e9fe64c37f9ee2301c744766a210d419b3178293c4fd725d59293c2fcede692f"
       },
       "syllableAudio": [
         {
@@ -1822,13 +1892,14 @@
         "نان"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/11/35.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/11/35.webp",
         "revision": "3fd654ed3f9682c983b87911ed40e1836ed0db6eefc9201fa808b0640e9412cb"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/11/35.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/11/35.m4a",
+        "revision": "f3c7442722e3cf2b7abee947b743be6c010a4a6106442e64dac0fb664edc7d19"
       },
       "syllableAudio": [
         {
@@ -1865,13 +1936,14 @@
         "مَي"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/8/2.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/8/2.webp",
         "revision": "6543f505b8f1fa02a543d326a94ec9e17f25415bbc819b6e8c3071e9c6927805"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/8/2.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/8/2.m4a",
+        "revision": "a8fc412d8e3537fd2ae6f5b01fa1e7fed7ab990b59109c9a15fd3f998220a3af"
       },
       "syllableAudio": [
         {
@@ -1908,13 +1980,14 @@
         "سيل"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/24/22.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/24/22.webp",
         "revision": "f70f73e8d4f971cddf4d17ab31bf4c04cb20ac8b1b6d06f8337a4f3d0582b8e4"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/24/22.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/24/22.m4a",
+        "revision": "741747c54d117f5548bc32a16b8be3e2738e442b0e847194e40803138b378fc1"
       },
       "syllableAudio": [
         {
@@ -1951,13 +2024,14 @@
         "سيل"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/28/11.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/28/11.webp",
         "revision": "36b3439b662c4e96be4fa5e57b2f57dc82e4fc9ac8265b2472e5b5815861d2bb"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/28/11.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/28/11.m4a",
+        "revision": "3cf82c064830d355ed2c6fb00a76dd72c8cf1c4f48b59f80367d84c24545e8f6"
       },
       "syllableAudio": [
         {
@@ -1994,13 +2068,14 @@
         "لون"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/28/12.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/28/12.webp",
         "revision": "64f14dcd0cb494b0ab65c5da1ba2c4067ee8675f34341fecb9158ed601b83f27"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/28/12.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/28/12.m4a",
+        "revision": "68c727f556456090e5aac40034a2c63f9b69721903dbaff3ee3f3190f616ba95"
       },
       "syllableAudio": [
         {
@@ -2038,13 +2113,14 @@
         "وة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/7/26.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/7/26.webp",
         "revision": "592eb6a745bcc686708ce99c395f2e850c48fc50f7c910e24f93c925ef96f20f"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/7/26.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/7/26.m4a",
+        "revision": "5587a9b030476fae8dbeceb576a5e939117e3bb6ab0e323a5576b4f9b9e1d120"
       },
       "syllableAudio": [
         {
@@ -2087,13 +2163,14 @@
         "قال"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/8/6.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/8/6.webp",
         "revision": "16d786b851ed7cc20c0198b037ab80b8807cfab74438a40514cfd96127e5f43a"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/8/6.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/8/6.m4a",
+        "revision": "31da902d05e7a45de08c8dc5c2ca4e79ca9bd2a00a15db6aeda03696fb810056"
       },
       "syllableAudio": [
         {
@@ -2136,13 +2213,14 @@
         "عاف"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/10/1.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/10/1.webp",
         "revision": "6d64441178fc49cb9a6501ba3e5ac6ebfe6e3d4d3b3dcd07a1e800b91ad0cf1e"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/10/1.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/10/1.m4a",
+        "revision": "8cf975721682c357fbbf0813a6ee72f8abb55c68e8898956f60e21f8084e978f"
       },
       "syllableAudio": [
         {
@@ -2185,13 +2263,14 @@
         "فاء"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/10/11.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/10/11.webp",
         "revision": "339c331ec992c08db1eb99a0c0511b298949ed58466d82237fc78088f225c081"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/10/11.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/10/11.m4a",
+        "revision": "669492bd4a1f5970436686cc9f2ba855090aa8d5d466f99fa02265841cd04682"
       },
       "syllableAudio": [
         {
@@ -2234,13 +2313,14 @@
         "طة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/10/17.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/10/17.webp",
         "revision": "bfcf381e89ccf2c8fc869525b0b1593cc2017d077d84b6d5daf387507839d1ee"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/10/17.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/10/17.m4a",
+        "revision": "4bcd3ae127746db1cbb1b26ad38f5f99edf271af8c1c9aa8272af515a45d7437"
       },
       "syllableAudio": [
         {
@@ -2283,13 +2363,14 @@
         "كُم"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/36/13.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/36/13.webp",
         "revision": "fdff0182ffcdb30c340f0637dfe19bb9b7c91490000a3e74c3a93013c5355b0f"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/36/13.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/36/13.m4a",
+        "revision": "1271be9ad754710c9134744ac3566da6388b17fda1f54cd4b5c0150b092edb74"
       },
       "syllableAudio": [
         {
@@ -2332,13 +2413,14 @@
         "بون"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/10/7.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/10/7.webp",
         "revision": "1abb04945a19b4fcab036cb5bd8f58985e9cf6359a9490882420d780addb857e"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/10/7.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/10/7.m4a",
+        "revision": "9f2fd7f8278896290b2b530ceb5ca4b9301e7994e597c4abdecf013f39341b9c"
       },
       "syllableAudio": [
         {
@@ -2381,13 +2463,14 @@
         "كه"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/8/14.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/8/14.webp",
         "revision": "eb40b48076ac4c56fcc42008d0ee07c2c8339cdc5f6cb8a5156f31f377ffd19a"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/8/14.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/8/14.m4a",
+        "revision": "150da6324d08df7abebc08022f09f856dd040903055ef06ae18cfc36765cb936"
       },
       "syllableAudio": [
         {
@@ -2430,13 +2513,14 @@
         "ري"
       ],
       "image": {
-        "library": "senb",
-        "path": "images/01 subject/66.webp",
+        "library": "taffaha",
+        "path": "assets/images/senb/01 subject/66.webp",
         "revision": "be05e6706f2f68d81e151eaf9766c888ca2481866a3b1c926e1d549d76994f26"
       },
       "audio": {
-        "library": "senb",
-        "path": "sounds/subject/66.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/senb/subject/66.m4a",
+        "revision": "7608d6f82adb43f350e707943c189db3b03ad66a1fde4fdcba679104ff2c82fd"
       },
       "syllableAudio": [
         {
@@ -2479,13 +2563,14 @@
         "رات"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/30/8.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/30/8.webp",
         "revision": "9e28419e2407e1adf68f71341379d36b71f480c63290e046732a7d83f2d33428"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/30/8.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/30/8.m4a",
+        "revision": "61d0a0b036e673dd1a44f389d994b185cab1733d9a4714a278b9f3c1913120c8"
       },
       "syllableAudio": [
         {
@@ -2528,13 +2613,14 @@
         "فاء"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/31/7.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/31/7.webp",
         "revision": "2238ca9e74d53bc32a199ee47206acb801f6a8b6e23adbe895f8332f72924e8f"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/31/7.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/31/7.m4a",
+        "revision": "f6404796fa72ece3abd43e8a2a8a4b4a776cf09b22c65ceab51eba9bd8c5b89f"
       },
       "syllableAudio": [
         {
@@ -2577,13 +2663,14 @@
         "سة"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/34/19.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/34/19.webp",
         "revision": "d7af85d92ce579f6131153d74f61251b059f6a0ce153dbf63173cdc4bbb6c3f1"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/34/19.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/34/19.m4a",
+        "revision": "8dd2c390229ba37f1e3bc1e4ee4fca634725c59be2a703ae053cfbec66964a8d"
       },
       "syllableAudio": [
         {
@@ -2626,13 +2713,14 @@
         "ليه"
       ],
       "image": {
-        "library": "voc",
-        "path": "images/37/2.webp",
+        "library": "taffaha",
+        "path": "assets/images/voc/37/2.webp",
         "revision": "b51a8ab2002ba2edaf203d5632b6eda061605aeea355ac2c23955e63f7cf52c7"
       },
       "audio": {
-        "library": "voc",
-        "path": "sounds/37/2.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/voc/37/2.m4a",
+        "revision": "cf6c27c706be021eb609f24a0cd36d6f8d7eb07ef25c2736d1040e8a4f060df5"
       },
       "syllableAudio": [
         {
@@ -2675,13 +2763,14 @@
         "يون"
       ],
       "image": {
-        "library": "senb",
-        "path": "images/01 subject/29.webp",
+        "library": "taffaha",
+        "path": "assets/images/senb/01 subject/29.webp",
         "revision": "f33332c586a7aa269272a9695566c6df7e9cb7e2333e705a09effdc9fd181276"
       },
       "audio": {
-        "library": "senb",
-        "path": "sounds/subject/29.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/senb/subject/29.m4a",
+        "revision": "a3ed5bd85a21dba07f064f7f0cee9b438b92d8e7b3308e5c23eba541f2cca2ae"
       },
       "syllableAudio": [
         {
@@ -2724,13 +2813,14 @@
         "نان"
       ],
       "image": {
-        "library": "senb",
-        "path": "images/01 subject/31.webp",
+        "library": "taffaha",
+        "path": "assets/images/senb/01 subject/31.webp",
         "revision": "fc97eab77824c859730b606cf5291e854f06db5fa2417f7de839413b9558b49f"
       },
       "audio": {
-        "library": "senb",
-        "path": "sounds/subject/31.m4a"
+        "library": "taffaha",
+        "path": "assets/sounds/words/senb/subject/31.m4a",
+        "revision": "830ca5cf67395a41ff6c42fe0b7c5d0e9ab15d7ed768f443dc075ba1a0a6ed2f"
       },
       "syllableAudio": [
         {

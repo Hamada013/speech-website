@@ -1,12 +1,12 @@
 # تف فا حة
 
-Arabic syllable practice with **75 cards: 15 in each of the 1, 2, 3, 4 and 5 syllable groups**. Longer groups include familiar compound names. The original two-syllable bank is retained. Whole-word audio and pictures come from VOC and SENB; no source assets are modified.
+Arabic syllable practice with **75 cards: 15 in each of the 1, 2, 3, 4 and 5 syllable groups**. Longer groups include familiar compound names. The original two-syllable bank is retained. The 75 pictures and 75 whole-word recordings are copied from VOC and SENB into this app; source assets are never modified. All runtime media lives under `assets/images/` and `assets/sounds/`, so Taffaha can be hosted or copied on its own.
 
-Serve the repository root over HTTPS or localhost and open `/tools/taffaha/`.
+Serve the repository root over HTTPS or localhost and open `/tools/taffaha/`, or serve the Taffaha directory itself.
 
 The home screen has two large icon buttons: **ابدأ** opens practice and **اختبار** opens the test workspace. The logo or header home icon returns home. `#practice` and `#test` also support direct links and browser back/forward navigation. Card selection is shared between the two workspaces; previous, next and shuffle stay in the selected syllable-count group.
 
-In practice, tap the image for the original whole word, an individual circle for its syllable, or the surrounding syllable frame for the full right-to-left sequence. The title has its own row below the image. There are no separate playback buttons. The header music icon switches to rhythm practice: spoken syllables move into a frame beneath the image, and blank colored metronome circles occupy the larger frame. Tap that frame for one beat per syllable, or a single circle for one beat. Both layouts retain image and syllable playback, fit the viewport, and remember the music setting locally. Recording and pause/stop controls are removed.
+In practice, tap the image for the original whole word, an individual circle for its syllable, or the surrounding syllable frame for the full right-to-left sequence. The title has its own row below the image. There are no separate playback buttons. The header music icon switches to rhythm practice: spoken syllables move into a frame beneath the image, and blank colored metronome circles occupy the larger frame. Tap that frame for one beat per syllable, or a single circle for one beat. The metronome sequence follows each recording's duration and the same saved pause as the syllable frame, so the two sequences have matching timing. If a recording is unavailable, the metronome uses a 350 ms syllable duration so rhythm practice still works. Both layouts retain image and syllable playback, fit the viewport, and remember the music setting locally. Recording and pause/stop controls are removed.
 
 ## Tests
 
@@ -21,7 +21,7 @@ Correct answers show an animated green tick over a blurred background and **alwa
 
 ## Prepare syllable audio
 
-The folders `assets/sounds/1/` through `assets/sounds/5/` contain a `mapping.txt` each. The complete UTF-8 audio mapping is **[assets/sounds/mapping.txt](assets/sounds/mapping.txt)**. All 15 one-syllable cards reuse their existing whole-word audio from VOC, with the same source folder and number as their picture. For example, عين uses `../voc/images/3/14.webp` and `../voc/sounds/3/14.m4a`. Their image, syllable circle and sequence frame all play the same recording. The `1/mapping.txt` file lists those existing paths; no new recordings are needed for that group.
+The folders `assets/sounds/1/` through `assets/sounds/5/` contain a `mapping.txt` each. The complete UTF-8 audio mapping is **[assets/sounds/mapping.txt](assets/sounds/mapping.txt)**. All 15 one-syllable cards reuse their local whole-word recording. For example, عين uses `assets/images/voc/3/14.webp` and `assets/sounds/words/voc/3/14.m4a`. The image, syllable circle and sequence frame all play the same recording. `1/mapping.txt` lists those local paths; no new recordings are needed for that group.
 
 For groups 2–5, supply one spoken syllable per numbered `.m4a` file. Numbering is continuous within each count group, independent of other groups. For example:
 
@@ -30,9 +30,9 @@ For groups 2–5, supply one spoken syllable per numbered `.m4a` file. Numbering
 
 Groups 2–5 need **30, 45, 60 and 75 files**, respectively, for **210 new files total**. Repeated syllables have separate positional files. Keep the filenames and card order in `scripts/build-data.cjs` stable after preparing the recordings. Pronounce the listed syllables according to the displayed divisions, without letter names or grammatical case endings.
 
-The current bank includes all **210 local syllable recordings** for groups 2–5. Missing or undecodable clips display a concise unavailable message. Whole-word audio and the one-syllable group work from the source libraries. There is no device-speech fallback that could mispronounce an isolated syllable.
+The current bank includes all **210 local syllable recordings** for groups 2–5. Missing or undecodable clips display a concise unavailable message. Whole-word audio and the one-syllable group work from the local copies. There is no device-speech fallback that could mispronounce an isolated syllable.
 
-After adding or replacing M4A files, rebuild the data and release. The build discovers local clips, hashes them and includes them in the optional offline download catalog under «المقاطع الصوتية». Only existing clips are cataloged, so the app can install before the recordings are ready.
+After adding or replacing M4A files, rebuild the data and release. The build discovers local clips, hashes them and includes them in the optional offline download catalog together with the local pictures and whole-word recordings. Only existing clips are cataloged, so the app can install before the recordings are ready.
 
 ## Artwork and audio references
 
@@ -61,10 +61,19 @@ node tools/taffaha/scripts/build-pwa.cjs
 node tools/taffaha/tests/static.cjs
 node tools/taffaha/tests/test-model.cjs
 node tools/taffaha/tests/browser.cjs
+node tools/taffaha/tests/update-browser.cjs
 node tools/taffaha/tests/activities-browser.cjs
 node tools/taffaha/tests/persistence.cjs
 ```
 
-Browser checks require Playwright (`TAFFAHA_PLAYWRIGHT` can point to an existing installation) and installed Google Chrome. `TAFFAHA_ENGINE=webkit` selects Playwright WebKit. The tests cover every card, complete-word decoding, numbered syllable playback order, duplicate syllables, unavailable clips, cancellation, 320px layouts, image races, offline installation, byte ranges and cache isolation. The activity suite checks home routing, the five-number category picker, the visual mode picker, all difficulty rules, both test types, real metronome playback, feedback, correct-only automatic advance, cancellation and responsive layouts. `npm run test:practice` verifies direct image/frame/circle playback, keyboard use, the music layout, single and sequenced beats, cancellation, saved rhythm settings and title spacing on phone and landscape screens. The pure model suite checks all 75 words at every difficulty with multiple random seeds. The persistence test checks card selection across a complete browser restart, including offline reopening. Browser artifacts are written to `/private/tmp/taffaha-qa`.
+Browser checks require Playwright (`TAFFAHA_PLAYWRIGHT` can point to an existing installation) and installed Google Chrome. `TAFFAHA_ENGINE=webkit` selects Playwright WebKit. The tests cover every card, complete-word decoding, numbered syllable playback order, duplicate syllables, unavailable clips, cancellation, 320px layouts, image races, offline installation, byte ranges and cache isolation. `npm run test:updates` serves Taffaha by itself and verifies all 360 downloads, updates to code and media, a waiting update across page reloads, multiple open windows, cache preservation and offline reopening. The activity suite checks home routing, the five-number category picker, the visual mode picker, all difficulty rules, both test types, real metronome playback, feedback, correct-only automatic advance, cancellation and responsive layouts. `npm run test:practice` verifies direct image/frame/circle playback, keyboard use, the music layout, single and sequenced beats, cancellation, saved rhythm settings and title spacing on phone and landscape screens. The pure model suite checks all 75 words at every difficulty with multiple random seeds. The persistence test checks card selection across a complete browser restart, including offline reopening. Browser artifacts are written to `/private/tmp/taffaha-qa`.
 
-Rebuild the PWA release after shipped code or shared media changes. `node tools/taffaha/scripts/build-pwa.cjs --check` verifies release freshness. The worker is scoped to this app and leaves other apps' caches alone. Existing legacy recording storage is no longer opened or used; this update does not delete browser data.
+## Offline downloads and updates
+
+The home download popup has exactly two buttons: **إضافة إلى الشاشة الرئيسية** and **تنزيل الصور والأصوات**. Tap outside the popup or press Escape to close it. Installation help appears after tapping the home-screen button when the browser has no native install prompt. The download button saves only the 360 files actually referenced by Taffaha (75 pictures, 75 whole-word recordings, 210 syllables; about 4.3 MB). Unused files and the rest of VOC, SENB and Arabic Sounds are excluded. The small app shell installs automatically; card media is optional and interrupted downloads resume from saved files.
+
+A new deployed release shows **يتوفر تحديث جديد لتطبيق تف فا حة** with **تحديث الآن**, even with the download popup closed. The app checks on opening, returning to the foreground, reconnecting and every five minutes while visible (checks are throttled to once per minute). Applying an update reloads open Taffaha windows, keeps preferences and unchanged downloaded media, and removes obsolete Taffaha media. Changed/new media can be downloaded again with the same download button.
+
+Run `node tools/taffaha/scripts/build-data.cjs` to refresh copies from the source apps and regenerate word/audio mappings. This build step needs the source apps; running Taffaha does not. When editing Taffaha's copied media directly, update the word revisions if needed and run the PWA builder.
+
+Rebuild and commit `assets/pwa-release.js` with shipped code or media changes before publishing to GitHub Pages. Updates become available after the changed files are deployed to the app's URL; a GitHub commit alone does not update an unpublished site. `node tools/taffaha/scripts/build-pwa.cjs --check` verifies release freshness. The worker is scoped to this app and leaves other apps' caches alone. Existing legacy recording storage is no longer opened or used; this update does not delete browser data.

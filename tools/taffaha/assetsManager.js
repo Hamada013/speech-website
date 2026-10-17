@@ -1,5 +1,5 @@
 /** Paths are resolved against this module, so subpath hosting works. */
-export const LIBRARIES={taffaha:'./',voc:'../voc/',senb:'../senb/',arabicsounds:'../arabicsounds/','arabic-sound-app':'../arabicsounds/'};
+export const LIBRARIES={taffaha:'./'};
 export const PLACEHOLDER=new URL('./assets/placeholder.svg',import.meta.url).href;
 const imageRequests=new WeakMap();
 export function assetURL(asset){

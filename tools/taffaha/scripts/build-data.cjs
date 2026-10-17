@@ -1,5 +1,5 @@
 // Keep source word IDs and whole-word audio together. Reviewed artwork/title
-// corrections are local to Taffaha. Syllable files belong to Taffaha.
+// corrections and all shipped media are local to Taffaha.
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto');
 const root=path.resolve(__dirname,'..'),voc=path.resolve(root,'../voc'),senb=path.resolve(root,'../senb');
 const source=fs.readFileSync(path.join(voc,'index.html'),'utf8');
@@ -83,18 +83,18 @@ const imageOverrides={
 };
 const words=[],mapping=[
  'تف فا حة — خريطة ملفات المقاطع الصوتية M4A',
- 'كلمات المقطع الواحد تستخدم صوت الكلمة الأصلي من VOC؛ لا تحتاج إلى تسجيل ملفات جديدة.',
+ 'كلمات المقطع الواحد تستخدم نسخة محلية من صوت الكلمة الأصلي؛ لا تحتاج إلى تسجيل ملفات جديدة.',
  'ضع تسجيلات كلمات المقاطع المتعددة داخل tools/taffaha/assets/sounds/ ثم مجلد عدد المقاطع (2 إلى 5).',
  'كل ملف يحتوي على مقطع واحد فقط. يُقرأ ترتيب المقاطع من اليمين إلى اليسار كما في الكلمة.',
  'الترقيم مستقل لكل مجلد ومتصل بين الكلمات؛ لا يبدأ من جديد لكل كلمة.',
  'تُسجّل المقاطع بحسب النطق المبين هنا دون إضافة أسماء الحروف أو حركات إعراب.',
- 'مسارات ../voc/ نسبية إلى tools/taffaha/. يلزم تجهيز 210 ملفات للمقاطع المتعددة؛ أصوات المقطع الواحد موجودة بالفعل.',
+ 'كل المسارات محلية ونسبية إلى tools/taffaha/. يلزم تجهيز 210 ملفات للمقاطع المتعددة؛ أصوات المقطع الواحد موجودة بالفعل.',
  ''
 ];
 for(const [countText,rows]of Object.entries(groups)){
  const count=Number(countText);if(rows.length!==15)throw Error(`Group ${count} needs fifteen cards`);
  const folder=path.join(root,'assets/sounds',countText);fs.mkdirSync(folder,{recursive:true});
- const folderMapping=count===1?['كلمات المقطع الواحد تستخدم صوت الكلمة الأصلي؛ لا يلزم تسجيل ملفات هنا.','مسارات ../voc/ نسبية إلى tools/taffaha/.']:[];let fileNumber=0;
+ const folderMapping=count===1?['كلمات المقطع الواحد تستخدم نسخة محلية من صوت الكلمة الأصلي؛ لا يلزم تسجيل ملفات هنا.','كل المسارات محلية ونسبية إلى tools/taffaha/.']:[];let fileNumber=0;
  mapping.push(count===1?'=== مقطع واحد — 15 صوتًا أصليًا من VOC، دون ملفات جديدة ===':`=== ${count} مقاطع — assets/sounds/${count}/ — ${rows.length*count} ملفًا ===`);
  for(const [categoryID,sourceLabel,syllables,label=sourceLabel]of rows){
   if(syllables.length!==count)throw Error('Incorrect syllable count: '+label);
@@ -113,14 +113,20 @@ for(const [countText,rows]of Object.entries(groups)){
   }
   const imagePath=imageOverrides[id]||item.image;
   for(const file of [imagePath,item.audio])if(!fs.existsSync(path.join(base,file)))throw Error('Missing source media: '+library+'/'+file);
-  const revision=crypto.createHash('sha256').update(fs.readFileSync(path.join(base,imagePath))).digest('hex');
-  const syllableAudio=count===1?[{library,path:item.audio}]:syllables.map(()=>{
+  function copyAsset(sourcePath,localPath){
+   const body=fs.readFileSync(path.join(base,sourcePath)),target=path.join(root,localPath);
+   fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,body);
+   return {library:'taffaha',path:localPath,revision:crypto.createHash('sha256').update(body).digest('hex')};
+  }
+  const image=copyAsset(imagePath,`assets/images/${library}/${imagePath.replace(/^images\//,'')}`);
+  const audio=copyAsset(item.audio,`assets/sounds/words/${library}/${item.audio.replace(/^sounds\//,'')}`);
+  const syllableAudio=count===1?[audio]:syllables.map(()=>{
    const file=`assets/sounds/${count}/${++fileNumber}.m4a`,asset={library:'taffaha',path:file};
    if(fs.existsSync(path.join(root,file)))asset.revision=crypto.createHash('sha256').update(fs.readFileSync(path.join(root,file))).digest('hex');
    return asset;
   });
   words.push({id,label,syllableCount:count,sourceCategory,syllables,
-   image:{library,path:imagePath,revision},audio:{library,path:item.audio},syllableAudio});
+   image,audio,syllableAudio});
   mapping.push('',label+' — '+syllables.join(' / '));
   folderMapping.push('',label+' — '+syllables.join(' / '));
   syllables.forEach((part,i)=>{

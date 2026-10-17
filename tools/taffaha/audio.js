@@ -3,7 +3,7 @@
  * and detaches native audio to prevent overlapping cues.
  */
 export class AudioEngine{
- constructor(){this.context=null;this.cancelCurrent=null;}
+ constructor(){this.context=null;this.cancelCurrent=null;this.durations=new Map();}
  unlock(){
   const Context=globalThis.AudioContext||globalThis.webkitAudioContext;
   try{if((!this.context||this.context.state==='closed')&&Context)this.context=new Context();}catch{this.context=null;}
@@ -14,6 +14,25 @@ export class AudioEngine{
  }
 
  stop(){this.cancelCurrent?.();this.cancelCurrent=null;}
+ async duration(source,{signal}={}){
+  if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
+  if(this.durations.has(source))return this.durations.get(source);
+  let duration;
+  if(this.context){
+   const response=await fetch(source,{signal});if(!response.ok)throw Error('الصوت غير موجود في المكتبة.');
+   const buffer=await this.context.decodeAudioData(await response.arrayBuffer());duration=buffer.duration;
+  }else{
+   duration=await new Promise((resolve,reject)=>{
+    const audio=new Audio();audio.preload='metadata';let done=false;
+    const finish=(error,value)=>{if(done)return;done=true;clearTimeout(timer);signal?.removeEventListener('abort',abort);audio.onloadedmetadata=null;audio.onerror=null;audio.removeAttribute('src');audio.load();error?reject(error):resolve(value);};
+    const abort=()=>finish(new DOMException('Cancelled','AbortError')),timer=setTimeout(()=>finish(Error('تعذر تحميل الصوت.')),10000);
+    audio.onloadedmetadata=()=>finish(null,audio.duration);audio.onerror=()=>finish(Error('تعذر تحميل الصوت.'));signal?.addEventListener('abort',abort,{once:true});audio.src=source;
+   });
+  }
+  if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
+  if(!Number.isFinite(duration)||duration<=0)throw Error('تعذر تحميل الصوت.');
+  this.durations.set(source,duration);return duration;
+ }
  beat({signal}={}){
   // A short, decaying wooden click generated locally, including when offline.
   if(!this.beatClip){
@@ -34,6 +53,7 @@ export class AudioEngine{
    if(response&&!response.ok)throw Error('الصوت غير موجود في المكتبة.');
    const bytes=await(source instanceof Blob?source.arrayBuffer():response.arrayBuffer());
    const buffer=await this.context.decodeAudioData(bytes.slice(0));
+   if(typeof source==='string')this.durations.set(source,buffer.duration);
    if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
    if(this.context.state!=='running')throw Error('المس زر الاستماع مجددًا لتفعيل الصوت.');
    return new Promise((resolve,reject)=>{

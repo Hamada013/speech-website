@@ -13,7 +13,7 @@ async function launch(){return chromium.launchPersistentContext(profile,{headles
   assert.equal(await p.locator('.syllable-circle').count(),5);await p.locator('#original').click();await p.waitForFunction(()=>!document.querySelector('.is-playing'));assert.equal(await p.locator('#status').innerText(),'');
   await context.close();context=null;await new Promise(r=>server.close(r));
   context=await launch();p=context.pages()[0]||await context.newPage();await p.goto(base+'#practice');await p.waitForFunction(()=>document.getElementById('word-label').textContent==='طبيبة عيون');await p.waitForFunction(()=>!document.getElementById('word-image').dataset.loading);
-  assert.equal(await p.locator('.syllable-circle').count(),5);assert.ok((await p.locator('#word-image').getAttribute('src')).includes('/senb/images/01%20subject/29.webp'));assert.equal(await p.locator('#toggle-recording,.record-button,#stop-audio').count(),0);
+  assert.equal(await p.locator('.syllable-circle').count(),5);assert.ok((await p.locator('#word-image').getAttribute('src')).includes('/taffaha/assets/images/senb/01%20subject/29.webp'));assert.equal(await p.locator('#toggle-recording,.record-button,#stop-audio').count(),0);
   await p.locator('#original').click();await p.waitForFunction(()=>!document.querySelector('.is-playing'));assert.equal(await p.locator('#status').innerText(),'');
   const prefs=await p.evaluate(()=>JSON.parse(localStorage.getItem('taffaha-preferences')));assert.equal(prefs.lastWord,'senb-subject-29');assert.ok(!('segments'in prefs));
   console.log('PASS: full offline browser restart retained five-syllable selection, image and whole-word audio.');

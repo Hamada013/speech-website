@@ -22,15 +22,22 @@ for(let n=1;n<=5;n++){
   }else{
    const subject=subjects.find(w=>w.id===Number(word.id.split('-')[2]));item={name:subject.title,image:`images/01 subject/${subject.id}.webp`,audio:`sounds/subject/${subject.id}.m4a`};base=senb;
   }
-  assert.equal(word.label,titleCorrections[word.id]||item.name);assert.equal(word.audio.path,item.audio,'Title/audio retain source ID');assert.equal(word.image.path,corrections[word.id]||item.image,'Only reviewed artwork may differ');
-  for(const a of [word.image,word.audio])assert.ok(fs.existsSync(path.join(base,a.path)));
-  assert.equal(word.image.revision,hash(fs.readFileSync(path.join(base,word.image.path))));
+  assert.equal(word.label,titleCorrections[word.id]||item.name);
+  const library=word.id.startsWith('voc-')?'voc':'senb';
+  const originalImage=corrections[word.id]||item.image;
+  assert.equal(word.audio.path,`assets/sounds/words/${library}/${item.audio.replace(/^sounds\//,'')}`,'Whole-word copy retains source ID');
+  assert.equal(word.image.path,`assets/images/${library}/${originalImage.replace(/^images\//,'')}`,'Only reviewed artwork may differ');
+  for(const [asset,sourcePath]of [[word.image,originalImage],[word.audio,item.audio]]){
+   assert.equal(asset.library,'taffaha');
+   assert.deepEqual(fs.readFileSync(path.join(root,asset.path)),fs.readFileSync(path.join(base,sourcePath)),'Local copy matches original');
+   assert.equal(asset.revision,hash(fs.readFileSync(path.join(root,asset.path))));
+  }
   for(const [i,part]of word.syllables.entries()){
    assert.ok(part.trim().length>0);const a=word.syllableAudio[i];clip++;
    if(n===1){
     assert.deepEqual(a,word.audio,'One-syllable audio reuses the whole word');
     assert.equal(a.library,word.image.library);
-    assert.equal(a.path,word.image.path.replace(/^images\//,'sounds/').replace(/\.webp$/,'.m4a'),'One-syllable picture/audio share their source number');
+    assert.equal(a.path,word.image.path.replace(/^assets\/images\//,'assets/sounds/words/').replace(/\.webp$/,'.m4a'),'One-syllable picture/audio share their source number');
    }else{
     assert.equal(a.library,'taffaha');assert.equal(a.path,`assets/sounds/${n}/${clip}.m4a`);
    }
@@ -43,6 +50,11 @@ for(let n=1;n<=5;n++){
  }
  assert.equal(clip,15*n);
 }
+const expectedMedia=new Set(words.flatMap(w=>[w.image,w.audio,...w.syllableAudio]).filter(a=>fs.existsSync(path.join(root,a.path))).map(a=>a.path));
+assert.deepEqual(new Set(release.media.map(a=>a.url)),expectedMedia,'Only files used by Taffaha are downloaded');
+assert.ok(release.media.every(a=>a.library==='taffaha'&&a.url.startsWith('assets/')&&!a.url.includes('..')));
+assert.ok(release.shell.every(file=>!expectedMedia.has(file)),'Media is opt-in, not part of shell installation');
+assert.equal(release.media.length,360);
 assert.equal(allClips.size,225);assert.match(mapping,/assets\/sounds\/2\/1\.m4a = مو/);assert.match(mapping,/assets\/sounds\/2\/2\.m4a = زة/);
 for(const file of release.shell.filter(f=>f.endsWith('.js')))require('node:child_process').execFileSync(process.execPath,['--check',path.join(root,file)]);
 const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.json')));assert.equal(manifest.dir,'rtl');assert.equal(manifest.scope,'./');
