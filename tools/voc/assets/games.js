@@ -3,6 +3,7 @@
 (() => {
     'use strict';
     const M = window.VocGameModel;
+    const P = window.VocProgress;
     const mode = document.body.dataset.game;
     const $ = selector => document.querySelector(selector);
     const all = selector => [...document.querySelectorAll(selector)];
@@ -13,7 +14,10 @@
     if (!bank || !meta) return;
     const items = bank.categories.flatMap(category => category.items);
     const byKey = new Map(items.map(item => [item.key, item]));
-    const prefix = `hamada-game-${mode}`;
+    const prefix = P.scope(`hamada-game-${mode}`);
+    let learnedOnly = false;
+    let activePlan = null;
+    let advanceTimer = null;
     const audio = $('#game-audio');
     let session = null;
     let selected = new Set();
@@ -30,10 +34,15 @@
     let deadline = null;
     let runningSince = null;
     let storageWarned = false;
+    let guideBusy = false;
+    const preview = document.createElement('dialog'); preview.id = 'word-preview'; preview.className = 'word-preview'; preview.hidden = true;
+    preview.setAttribute('aria-label', 'نتعرّف على الكلمات');
+    preview.addEventListener('cancel', event => { event.preventDefault(); pause(); });
+    document.body.append(preview);
     const timers = new Set();
 
     function alert(text) { $('#game-alert').textContent = text; $('#game-alert').hidden = false; }
-    function feedback(text, error = false) { $('#game-feedback').textContent = text; $('#game-feedback').classList.toggle('error', error); }
+    function feedback(text, error = false) { const status = preview.querySelector('[role=status]'); if (status) status.textContent = text; $('#game-feedback').textContent = text; $('#game-feedback').classList.toggle('error', error); }
     function store(key, value) {
         try { localStorage.setItem(key, JSON.stringify(value)); return true; }
         catch { if (!storageWarned) { storageWarned = true; alert('التخزين المحلي غير متاح. يمكنك اللعب، لكن قد لا يُحفظ التقدم بعد إغلاق الصفحة.'); } return false; }
@@ -53,7 +62,8 @@
         collectTime(); ++generation;
         for (const timer of timers) clearTimeout(timer);
         timers.clear(); stopAudio(); ready = false; deadline = null;
-        $('#play-view').classList.remove('listening-replay');
+        $('#play-view').classList.remove('listening-replay', 'production-preview');
+        preview.close(); preview.hidden = true; guideBusy = false;
     }
     function later(action, delay) {
         const ticket = generation;
@@ -106,8 +116,8 @@
     }
     function filteredItems() {
         const query = M.normalize($('#word-search').value.trim());
-        return query ? items.filter(item => M.normalize(item.name).includes(query))
-            : bank.categories.find(category => String(category.id) === categoryId).items;
+        return (query ? items.filter(item => M.normalize(item.name).includes(query))
+            : bank.categories.find(category => String(category.id) === categoryId).items).filter(item => P.mastered(item) === learnedOnly);
     }
     function refreshSelection() {
         const visible = filteredItems(), pageCount = Math.max(1, Math.ceil(visible.length / 24));
@@ -134,7 +144,7 @@
     function updatePreview() {
         const visible = filteredItems();
         $('#select-category').setAttribute('aria-pressed', String(visible.length > 0 && visible.every(item => selected.has(item.key))));
-        $('#select-everything').setAttribute('aria-pressed', String(selected.size === items.length));
+        $('#select-everything').setAttribute('aria-pressed', String(items.filter(item => P.mastered(item) === learnedOnly).every(item => selected.has(item.key))));
         const unique = M.uniqueItems(items.filter(item => selected.has(item.key)));
         const config = settings();
         const count = mode === 'memory' ? Math.min(config.level, unique.length) : Math.min(config.length, unique.length);
@@ -155,13 +165,28 @@
             Array.isArray(value.pool) && value.pool.every(key => byKey.has(key)) && Number.isInteger(value.position) && value.position >= 0 && value.position <= value.order.length &&
             value.settings && [2, 4, 6].includes(value.settings.level) && Array.isArray(value.records) && Array.isArray(value.deck) && Array.isArray(value.open) && Array.isArray(value.matched);
     }
-    function begin(pool = null, review = false) {
+    function stopPlan() {
+        clearTimeout(advanceTimer); P.cancelPlan(); activePlan = null; planBanner.hidden = true;
+        all('[data-child-profile]').forEach(button => { button.disabled = false; });
+    }
+    function begin(pool = null, review = false, round = null) {
         clearWork();
-        try { session = M.createSession(mode, pool || items.filter(item => selected.has(item.key)), settings(), bank.version); }
+        if (!round && activePlan) stopPlan();
+        try { session = M.createSession(mode, pool || items.filter(item => selected.has(item.key)), round?.settings || settings(), bank.version); }
         catch (error) { alert(error.message); return; }
+        session.sessionId = `${mode}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
         session.review = review;
+        if (activePlan) { session.planId = activePlan.id; session.planPosition = activePlan.position; }
         $('#game-alert').hidden = true;
-        selectionPreferences(); save(); void renderCurrent();
+        if (mode === 'memory' || mode === 'test' || (mode === 'rapid' && activePlan)) session.guide = { index: 0, done: false };
+        selectionPreferences(); save(); void launch();
+    }
+    async function launch() {
+        clearWork(); phase = 'countdown'; show('play');
+        if (!await window.VocCountdown.start()) {
+            phase = 'paused'; save(); show('pause'); $('#pause-description').textContent = 'اضغط المتابعة عندما تكون مستعداً.'; return;
+        }
+        void renderCurrent();
     }
     function updateStats() {
         $('#session-progress').max = session.order.length; $('#session-progress').value = session.position;
@@ -175,7 +200,9 @@
             button.disabled = !active || button.classList.contains('matched') || (mode === 'test' && heardKey !== session.order[session.position]);
         }
         for (const button of all('[data-grade]')) button.disabled = !active || !gradeReady || session.autoPlay;
-        $('#play-word').disabled = !lastKey || !ready || !['active', 'feedback'].includes(phase) || (['matching', 'test'].includes(mode) && phase === 'feedback') || session.autoPlay;
+        $('#play-word').disabled = !lastKey || !ready || !['active', 'feedback', 'guiding'].includes(phase) || (['matching', 'test'].includes(mode) && phase === 'feedback') || session.autoPlay || (phase === 'guiding' && guideBusy);
+        const guideReplay = preview.querySelector('[data-guide-replay]');
+        if (guideReplay) guideReplay.disabled = guideBusy || phase !== 'guiding';
         $('#show-grading').disabled = !active || gradeReady;
         $('#skip-word').disabled = !active;
     }
@@ -202,6 +229,7 @@
         $('#play-title').textContent = session.autoPlay ? 'استمع وشاهد البطاقات.' : meta.description;
         $('#game-board').className = `game-board${mode === 'memory' ? ' memory-board' : ''}`;
         $('#game-board').replaceChildren(); $('#active-match').replaceChildren();
+        $('#rapid-autoplay').disabled = false;
         $('#rapid-autoplay').setAttribute('aria-pressed', String(!!session.autoPlay));
         $('#rapid-controls').hidden = mode !== 'rapid' || session.autoPlay; $('#next-round').hidden = true; $('#reload-media').hidden = true;
         $('#skip-word').hidden = !['rapid', 'test'].includes(mode) || session.autoPlay;
@@ -248,7 +276,8 @@
         ready = results.every(Boolean);
         phase = session.between ? 'between' : 'active'; runningSince = performance.now();
         if (!ready) { feedback('تعذر تحميل صورة. أعد التحميل أو نزّل المحتوى من الرئيسية. يمكنك إنهاء الجلسة دون احتسابها نجاحاً.', true); $('#reload-media').hidden = false; enableControls(); return; }
-        if (session.between) { feedback('أحسنت! أكملت هذه المجموعة. تابع عندما تكون مستعداً.'); $('#next-round').hidden = false; enableControls(); return; }
+        if (session.between) { feedback('أحسنت! أكملت هذه المجموعة.'); if (activePlan) later(() => { session.between = false; void renderCurrent(); }, 650); else $('#next-round').hidden = false; enableControls(); return; }
+        if (session.guide && !session.guide.done) { void runGuide(ticket); return; }
         feedback(mode === 'test' ? 'استمع إلى الكلمة ثم المس صورتها.' : meta.description);
         if (mode === 'memory' && session.pendingMismatch) { phase = 'feedback'; later(closeMismatch, 800); }
         if (mode === 'rapid' && session.autoPlay) { enableControls(); void autoAdvance(ticket); return; }
@@ -256,6 +285,61 @@
         enableControls();
         if (mode === 'test' || (mode === 'rapid' && session.settings.sound)) await playWord(target.key, mode === 'test');
         if (ticket === generation) enableControls();
+    }
+    // A preview never changes attempts, grades, or mastery. Its cursor survives a pause/reload.
+    async function runGuide(ticket) {
+        if (guideBusy || ticket !== generation) return;
+        guideBusy = true; phase = 'guiding';
+        $('#rapid-controls').hidden = true; $('#skip-word').hidden = true;
+        $('#rapid-autoplay').disabled = true;
+        const guide = session.guide;
+        const keys = mode === 'test' ? [session.order[0]] : session.order;
+        if (mode === 'memory') updateMemory();
+        if (mode === 'rapid') $('#play-view').classList.add('production-preview');
+        while (guide.index < keys.length && ticket === generation) {
+            const key = keys[guide.index]; lastKey = key;
+            feedback(mode === 'memory' ? 'شاهد الزوج واستمع.' : mode === 'test' ? 'نجرب مرة معاً.' : 'استمع وشاهد.');
+            all('#game-board > button').forEach(button => button.classList.toggle('guide-glow', mode === 'memory' && button.dataset.key === key));
+            if (mode === 'rapid') {
+                const card = picture(byKey.get(key), true, 'picture-button', 'div');
+                const toolbar = document.createElement('div'); toolbar.className = 'preview-toolbar';
+                for (const [icon, label, action, replay] of [
+                    ['pause', 'إيقاف مؤقت', pause], ['times', 'إنهاء الجلسة', () => finish(true)],
+                    ['play', 'أعد سماع الكلمة', () => { void runGuide(generation); }, true]
+                ]) {
+                    const button = document.createElement('button'); button.type = 'button'; button.className = 'game-button icon-button';
+                    button.setAttribute('aria-label', label); button.title = label; button.innerHTML = `<i class="fas fa-${icon}" aria-hidden="true"></i>`;
+                    if (replay) button.dataset.guideReplay = '';
+                    button.onclick = action; toolbar.append(button);
+                }
+                const status = document.createElement('p'); status.className = 'preview-status'; status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+                preview.replaceChildren(toolbar, card.element, status); preview.hidden = false;
+                if (!preview.open) preview.showModal();
+                if (!await card.loaded || ticket !== generation) {
+                    if (ticket === generation) {
+                        guideBusy = false; feedback('تعذر تحميل الصورة. اضغط زر إعادة المحاولة.', true);
+                        const retry = preview.querySelector('[data-guide-replay]'); retry.setAttribute('aria-label', 'إعادة المحاولة'); retry.title = 'إعادة المحاولة';
+                        enableControls();
+                    }
+                    return;
+                }
+            }
+            enableControls();
+            const played = await playWord(key, false, true);
+            if (ticket !== generation) return;
+            if (!played) {
+                guideBusy = false;
+                if (!$('#game-feedback').classList.contains('error')) feedback('تعذر إكمال الصوت. اضغط «أعد سماع الكلمة» للمحاولة مجدداً.', true);
+                enableControls(); return;
+            }
+            if (mode === 'test') all('#game-board > button').forEach(button => button.classList.toggle('guide-glow', button.dataset.key === key));
+            await new Promise(resolve => later(resolve, 900));
+            if (ticket !== generation) return;
+            guide.index++; save();
+        }
+        if (ticket !== generation) return;
+        guide.done = true; guideBusy = false; $('#rapid-autoplay').disabled = false;
+        save(); void renderCurrent();
     }
     // Completion is separate from play(): play() resolves when audio STARTS.
     // A progress-reset watchdog handles broken/stalled media without imposing
@@ -370,7 +454,7 @@
     }
     function updateMemory() {
         all('#game-board > button').forEach((button, index) => {
-            const matched = session.matched.includes(session.deck[index].key), shown = matched || session.open.includes(index);
+            const matched = session.matched.includes(session.deck[index].key), shown = (session.guide && !session.guide.done) || matched || session.open.includes(index);
             button.classList.toggle('matched', matched); button.classList.toggle('flipped', shown);
             button.querySelector('.memory-front').hidden = !shown; button.querySelector('.memory-back').hidden = shown;
             button.setAttribute('aria-label', shown ? `${byKey.get(session.deck[index].key).name}${matched ? '، تم التطابق' : ''}` : `بطاقة مخفية ${index + 1}`);
@@ -436,7 +520,7 @@
         session.position++; session.trialMistakes = 0; session.currentChoices = null; session.rapidRemaining = null; save(); void renderCurrent();
     }
     function pause() {
-        if (!session || !['active', 'loading', 'feedback', 'between'].includes(phase)) return;
+        if (!session || !['active', 'loading', 'feedback', 'between', 'guiding'].includes(phase)) return;
         if (mode === 'rapid' && deadline !== null && !gradeReady) session.rapidRemaining = Math.max(0, deadline - performance.now());
         clearWork(); phase = 'paused'; save();
         $('#pause-description').textContent = `حُفظ التقدم: ${session.position} من ${session.order.length}. المؤقت والصوت متوقفان حتى المتابعة.`; show('pause');
@@ -445,6 +529,17 @@
         if (!session || session.finished) return;
         clearWork(); phase = 'results'; session.finished = true;
         const summary = M.summarize(session, partial); store(`${prefix}-last`, summary); store(`${prefix}-draft`, null);
+        const domain = mode === 'rapid' ? 'expressive' : mode === 'test' ? 'receptive' : null;
+        P.logSession({ id: session.sessionId || `${mode}-${session.created}`, started: session.created, source: mode, domain, kind: mode === 'test' || (mode === 'rapid' && !session.autoPlay) ? 'assessment' : 'practice', partial,
+            records: session.records.map(record => ({ key: record.key,
+                correct: domain && !['viewed','skip'].includes(record.result) ? (mode === 'rapid' ? Number(record.result === 'mastered') : Number(record.result === 'correct' && record.attempts === 1)) : 0,
+                total: domain && record.result !== 'viewed' ? 1 : 0 })) });
+        if (activePlan && !partial) {
+            if (!session.review && domain) P.record(domain, session.records.filter(record => record.result !== 'viewed').map(record => ({ key: record.key, correct: mode === 'rapid' ? record.result === 'mastered' : record.result === 'correct' && record.attempts === 1 })));
+            P.advancePlan(activePlan.id, activePlan.position, domain ? { domain, records: session.records.filter(record => !['viewed', 'skip'].includes(record.result)).map(record => ({ key: record.key, correct: mode === 'rapid' ? record.result === 'mastered' : record.result === 'correct' && record.attempts === 1 })) } : null);
+            show('play'); $('#game-board').replaceChildren(); $('#active-match').replaceChildren();
+            location.replace(P.planURL()); return;
+        }
         $('#results-title').textContent = partial ? 'نتيجة الجلسة الحالية' : session.review ? 'أحسنت! انتهت المراجعة' : 'أحسنت! انتهت الجلسة';
         $('#results-description').textContent = `${session.position} / ${session.order.length} ${mode === 'memory' ? 'أزواج' : 'كلمات'} · ${session.review ? 'جلسة مراجعة' : 'تدريب'}${partial ? ' · غير مكتملة' : ''}`;
         $('#result-metrics').replaceChildren();
@@ -457,6 +552,12 @@
         const seconds = Math.round(summary.elapsedMs / 1000);
         $('#result-details').textContent = `وقت اللعب: ${Math.floor(seconds / 60)} د و${seconds % 60} ث · كلمات للمراجعة: ${session.missed.length} · تم تجاوز: ${summary.skipped}${summary.viewed ? ` · عُرضت دون تقييم: ${summary.viewed}` : ''}. النتيجة للتدريب وليست تقييماً تشخيصياً.`;
         $('#review-missed').hidden = !session.missed.length || session.pool.length < meta.minimum;
+        if (!partial && !session.review && ['rapid', 'test'].includes(mode)) {
+            P.record(mode === 'rapid' ? 'expressive' : 'receptive', session.records.filter(record => record.result !== 'viewed').map(record => ({
+                key: record.key, correct: mode === 'rapid' ? record.result === 'mastered' : record.result === 'correct' && record.attempts === 1
+            })));
+        }
+        if (activePlan && partial) stopPlan();
         show('results'); $('#results-title').focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: 'instant' });
     }
 
@@ -467,16 +568,16 @@
     }
     if (mode === 'test') {
         $('#labels-field').hidden = true; $('#sound-field').hidden = true;
-        $('input[name="game-level"][value="6"]').closest('label').remove(); $('#level-field .choice-options').classList.add('two-options');
+        // All three existing levels are also available to the automatic plan.
     }
     $('#settings-help').textContent = mode === 'rapid' ? 'الصوت نموذج للتعلّم ويمكن إيقافه. زر الأرنب في رأس الصفحة يعرض البطاقات تلقائياً دون تقييم؛ اضغطه مجدداً للعودة إلى التقييم اليدوي.'
         : mode === 'memory' ? 'ابدأ بزوجين، ثم زد العدد تدريجياً. الصور المخفية لا تظهر أسماؤها لقارئ الشاشة.'
             : mode === 'test' ? 'يجب تشغيل الكلمة قبل الإجابة. تُحتسب الدقة من أول اختيار، حتى لو نجح الطفل بعد المحاولة مجدداً.' : 'يمكن المطابقة باللمس أو بالسحب أو بلوحة المفاتيح. كل جلسة تنتهي بنتيجة واضحة.';
     const preferences = read(`${prefix}-preferences`);
-    selected = new Set((Array.isArray(preferences?.selected) ? preferences.selected : bank.categories[0].items.slice(0, 6).map(item => item.key)).filter(key => byKey.has(key)));
+    selected = new Set((Array.isArray(preferences?.selected) ? preferences.selected : bank.categories[0].items.slice(0, 6).map(item => item.key)).filter(key => byKey.has(key) && !P.mastered(key)));
     if (preferences?.settings) {
         const p = preferences.settings;
-        if ([2, 4, 6].includes(p.level) && !(mode === 'test' && p.level === 6)) pick('game-level', p.level);
+        if ([2, 4, 6].includes(p.level)) pick('game-level', p.level);
         if ([6, 10, 20].includes(p.length)) pick('game-length', p.length);
         if ([0, 2, 4, 6].includes(p.duration)) pick('game-duration', p.duration);
         $('#show-labels').checked = p.labels === true; $('#sound-hint').checked = p.sound !== false;
@@ -491,7 +592,7 @@
         const visible = filteredItems(), clear = visible.every(item => selected.has(item.key));
         visible.forEach(item => clear ? selected.delete(item.key) : selected.add(item.key)); refreshSelection(); selectionPreferences();
     });
-    $('#select-everything').addEventListener('click', () => { selected = selected.size === items.length ? new Set() : new Set(items.map(item => item.key)); refreshSelection(); selectionPreferences(); });
+    $('#select-everything').addEventListener('click', () => { const available = items.filter(item => P.mastered(item) === learnedOnly); selected = available.every(item => selected.has(item.key)) ? new Set() : new Set(available.map(item => item.key)); refreshSelection(); selectionPreferences(); });
     $('#rapid-autoplay').addEventListener('click', () => {
         if (mode !== 'rapid' || !session || !['active', 'loading', 'feedback'].includes(phase)) return;
         session.autoPlay = !session.autoPlay; session.rapidRemaining = null; save(); void renderCurrent();
@@ -499,12 +600,12 @@
     $('#page-previous').addEventListener('click', () => { page--; refreshSelection(); });
     $('#page-next').addEventListener('click', () => { page++; refreshSelection(); });
     $('#start-game').addEventListener('click', () => begin());
-    $('#resume-saved').addEventListener('click', () => { const draft = read(`${prefix}-draft`); if (validDraft(draft)) { session = draft; void renderCurrent(); } });
+    $('#resume-saved').addEventListener('click', () => { const draft = read(`${prefix}-draft`); if (validDraft(draft)) { session = draft; void launch(); } });
     $('#pause-game').addEventListener('click', pause);
-    $('#continue-game').addEventListener('click', () => { void renderCurrent(); });
-    $('#change-cards').addEventListener('click', () => { clearWork(); phase = 'setup'; show('setup'); renderResume(); });
+    $('#continue-game').addEventListener('click', () => { void launch(); });
+    $('#change-cards').addEventListener('click', () => { clearWork(); stopPlan(); phase = 'setup'; show('setup'); renderResume(); });
     $('#finish-game').addEventListener('click', () => finish(true)); $('#finish-paused').addEventListener('click', () => finish(true));
-    $('#return-setup').addEventListener('click', () => { phase = 'setup'; show('setup'); renderResume(); });
+    $('#return-setup').addEventListener('click', () => { stopPlan(); refreshSelection(); phase = 'setup'; show('setup'); renderResume(); });
     $('#play-again').addEventListener('click', () => begin(session.pool.map(key => byKey.get(key))));
     $('#review-missed').addEventListener('click', () => {
         const keys = [...session.missed];
@@ -515,7 +616,7 @@
     });
     $('#next-round').addEventListener('click', () => { session.between = false; void renderCurrent(); });
     $('#reload-media').addEventListener('click', () => { void renderCurrent(); });
-    $('#play-word').addEventListener('click', () => { if (lastKey) void playWord(lastKey, mode === 'test'); });
+    $('#play-word').addEventListener('click', () => { if (phase === 'guiding') { void runGuide(generation); return; } if (lastKey) void playWord(lastKey, mode === 'test'); });
     $('#show-grading').addEventListener('click', () => { gradeReady = true; session.rapidRemaining = 0; $('#observation-progress').value = $('#observation-progress').max; $('#show-grading').hidden = true; enableControls(); });
     for (const button of all('[data-grade]')) button.addEventListener('click', () => grade(button.dataset.grade));
     $('#skip-word').addEventListener('click', skip);
@@ -529,5 +630,28 @@
             const button = all('#game-board > button')[Number(event.key) - 1]; if (button && !button.disabled) { event.preventDefault(); button.click(); }
         }
     });
+    const library = document.createElement('button'); library.type = 'button'; library.className = 'game-button icon-button voc-book';
+    library.id = 'game-learned-library'; library.hidden = P.isAdmin(); library.setAttribute('aria-label', 'البطاقات المتقنة'); library.setAttribute('aria-pressed', 'false');
+    library.innerHTML = '<i class="fas fa-book-open" aria-hidden="true"></i>';
+    $('#word-bank-title').after(library);
+    library.addEventListener('click', () => { learnedOnly = !learnedOnly; library.setAttribute('aria-pressed', String(learnedOnly)); selected.clear(); page = 0; refreshSelection(); selectionPreferences(); });
+    const planBanner = document.createElement('div'); planBanner.className = 'voc-plan-banner'; planBanner.hidden = true;
+    const planText = document.createElement('span'); planText.textContent = 'مسار الألعاب · نفس بطاقات مساحة العمل';
+    const cancelPlan = document.createElement('button'); cancelPlan.className = 'voc-choice'; cancelPlan.textContent = 'إيقاف المسار'; cancelPlan.type = 'button';
+    cancelPlan.addEventListener('click', stopPlan);
+    planBanner.append(planText, cancelPlan); $('#game-main').prepend(planBanner);
+    window.addEventListener('voc-profile-open', pause);
+    window.addEventListener('voc-profile-beforechange', () => { pause(); clearTimeout(advanceTimer); });
     refreshSelection(); renderResume();
+    if (new URLSearchParams(location.search).has('plan') && P.currentRound()) {
+        const round = P.currentRound();
+        if (round.mode !== mode) { location.replace(P.planURL()); return; }
+        const pool = round.keys.map(key => byKey.get(key));
+        if (pool.some(item => !item)) { P.cancelPlan(); alert('إحدى البطاقات غير متاحة. اختر البطاقات مجدداً من مساحة العمل.'); return; }
+        const plan = P.active().plan; activePlan = { id: plan.id, position: plan.position }; planBanner.hidden = false;
+        selected = new Set(round.keys);
+        const draft = read(`${prefix}-draft`);
+        if (validDraft(draft) && draft.planId === plan.id && draft.planPosition === plan.position) { session = draft; phase = 'paused'; show('pause'); $('#pause-description').textContent = 'حُفظ المسار. اضغط المتابعة لإكماله.'; }
+        else begin(pool, false, round);
+    }
 })();

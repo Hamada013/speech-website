@@ -140,3 +140,14 @@ body[data-game=test] .wrong { animation:wrong-shake .4s ease-in-out; }
 @media(max-width:700px) { .selection-grid { grid-template-columns:repeat(4,minmax(0,1fr)); } .game-settings { grid-template-columns:repeat(2,minmax(0,1fr)); } .game-board { gap:.6rem; } .picture-button img { height:clamp(95px,17vh,145px); } .picture-button { min-height:125px; } }
 @media(max-width:480px) { .game-header { padding:.8rem 1rem; } .game-brand img { width:42px; height:42px; } .game-back span { display:none; } .game-shell { padding:1rem .75rem 2rem; } .game-panel { padding:1rem; } .game-settings,.game-selection-tools { grid-template-columns:1fr; } .selection-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:.5rem; } .selection-card img { width:60px; height:60px; } .game-footer { margin-inline:-1rem; margin-bottom:-1rem; padding:.8rem; } .game-footer .primary { flex:1; } .game-stats { gap:.65rem; font-size:.78rem; } .picture-button { padding:.5rem; border-radius:.8rem; } .picture-button span { font-size:.72rem; } .game-board.three-columns .picture-button img { height:85px; } .memory-board { gap:.45rem; } .memory-board .picture-button img { height:62px; } .memory-board .picture-button .memory-back { font-size:1.8rem; } .memory-front span { font-size:.6rem; } .match-source { max-width:160px; } .match-source img { height:85px; } .rapid-toolbar { gap:.4rem; } .rapid-toolbar button { font-size:.75rem; } .result-metrics { gap:.5rem; } .result-metrics strong { font-size:1.5rem; } }
 @media(prefers-reduced-motion:reduce) { .game-page * { transition:none!important; animation:none!important; scroll-behavior:auto!important; } }
+/* Guided practice keeps the board still and gives one clear visual cue. */
+.game-page .picture-button:disabled { opacity:1; }
+.game-page .picture-button.guide-glow { border-color:#25a786; background:#edfcf5; box-shadow:0 0 0 4px #a4e9d6,0 0 26px #48cfa566; }
+.production-preview .game-workspace { filter:blur(9px); pointer-events:none; }
+.word-preview { position:fixed; inset:0; width:min(560px,calc(100vw - 2rem)); max-height:calc(100dvh - 2rem); margin:auto; border:1px solid #dceaf4; border-radius:28px; padding:1rem; background:#fff; color:#22445a; box-shadow:0 14px 60px #22445a30; }
+.word-preview::backdrop { background:#f8fafc99; backdrop-filter:blur(9px); -webkit-backdrop-filter:blur(9px); }
+.preview-toolbar { display:flex; gap:.5rem; margin-bottom:.5rem; }
+.word-preview .picture-button { height:60dvh; max-height:520px; min-height:100px; border:0; padding:1rem; }
+.word-preview img { height:calc(100% - 3rem); min-height:0; max-height:420px; }
+.word-preview span { font-size:1.35rem; }
+.preview-status { margin:0; font-size:.85rem; line-height:1.6; color:#49657b; }

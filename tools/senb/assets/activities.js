@@ -27,6 +27,10 @@ function stopActivityPlayback() {
     for (const [timer, resolve] of activityTimers) { clearTimeout(timer); resolve(false); }
     activityTimers.clear();
     cleanupGameDrag();
+    document.querySelectorAll('.expression-card-playing,.expression-frame-playing').forEach(node => {
+        node.classList.remove('expression-card-playing', 'expression-frame-playing');
+        node.setAttribute('aria-busy', 'false');
+    });
     if (activity) { activity.autoplay = false; activity.busy = false; }
     activityRoot()?.setAttribute('aria-busy', 'false');
     document.querySelectorAll('[data-lock-playback]').forEach(button => { button.disabled = false; });
@@ -107,7 +111,7 @@ function renderActivitySetup() {
         <section class="activity-field"><h3>اختر طول الجملة</h3><div class="word-count-options">${[2, 3, 4, 5, 6].map(folder => activityButton(`${folder}<span> كلمات</span>`, `chooseActivityFolder(${folder})`, folder === a.folder, `data-folder="${folder}"`)).join('')}</div></section>
         ${(a.mode === 'repetition' || assessment) && cat ? `<section class="activity-field"><h3>اختر المجموعة الفرعية</h3><div class="subgroup-options">${assessment ? activityButton('كل المجموعات', 'chooseActivitySubgroup(null)', a.subgroup === null, 'data-subgroup="all"') : ''}${cat.subcategories.map(sub => activityButton(`${sub.id}. ${htmlText(sub.name)}`, `chooseActivitySubgroup(${sub.id})`, sub.id === a.subgroup, `data-subgroup="${sub.id}"`)).join('')}</div></section>` : ''}
         ${a.mode === 'game' && cat ? `<section class="activity-field"><h3>اختر كل المجموعة أو مجموعات فرعية متعددة</h3><div class="subgroup-options">${activityButton('كل المجموعات', 'chooseGameSubgroup(null)', !a.gameSubgroups.length, 'data-game-subgroup="all"')}${cat.subcategories.map(sub => activityButton(`${sub.id}. ${htmlText(sub.name)}`, `chooseGameSubgroup(${sub.id})`, a.gameSubgroups.includes(sub.id), `data-game-subgroup="${sub.id}"`)).join('')}</div></section>` : ''}
-        ${a.mode === 'comprehension' && a.folder ? `<section class="activity-field"><h3>كيف تريد عرض الخيارات؟</h3><div class="presentation-options">${activityButton('الصور المتكاملة', "chooseTestPresentation('advanced')", a.presentation === 'advanced', 'data-presentation="advanced"')}${activityButton('بطاقات الكلمات', "chooseTestPresentation('slots')", a.presentation === 'slots', 'data-presentation="slots"')}</div></section>` : ''}
+        ${assessment && a.folder ? `<section class="activity-field"><h3>كيف تريد عرض الخيارات؟</h3><div class="presentation-options">${activityButton('الصور المتكاملة', "chooseTestPresentation('advanced')", a.presentation === 'advanced', 'data-presentation="advanced"')}${activityButton('بطاقات الكلمات', "chooseTestPresentation('slots')", a.presentation === 'slots', 'data-presentation="slots"')}</div></section>` : ''}
         ${assessment && a.folder ? `<section class="activity-field"><h3 id="assessmentTrialsHeading">عدد المحاولات لكل مجموعة فرعية</h3><div class="assessment-trial-options" role="group" aria-labelledby="assessmentTrialsHeading">${[3, 4, 5, 6, 7, 8, 9, 10].map(count => activityButton(count, `chooseAssessmentTrials(${count})`, a.trialsPerSubgroup === count, `data-trial-count="${count}"`)).join('')}</div></section>` : ''}
         ${assessment ? `<p class="activity-intro" id="assessmentTrialInfo">${a.trialsPerSubgroup} محاولات عشوائية ${a.subgroup ? 'من المجموعة الفرعية المختارة' : `لكل مجموعة فرعية · 8 مجموعات · ${a.trialsPerSubgroup * 8} محاولة`}</p>` : ''}
         ${a.mode === 'game' ? '<p class="activity-intro">اختر البطاقة، واسحبها إلى الخانة الناقصة. يمكنك أيضاً اختيارها باللمس ثم لمس الخانة.</p>' : ''}
@@ -116,7 +120,7 @@ function renderActivitySetup() {
 function startActivity() {
     if (!activity.folder || (activity.mode === 'repetition' && !activity.subgroup)) return;
     stopActivityPlayback();
-    Object.assign(activity, { mount: 'session', index: 0, results: [], completed: new Set(), phase: 'ready', testStartedAt: new Date() });
+    Object.assign(activity, { mount: 'session', index: 0, results: [], completed: new Set(), phase: 'ready', testStartedAt: new Date(), progressLogged: false });
     if (activity.mode === 'repetition') activity.sentences = SENBActivities.sentences(activity.folder, activity.subgroup);
     else if (activity.mode === 'game') {
         activity.bag = SENBActivities.gameBag(activity.folder, Math.random, activity.gameSubgroups);
@@ -153,6 +157,7 @@ function renderActivity() {
     view.classList.toggle('fixed-session', activity.mode === 'game' || activity.mode === 'expressive');
     view.classList.toggle('game-session', activity.mode === 'game');
     view.classList.toggle('expressive-session', activity.mode === 'expressive');
+    view.dataset.testPresentation = activity.presentation;
     const title = `<div class="activity-title"><h2 id="activityHeading">${ACTIVITY_NAMES[activity.mode]}</h2><p>${activity.folder} كلمات · ${htmlText(group.name)}</p></div>`;
     const settings = activityIconButton('activitySetupBtn', 'تغيير الاختيار', 'settings', 'returnToActivitySetup()');
     const progress = `<div class="activity-progress-label">${activity.mode === 'game' ? `الجولة ${activity.index + 1}` : `${activity.mode === 'repetition' ? 'الجملة' : 'المحاولة'} ${activity.index + 1} / ${activityTrialCount()}${activity.mode !== 'repetition' ? ` · المجموعة ${sentence.subCatId}${activity.subgroup ? '' : ' / 8'}` : ''}`}</div>${activity.mode === 'game' ? '' : progressHTML()}`;
@@ -193,10 +198,39 @@ async function playActivitySentence() {
     if (activity.mode === 'repetition') renderRepetitionControls();
 }
 async function playActivitySlot(index, candidate = null) {
+    if (activity.mode === 'expressive' && activity.presentation === 'slots') return playExpressiveCards(index);
     stopActivityPlayback();
     const sentence = currentActivitySentence();
     await playActivitySegments(SENBActivities.slotSegments(sentence, candidate || sentence.slots[index], index), activityRunToken);
     if (activity.mode === 'repetition') renderRepetitionControls();
+}
+async function playExpressiveWordFrame() { return playExpressiveCards(); }
+async function playExpressiveCards(onlyIndex) {
+    stopActivityPlayback();
+    const token = activityRunToken, sentence = currentActivitySentence();
+    const frame = document.querySelector('.expressive-word-cards');
+    if (!frame) return;
+    const cards = [...frame.querySelectorAll('.activity-slot')];
+    const indices = onlyIndex === undefined ? sentence.slots.map((_, index) => index) : [onlyIndex];
+    activityStatus('');
+    frame.classList.add('expression-frame-playing'); frame.setAttribute('aria-busy', 'true');
+    try {
+        // DOM order is the sentence's reading order; the frame lays it out in RTL.
+        for (const index of indices) {
+            if (token !== activityRunToken) return;
+            const card = cards[index];
+            card.classList.add('expression-card-playing'); card.setAttribute('aria-busy', 'true');
+            const played = await playActivitySegments(SENBActivities.slotSegments(sentence, sentence.slots[index], index), token);
+            if (token !== activityRunToken) return;
+            card.classList.remove('expression-card-playing'); card.setAttribute('aria-busy', 'false');
+            if (!played) { activityStatus('تعذّر تشغيل الصوت. اضغط على البطاقة للمحاولة مجدداً.'); return; }
+        }
+    } finally {
+        if (token === activityRunToken) {
+            frame.classList.remove('expression-frame-playing'); frame.setAttribute('aria-busy', 'false');
+            cards.forEach(card => { card.classList.remove('expression-card-playing'); card.setAttribute('aria-busy', 'false'); });
+        }
+    }
 }
 function renderRepetition(stage, sentence) {
     stage.innerHTML = `${sentenceImageHTML(sentence, 'playActivitySentence()')}<div class="activity-slots" style="--slot-count:${sentence.slots.length}">${sentence.slots.map((slot, index) => slotHTML(sentence, slot, index, `playActivitySlot(${index})`)).join('')}</div>
@@ -295,7 +329,10 @@ async function answerComprehension(index) {
     playTestPrompt();
 }
 function renderExpressive(stage, sentence) {
-    stage.innerHTML = `${sentenceImageHTML(sentence, 'playActivitySentence()')}<p class="activity-intro">المس دائرة لكل كلمة قالها الطفل.</p>
+    const display = activity.presentation === 'slots'
+        ? `<div class="activity-slots expressive-word-cards" role="group" tabindex="0" aria-label="استمع إلى كلمات الجملة من اليمين إلى اليسار" onclick="playExpressiveWordFrame()" onkeydown="if(event.target===this &amp;&amp; (event.key==='Enter' || event.key===' ')){event.preventDefault();playExpressiveWordFrame();}" style="--slot-count:${sentence.slots.length}">${sentence.slots.map((slot, index) => slotHTML(sentence, slot, index, `event.stopPropagation();playActivitySlot(${index})`, false)).join('')}</div>`
+        : sentenceImageHTML(sentence, 'playActivitySentence()');
+    stage.innerHTML = `${display}<p class="activity-intro">المس دائرة لكل كلمة قالها الطفل.</p>
         <div class="word-score-row">${activity.wordMarks.map((marked, index) => `<button class="word-score-dot${marked ? ' marked' : ''}" style="--word-color:${getSlotColorConfig(index, activity.folder)}" aria-label="الكلمة ${index + 1}" aria-pressed="${marked}" onclick="toggleExpressiveWord(${index},this)">${index + 1}</button>`).join('')}</div>
         <div class="activity-controls">${activityIconButton('expressiveNextBtn', activity.index === activity.plan.length - 1 ? 'عرض النتيجة' : 'التالي', 'next', 'nextExpressiveTrial()', true)}</div>`;
 }
@@ -317,6 +354,7 @@ function renderActivitySummary() {
     clearComprehensionHeader();
     document.getElementById('activityView').classList.remove('comprehension-session', 'fixed-session', 'game-session', 'expressive-session');
     activity.mount = 'summary';
+    logCompletedAssessment();
     const expressive = activity.mode === 'expressive';
     const summary = SENBActivities.assessmentSummary(activity.results, expressive, activity.folder);
     activity.reportDate = activity.testStartedAt;
@@ -324,8 +362,29 @@ function renderActivitySummary() {
     activityRoot().innerHTML = `<div class="activity-summary"><h2 id="activityHeading">${expressive ? 'متوسط طول الملفوظ بالكلمات (MLU)' : 'نسبة الإنجاز في الفهم'}</h2><p class="activity-intro">${activity.folder} كلمات · ${activity.subgroup ? `المجموعة الفرعية ${activity.subgroup}` : 'كل المجموعات'}</p><p class="activity-report-meta">تاريخ الاختبار: ${htmlText(SENBReport.formatDate(activity.reportDate))}</p><p class="activity-report-meta" dir="ltr">${SENBReport.clinicianName}</p><div class="activity-result-total" dir="ltr">${expressive ? summary.mlu : `${summary.percentage}%`}</div>
         ${expressive ? '<p class="activity-intro">MLU بالكلمات = مجموع الكلمات المحددة ÷ عدد المحاولات المكتملة</p>' : ''}
         <div class="activity-report-table"><table><caption>نتائج المجموعات الفرعية</caption><thead><tr><th scope="col">المجموعة الفرعية</th><th scope="col">${expressive ? 'MLU بالكلمات' : 'الإجابات الصحيحة'}</th><th scope="col">${expressive ? 'المحاولات' : 'النسبة'}</th></tr></thead><tbody>${summary.groups.map(group => `<tr data-result-subgroup="${group.id}"><th scope="row">${group.id}. ${htmlText(group.name)}</th><td dir="ltr">${expressive ? group.mlu : `${group.earned} / ${group.possible}`}</td><td dir="ltr">${expressive ? group.trials : `${group.percentage}%`}</td></tr>`).join('')}</tbody></table></div>
-        ${expressive ? `<div class="activity-report-table"><table><caption>الأداء حسب نوع الكلمة</caption><thead><tr><th scope="col">نوع الكلمة</th><th scope="col">نسبة الإنتاج</th></tr></thead><tbody>${summary.wordTypes.map(type => `<tr data-word-type="${type.id}"><th scope="row">${htmlText(type.label)}</th><td dir="ltr">${type.percentage}%</td></tr>`).join('')}</tbody></table><p class="activity-intro">النسبة لكل نوع = الكلمات المحددة من هذا النوع ÷ مرات عرضه في الاختبار</p><div class="activity-word-findings">${SENBReport.wordFindings(summary).map(finding => `<p>${htmlText(finding)}</p>`).join('')}</div></div>` : ''}
         <div class="activity-controls"><button id="downloadActivityResultsBtn" class="activity-primary" onclick="downloadActivityResults()">تنزيل التقرير PDF</button>${activityIconButton('testRestartBtn', 'اختبار جديد', 'restart', 'returnToActivitySetup()', true)}${activityIconButton('testHomeBtn', 'الرئيسية', 'home', "navigateTo('home')")}</div><p id="reportStatus" class="activity-status" role="status"></p></div>`;
+}
+function logCompletedAssessment() {
+    if (!window.SenbProgress || activity.progressLogged || !['comprehension', 'expressive'].includes(activity.mode) || activity.results.length !== activity.plan.length) return;
+    const domain = activity.mode === 'expressive' ? 'expressive' : 'receptive';
+    const records = new Map();
+    const add = (key, title, entity, correct, total) => {
+        if (!records.has(key)) records.set(key, { key, title, entity, domain, presentation: activity.presentation, correct: 0, total: 0 });
+        const record = records.get(key);
+        record.correct += correct;
+        record.total += total;
+    };
+    activity.results.forEach(result => {
+        const sentence = getAdvancedItemData(activity.folder, result.subgroup, result.item);
+        add(`s:${sentence.folder}/${sentence.subCatId}/${sentence.itemNum}`, sentence.title, 'sentence', domain === 'expressive' ? result.words : Number(result.correct), domain === 'expressive' ? sentence.slots.length : 1);
+        // Only expressive word marks isolate a specific word; choosing a whole sentence does not.
+        if (domain === 'expressive') sentence.slots.forEach((slot, index) => {
+            const item = SENBActivities.normalizeSlot(slot);
+            add(`w:${item.categoryId}/${item.id}`, SENBActivities.slotTitle(sentence, slot, index), 'word', Number(Boolean(result.marks?.[index])), 1);
+        });
+    });
+    SenbProgress.logSession({ id: `senb-assessment-${activity.testStartedAt.getTime()}-${Math.random().toString(36).slice(2)}`, kind: 'assessment', startedAt: activity.testStartedAt.toISOString(), endedAt: new Date().toISOString(), partial: false, records: [...records.values()] });
+    activity.progressLogged = true;
 }
 function renderGame(stage, sentence) {
     const round = activity.round;

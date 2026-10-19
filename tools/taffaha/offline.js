@@ -1,5 +1,6 @@
+import './assets/updates.js';
 const $=id=>document.getElementById(id);
-let registration,downloading=false,promptEvent;
+let registration,downloading=false;
 export function rpc(type,extra={}){
  return new Promise((resolve,reject)=>{
   const worker=navigator.serviceWorker?.controller||registration?.active;if(!worker)return reject(Error('التطبيق غير جاهز للتنزيل. انتظر قليلًا أو أعد فتحه.'));
@@ -9,18 +10,20 @@ export function rpc(type,extra={}){
  });
 }
 function render(result){
- const {count=0,total=0,bytes=0}=result.groups.taffaha||{};
- $('download-progress').max=total||1;$('download-progress').value=count;
- $('download-status').textContent=total&&count===total?'جاهز للاستخدام دون اتصال ✔':`${count} من ${total} ملف محفوظ على الجهاز · ${(bytes/1e6).toFixed(1)} MB${downloading?' — احتفظ بالتطبيق مفتوحًا حتى يكتمل التنزيل.':''}`;
+ const {count=0,total=0}=result.groups.taffaha||{};
+ const percent=total?Math.min(100,Math.floor(count/total*100)):0;
+ $('download-progress').value=percent;
+ $('download-status').textContent=`${percent}%`;
+ $('download-error').hidden=true;
  return total>0&&count===total;
 }
-export async function refreshOffline(){try{render(await rpc('STATUS'));}catch(e){$('download-status').textContent=e.message;}}
+function showError(message){$('download-error').textContent=message;$('download-error').hidden=false;}
+export async function refreshOffline(){try{render(await rpc('STATUS'));}catch(e){showError(e.message);}}
 export async function initOffline(){
- window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();promptEvent=e;});
- $('install').onclick=async()=>{if(promptEvent){await promptEvent.prompt();await promptEvent.userChoice;promptEvent=null;}else {$('install-help').hidden=false;$('install-help').textContent=matchMedia('(display-mode: standalone)').matches?'التطبيق مفتوح من الشاشة الرئيسية.':'على iPhone: مشاركة ← إضافة إلى الشاشة الرئيسية. على Android: قائمة المتصفح ← تثبيت التطبيق.';}};
+ window.addEventListener('beforeinstallprompt',e=>e.preventDefault());
  $('download').onclick=async()=>{
   if(downloading)return;
-  downloading=true;$('download').disabled=true;$('apply-update').disabled=true;
+  downloading=true;$('download').disabled=true;window.AppUpdates.setBusy(true);
   navigator.storage?.persist?.().catch(()=>{});
   try{
    let result=await rpc('STATUS'),done=render(result);
@@ -33,33 +36,13 @@ export async function initOffline(){
     result=next;
    }
   }
-  catch(e){$('download-status').textContent=e.message;}
-  finally{downloading=false;$('download').disabled=false;$('apply-update').disabled=false;}
+  catch(e){showError(e.message);}
+  finally{downloading=false;$('download').disabled=false;window.AppUpdates.setBusy(false);}
  };
- if(!isSecureContext||!('serviceWorker'in navigator)){$('download-status').textContent='التنزيل دون إنترنت يحتاج HTTPS أو localhost ومتصفحًا يدعم تطبيقات الويب.';$('download').disabled=true;return;}
+ if(!isSecureContext||!('serviceWorker'in navigator)){showError('التنزيل دون إنترنت يحتاج HTTPS أو localhost ومتصفحًا يدعم تطبيقات الويب.');$('download').disabled=true;return;}
  try{
-  let controlled=!!navigator.serviceWorker.controller,reloading=false,lastCheck=0;
-  navigator.serviceWorker.addEventListener('controllerchange',()=>{
-   // Reload existing windows together to keep new code and media in sync.
-   if(controlled&&!reloading){reloading=true;location.reload();return;}
-   controlled=true;refreshOffline();
-  });
   registration=await navigator.serviceWorker.register('./sw.js',{scope:'./',updateViaCache:'none'});
-  const showUpdate=()=>{if(registration.waiting)$('update-notice').hidden=false;};
-  const watch=worker=>worker?.addEventListener('statechange',()=>{if(worker.state==='installed'&&navigator.serviceWorker.controller)showUpdate();});
-  registration.addEventListener('updatefound',()=>watch(registration.installing));
-  watch(registration.installing);showUpdate();
-  $('apply-update').onclick=()=>{
-   if(!registration.waiting||downloading)return;
-   $('apply-update').disabled=true;registration.waiting.postMessage({type:'SKIP_WAITING'});
-  };
-  const checkUpdate=()=>{
-   if(document.hidden||!navigator.onLine||Date.now()-lastCheck<60000)return;
-   lastCheck=Date.now();registration.update().then(showUpdate).catch(()=>{});
-  };
-  window.addEventListener('online',checkUpdate);
-  document.addEventListener('visibilitychange',checkUpdate);
-  setInterval(checkUpdate,5*60*1000);checkUpdate();
+  window.AppUpdates.watch(registration,{dialogId:'update-notice',buttonId:'apply-update',command:'SKIP_WAITING',onFirstControl:refreshOffline});
   await navigator.serviceWorker.ready;await refreshOffline();
- }catch(e){$('download-status').textContent='لم يكتمل تجهيز التطبيق دون اتصال. تحقق من الاتصال ثم أعد فتحه.';}
+ }catch(e){showError('لم يكتمل تجهيز التطبيق دون اتصال. تحقق من الاتصال ثم أعد فتحه.');}
 }

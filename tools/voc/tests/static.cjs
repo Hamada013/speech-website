@@ -36,6 +36,7 @@ for (const page of release.shell.filter(url => url.endsWith('.html'))) {
     for (const script of source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)) {
         new vm.Script(script[1], { filename: page }).runInContext(sandbox);
     }
+    if (page === 'report.html') { assert.ok(source.includes('assets/reports.js')); continue; }
     if (page !== 'index.html') {
         assert.ok(source.includes('assets/games.js'), `${page} must load the shared game engine`);
         continue;

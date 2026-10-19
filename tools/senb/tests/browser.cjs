@@ -48,19 +48,22 @@ async function run(browserType, name) {
         for (const viewport of viewports) {
             const context = await browser.newContext({ viewport, hasTouch: viewport.width < 1200 });
             await context.route('https://**', route => route.abort());
+            await context.addInitScript(() => localStorage.setItem('voc-children-v1', JSON.stringify({ schema: 1, active: 'browser-child', children: [{ id: 'browser-child', name: 'علي', senb: {} }] })));
             const page = await context.newPage();
             const errors = [], requests = [];
             page.on('pageerror', error => errors.push(error.message));
             page.on('request', req => requests.push(req.url()));
-            await page.goto(`http://127.0.0.1:${server.address().port}/index.html`, { waitUntil: 'load' });
+            await page.goto(`http://127.0.0.1:${server.address().port}/index.html`, { waitUntil: 'domcontentloaded' });
             assert.equal(await page.locator('#homeView').isVisible(), true);
             assert.equal(requests.filter(url => url.includes('/sounds/')).length, 0, 'Startup should not bulk-download audio');
             assert.ok(requests.filter(url => url.includes('/images/')).length <= 3, 'Startup should only load the logo');
             await page.getByRole('button', { name: 'ابدأ الجلسة', exact: true }).click();
+            assert.equal(await page.evaluate(() => getWorkplaceSentence().key), 's:2/1/1', 'The first two-word sentence starts on the workplace');
+            assert.equal(await page.locator('#slotsRow1 > div').count(), 2);
+            assert.equal(await page.locator('#featuredCard img').getAttribute('src'), 'images/advanced/6/1/1.webp');
             if (viewport.width === 320) {
                 // First confirm that a genuine user tap starts a real local M4A in this engine.
                 await page.locator('#slot-1-0').click();
-                await page.locator('#itemsGrid .picker-card').first().click();
                 try {
                     await page.waitForFunction(() => playbackAudio.currentTime > 0, null, { timeout: 10000 });
                 } catch (error) {
@@ -69,8 +72,8 @@ async function run(browserType, name) {
                 }
                 assert.equal(await page.evaluate(() => playbackAudio.error), null);
                 await page.evaluate(() => { playbackAudio.pause(); finishActivePlayback?.(); });
-                await page.getByRole('button', { name: 'مسح اللوحة', exact: true }).click();
             }
+            await page.evaluate(() => { clearAllSlots(); state.isAdvancedMode = false; renderWorkplace(); });
             // Track sequence order separately, without relying on speakers or playback duration.
             await page.evaluate(() => {
                 window.playedPaths = [];
@@ -80,20 +83,23 @@ async function run(browserType, name) {
                     return Promise.resolve();
                 };
             });
+            await page.locator('#sequencePlayBtn').click({trial:true}); // Wait for the header's opening transition to settle.
             const buttons = await inViewport(page, 'header button');
-            for (const box of buttons) assert.ok(box.width >= 44 && box.height >= 44, 'Toolbar touch target is too small');
+            for (const box of buttons) assert.ok(box.width >= 44 && box.height >= 44, `Toolbar touch target is too small: ${JSON.stringify(box)}`);
             assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
             await page.locator('#templateToggleBtn').click();
             await inViewport(page, '#templateDropdown');
             await page.locator('#templateDropdown button').filter({ hasText: /^6$/ }).click();
             assert.equal(await page.locator('#slotsRow1 > div').count(), 6);
-            await page.locator('#multilineBtn').click();
-            assert.equal(await page.locator('#slotsRow2 > div').count(), 6);
+            await page.locator('#workplaceMetronomeBtn').click();
+            assert.equal(await page.locator('#slotsRow2').count(), 0);
+            assert.equal(await page.locator('[data-workplace-beat]').count(), 0, 'Empty slots do not add beats');
             await page.locator('#slot-1-0').click();
             await inViewport(page, '#categoryModal .picker-panel');
             assert.equal(await page.locator('header').evaluate(node => node.inert), true);
             await page.locator('#itemsGrid .picker-card').nth(1).click();
             assert.equal(await page.locator('#slot-1-0 img').getAttribute('src'), 'images/01 subject/2.webp');
+            assert.equal(await page.locator('[data-workplace-beat]').count(), 1);
             await page.locator('#slot-1-1').click();
             await page.locator('#categoriesList button').filter({ hasText: 'أفعال' }).click();
             await inViewport(page, '#modalGrammarControls');
@@ -110,16 +116,17 @@ async function run(browserType, name) {
             await page.locator('#circlesToggleBtn').click();
             assert.equal(await page.locator('#slotsRow1 .slot-cover-toggle').count(), 0);
             await page.locator('#circlesToggleBtn').click();
-            await page.locator('#slot-1-1 .slot-clear').click();
+            await page.locator('#clearBoardBtn').click();await page.locator('#slot-1-1').evaluate(card=>card.click());await page.locator('#clearBoardBtn').click();
             assert.equal(await page.evaluate(() => state.row1Slots[1]), null);
-            await page.locator('#slot-2-0').click();
+            await page.locator('#slot-1-2').click();
             await page.keyboard.press('Escape');
             assert.equal(await page.locator('#categoryModal').isVisible(), false);
             assert.equal(await page.locator('header').evaluate(node => node.inert), false);
             await page.locator('#advancedModeBtn').click();
             await page.locator('#featuredCard').click();
-            await page.locator('#advMainCatList button').first().click();
-            await page.locator('#advSubCatList button').nth(1).click();
+            await page.locator('[data-advanced-group="2"]').click();
+            assert.equal(await page.locator('#advMainCatList').textContent().then(text => text.includes('خانات')), false);
+            await page.locator('[data-advanced-subgroup="2"]').click();
             assert.equal(await page.locator('#advItemsGrid img').first().getAttribute('src'), 'images/advanced/3/2/1.webp');
             await page.locator('#advItemsGrid .picker-card').first().click();
             assert.equal(await page.locator('#featuredCard img').getAttribute('src'), 'images/advanced/3/2/1.webp');
@@ -127,6 +134,12 @@ async function run(browserType, name) {
             const slotIds = await page.evaluate(() => state.row1Slots.filter(Boolean).map(item => [item.categoryId, item.id]));
             const expected = await page.evaluate(() => getAdvancedItemData('2', '2', 1).slots.map(item => [item.categoryId, item.id]));
             assert.deepEqual(slotIds, expected);
+            const navigationStart = await page.evaluate(() => playedPaths.length);
+            await page.locator('#nextAdvancedSentence').click();
+            assert.equal(await page.evaluate(() => state.featuredAdvancedCard.itemNum), 2);
+            await page.locator('#previousAdvancedSentence').click();
+            assert.equal(await page.evaluate(() => state.featuredAdvancedCard.itemNum), 1);
+            assert.equal(await page.evaluate(() => playedPaths.length), navigationStart, 'Sentence arrows navigate independently of playback');
             const before = await page.evaluate(() => playedPaths.length);
             await page.locator('#sequencePlayBtn').click();
             assert.equal(await page.locator('#sequencePlayBtn').isDisabled(), true);
@@ -143,13 +156,14 @@ async function run(browserType, name) {
             if (viewport.width === 390 || viewport.width === 768 || viewport.height === 390) {
                 await page.screenshot({ path: `/private/tmp/senb-${name}-${viewport.width}x${viewport.height}.png`, fullPage: true });
             }
-            await page.getByRole('button', { name: 'مسح اللوحة', exact: true }).click();
+            await page.locator('#clearBoardBtn').click();
+            await page.evaluate(()=>{while(state.deleteMode){const card=document.querySelector('#workplaceView .workplace-delete-card');if(!card)break;card.click();}});
             assert.equal(await page.evaluate(() => state.row1Slots.every(item => !item) && state.row2Slots.every(item => !item) && !state.featuredAdvancedCard), true);
             if (viewport.width === 320) {
                 // The reported five-word preset: subject, adjective, verb, preposition, object.
                 await page.locator('#featuredCard').click();
-                await page.locator('#advMainCatList button').nth(3).click();
-                await page.locator('#advSubCatList button').nth(7).click();
+                await page.locator('[data-advanced-group="5"]').click();
+                await page.locator('[data-advanced-subgroup="8"]').click();
                 await page.locator('#advItemsGrid .picker-card').first().click();
                 assert.equal(await page.locator('#featuredCard img').getAttribute('src'), 'images/advanced/6/8/1.webp');
                 const verbBox = await page.locator('#slot-1-2').boundingBox();
@@ -192,6 +206,6 @@ async function run(browserType, name) {
 }
 (async () => {
     await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-    await run(chromium, 'chromium');
+    if (process.env.SENB_ENGINE !== 'webkit') await run(chromium, 'chromium');
     if (process.env.SENB_SKIP_WEBKIT !== '1') await run(webkit, 'webkit');
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(() => server.close());

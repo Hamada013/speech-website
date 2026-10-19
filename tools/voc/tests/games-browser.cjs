@@ -20,14 +20,14 @@ async function offline(context, name, value) {
     if (value && server.listening) await new Promise(resolve => { server.close(resolve); server.closeAllConnections(); });
     if (!value && !server.listening) await new Promise(resolve => server.listen(port, '127.0.0.1', resolve));
 }
-const snapshot = (page, mode) => page.evaluate(mode => JSON.parse(localStorage.getItem(`hamada-game-${mode}-draft`)), mode);
-const last = (page, mode) => page.evaluate(mode => JSON.parse(localStorage.getItem(`hamada-game-${mode}-last`)), mode);
+const snapshot = (page, mode) => page.evaluate(mode => JSON.parse(localStorage.getItem(`${VocProgress.scope(`hamada-game-${mode}`)}-draft`)), mode);
+const last = (page, mode) => page.evaluate(mode => JSON.parse(localStorage.getItem(`${VocProgress.scope(`hamada-game-${mode}`)}-last`)), mode);
 async function ready(page, mode) {
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < 900; i++) {
         const enabled = mode === 'rapid' ? await page.locator('#show-grading').isEnabled() || await page.locator('[data-grade]').first().isEnabled()
             : await page.locator('#game-board > button:not(:disabled)').count() > 0;
         if (enabled) return;
-        if (mode === 'test' && await page.locator('#play-word').isEnabled()) await page.locator('#play-word').click();
+        if (await page.locator('#play-word').isEnabled() && (mode === 'test' || await page.locator('#game-feedback.error').count())) await page.locator('#play-word').click();
         await page.waitForTimeout(100);
     }
     throw new Error(`${mode}: ${await page.locator('#game-feedback').textContent()}`);
@@ -77,6 +77,7 @@ async function run(name, engine, origin) {
     // bundled headless shell does not include that proprietary codec.
     const browser = await engine.launch({ headless:true, ...(name === 'chromium' ? { channel:'chrome' } : {}) });
     const context = await browser.newContext({ viewport:{width:390,height:844}, hasTouch:true });
+    await context.addInitScript(() => { if (!localStorage.getItem('voc-children-v1')) localStorage.setItem('voc-children-v1', JSON.stringify({schema:1,active:'qa',children:[{id:'qa',name:'طفل الاختبار',words:{},workspace:null,plan:null}]})); });
     const page = await context.newPage(), errors = [];
     page.on('pageerror', error => errors.push(error.message));
     try {
@@ -103,13 +104,13 @@ async function run(name, engine, origin) {
             if (size.width===1024) await page.screenshot({path:`/private/tmp/voc-${name}-nine-cards.png`,fullPage:true});
         }
         for (const mode of ['test','practice']) {
-            await page.evaluate(mode => {
+            await page.evaluate(async mode => {
                 app.exitTestMode(false); app.setTemplate(4);
                 app.state.slotsData.forEach((slot,i)=>slot.item=CATEGORIES[0].items[i]); app.renderSlotsContent();
                 window.shuffleCalls=0; const original=app.executeShuffle.bind(app);
                 if (!window.originalShuffle) window.originalShuffle=original;
                 app.executeShuffle=()=>{window.shuffleCalls++;window.originalShuffle();};
-                app.handleModeButtonClick(mode);
+                await app.handleModeButtonClick(mode);
             },mode);
             for(let trial=0;trial<3;trial++) {
                 await page.evaluate(()=>app.evaluateTestAnswer(app.state.slotsData.findIndex(slot=>slot.item===app.state.testState.targetItem)));
@@ -148,7 +149,7 @@ async function run(name, engine, origin) {
         const zone = await page.locator(`#game-board > button[data-key="${s.order[0]}"]`).boundingBox();
         await page.mouse.move(source.x+source.width/2,source.y+source.height/2); await page.mouse.down();
         await page.mouse.move(zone.x+zone.width/2,zone.y+zone.height/2,{steps:10}); await page.mouse.up();
-        await page.waitForFunction(() => JSON.parse(localStorage.getItem('hamada-game-matching-draft')).position === 1);
+        await page.waitForFunction(() => JSON.parse(localStorage.getItem('hamada-game-matching-child-qa-draft')).position === 1);
         await page.locator('#pause-game').click(); await page.waitForTimeout(800);
         assert.equal(await page.locator('#pause-view').isVisible(), true, 'Old match transition cannot undo pause');
         await page.reload(); await page.locator('#resume-saved').click(); await ready(page, 'matching');
@@ -191,7 +192,7 @@ async function run(name, engine, origin) {
         assert.equal((await snapshot(page,'memory')).open.length,2);
         await page.locator('#pause-game').click(); await page.waitForTimeout(1000); await page.reload();
         await page.locator('#resume-saved').click();
-        await page.waitForFunction(() => JSON.parse(localStorage.getItem('hamada-game-memory-draft')).open.length===0);
+        await page.waitForFunction(() => JSON.parse(localStorage.getItem('hamada-game-memory-child-qa-draft')).open.length===0);
         assert.deepEqual((await snapshot(page,'memory')).deck,s.deck,'Memory board survives pause/reload');
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),true);
         await page.screenshot({path:`/private/tmp/voc-games-${name}-memory-phone.png`,fullPage:true});
@@ -231,7 +232,7 @@ async function run(name, engine, origin) {
         await page.locator('#continue-game').click(); await ready(page,'rapid');
         await page.locator('#show-grading').click();
         await page.evaluate(() => { const b=document.querySelector('[data-grade="notMastered"]'); b.click(); b.click(); });
-        await page.waitForFunction(() => JSON.parse(localStorage.getItem('hamada-game-rapid-draft')).position===1);
+        await page.waitForFunction(() => JSON.parse(localStorage.getItem('hamada-game-rapid-child-qa-draft')).position===1);
         for (const grade of ['learning','mastered']) {
             await page.waitForTimeout(350); await ready(page,'rapid');
             if (await page.locator('#show-grading').isVisible()) await page.locator('#show-grading').click();
@@ -243,7 +244,7 @@ async function run(name, engine, origin) {
         await page.evaluate(()=>document.getElementById('sound-hint').checked=true);
         await page.locator('#play-again').click(); await ready(page, 'rapid');
         await page.locator('#rapid-autoplay').click();
-        await page.waitForFunction(() => JSON.parse(localStorage.getItem('hamada-game-rapid-draft')).records.some(record => record.result === 'viewed'));
+        await page.waitForFunction(() => JSON.parse(localStorage.getItem('hamada-game-rapid-child-qa-draft')).records.some(record => record.result === 'viewed'));
         await page.locator('#pause-game').click();
         const autoPaused = await snapshot(page, 'rapid'); await page.waitForTimeout(2200);
         assert.equal((await snapshot(page, 'rapid')).position, autoPaused.position, 'Autoplay pauses safely');

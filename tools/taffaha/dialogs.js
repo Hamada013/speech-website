@@ -15,14 +15,18 @@ export function installDialogFallback(){
    for(const [child,value]of hidden){if(value===null)child.removeAttribute('aria-hidden');else child.setAttribute('aria-hidden',value);}hidden.clear();
   }
  }
- for(const dialog of document.querySelectorAll('dialog')){
+ function show(){
+  const dialog=this;if(stack.includes(dialog))return;
   dialog.classList.add('legacy-dialog');dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.tabIndex=-1;
-  dialog.showModal=()=>{if(stack.includes(dialog))return;dialog.previousFocus=document.activeElement;dialog.setAttribute('open','');stack.push(dialog);update();(focusable(dialog)[0]||dialog).focus();};
-  dialog.close=()=>{const index=stack.indexOf(dialog);if(index<0)return;stack.splice(index,1);dialog.removeAttribute('open');update();dialog.previousFocus?.focus();dialog.dispatchEvent(new Event('close'));};
+  dialog.previousFocus=document.activeElement;dialog.setAttribute('open','');stack.push(dialog);update();(focusable(dialog)[0]||dialog).focus();
  }
+ function close(){const dialog=this,index=stack.indexOf(dialog);if(index<0)return;stack.splice(index,1);dialog.removeAttribute('open');update();dialog.previousFocus?.focus();dialog.dispatchEvent(new Event('close'));}
+ // Prototype methods also support dialogs created later by navigation/accounts.
+ if(typeof HTMLDialogElement!=='undefined'){HTMLDialogElement.prototype.showModal=show;HTMLDialogElement.prototype.close=close;}
+ else for(const dialog of document.querySelectorAll('dialog')){dialog.showModal=show;dialog.close=close;}
  document.addEventListener('keydown',event=>{
   const top=stack[stack.length-1];if(!top)return;
-  if(event.key==='Escape'){event.preventDefault();top.close();}
+  if(event.key==='Escape'){event.preventDefault();if(top.dispatchEvent(new Event('cancel',{cancelable:true})))top.close();}
   if(event.key==='Tab'){
    const list=focusable(top),first=list[0]||top,last=list[list.length-1]||top;
    if(event.shiftKey&&(document.activeElement===first||document.activeElement===top)){event.preventDefault();last.focus();}

@@ -156,6 +156,7 @@ async function runBatch() {
 
 self.addEventListener('message', event => {
     const command = event.data?.type;
+    if (command === 'ACTIVATE_UPDATE' && event.source?.url?.startsWith(BASE)) { event.waitUntil(self.skipWaiting()); return; }
     if (!['VOC_STATUS', 'VOC_START', 'VOC_PAUSE', 'VOC_BATCH'].includes(command)) return;
     // Only this app's own windows can initiate a download.
     if (!event.source?.url?.startsWith(BASE)) return;

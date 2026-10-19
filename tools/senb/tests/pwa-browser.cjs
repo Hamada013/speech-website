@@ -80,7 +80,7 @@ async function run(browserType, name) {
         assert.ok((await savedCount(page)) < 5, 'Startup must not download the media library');
         assert.equal(requests.filter(request => request.relative.endsWith('.m4a')).length, 0);
         await page.evaluate(async () => { const cache = await caches.open('another-app-cache'); await cache.put('/outside-data', new Response('preserve')); });
-        assert.equal(await page.locator('.app-header #pwaInstallBtn svg').count(), 1);
+        assert.equal(await page.locator('.app-header #pwaDownloadToggle svg').count(), 1);
         assert.equal(await page.locator('#pwaDownloadToggle, #offlinePanel').count(), 2);
         assert.equal(await page.evaluate(() => typeof SENBOffline.download), 'function');
         await page.locator('#homeTasksBtn').click();
@@ -104,9 +104,12 @@ async function run(browserType, name) {
         assert.equal(await savedCount(page), cachedCount, 'Viewed media survives reload');
         await page.locator('#pwaDownloadToggle').click();
         await page.locator('#offlineDownloadBtn').click();
-        await page.waitForFunction(() => document.getElementById('offlineProgress').value > 50);
-        await page.locator('#offlinePauseBtn').click();
-        await page.locator('#offlinePauseBtn').waitFor({ state: 'hidden' });
+        await page.waitForFunction(() => document.getElementById('offlineProgress').value > 1);
+        // Leaving the page interrupts the single-action downloader. Its saved
+        // files remain available when the user opens the app again.
+        await page.reload({ waitUntil: 'load' });
+        await waitReady(page);
+        await page.waitForTimeout(500);
         const pausedCount = await savedCount(page);
         assert.ok(pausedCount > 50 && pausedCount < originalCatalog.assets.length);
         await page.reload({ waitUntil: 'load' });
@@ -114,11 +117,11 @@ async function run(browserType, name) {
         assert.equal(await savedCount(page), pausedCount, 'Interrupted download survives reopening');
         await page.locator('#pwaDownloadToggle').click();
         await page.locator('#offlineDownloadBtn').click();
-        await page.waitForFunction(() => document.getElementById('offlineStatus').textContent.includes('جاهز للاستخدام'), null, { timeout: 180000 });
+        await page.waitForFunction(() => document.getElementById('offlineStatus').textContent === '100%', null, { timeout: 180000 });
         const fullCount = await savedCount(page);
         assert.equal(fullCount, originalCatalog.assets.length, 'Every media file is saved');
         cachedCount = fullCount;
-        await page.locator('#offlineCloseBtn').click();
+        await page.keyboard.press('Escape');
         await setOffline(context, name, true);
         if (process.env.SENB_PWA_DEBUG) console.log(name, 'offline navigation diagnostic', await page.evaluate(async () => {
             const names = await caches.keys();
@@ -195,7 +198,7 @@ async function run(browserType, name) {
         await outside.goto(`http://127.0.0.1:${server.address().port}/outside.html`);
         assert.equal(await outside.evaluate(() => navigator.serviceWorker.controller), null, 'SENB must not control other apps');
         assert.deepEqual(errors, []);
-        console.log(`PASS ${name}: header installation, full batched download, on-demand media cache/reload, real offline M4A playback/ranges, safe updates, one-file refresh, failed-release rollback, and other-app isolation`);
+        console.log(`PASS ${name}: single download action, full batched download, on-demand media cache/reload, real offline M4A playback/ranges, safe updates, one-file refresh, failed-release rollback, and other-app isolation`);
     } finally { await setOffline(context, name, false); await context.close(); await browser.close(); overrides.clear(); }
 }
 (async () => {

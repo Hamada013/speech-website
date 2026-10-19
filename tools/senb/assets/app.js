@@ -1,10 +1,11 @@
 // SENB interface, interaction, and audio playback.
 let state = {
     currentView: 'home',
+    deleteMode: false,
     slotCount: 4,
-    isMultiline: false,
+    isMultiline: false, // Legacy saved boards; new workplace uses a metronome row.
+    showMetronome: false,
     showColoredCircles: true,
-    isCoverMode: false,
     isAdvancedMode: false,
     isPlayingSequence: false, // Prevents duplicate sequence plays
     featuredAdvancedCard: null,
@@ -16,15 +17,25 @@ let state = {
     activeCategory: '01 subject',
     selectedVerbTense: 'present',
     selectedPronounModifier: 'standard',
-    advFolder: '6',
-    advSubCatId: 1
+    advFolder: '2',
+    advSubCatId: 1,
+    basicLearnedFilter: null,
+    advancedLearnedFilter: null
 };
+let activeWorkplace = 0;
+const workplaceId = id => (activeWorkplace ? 'second-' : '') + id;
+const workplaceElement = id => document.getElementById(workplaceId(id));
+let workplaceInitialized = false;
+let expandedAdvancedFolder = null;
 
 function navigateTo(viewName) {
+    if(viewName!=='workplace')state.deleteMode=false;
+    syncWorkplaceDeleteMode();
     if (typeof clearComprehensionHeader === 'function') clearComprehensionHeader();
     if (typeof stopActivityPlayback === 'function') stopActivityPlayback();
     else stopAllPlayback();
     state.currentView = viewName;
+    document.body.classList.toggle('app-home-shell', viewName === 'home');
     document.getElementById('homeView').classList.toggle('hidden', viewName !== 'home');
     document.getElementById('workplaceView').classList.toggle('hidden', viewName !== 'workplace');
     document.getElementById('activityView').classList.toggle('hidden', viewName !== 'activity');
@@ -32,9 +43,8 @@ function navigateTo(viewName) {
     document.getElementById('clearBoardBtn').classList.toggle('hidden', viewName !== 'workplace');
     document.getElementById('activityHomeBtn').classList.toggle('hidden', viewName !== 'activity');
     document.getElementById('homeHeaderTools').classList.toggle('hidden', viewName !== 'home');
-    document.getElementById('pwaInstallHelp').hidden = true;
-    document.getElementById('pwaInstallBtn').setAttribute('aria-expanded', 'false');
     if (viewName === 'workplace') renderWorkplace();
+    window.SenbSplit?.orientation();
 }
 
 function toggleTemplateDropdown() {
@@ -52,62 +62,129 @@ document.addEventListener('click', (e) => {
 });
 
 function setSlotCount(count) {
+    state.deleteMode=false;
     state.slotCount = count;
     document.getElementById('templateDropdown').classList.add('hidden');
     document.getElementById('templateToggleBtn').setAttribute('aria-expanded', 'false');
-    renderWorkplace();
+    applyWorkplaceSettings({ slotCount: count });
 }
 
-function toggleMultilineRow() {
-    state.isMultiline = !state.isMultiline;
-    const btn = document.getElementById('multilineBtn');
-    const container = document.getElementById('multilineRowContainer');
-    if (state.isMultiline) {
-        btn.classList.add('bg-sky-500', 'text-white');
-        btn.classList.remove('bg-slate-100', 'text-slate-700');
-        container.classList.remove('hidden');
-    } else {
-        btn.classList.remove('bg-sky-500', 'text-white');
-        btn.classList.add('bg-slate-100', 'text-slate-700');
-        container.classList.add('hidden');
+function applyWorkplaceSettings(patch) {
+    stopAllPlayback();
+    Object.assign(state, patch);
+    if (window.SenbSplit?.enabled()) SenbSplit.updateSettings(patch);
+    else renderWorkplace();
+}
+
+function toggleWorkplaceMetronome() {
+    applyWorkplaceSettings({ showMetronome: !state.showMetronome });
+}
+
+function renderWorkplaceMetronome() {
+    const frame = workplaceElement('workplaceMetronomeFrame');
+    frame.replaceChildren();
+    const words = state.row1Slots.slice(0, state.slotCount).filter(Boolean);
+    frame.hidden = !words.length;
+    workplaceElement('workplaceMetronomeContainer').classList.toggle('hidden', !state.showMetronome || !words.length);
+    frame.tabIndex = words.length ? 0 : -1;
+    frame.setAttribute('aria-busy', 'false');
+    let beatIndex=0;
+    state.row1Slots.slice(0,state.slotCount).forEach((word,slotIndex) => {
+        if(!word)return;
+        const index=beatIndex++;
+        const circle = document.createElement('button'); circle.type = 'button';
+        circle.className = 'workplace-metronome-circle'; circle.dataset.workplaceBeat = index;circle.dataset.slotIndex=slotIndex;
+        circle.style.gridColumn=slotIndex+1;
+        circle.style.setProperty('--beat-color', getSlotColorConfig(slotIndex, state.slotCount));
+        circle.setAttribute('aria-label', `استمع إلى النبضة ${slotIndex + 1}`);
+        circle.onclick = event => { event.stopPropagation(); void playWorkplaceMetronome(index); };
+        frame.append(circle);
+    });
+}
+
+let workplaceMetronomePlaying = false;
+async function playWorkplaceMetronome(onlyIndex, sequenceTicket) {
+    const frame = workplaceElement('workplaceMetronomeFrame');
+    if (state.currentView !== 'workplace') return;
+    if (!state.showMetronome || frame.hidden) return true;
+    if(state.deleteMode){state.deleteMode=false;renderWorkplace();}
+    if (sequenceTicket === undefined) stopAllPlayback();
+    const ticket = sequenceTicket ?? sentencePlaybackToken;
+    const circles = [...frame.querySelectorAll('[data-workplace-beat]')];
+    const indices = onlyIndex === undefined ? circles.map((_, index) => index) : [onlyIndex];
+    workplaceMetronomePlaying = true; frame.setAttribute('aria-busy', 'true');
+    try {
+        for (const index of indices) {
+            if (ticket !== sentencePlaybackToken) return;
+            const circle = circles[index]; if (!circle) return;
+            circle.classList.add('lit');
+            const playback = playAudioFilePath(getMetronomeAudioPath(), '');
+            const requestId = playbackRequestId;
+            if (!await playback || ticket !== sentencePlaybackToken || requestId !== playbackRequestId) return;
+            await new Promise(resolve => setTimeout(resolve, 500));
+            if (ticket !== sentencePlaybackToken || requestId !== playbackRequestId) return;
+            circle.classList.remove('lit');
+        }
+        return true;
+    } finally {
+        if (ticket === sentencePlaybackToken) {
+            workplaceMetronomePlaying = false; frame.setAttribute('aria-busy', 'false');
+            circles.forEach(circle => circle.classList.remove('lit'));
+        }
     }
-    renderWorkplace();
+}
+
+let workplaceWordsPlaying=false;
+async function playWorkplaceWords(onlyIndex, sequenceTicket) {
+    if(state.currentView!=='workplace'||state.deleteMode)return;
+    if (sequenceTicket === undefined) stopAllPlayback();
+    const ticket=sequenceTicket ?? sentencePlaybackToken,frame=workplaceElement('workplaceWordFrame');
+    const indices=onlyIndex===undefined?state.row1Slots.slice(0,state.slotCount).map((item,index)=>item?index:-1).filter(index=>index>=0):[onlyIndex];
+    if(!indices.length)return true;
+    workplaceWordsPlaying=true;frame.classList.add('expression-frame-playing');frame.setAttribute('aria-busy','true');
+    try {
+        for(const index of indices){
+            if(ticket!==sentencePlaybackToken)return;
+            const item=state.row1Slots[index],card=workplaceElement(`slot-1-${index}`);if(!item||!card)continue;
+            card.classList.remove('pop-animation');card.classList.add('expression-card-playing');card.setAttribute('aria-busy','true');
+            card.scrollIntoView({block:'nearest',inline:'nearest'});
+            for(const segment of getSlotAudioSegments(item,1,index)){
+                const playback=playAudioFilePath(segment.path,segment.text),requestId=playbackRequestId;
+                if(!await playback||ticket!==sentencePlaybackToken||requestId!==playbackRequestId)return;
+            }
+            card.classList.remove('expression-card-playing');card.setAttribute('aria-busy','false');
+        }
+        return true;
+    }finally{
+        if(ticket===sentencePlaybackToken){
+            workplaceWordsPlaying=false;frame.classList.remove('expression-frame-playing');frame.setAttribute('aria-busy','false');
+            frame.querySelectorAll('.expression-card-playing').forEach(card=>{card.classList.remove('expression-card-playing');card.setAttribute('aria-busy','false');});
+        }
+    }
 }
 
 function toggleColoredCircles() {
-    state.showColoredCircles = !state.showColoredCircles;
-    document.getElementById('circlesToggleBtn').classList.toggle('bg-sky-100', state.showColoredCircles);
-    renderWorkplace();
-}
-
-function toggleCoverMode() {
-    state.isCoverMode = !state.isCoverMode;
-    const btn = document.getElementById('coverModeBtn');
-    if (state.isCoverMode) {
-        btn.classList.add('bg-amber-500', 'text-white');
-        btn.classList.remove('bg-slate-100', 'text-slate-700');
-    } else {
-        btn.classList.remove('bg-amber-500', 'text-white');
-        btn.classList.add('bg-slate-100', 'text-slate-700');
-    }
-    renderWorkplace();
+    applyWorkplaceSettings({ showColoredCircles: !state.showColoredCircles });
 }
 
 function toggleAdvancedMode() {
-    state.isAdvancedMode = !state.isAdvancedMode;
-    const btn = document.getElementById('advancedModeBtn');
-    const container = document.getElementById('advancedCardContainer');
+    applyWorkplaceSettings({ isAdvancedMode: !state.isAdvancedMode });
+}
 
-    if (state.isAdvancedMode) {
-        btn.classList.add('bg-purple-600', 'text-white');
-        btn.classList.remove('bg-purple-50', 'text-purple-700');
-        container.classList.remove('hidden');
-    } else {
-        btn.classList.remove('bg-purple-600', 'text-white');
-        btn.classList.add('bg-purple-50', 'text-purple-700');
-        container.classList.add('hidden');
-    }
-    renderWorkplace();
+function syncWorkplaceDeleteMode() {
+    const button=document.getElementById('clearBoardBtn');
+    button.classList.toggle('delete-mode-active',state.deleteMode);
+    button.setAttribute('aria-pressed',String(state.deleteMode));
+    const label=state.deleteMode?'إنهاء وضع الحذف':'تفعيل وضع الحذف';
+    button.setAttribute('aria-label',label);button.title=label;
+    if(!state.deleteMode)document.querySelectorAll('#workplaceView .workplace-delete-card').forEach(card=>card.classList.remove('workplace-delete-card'));
+}
+function toggleWorkplaceDeleteMode() {
+    applyWorkplaceSettings({ deleteMode: !state.deleteMode });
+}
+function finishWorkplaceDeletion(focusId) {
+    if(!window.SenbSplit?.enabled()&&!state.featuredAdvancedCard&&!state.row1Slots.slice(0,state.slotCount).some(Boolean))state.deleteMode=false;
+    renderWorkplace();document.getElementById(focusId)?.focus({preventScroll:true});
 }
 
 function clearAllSlots() {
@@ -119,16 +196,22 @@ function clearAllSlots() {
     renderWorkplace();
 }
 
-function renderWorkplace() {
+function renderWorkplace({persist = true} = {}) {
+    syncWorkplaceDeleteMode();
+    if (workplaceMetronomePlaying || workplaceWordsPlaying) stopAllPlayback();
+    workplaceElement('workplaceWordStage').style.setProperty('--word-count',state.slotCount);
+    workplaceElement('workplaceWordStage').closest('.workplace-content').classList.toggle('has-advanced-image',state.isAdvancedMode);
     syncToolbar();
     renderFeaturedCard();
     renderSlotRow('slotsRow1', 1);
-    if (state.isMultiline) renderSlotRow('slotsRow2', 2);
+    renderWorkplaceMetronome();
+    renderAdvancedSentenceNavigation();
+    if (persist) { window.SenbSplit?.refresh(); if (workplaceInitialized && window.SenbProgress) SenbProgress.saveWorkspace(workplaceStateSnapshot()); }
 }
 
 function renderFeaturedCard() {
-    const container = document.getElementById('featuredCard');
-    const titleEl = document.getElementById('featuredTitle');
+    const container = workplaceElement('featuredCard');
+    const titleEl = workplaceElement('featuredTitle');
     if (!container) return;
     makeInteractiveCard(container, state.featuredAdvancedCard?.title || 'اختر جملة متكاملة');
 
@@ -139,16 +222,15 @@ function renderFeaturedCard() {
 
         // Play audio on click when filled instead of opening the modal
         container.onclick = async (e) => {
-            if (e.target.closest('button') || state.isPlayingSequence) return;
+            if(state.deleteMode){stopAllPlayback();state.featuredAdvancedCard=null;finishWorkplaceDeletion(workplaceId('featuredCard'));return;}
+            if (e.target.closest('button')) return;
+            stopAllPlayback();
             container.classList.add('playing-ring');
             await playAudioFilePath(item.soundPath, item.title);
             container.classList.remove('playing-ring');
         };
 
         container.innerHTML = `
-            <button aria-label="مسح الجملة" onclick="clearFeaturedCard(event)" class="featured-clear absolute top-1.5 left-1.5 z-10 w-6 h-6 rounded-full bg-slate-100/90 hover:bg-rose-500 hover:text-white text-slate-500 flex items-center justify-center shadow-sm transition-colors">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
             <span class="absolute top-1.5 right-1.5 text-[10px] font-black text-purple-600 bg-purple-50/90 px-1.5 py-0.5 rounded-md border border-purple-100/80 z-10">++</span>
             <div class="w-full h-full flex items-center justify-center p-1">
                 <img src="${item.imgPath}" alt="${item.title}" class="w-full h-full object-contain filter drop-shadow-sm" onerror="this.onerror=null; this.src='assets/image-fallback.svg';">
@@ -159,7 +241,7 @@ function renderFeaturedCard() {
         container.className = 'featured-16-9-card relative rounded-2xl border-2 border-dashed border-purple-300 bg-purple-50/60 hover:bg-purple-100/60 flex flex-col items-center justify-center p-2 text-center cursor-pointer overflow-hidden shadow-sm hover:shadow';
 
         // Re-enable opening modal when empty
-        container.onclick = openAdvancedCategoryModal;
+        container.onclick = () => {if(!state.deleteMode)openAdvancedCategoryModal();};
 
         container.innerHTML = `
             <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center mb-0.5">
@@ -168,6 +250,9 @@ function renderFeaturedCard() {
             <span class="text-xs font-extrabold text-purple-800">اختر جملة متكاملة ++</span>
         `;
     }
+    if(state.deleteMode && state.featuredAdvancedCard){container.classList.add('workplace-delete-card');container.setAttribute('aria-label',`مسح الجملة: ${state.featuredAdvancedCard.title}`);}
+    container.setAttribute('aria-disabled',String(state.deleteMode && !state.featuredAdvancedCard));
+    container.tabIndex=state.deleteMode && !state.featuredAdvancedCard?-1:0;
 }
 
 function clearFeaturedCard(e) {
@@ -177,18 +262,10 @@ function clearFeaturedCard(e) {
 }
 
 function renderSlotRow(containerId, rowNumber) {
-    const container = document.getElementById(containerId);
+    const container = workplaceElement(containerId);
     container.innerHTML = '';
 
-    const gridColsClass = {
-        2: 'grid-cols-2 max-w-md',
-        3: 'grid-cols-3 max-w-lg',
-        4: 'grid-cols-4 max-w-2xl',
-        5: 'grid-cols-5 max-w-4xl',
-        6: 'grid-cols-6 max-w-5xl'
-    }[state.slotCount];
-
-    container.className = `grid ${gridColsClass} gap-1.5 sm:gap-3 w-full mx-auto justify-items-center h-full px-1 sm:px-0`;
+    container.className = 'workplace-word-grid';
     const slotsData = rowNumber === 1 ? state.row1Slots : state.row2Slots;
     const coveredData = rowNumber === 1 ? state.row1Covered : state.row2Covered;
 
@@ -201,7 +278,7 @@ function renderSlotRow(containerId, rowNumber) {
         slotWrapper.className = 'flex flex-col items-center gap-0.5 sm:gap-1 w-full justify-center min-w-0';
 
         const card = document.createElement('div');
-        card.id = `slot-${rowNumber}-${i}`;
+        card.id = workplaceId(`slot-${rowNumber}-${i}`);
         makeInteractiveCard(card, item ? getDisplayedItemTitle(item, rowNumber, i) : `اختر رمزاً للخانة ${i + 1}`);
         const compactClass = state.isAdvancedMode ? 'slot-card-compact' : '';
         card.className = `slot-card ${compactClass} relative rounded-xl sm:rounded-3xl border sm:border-2 flex flex-col items-center justify-center p-1 text-center cursor-pointer overflow-hidden ${
@@ -209,18 +286,10 @@ function renderSlotRow(containerId, rowNumber) {
         }`;
 
         card.onclick = (e) => {
-            if (e.target.closest('.clear-card-btn')) return;
-            if (state.isCoverMode) {
-                if (rowNumber === 1) state.row1Covered[i] = !state.row1Covered[i];
-                else state.row2Covered[i] = !state.row2Covered[i];
-                renderWorkplace();
-                return;
-            }
-
+            e.stopPropagation();
+            if(state.deleteMode){if(item){stopAllPlayback();if(rowNumber===1){state.row1Slots[i]=null;state.row1Covered[i]=false;}else{state.row2Slots[i]=null;state.row2Covered[i]=false;}finishWorkplaceDeletion(card.id);}return;}
             if (item) {
-                if (state.isPlayingSequence) return;
-                triggerCardAnimation(card);
-                playSlotAudio(item, rowNumber, i);
+                void playWorkplaceWords(i);
             } else {
                 openCategoryModal(rowNumber, i);
             }
@@ -232,9 +301,8 @@ function renderSlotRow(containerId, rowNumber) {
             const titleText = getDisplayedItemTitle(item, rowNumber, i);
 
             card.innerHTML = `
-                <button onclick="clearSingleSlot(${rowNumber}, ${i}, event)" aria-label="مسح الخانة" class="clear-card-btn slot-clear absolute top-0.5 left-0.5 sm:top-1 sm:left-1 z-10"></button>
-                <div class="w-full h-full flex items-center justify-center p-1 sm:p-2">
-                    <img src="${imagePath}" alt="${titleText}" class="w-full h-full object-contain filter drop-shadow-sm" onerror="this.onerror=null; this.src='assets/image-fallback.svg';">
+                <div class="workplace-slot-image">
+                    <img src="${imagePath}" alt="${titleText}" onerror="this.onerror=null; this.src='assets/image-fallback.svg';">
                 </div>
                 <div class="cover-overlay absolute inset-0 rounded-xl sm:rounded-3xl flex flex-col items-center justify-center text-white z-20 ${isCovered ? '' : 'cover-hidden'}" style="background-color: ${colorHex};">
                     <svg class="w-6 h-6 sm:w-7 sm:h-7 opacity-90 drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
@@ -251,23 +319,28 @@ function renderSlotRow(containerId, rowNumber) {
             `;
         }
 
+        if(state.deleteMode && item){card.classList.add('workplace-delete-card');card.style.setProperty('--delete-delay',`${-(i%3)*.07}s`);card.setAttribute('aria-label',`مسح البطاقة: ${getDisplayedItemTitle(item,rowNumber,i)}`);}
+        card.setAttribute('aria-disabled',String(state.deleteMode && !item));card.tabIndex=state.deleteMode && !item?-1:0;
         slotWrapper.appendChild(card);
 
         const titleEl = document.createElement('div');
         titleEl.className = 'slot-label text-[9px] sm:text-xs font-black text-slate-700 truncate w-full text-center h-3 sm:h-4 leading-tight px-0.5 mt-0.5 sm:mt-1';
         titleEl.innerText = (item && state.showColoredCircles) ? getDisplayedItemTitle(item, rowNumber, i) : '';
         if (!state.showColoredCircles) {
-            titleEl.classList.add('invisible');
+            titleEl.hidden = true;
         }
         slotWrapper.appendChild(titleEl);
 
         if (state.showColoredCircles) {
             const circle = document.createElement('button');
-            circle.className = `slot-cover-toggle w-3 h-3 sm:w-4.5 sm:h-4.5 rounded-full shadow-sm border border-white shrink-0 transition-transform active:scale-90 ${state.isCoverMode ? 'ring-2 ring-amber-400 ring-offset-1' : ''}`;
+            circle.className = `slot-cover-toggle w-3 h-3 sm:w-4.5 sm:h-4.5 rounded-full shadow-sm border border-white shrink-0 transition-transform active:scale-90`;
             circle.style.setProperty('--slot-color', colorHex);
             circle.setAttribute('aria-label', `تغطية الخانة ${i + 1}`);
             circle.setAttribute('aria-pressed', String(isCovered));
-            circle.onclick = () => {
+            circle.disabled=state.deleteMode;
+            circle.onclick = event => {
+                event.stopPropagation();
+                if(state.deleteMode)return;
                 if (rowNumber === 1) state.row1Covered[i] = !state.row1Covered[i];
                 else state.row2Covered[i] = !state.row2Covered[i];
                 renderWorkplace();
@@ -351,7 +424,7 @@ function setPronounModifier(mod) {
 function renderModalItemsGrid(categoryId) {
     const grid = document.getElementById('itemsGrid');
     grid.innerHTML = '';
-    const items = ITEMS_DATABASE[categoryId] || [];
+    const items = (ITEMS_DATABASE[categoryId] || []).filter(item => !state.basicLearnedFilter || isSenbLearned(`w:${categoryId}/${item.id}`, state.basicLearnedFilter));
     const cat = CATEGORIES.find(c => c.id === categoryId);
     const slotInfo = state.activePickerSlot;
 
@@ -388,6 +461,7 @@ function renderModalItemsGrid(categoryId) {
         wrapper.appendChild(titleEl);
         grid.appendChild(wrapper);
     });
+    if (!items.length) renderLearnedEmpty(grid);
 }
 
 function selectItemForSlot(item, categoryId) {
@@ -402,8 +476,7 @@ function selectItemForSlot(item, categoryId) {
 
 function openAdvancedCategoryModal() {
     openPicker('advancedModal');
-    renderAdvMainCategoriesList();
-    selectAdvFolder(state.advFolder);
+    selectAdvFolder(state.advFolder, false);
 }
 
 function closeAdvancedModal() { closePicker('advancedModal'); }
@@ -413,21 +486,63 @@ function renderAdvMainCategoriesList() {
     container.innerHTML = '';
     ADVANCED_CATEGORIES.forEach(cat => {
         const isSelected = cat.folder === state.advFolder;
+        const expanded = isSelected && expandedAdvancedFolder === cat.folder;
+        const group = document.createElement('div');
+        group.className = 'advanced-picker-group';
         const btn = document.createElement('button');
-        btn.className = `w-full text-right p-2.5 sm:p-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-between shrink-0 ${isSelected ? 'bg-purple-600 text-white shadow' : 'bg-white text-slate-700 hover:bg-purple-50'}`;
-        btn.onclick = () => selectAdvFolder(cat.folder);
-        btn.innerHTML = `<span>${cat.name}</span><span class="text-[10px] opacity-80 px-1.5 py-0.5 rounded bg-black/10">${cat.folder} خانات</span>`;
-        container.appendChild(btn);
+        btn.type = 'button';
+        btn.className = `advanced-group-toggle${isSelected ? ' selected' : ''}`;
+        btn.dataset.advancedGroup = cat.folder;
+        btn.setAttribute('aria-expanded', String(expanded));
+        if (isSelected) btn.setAttribute('aria-controls', `advanced-subgroups-${cat.folder}`);
+        btn.onclick = () => {
+            selectAdvFolder(cat.folder, !expanded);
+            document.querySelector(`[data-advanced-group="${cat.folder}"]`).focus({ preventScroll: true });
+        };
+        const label = document.createElement('span'); label.textContent = cat.name;
+        const arrow = document.createElement('span'); arrow.className = 'advanced-group-chevron';
+        arrow.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+        btn.append(label, arrow); group.appendChild(btn);
+        if (isSelected) {
+            const list = document.createElement('div');
+            list.id = `advanced-subgroups-${cat.folder}`;
+            list.className = `advanced-subgroup-list${expanded ? ' expanded' : ''}`;
+            list.setAttribute('role', 'group'); list.setAttribute('aria-label', 'المجموعات الفرعية');
+            cat.subcategories.filter(sub => expanded || Number(sub.id) === Number(state.advSubCatId)).forEach(sub => {
+                const selected = Number(sub.id) === Number(state.advSubCatId);
+                const choice = document.createElement('button'); choice.type = 'button';
+                choice.className = 'advanced-subgroup-choice'; choice.dataset.advancedSubgroup = sub.id;
+                choice.setAttribute('aria-pressed', String(selected));
+                const title = document.createElement('span'); title.textContent = `${sub.id}. ${sub.name}`;
+                choice.append(title);
+                if (selected) {
+                    const tick = document.createElement('span'); tick.className = 'advanced-subgroup-tick';
+                    tick.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>';
+                    choice.append(tick);
+                }
+                choice.onclick = () => {
+                    if (!expanded) expandedAdvancedFolder = cat.folder;
+                    else { state.advSubCatId = sub.id; expandedAdvancedFolder = null; }
+                    renderAdvMainCategoriesList();
+                    renderAdvItemsGrid(cat.folder, state.advSubCatId);
+                    document.querySelector(`[data-advanced-subgroup="${state.advSubCatId}"]`).focus({ preventScroll: true });
+                };
+                list.appendChild(choice);
+            });
+            group.appendChild(list);
+        }
+        container.appendChild(group);
     });
 }
 
-function selectAdvFolder(folder) {
-    state.advFolder = folder;
+function selectAdvFolder(folder, expand = true) {
+    const changed = String(state.advFolder) !== String(folder);
+    const cat = ADVANCED_CATEGORIES.find(c => c.folder === String(folder));
+    if (!cat) return;
+    state.advFolder = String(folder);
+    expandedAdvancedFolder = expand ? state.advFolder : null;
+    if (changed || !cat.subcategories.some(sub => Number(sub.id) === Number(state.advSubCatId))) state.advSubCatId = cat.subcategories[0].id;
     renderAdvMainCategoriesList();
-
-    const cat = ADVANCED_CATEGORIES.find(c => c.folder === folder);
-    state.advSubCatId = cat.subcategories[0].id;
-
     renderAdvSubCategoriesList(cat.subcategories);
     renderAdvItemsGrid(folder, state.advSubCatId);
 }
@@ -435,18 +550,7 @@ function selectAdvFolder(folder) {
 function renderAdvSubCategoriesList(subcategories) {
     const container = document.getElementById('advSubCatList');
     container.innerHTML = '';
-    subcategories.forEach(sub => {
-        const isSelected = sub.id === state.advSubCatId;
-        const btn = document.createElement('button');
-        btn.className = `px-3 py-1.5 rounded-xl font-bold text-xs whitespace-nowrap transition-colors shrink-0 ${isSelected ? 'bg-purple-100 text-purple-900 border-2 border-purple-400' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
-        btn.onclick = () => {
-            state.advSubCatId = sub.id;
-            renderAdvSubCategoriesList(subcategories);
-            renderAdvItemsGrid(state.advFolder, sub.id);
-        };
-        btn.innerText = `${sub.id}. ${sub.name}`;
-        container.appendChild(btn);
-    });
+    container.classList.add('hidden');
 }
 
 function renderAdvItemsGrid(folder, subCatId) {
@@ -455,6 +559,7 @@ function renderAdvItemsGrid(folder, subCatId) {
 
     for (let i = 1; i <= 24; i++) {
         const item = getAdvancedItemData(folder, subCatId, i);
+        if (state.advancedLearnedFilter && !isSenbLearned(`s:${item.folder}/${item.subCatId}/${item.itemNum}`, state.advancedLearnedFilter)) continue;
 
         const wrapper = document.createElement('div');
         wrapper.className = 'flex flex-col items-center w-full';
@@ -478,21 +583,171 @@ function renderAdvItemsGrid(folder, subCatId) {
         wrapper.appendChild(titleEl);
         grid.appendChild(wrapper);
     }
+    if (!grid.children.length) renderLearnedEmpty(grid);
 }
 
 function selectAdvancedSentenceItem(item) {
-    state.featuredAdvancedCard = item;
-    state.slotCount = parseInt(item.folder);
-
-    state.row1Slots = Array(6).fill(null);
-    item.slots.forEach((s, idx) => {
-        if (idx < 6) state.row1Slots[idx] = s;
-    });
-
+    loadAdvancedSentence(item);
     closeAdvancedModal();
     renderWorkplace();
-
     playAudioFilePath(item.soundPath, item.title);
+}
+
+function loadAdvancedSentence(item) {
+    state.deleteMode=false;
+    stopAllPlayback();
+    state.featuredAdvancedCard = item;
+    state.slotCount = parseInt(item.folder);
+    state.advFolder = String(item.folder);
+    state.advSubCatId = Number(item.subCatId);
+    if (!window.SenbSplit?.enabled()) state.isAdvancedMode = true;
+    state.row1Slots = Array(6).fill(null);
+    item.slots.forEach((s, idx) => {
+        if (idx < 6) state.row1Slots[idx] = { ...s };
+    });
+    state.row1Covered = Array(6).fill(false);
+}
+
+function renderAdvancedSentenceNavigation() {
+    let nav=workplaceElement('advancedSentenceNav');
+    if(!nav){
+        nav=document.createElement('div');nav.id=workplaceId('advancedSentenceNav');nav.className='advanced-sentence-nav';nav.setAttribute('role','group');nav.setAttribute('aria-label','التنقل بين جمل المجموعة الفرعية');
+        nav.innerHTML='<button id="previousAdvancedSentence" type="button" aria-label="الجملة السابقة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 5 7 7-7 7"/></svg></button><button id="nextAdvancedSentence" type="button" aria-label="الجملة التالية"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 5-7 7 7 7"/></svg></button>';
+        nav.querySelector('#previousAdvancedSentence').id=workplaceId('previousAdvancedSentence');nav.querySelector('#nextAdvancedSentence').id=workplaceId('nextAdvancedSentence');
+    }
+    nav.querySelector('button:first-child').onclick=()=>moveWorkplaceSentence(-1);nav.querySelector('button:last-child').onclick=()=>moveWorkplaceSentence(1);
+    const item=state.featuredAdvancedCard;
+    const advanced=workplaceElement('advancedImageStage'),words=workplaceElement('workplaceWordStage');
+    const host=state.isAdvancedMode && item?advanced:words;
+    host.append(nav);nav.hidden=!item;
+    advanced.dataset.navigation=String(Boolean(item)&&host===advanced);words.dataset.navigation=String(Boolean(item)&&host===words);
+    workplaceElement('previousAdvancedSentence').disabled=!item||Number(item.itemNum)<=1;
+    workplaceElement('nextAdvancedSentence').disabled=!item||Number(item.itemNum)>=24;
+    updateWorkplaceNavigationPosition();
+}
+function updateWorkplaceNavigationPosition(){
+    for(const nav of document.querySelectorAll('.advanced-sentence-nav')) {
+        const frame=nav.closest('.workplace-content').querySelector('.workplace-word-frame');
+        nav.style.height=nav.parentElement.id.endsWith('workplaceWordStage')?`${frame.offsetHeight}px`:'100%';
+    }
+}
+
+function moveWorkplaceSentence(direction) {
+    const current = state.featuredAdvancedCard;
+    if (!current || ![-1, 1].includes(direction)) return;
+    const number = Math.max(1, Math.min(24, Number(current.itemNum) + direction));
+    if (number === Number(current.itemNum)) return;
+    const advanced=state.isAdvancedMode;
+    loadAdvancedSentence(getAdvancedItemData(current.folder, current.subCatId, number));
+    state.isAdvancedMode=advanced;
+    renderWorkplace();
+}
+
+function isSenbLearned(key, domain) { return Boolean(window.SenbProgress?.learned(key, domain)); }
+
+function renderLearnedEmpty(grid) {
+    const message = document.createElement('p');
+    message.className = 'picker-learned-empty';
+    message.setAttribute('role', 'status');
+    message.textContent = 'لا توجد بطاقات مكتسبة هنا بعد.';
+    grid.appendChild(message);
+}
+
+function installLearnedPickerControls() {
+    const icons = {
+        receptive: '<path d="M8 10a4 4 0 1 1 8 0c0 3-3 3-3 6a3 3 0 0 1-6 0M11 10a1 1 0 0 1 2 0M16 18l2 2 4-4"/>',
+        expressive: '<path d="M6 4h12a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-6l-5 4v-4H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3ZM8 9h8M8 13h5"/>'
+    };
+    for (const [modalId, type] of [['categoryModal', 'basic'], ['advancedModal', 'advanced']]) {
+        const controls = document.createElement('div');
+        controls.className = 'picker-learned-controls';
+        controls.setAttribute('role', 'group');
+        controls.setAttribute('aria-label', 'البطاقات المكتسبة بنسبة 80%');
+        for (const [domain, label] of [['receptive', 'المكتسب في الفهم 80%'], ['expressive', 'المكتسب في التعبير 80%']]) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'picker-learned-button';
+            button.dataset.learnedDomain = domain;
+            button.dataset.learnedType = type;
+            button.setAttribute('aria-label', label);
+            button.setAttribute('title', label);
+            button.setAttribute('aria-pressed', 'false');
+            button.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[domain]}</svg>`;
+            button.onclick = () => {
+                const field = `${type}LearnedFilter`;
+                state[field] = state[field] === domain ? null : domain;
+                controls.querySelectorAll('button').forEach(control => control.setAttribute('aria-pressed', String(control.dataset.learnedDomain === state[field])));
+                if (type === 'basic') renderModalItemsGrid(state.activeCategory);
+                else renderAdvItemsGrid(state.advFolder, state.advSubCatId);
+            };
+            controls.appendChild(button);
+        }
+        const header = document.querySelector(`#${modalId} .picker-header`);
+        header.insertBefore(controls, header.lastElementChild);
+    }
+}
+
+function workplaceBoardSnapshot() {
+    const fields = ['slotCount', 'showMetronome', 'isMultiline', 'showColoredCircles', 'isAdvancedMode', 'featuredAdvancedCard', 'row1Slots', 'row2Slots', 'row1Covered', 'row2Covered', 'advFolder', 'advSubCatId', 'activeCategory', 'selectedVerbTense', 'selectedPronounModifier'];
+    return JSON.parse(JSON.stringify(Object.fromEntries(fields.map(field => [field, state[field]]))));
+}
+
+function workplaceStateSnapshot() {
+    const saved = workplaceBoardSnapshot();
+    if(window.SenbSplit) saved.splitWorkplace = window.SenbSplit.snapshot();
+    return saved;
+}
+
+function initializeWorkplace() {
+    state.deleteMode=false;syncWorkplaceDeleteMode();
+    const saved = window.SenbProgress?.workspace();
+    if (saved && [2, 3, 4, 5, 6].includes(saved.slotCount) && Array.isArray(saved.row1Slots)) {
+        const allowed = Object.keys(workplaceBoardSnapshot());
+        for (const field of allowed) if (Object.hasOwn(saved, field)) state[field] = saved[field];
+        state.showMetronome = saved.showMetronome ?? Boolean(saved.isMultiline);
+        state.isMultiline = false;
+        for (const field of ['row1Slots', 'row2Slots']) state[field] = Array.from({ length: 6 }, (_, index) => state[field]?.[index] || null);
+        for (const field of ['row1Covered', 'row2Covered']) state[field] = Array.from({ length: 6 }, (_, index) => Boolean(state[field]?.[index]));
+    } else {
+        state.showMetronome = false; state.isMultiline = false;
+        state.showColoredCircles = true; state.isAdvancedMode = true;
+        state.row2Slots = Array(6).fill(null); state.row2Covered = Array(6).fill(false);
+        loadAdvancedSentence(getAdvancedItemData('2', 1, 1));
+    }
+    window.SenbSplit?.restore(saved?.splitWorkplace);
+    workplaceInitialized = true;
+}
+
+function getWorkplaceSentence() {
+    const slots = [];
+    const slotContexts = [];
+    const rows = [1];
+    for (const row of rows) {
+        const items = row === 1 ? state.row1Slots : state.row2Slots;
+        for (let index = 0; index < state.slotCount; index++) {
+            const original = items[index];
+            if (!original) continue;
+            const item = typeof SENBActivities === 'undefined' ? { ...original } : SENBActivities.normalizeSlot(original);
+            const title = getDisplayedItemTitle(item, row, index);
+            const segments = getSlotAudioSegments(item, row, index);
+            slots.push({ ...item });
+            slotContexts.push({ row, index, title, segments, key: `w:${item.categoryId}/${item.id}` });
+        }
+    }
+    if (!slots.length) return null;
+    const featured = state.featuredAdvancedCard;
+    const signature = item => JSON.stringify([item.categoryId, item.id, item.title, item.verbTense, item.pronounModifier, item.conjugation, item.customImgPath, item.customSoundPath]);
+    const preset = featured && featured.slots.length === slots.length && featured.slots.every((slot, index) => signature(slot) === signature(state.row1Slots[index]));
+    const customKey = `b:${slots.map((slot, index) => `${slotContexts[index].row}.${slotContexts[index].index}:${encodeURIComponent(signature(slot))}`).join('|')}`;
+    return JSON.parse(JSON.stringify({
+        key: preset ? `s:${featured.folder}/${featured.subCatId}/${featured.itemNum}` : customKey,
+        title: preset ? featured.title : slotContexts.map(context => context.title).join(' '),
+        entity: 'sentence', presentation: preset && state.isAdvancedMode ? 'advanced' : 'slots',
+        folder: preset ? featured.folder : String(slots.length),
+        subCatId: preset ? featured.subCatId : null, itemNum: preset ? featured.itemNum : null,
+        imgPath: preset ? featured.imgPath : null, soundPath: preset ? featured.soundPath : null,
+        slots, slotContexts, slotCount: state.slotCount, secondRow: false
+    }));
 }
 
 // Fixed playAudioFilePath to ensure strict synchrony by preventing overlapping double-resolves if a file fails to load
@@ -562,6 +817,7 @@ function playAudioFilePath(path, fallbackSpeechText) {
 
 async function playSlotAudio(item, rowNumber, slotIndex) {
     if (!item) return;
+    if (workplaceMetronomePlaying || workplaceWordsPlaying) stopAllPlayback();
     for (const segment of getSlotAudioSegments(item, rowNumber, slotIndex)) {
         const playback = playAudioFilePath(segment.path, segment.text);
         const requestId = playbackRequestId;
@@ -571,63 +827,54 @@ async function playSlotAudio(item, rowNumber, slotIndex) {
     }
 }
 
-// Enforced strict awaiting sequences with play button locking
+function playWorkplaces() {
+    if (window.SenbSplit?.enabled()) return SenbSplit.playAll();
+    return playSentenceSequence();
+}
+
+// Enforced strict awaiting sequences: picture, word cards, then optional rhythm.
 async function playSentenceSequence() {
-    // Check state lock to prevent spamming
-    if (state.isPlayingSequence) return;
+    if (state.currentView !== 'workplace') return;
+    if (state.deleteMode) applyWorkplaceSettings({ deleteMode: false });
+    stopAllPlayback();
     state.isPlayingSequence = true;
-    const sequenceToken = ++sentencePlaybackToken;
-
+    const sequenceToken = sentencePlaybackToken;
+    const panel = workplaceElement('workplaceWordFrame').closest('.sentence-workplace');
+    const featured = workplaceElement('featuredCard');
     const playBtn = document.getElementById('sequencePlayBtn');
-    if (playBtn) {
-        playBtn.disabled = true;
-        playBtn.setAttribute('aria-busy', 'true');
-        playBtn.classList.add('opacity-75', 'cursor-not-allowed', 'scale-95');
-    }
-
+    panel?.setAttribute('aria-busy', 'true');
+    if (playBtn) { playBtn.disabled = true; playBtn.setAttribute('aria-busy', 'true'); }
     try {
-        // Wait for the complete execution of the Big Card first
         if (state.isAdvancedMode && state.featuredAdvancedCard) {
-            const featCard = document.getElementById('featuredCard');
-            if (featCard) featCard.classList.add('playing-ring');
-
-            // Await fully ensures it blocks until completion
-            await playAudioFilePath(state.featuredAdvancedCard.soundPath, state.featuredAdvancedCard.title);
+            featured.classList.add('playing-ring');
+            const completed = await playAudioFilePath(state.featuredAdvancedCard.soundPath, state.featuredAdvancedCard.title);
+            if (!completed || sequenceToken !== sentencePlaybackToken) return;
+            featured.classList.remove('playing-ring');
+            await new Promise(resolve => setTimeout(resolve, 400));
             if (sequenceToken !== sentencePlaybackToken) return;
-
-            if (featCard) featCard.classList.remove('playing-ring');
-            await new Promise(res => setTimeout(res, 400)); // Natural pause before slot cards
         }
-
-        // Play subsequent individual cards in sequence
-        const rows = state.isMultiline ? [1, 2] : [1];
-        for (const r of rows) {
-            const slotsData = r === 1 ? state.row1Slots : state.row2Slots;
-            for (let i = 0; i < state.slotCount; i++) {
-                const item = slotsData[i];
-                if (sequenceToken !== sentencePlaybackToken) return;
-                if (!item) continue;
-
-                const card = document.getElementById(`slot-${r}-${i}`);
-                if (card) card.classList.add('playing-ring');
-
-                // Wait for each individual card
-                await playSlotAudio(item, r, i);
-                if (sequenceToken !== sentencePlaybackToken) return;
-
-                if (card) card.classList.remove('playing-ring');
-                await new Promise(res => setTimeout(res, 150));
-            }
-        }
+        if (!await playWorkplaceWords(undefined, sequenceToken) || sequenceToken !== sentencePlaybackToken) return;
+        if (state.showMetronome && !await playWorkplaceMetronome(undefined, sequenceToken)) return;
+        return sequenceToken === sentencePlaybackToken;
     } finally {
-        // Free lock
-        if (sequenceToken === sentencePlaybackToken) state.isPlayingSequence = false;
-        if (playBtn) {
-            playBtn.disabled = false;
-            playBtn.setAttribute('aria-busy', 'false');
-            playBtn.classList.remove('opacity-75', 'cursor-not-allowed', 'scale-95');
+        if (sequenceToken === sentencePlaybackToken) {
+            state.isPlayingSequence = false;
+            featured.classList.remove('playing-ring');
+            panel?.setAttribute('aria-busy', 'false');
+            if (playBtn) { playBtn.disabled = false; playBtn.setAttribute('aria-busy', 'false'); }
         }
     }
+}
+
+let beatURL;
+function getMetronomeAudioPath() {
+    if(beatURL)return beatURL;
+    // Taffaha's short wooden click, played by the same cancellable audio owner as speech.
+    const rate=22050,length=Math.round(rate*.1),buffer=new ArrayBuffer(44+length*2),view=new DataView(buffer);
+    const write=(offset,value)=>{for(let i=0;i<value.length;i++)view.setUint8(offset+i,value.charCodeAt(i));};
+    write(0,'RIFF');view.setUint32(4,36+length*2,true);write(8,'WAVE');write(12,'fmt ');view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,1,true);view.setUint32(24,rate,true);view.setUint32(28,rate*2,true);view.setUint16(32,2,true);view.setUint16(34,16,true);write(36,'data');view.setUint32(40,length*2,true);
+    for(let i=0;i<length;i++){const t=i/rate,envelope=Math.min(1,t/.002)*Math.exp(-70*t),sample=(Math.sin(2*Math.PI*1000*t)+.35*Math.sin(2*Math.PI*1800*t))*envelope*.35;view.setInt16(44+i*2,sample*32767,true);}
+    beatURL=URL.createObjectURL(new Blob([buffer],{type:'audio/wav'}));return beatURL;
 }
 
 // A shared audio element retains the user's playback gesture on mobile browsers.
@@ -641,6 +888,14 @@ let pickerRestoreFocus = null;
 
 function stopAllPlayback() {
     sentencePlaybackToken++;
+    document.querySelectorAll('.sentence-workplace[aria-busy]').forEach(panel => panel.setAttribute('aria-busy', 'false'));
+    workplaceWordsPlaying=false;
+    const frame=workplaceElement('workplaceWordFrame');
+    frame?.classList.remove('expression-frame-playing');frame?.setAttribute('aria-busy','false');
+    frame?.querySelectorAll('.expression-card-playing').forEach(card=>{card.classList.remove('expression-card-playing');card.setAttribute('aria-busy','false');});
+    workplaceMetronomePlaying = false;
+    document.querySelectorAll('[data-workplace-beat].lit').forEach(circle => circle.classList.remove('lit'));
+    workplaceElement('workplaceMetronomeFrame')?.setAttribute('aria-busy', 'false');
     playbackRequestId++;
     finishActivePlayback?.();
     playbackAudio.pause();
@@ -663,6 +918,7 @@ function updateViewportHeight() {
 }
 
 function openPicker(id) {
+    stopAllPlayback();
     pickerRestoreFocus = document.activeElement;
     const modal = document.getElementById(id);
     modal.classList.remove('hidden');
@@ -682,8 +938,8 @@ function closePicker(id) {
     requestAnimationFrame(() => {
         if (previousFocus?.isConnected) previousFocus.focus();
         else if (id === 'categoryModal') {
-            document.getElementById(`slot-${state.activePickerSlot.row}-${state.activePickerSlot.index}`)?.focus();
-        } else document.getElementById('featuredCard').focus();
+            workplaceElement(`slot-${state.activePickerSlot.row}-${state.activePickerSlot.index}`)?.focus();
+        } else workplaceElement('featuredCard').focus();
     });
 }
 
@@ -696,10 +952,20 @@ function makeInteractiveCard(card, label) {
 function syncToolbar() {
     for (const [id, enabled] of [
         ['advancedModeBtn', state.isAdvancedMode],
-        ['multilineBtn', state.isMultiline],
-        ['circlesToggleBtn', state.showColoredCircles],
-        ['coverModeBtn', state.isCoverMode]
+        ['workplaceMetronomeBtn', state.showMetronome],
+        ['circlesToggleBtn', state.showColoredCircles]
     ]) document.getElementById(id).setAttribute('aria-pressed', String(enabled));
+    workplaceElement('advancedCardContainer').classList.toggle('hidden', !state.isAdvancedMode);
+    document.getElementById('advancedModeBtn').classList.toggle('bg-purple-600', state.isAdvancedMode);
+    document.getElementById('advancedModeBtn').classList.toggle('text-white', state.isAdvancedMode);
+    document.getElementById('advancedModeBtn').classList.toggle('bg-purple-50', !state.isAdvancedMode);
+    document.getElementById('advancedModeBtn').classList.toggle('text-purple-700', !state.isAdvancedMode);
+    workplaceElement('workplaceMetronomeContainer').classList.toggle('hidden', !state.showMetronome);
+    document.getElementById('workplaceMetronomeBtn').classList.toggle('bg-sky-500', state.showMetronome);
+    document.getElementById('workplaceMetronomeBtn').classList.toggle('text-white', state.showMetronome);
+    document.getElementById('workplaceMetronomeBtn').classList.toggle('bg-slate-100', !state.showMetronome);
+    document.getElementById('workplaceMetronomeBtn').classList.toggle('text-slate-700', !state.showMetronome);
+    document.getElementById('circlesToggleBtn').classList.toggle('bg-sky-100', state.showColoredCircles);
     document.querySelectorAll('#templateDropdown button').forEach(button => {
         const selected = Number(button.textContent) === state.slotCount;
         button.setAttribute('aria-pressed', String(selected));
@@ -715,13 +981,14 @@ function showAudioStatus(message) {
 document.addEventListener('keydown', event => {
     const modal = document.querySelector('[role="dialog"]:not(.hidden)');
     if (event.key === 'Escape') {
+        if(state.deleteMode&&!modal){state.deleteMode=false;renderWorkplace();document.getElementById('clearBoardBtn').focus();event.preventDefault();return;}
         if (modal) closePicker(modal.id);
         document.getElementById('templateDropdown').classList.add('hidden');
         document.getElementById('templateToggleBtn').setAttribute('aria-expanded', 'false');
         return;
     }
     if (event.key === 'Tab' && modal) {
-        const controls = [...modal.querySelectorAll('button, [tabindex="0"]')]
+        const controls = [...modal.querySelectorAll('button, select, [tabindex="0"]')]
             .filter(control => !control.disabled && control.getClientRects().length);
         const first = controls[0], last = controls[controls.length - 1];
         if (event.shiftKey && document.activeElement === first) {
@@ -743,5 +1010,14 @@ for (const id of ['categoryModal', 'advancedModal']) {
 window.addEventListener('resize', updateViewportHeight, { passive: true });
 window.visualViewport?.addEventListener('resize', updateViewportHeight, { passive: true });
 updateViewportHeight();
+installLearnedPickerControls();
+initializeWorkplace();
 navigateTo('home');
 syncToolbar();
+
+document.addEventListener('visibilitychange', () => { if (document.hidden && (workplaceMetronomePlaying || workplaceWordsPlaying || state.isPlayingSequence)) stopAllPlayback(); });
+window.addEventListener('pagehide', () => { if (workplaceMetronomePlaying || workplaceWordsPlaying) stopAllPlayback(); });
+
+const workplaceNavigationObserver=new ResizeObserver(updateWorkplaceNavigationPosition);
+workplaceNavigationObserver.observe(workplaceElement('workplaceWordFrame'));
+workplaceNavigationObserver.observe(workplaceElement('advancedImageStage'));

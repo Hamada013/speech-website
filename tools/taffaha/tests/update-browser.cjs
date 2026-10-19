@@ -31,9 +31,10 @@ function publish(file,body){
   browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
   const context=await browser.newContext({viewport:{width:390,height:844}}),page=await context.newPage();
   page.on('pageerror',e=>errors.push(e.message));
+  await require('./profile-fixture.cjs')(context);
   await page.goto(base);await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
-  await page.locator('#open-offline').click();assert.equal(await page.locator('#offline-dialog button').count(),2);
-  await page.locator('#install').click();assert.ok(await page.locator('#install-help').isVisible());
+  await page.locator('#open-offline').click();assert.equal(await page.locator('#offline-dialog button').count(),1);
+  assert.equal(await page.locator('#download').innerText(),'تنزيل');assert.equal(await page.locator('#install,#install-help').count(),0);
   await page.locator('#download').click();await page.waitForFunction(()=>!document.getElementById('download').disabled,null,{timeout:90000});
   const before=await rpc(page,'STATUS');assert.equal(before.groups.taffaha.count,360);assert.deepEqual(Object.keys(before.groups),['taffaha']);
   await page.keyboard.press('Escape');assert.ok(await page.locator('#offline-dialog').isHidden());
@@ -67,10 +68,10 @@ function publish(file,body){
   assert.equal(digest,sha(replacement));
   assert.ok(requests.every(url=>url.startsWith('/standalone/')||url==='/favicon.ico'),'No source app requests');
   offline=true;await page.reload();await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
-  await page.locator('#open-offline').click();await page.waitForFunction(()=>document.getElementById('download-status').textContent.includes('جاهز'));
+  await page.locator('#open-offline').click();await page.waitForFunction(()=>document.getElementById('download-status').textContent==='100%');
   await page.keyboard.press('Escape');await page.locator('#start-practice').click();await page.waitForFunction(()=>!document.getElementById('word-image').dataset.loading&&document.getElementById('word-image').src.includes('/standalone/assets/images/'));
   assert.ok((await page.locator('#word-image').getAttribute('src')).includes('/standalone/assets/images/'));
   assert.deepEqual(errors,[]);
-  console.log('PASS: standalone hosting, exact two-button popup, 360 local downloads, offline reopening, waiting-update recovery, multi-window reload, shell/media update notices and cache preservation.');
+  console.log('PASS: standalone hosting, single download button and percentage progress, 360 local downloads, offline reopening, waiting-update recovery, multi-window reload, shell/media update notices and cache preservation.');
  }finally{await browser?.close();await new Promise(r=>{server.close(r);server.closeAllConnections();});}
 })().catch(e=>{console.error(e);process.exitCode=1;});

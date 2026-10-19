@@ -4,15 +4,19 @@ import {loadWords,loadImage,assetURL} from './assetsManager.js';
 import {AudioEngine} from './audio.js';
 import {readPreferences,savePreferences} from './storage.js';
 import {initOffline,refreshOffline} from './offline.js';
+import {progress as P} from './progress.js';
+import {initProfile,initReports} from './profile-ui.js';
 import {LEVELS,pictureChoices,countChoices} from './test-model.js';
 installDialogFallback();applyIcons();
 const $=id=>document.getElementById(id),engine=new AudioEngine();
-const saved=readPreferences(),preferences=saved&&typeof saved==='object'&&!Array.isArray(saved)?saved:{};
+const saved=P.active()?P.workspace()||readPreferences():readPreferences(),preferences=saved&&typeof saved==='object'&&!Array.isArray(saved)?saved:{};
 const levelNames={easy:'سهل',moderate:'متوسط',hard:'صعب'};
 let words=[],index=0,playback=null,libraryCount=3,screen='home',questionSerial=0,answerPending=false,answered=false,feedbackTimer=null;
 let level=LEVELS.includes(preferences.testLevel)?preferences.testLevel:'easy';
 let testKind=preferences.testKind==='count'?'count':'picture';
 let practiceRhythm=preferences.practiceRhythm===true;
+let learnedFilter=null,attemptsThisQuestion=0,sessionId=preferences.sessionId||crypto.randomUUID(),resumeAttempt=preferences;
+
 const current=()=>words[index],digits=n=>String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
 const countLabel=count=>count===1?'مقطع واحد':count===2?'مقطعان':digits(count)+' مقاطع';
 const group=()=>words.filter(word=>word.syllableCount===current().syllableCount);
@@ -21,8 +25,10 @@ const feedbackOpen=()=>$('answer-feedback').hasAttribute('open');
 function say(text){$('status').textContent=text;}
 function persist(){
  if(current())preferences.lastWord=current().id;
- Object.assign(preferences,{testLevel:level,testKind,practiceRhythm});
- if(!savePreferences(preferences))say('تعذر حفظ اختياراتك على هذا المتصفح.');
+ delete preferences.autoAdvance;delete preferences.imagePrompt;delete preferences.segments;
+ Object.assign(preferences,{testLevel:level,testKind,practiceRhythm,screen,testTries:attemptsThisQuestion,sessionId});
+ const saved=P.active()?P.saveWorkspace(preferences):savePreferences(preferences);
+ if(!saved)say('تعذر حفظ اختياراتك على هذا المتصفح.');
 }
 function locks(){
  for(const id of ['start-practice','start-test','previous','next','random','original','sequence','rhythm-sequence','toggle-rhythm','test-prompt','open-library'])$(id).disabled=!words.length;
@@ -82,6 +88,8 @@ async function playSyllables(container,button,word,signal){
 function cancelFeedback(){clearTimeout(feedbackTimer);feedbackTimer=null;document.body.classList.remove('feedback-visible');if(feedbackOpen())$('answer-feedback').close();}
 $('answer-feedback').addEventListener('close',()=>{if(feedbackOpen())return;clearTimeout(feedbackTimer);feedbackTimer=null;document.body.classList.remove('feedback-visible');for(const el of $('test-answers').querySelectorAll('.is-wrong'))el.classList.remove('is-wrong');locks();});
 function showFeedback(correct,choice){
+ P.record({id:crypto.randomUUID(),word:current(),mode:testKind,level,correct,firstTry:attemptsThisQuestion===0,completed:correct,sessionId});
+ attemptsThisQuestion++;preferences.questionCompleted=correct;persist();
  stopPlayback();answered=correct;choice.classList.add(correct?'is-correct':'is-wrong');
  $('answer-feedback').dataset.result=correct?'correct':'wrong';$('feedback-symbol').innerHTML=icon(correct?'check':'close');$('feedback-text').textContent=correct?'أحسنت!':'حاول مرة أخرى';
  const serial=questionSerial;document.body.classList.add('feedback-visible');$('answer-feedback').showModal();locks();
@@ -148,7 +156,7 @@ function renderTest(){
  }
 }
 function updateToolbar(){
- $('open-offline').hidden=screen!=='home';document.querySelector('.contact-footer').hidden=screen!=='home';
+ $('open-profile').hidden=screen!=='home';$('open-report').hidden=screen!=='home';$('open-offline').hidden=screen!=='home';document.querySelector('.contact-footer').hidden=screen!=='home';
  $('go-home').hidden=screen==='home';$('open-library').hidden=screen==='home';
  $('toggle-rhythm').hidden=screen!=='practice';$('toggle-rhythm').setAttribute('aria-pressed',String(practiceRhythm));
  for(const id of ['open-mode','open-level'])$(id).hidden=screen!=='test';
@@ -159,6 +167,7 @@ function updateToolbar(){
 }
 function renderCurrent(){
  stopPlayback();cancelFeedback();questionSerial++;answerPending=false;answered=false;say('');
+ attemptsThisQuestion=resumeAttempt?.lastWord===current().id&&resumeAttempt?.testKind===testKind&&resumeAttempt?.testLevel===level?Number(resumeAttempt.testTries)||0:0;resumeAttempt=null;preferences.questionCompleted=false;
  const word=current(),siblings=group(),position=digits(siblings.findIndex(w=>w.id===word.id)+1)+' / '+digits(siblings.length);persist();
  if(screen==='practice'){
   $('practice-screen').dataset.rhythm=String(practiceRhythm);$('rhythm-frame').hidden=!practiceRhythm;
@@ -169,13 +178,15 @@ function renderCurrent(){
  updateToolbar();locks();
 }
 function activateScreen(next){
- screen=['practice','test'].includes(next)?next:'home';
+ if(['practice','test'].includes(next)&&!P.active()){window.TaffahaProfile?.open();next='home';}
+ const before=screen;screen=['practice','test'].includes(next)?next:'home';
+ if(screen==='test'&&before!=='test'&&!resumeAttempt)sessionId=crypto.randomUUID();
  stopPlayback();cancelFeedback();questionSerial++;answerPending=false;answered=false;
  for(const name of ['home','practice','test'])$(name+'-screen').hidden=screen!==name;
  $('word-navigation').hidden=screen==='home';document.body.dataset.screen=screen;
- updateToolbar();if(words.length&&screen!=='home')renderCurrent();else{say('');locks();}
+ updateToolbar();if(words.length&&screen!=='home')renderCurrent();else{say('');locks();if(words.length)persist();}
 }
-function goTo(next){const hash=next==='home'?'':'#'+next;if(location.hash===hash)activateScreen(next);else location.hash=hash;}
+function goTo(next){activateScreen(next);const hash=screen==='home'?'':'#'+screen;if(location.hash!==hash)history.pushState(null,'',location.pathname+location.search+hash);}
 window.addEventListener('hashchange',()=>{if(words.length)activateScreen(location.hash.slice(1));});
 $('start-practice').onclick=()=>goTo('practice');$('start-test').onclick=()=>goTo('test');$('go-home').onclick=()=>goTo('home');
 document.querySelector('.brand').onclick=e=>{e.preventDefault();goTo('home');};
@@ -209,12 +220,15 @@ function background(){stopPlayback();cancelFeedback();}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)background();});window.addEventListener('pagehide',background);
 function renderLibrary(){
  const q=$('search').value.trim();$('word-library').replaceChildren();
- for(const [i,word]of words.entries())if(word.syllableCount===libraryCount&&word.label.includes(q)){
-  const b=document.createElement('button'),image=document.createElement('img'),label=document.createElement('span');image.loading='lazy';loadImage(image,word.image);label.textContent=word.label;b.append(image,label);b.setAttribute('aria-current',String(i===index));b.onclick=()=>{index=i;renderCurrent();$('library-dialog').close();};$('word-library').append(b);
+ for(const [i,word]of words.entries())if(word.syllableCount===libraryCount&&word.label.includes(q)&&(!learnedFilter||P.learned(word.id,learnedFilter))){
+  const b=document.createElement('button'),image=document.createElement('img'),label=document.createElement('span');image.loading='lazy';loadImage(image,word.image);label.textContent=word.label;b.append(image,label);b.setAttribute('aria-current',String(i===index));b.onclick=()=>{index=i;$('library-dialog').close();if(screen==='home')goTo('practice');else renderCurrent();};$('word-library').append(b);
  }
- if(!$('word-library').children.length)$('word-library').textContent='لا توجد كلمات مطابقة.';
+ if(!$('word-library').children.length)$('word-library').textContent=learnedFilter?'لا توجد كلمات مكتسبة هنا بعد.':'لا توجد كلمات مطابقة.';
+ for(const button of document.querySelectorAll('[data-learned-mode]'))button.setAttribute('aria-pressed',String(button.dataset.learnedMode===learnedFilter));
  for(const b of $('category-filters').children)b.setAttribute('aria-pressed',String(Number(b.dataset.count)===libraryCount));
 }
+for(const button of document.querySelectorAll('[data-learned-mode]'))button.onclick=()=>{learnedFilter=learnedFilter===button.dataset.learnedMode?null:button.dataset.learnedMode;renderLibrary();};
+for(const button of document.querySelectorAll('[data-open-learned]'))button.onclick=()=>{learnedFilter=button.dataset.openLearned;libraryCount=current()?.syllableCount||3;$('search').value='';renderLibrary();$('library-dialog').showModal();};
 $('search').oninput=renderLibrary;$('open-library').onclick=()=>{
  if(screen==='test'){
   for(const b of $('test-categories').children)b.setAttribute('aria-pressed',String(Number(b.dataset.count)===current().syllableCount));
@@ -222,15 +236,29 @@ $('search').oninput=renderLibrary;$('open-library').onclick=()=>{
  }else{libraryCount=current().syllableCount;$('search').value='';renderLibrary();$('library-dialog').showModal();}
 };
 $('open-offline').onclick=()=>{$('offline-dialog').showModal();refreshOffline();};
+window.TaffahaApp={go:goTo,test:kind=>{testKind=kind;goTo('test');}};
+window.addEventListener('taffaha-profile-open',background);
+window.addEventListener('suite-navigation-open',background);
+window.addEventListener('taffaha-profile-beforechange',()=>{background();});
+window.addEventListener('taffaha-profile-change',()=>{
+ const saved=P.workspace()||{};for(const key of Object.keys(preferences))delete preferences[key];Object.assign(preferences,saved);
+ level=LEVELS.includes(saved.testLevel)?saved.testLevel:'easy';testKind=saved.testKind==='count'?'count':'picture';practiceRhythm=saved.practiceRhythm===true;
+ index=Math.max(0,words.findIndex(word=>word.id===(saved.lastWord||'voc-6-1')));sessionId=saved.sessionId||crypto.randomUUID();resumeAttempt=saved;attemptsThisQuestion=Number(saved.testTries)||0;learnedFilter=null;
+ if(saved.questionCompleted){const siblings=group();index=words.indexOf(siblings[(siblings.indexOf(current())+1)%siblings.length]);resumeAttempt=null;attemptsThisQuestion=0;preferences.questionCompleted=false;}
+ goTo('home');window.AppNavigation?.register();
+});
 async function init(){
  try{
   words=await loadWords();index=words.findIndex(w=>w.id===(preferences.lastWord||'voc-6-1'));if(index<0)index=0;
+  if(preferences.questionCompleted){const siblings=group();index=words.indexOf(siblings[(siblings.indexOf(current())+1)%siblings.length]);resumeAttempt=null;}
   for(let n=1;n<=5;n++){const b=document.createElement('button');b.textContent=String(n);b.dataset.count=n;b.setAttribute('aria-label',countLabel(n));b.onclick=()=>{libraryCount=n;renderLibrary();};$('category-filters').append(b);}
   for(let n=1;n<=5;n++){
    const b=document.createElement('button');b.textContent=String(n);b.dataset.count=n;b.setAttribute('aria-label',countLabel(n));
    b.onclick=()=>{index=words.findIndex(w=>w.syllableCount===n);$('test-category-dialog').close();renderCurrent();};$('test-categories').append(b);
   }
-  activateScreen(location.hash.slice(1));
+  initReports(words);initProfile();
+  activateScreen(location.hash.slice(1)||preferences.screen);
+  window.dispatchEvent(new Event('taffaha-ready'));
  }catch(e){say(e.message);$('word-label').textContent='تعذر تحميل البطاقات';}
  initOffline();
 }

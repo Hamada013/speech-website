@@ -6,32 +6,23 @@
     const statusText = card?.querySelector('[data-offline-status]');
     const progress = card?.querySelector('progress');
     const button = card?.querySelector('[data-offline-download]');
-    const installButton = document.querySelector('[data-offline-install]');
+    const downloadToggle = document.querySelector('[data-open-download]');
     const dialog = document.querySelector('[data-offline-dialog]');
-    const standalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-    let installed = standalone();
-    let offered = false;
-    function openDialog(download) {
-        if (!dialog) return;
-        dialog.querySelector('[data-install-help]').hidden = download;
-        dialog.querySelector('[data-download-panel]').hidden = !download;
-        if (!dialog.open) dialog.showModal();
-    }
-    document.querySelector('[data-offline-close]')?.addEventListener('click', () => dialog.close());
-    document.querySelector('[data-install-confirm]')?.addEventListener('click', () => openDialog(true));
+    const errorText = card?.querySelector('[data-offline-error]');
+    downloadToggle?.addEventListener('click', () => { if (!dialog.open) dialog.showModal(); void sync(); });
+    dialog?.addEventListener('click', event => { if (event.target === dialog && (event.clientX < dialog.getBoundingClientRect().left || event.clientX > dialog.getBoundingClientRect().right || event.clientY < dialog.getBoundingClientRect().top || event.clientY > dialog.getBoundingClientRect().bottom)) dialog.close(); });
     let registration;
     let status;
     let running = false;
     let fault = false;
-    let installPrompt;
 
     function showError(message) {
         fault = true;
         if (!card) return;
         card.dataset.state = 'error';
-        statusText.textContent = message;
+        errorText.textContent = message;
+        errorText.hidden = false;
         button.disabled = false;
-        button.textContent = 'إعادة المحاولة / استكمال التنزيل';
     }
 
     function render(next) {
@@ -44,21 +35,14 @@
         status = next;
         fault = false;
         if (!card) return;
-        if (installed && !offered) {
-            offered = true;
-            if (!status.ready && !status.wanted) openDialog(true);
-        }
-        progress.max = Math.max(1, status.total);
-        progress.value = status.done;
-        progress.setAttribute('aria-valuetext', `${status.done} / ${status.total}`);
+        errorText.hidden = true;
+        const percent = status.total ? Math.min(100, Math.floor(status.done / status.total * 100)) : 0;
+        progress.max = 100;
+        progress.value = percent;
+        progress.setAttribute('aria-valuetext', `${percent}%`);
+        statusText.textContent = `${percent}%`;
         card.dataset.state = status.ready ? 'ready' : status.wanted ? 'downloading' : 'idle';
-        if (status.ready) statusText.textContent = 'جاهز للاستخدام دون اتصال ✔';
-        else if (status.wanted && !navigator.onLine) statusText.textContent = `بانتظار الاتصال — محفوظ ${status.done} من ${status.total}`;
-        else if (status.wanted) statusText.textContent = `جاري تنزيل المحتوى ${status.done} من ${status.total}…`;
-        else statusText.textContent = `محفوظ ${status.done} من ${status.total} — حجم المحتوى ${(status.bytes / 1e6).toFixed(1)} ميغابايت`;
-        button.disabled = status.ready;
-        button.textContent = status.ready ? 'تم تنزيل جميع الملفات' : status.wanted
-            ? 'إيقاف التنزيل مؤقتاً' : status.done ? 'استكمال التنزيل دون اتصال' : 'تنزيل كل المحتوى دون اتصال';
+        button.disabled = status.ready || running || (status.wanted && navigator.onLine);
     }
 
     function worker() {
@@ -91,6 +75,7 @@
     async function pump() {
         if (running || fault || !status?.wanted || status.ready || !navigator.onLine || document.hidden) return;
         running = true;
+        window.AppUpdates.setBusy(true);
         try {
             while (status?.wanted && !status.ready && navigator.onLine && !document.hidden) {
                 const next = await send('VOC_BATCH');
@@ -103,6 +88,8 @@
             showError('توقف التنزيل مؤقتاً. اضغط استكمال التنزيل؛ الملفات المحفوظة لن تضيع.');
         } finally {
             running = false;
+            window.AppUpdates.setBusy(false);
+            if (button) button.disabled = !fault && !!status?.ready;
         }
     }
 
@@ -112,35 +99,15 @@
         catch { showError('تعذر التحقق من الملفات. اضغط إعادة المحاولة.'); }
     }
 
-    window.addEventListener('beforeinstallprompt', event => {
-        event.preventDefault();
-        installPrompt = event;
-    });
-    installButton?.addEventListener('click', async () => {
-        if (installed || standalone()) { openDialog(true); return; }
-        if (!installPrompt) { openDialog(false); return; }
-        try {
-            await installPrompt.prompt();
-            const choice = await installPrompt.userChoice;
-            installPrompt = null;
-            if (choice.outcome === 'accepted') { installed = true; offered = true; openDialog(true); }
-        } catch { installPrompt = null; openDialog(false); }
-    });
-    window.addEventListener('appinstalled', () => { installed = true; offered = true; openDialog(true); });
-
+    window.addEventListener('beforeinstallprompt', event => event.preventDefault());
     button?.addEventListener('click', async () => {
+        if (running) return;
         button.disabled = true;
         try {
             if (!registration?.active) await initialize();
             if (!registration?.active) return;
-            const pause = status?.wanted && !fault;
-            if (!pause) {
-                // Request in the click gesture, but never delay saving download
-                // intent while a browser decides whether persistence is granted.
-                // This also survives immediately navigating to a game after click.
-                try { void navigator.storage?.persist?.()?.catch(() => {}); } catch {}
-            }
-            render(await send(pause ? 'VOC_PAUSE' : 'VOC_START'));
+            try { void navigator.storage?.persist?.()?.catch(() => {}); } catch {}
+            render(await send('VOC_START'));
             void pump();
         } catch {
             showError('تعذر بدء التنزيل. تحقق من الاتصال ثم أعد المحاولة.');
@@ -149,12 +116,13 @@
 
     async function initialize() {
         if (!('serviceWorker' in navigator) || !window.isSecureContext) {
-            if (statusText) statusText.textContent = 'يتطلب التنزيل دون اتصال فتح التطبيق عبر HTTPS أو localhost.';
+            showError('يتطلب التنزيل دون اتصال فتح التطبيق عبر HTTPS أو localhost.');
             if (button) button.disabled = true;
             return;
         }
         try {
             registration = await navigator.serviceWorker.register('./sw.js', { scope: './', updateViaCache: 'none' });
+            window.AppUpdates.watch(registration);
             if (!registration.active) {
                 // ready alone never rejects if shell installation fails (e.g. 404).
                 await new Promise((resolve, reject) => {

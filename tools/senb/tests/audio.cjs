@@ -15,7 +15,7 @@ function fixture({ speech = false, reject = null } = {}) {
     };
     const context = currentContext();
     Object.assign(context, {
-        playbackAudio: audio, finishActivePlayback: null, playbackRequestId: 0,
+        playbackAudio: audio, finishActivePlayback: null, playbackRequestId: 0, workplaceMetronomePlaying: false, workplaceWordsPlaying: false,
         setTimeout(fn, delay) { timers.set(++id, { fn, delay }); return id; },
         clearTimeout(id) { timers.delete(id); },
         showAudioStatus(message) { status = message; },

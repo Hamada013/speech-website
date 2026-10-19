@@ -13,8 +13,8 @@ function getBasicImagePath(item) {
 
 function getSlotColorConfig(index, totalSlots) {
     let colorHex = '#eab308';
-    if (index === 0) colorHex = '#eab308';
-    else if (index === 1) colorHex = '#f97316';
+    if (index === 0) colorHex = '#f97316';
+    else if (index === 1) colorHex = '#eab308';
     else if (index === 2) colorHex = '#22c55e';
     else if (index === 3) colorHex = '#3b82f6';
     else if (index === 4) {

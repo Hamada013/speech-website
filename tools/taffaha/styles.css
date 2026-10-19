@@ -235,3 +235,8 @@ main,body[data-screen=home] main{width:100%;flex:1;min-height:0;margin:0 auto;di
 .offline-actions{display:grid;gap:12px;margin-top:24px}
 .update-notice{position:fixed;z-index:90;bottom:max(16px,env(safe-area-inset-bottom));inset-inline:12px;margin-inline:auto;width:min(540px,calc(100% - 24px));display:flex;align-items:center;justify-content:space-between;gap:12px;background:white;border:1px solid var(--line);border-radius:20px;padding:14px 16px;box-shadow:0 12px 50px #13385233}
 .update-notice p{font-size:14px;line-height:1.6;margin:0}.update-notice button{flex-shrink:0}
+
+#download-progress { appearance: none; -webkit-appearance: none; border: 0; border-radius: 999px; overflow: hidden; background: #eaf5ff; }
+#download-progress::-webkit-progress-bar { background: #eaf5ff; border-radius: 999px; }
+#download-progress::-webkit-progress-value { background: #0284c7; border-radius: 999px; }
+#download-progress::-moz-progress-bar { background: #0284c7; border-radius: 999px; }

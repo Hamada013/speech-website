@@ -1,5 +1,6 @@
 // Real-browser tests of interruption, deduplication, integrity, and offline audio.
 const assert = require('node:assert/strict');
+const { solveParentGate } = require('../../tests/solve-parent-gate.cjs');
 const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
@@ -58,8 +59,7 @@ function rpc(page, type) {
 }
 
 async function openDownloads(page) {
-    if (!await page.locator('[data-offline-dialog]').evaluate(dialog => dialog.open)) await page.locator('[data-offline-install]').click();
-    if (await page.locator('[data-install-confirm]').isVisible()) await page.locator('[data-install-confirm]').click();
+    if (!await page.locator('[data-offline-dialog]').evaluate(dialog => dialog.open)) await page.locator('[data-open-download]').click();
 }
 async function testBrowser(name, engine, origin) {
     mediaRequests = 0;
@@ -67,6 +67,7 @@ async function testBrowser(name, engine, origin) {
     const browser = await engine.launch({ headless: true,
         ...(name === 'chromium' && process.env.VOC_USE_CHROME ? { channel: 'chrome' } : {}) });
     const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
+    await context.addInitScript(() => { if (!localStorage.getItem('voc-children-v1')) localStorage.setItem('voc-children-v1', JSON.stringify({schema:1,active:'qa',children:[{id:'qa',name:'طفل الاختبار',words:{},workspace:null,plan:null}]})); });
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
@@ -77,9 +78,10 @@ async function testBrowser(name, engine, origin) {
         assert.equal(mediaRequests, 0, 'Install/startup must never preload media');
         assert.equal(await page.locator('#home-view').isVisible(), true);
         assert.equal(await page.locator('[data-offline-card]').isVisible(), false, 'No offline card on the home screen');
-        await page.evaluate(() => window.dispatchEvent(new Event('appinstalled')));
-        assert.equal(await page.locator('[data-download-panel]').isVisible(), true, 'Installation offers offline download in a popup');
-        await page.locator('[data-offline-close]').click();
+        await openDownloads(page);
+        assert.equal(await page.locator('[data-offline-dialog] button').count(), 1);
+        assert.equal(await page.locator('[data-offline-download]').textContent(), 'تنزيل');
+        await page.keyboard.press('Escape');
         const initial = await rpc(page, 'VOC_STATUS');
         assert.equal(initial.done, 0);
         assert.equal(initial.ready, false);
@@ -116,12 +118,11 @@ async function testBrowser(name, engine, origin) {
             await sw.evaluate(() => { Cache.prototype.put = self.originalPut; });
         }
 
-        // The real button starts the pump, then pause survives navigation/reload.
+        // The real button starts the pump; a worker-level interruption survives reload.
         await openDownloads(page);
         await page.locator('[data-offline-download]').click();
-        await page.waitForFunction(saved => Number(document.querySelector('progress').value) > saved, paused.done);
-        await openDownloads(page);
-        await page.locator('[data-offline-download]').click();
+        await page.waitForFunction(saved => Number(document.querySelector('progress').value) > saved, Math.floor(paused.done / initial.total * 100));
+        await rpc(page, 'VOC_PAUSE');
         await page.waitForFunction(() => document.querySelector('[data-offline-card]').dataset.state === 'idle');
         await page.waitForTimeout(300);
         const saved = (await rpc(page, 'VOC_STATUS')).done;
@@ -175,6 +176,23 @@ async function testBrowser(name, engine, origin) {
         assert.equal(mediaResult.suffix, 10);
         assert.equal(mediaResult.invalid, 416);
 
+        // A fresh offline page must also load the local PDF library and save an admin report.
+        await page.locator('[data-child-profile]:visible').click();
+        await solveParentGate(page);
+        await page.locator('#saved-children button').filter({ hasText: 'Hamada' }).click();
+        await page.waitForFunction(() => window.VocProgress?.isAdmin());
+        await page.locator('[data-child-profile]:visible').click();
+        await solveParentGate(page);
+        await page.locator('[data-report-child="qa"]').click();
+        const reportPage = page; await reportPage.locator('#voc-activity-report[open]').waitFor();
+        const pdfDownload = reportPage.waitForEvent('download');
+        await reportPage.locator('#report-download').click();
+        const report = await pdfDownload;
+        assert.ok((await report.suggestedFilename()).endsWith('.pdf'));
+        assert.equal(await reportPage.locator('#report-error').isHidden(), true);
+        await reportPage.locator('#report-close').click();
+        console.log(`${name}: admin report popup downloads a PDF while offline`);
+
         // Verify actual media decoding/playback, beyond HTTP/cache assertions.
         await page.evaluate(() => {
             const button = document.createElement('button');
@@ -205,6 +223,7 @@ async function testBrowser(name, engine, origin) {
         await page.goto(`${origin}/tools/voc/index.html`);
         await page.screenshot({ path: `/private/tmp/voc-${name}-tablet.png`, fullPage: true });
     } catch (error) {
+        console.error(error);
         try {
             console.error(`${name} failure state:`, await page.locator('[data-offline-status]').textContent({ timeout: 1000 }));
             console.error(`${name} worker status:`, await rpc(page, 'VOC_STATUS'));

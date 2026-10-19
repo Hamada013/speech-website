@@ -14,6 +14,7 @@ async function choose(p,word){await p.locator('#open-library').click();await p.l
   browser=await(engine==='webkit'?webkit:chromium).launch({headless:true,...(engine==='chromium'?{executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'}:{})});
   context=await browser.newContext({viewport:{width:390,height:844}});let p=await context.newPage();const errors=[];p.on('pageerror',e=>errors.push(e.message));
   // Legacy divisions must not shrink or move cards between the curated groups.
+  await require('./profile-fixture.cjs')(context);
   await p.addInitScript(()=>localStorage.setItem('taffaha-preferences',JSON.stringify({lastWord:'voc-6-1',segments:{'voc-6-1':['تفاحة']},pace:250})));
   await p.goto(base+'#practice');await p.waitForFunction(()=>document.querySelectorAll('.syllable-circle').length===3);await p.waitForFunction(()=>!!navigator.serviceWorker.controller);
   assert.equal(await p.locator('#toggle-recording,.record-button,#recording-bar,#stop-audio,#save-copy').count(),0);
@@ -53,6 +54,7 @@ async function choose(p,word){await p.locator('#open-library').click();await p.l
   const fixtureContext=await browser.newContext({viewport:{width:1280,height:900},serviceWorkers:'block'}),fixturePage=await fixtureContext.newPage(),requests=[];
   const shortest=decoded.reduce((a,b)=>a.duration<b.duration?a:b),fixtureWord=words.find(w=>w.id===shortest.id);
   const fixtureBytes=fs.readFileSync(path.join(root,'tools',fixtureWord.audio.library,fixtureWord.audio.path));
+  await require('./profile-fixture.cjs')(fixtureContext);
   await fixturePage.route('**/assets/sounds/**/*.m4a*',route=>{requests.push(new URL(route.request().url()).pathname);return route.fulfill({status:200,contentType:'audio/mp4',body:fixtureBytes});});
   await fixturePage.goto(base+'#practice');await choose(fixturePage,banana);await fixturePage.locator('#sequence').click({position:{x:8,y:8}});await fixturePage.waitForFunction(()=>document.getElementById('sequence').getAttribute('aria-busy')==='false');assert.equal(await fixturePage.locator('#status').innerText(),'');
   assert.deepEqual(requests,['/tools/taffaha/assets/sounds/2/1.m4a','/tools/taffaha/assets/sounds/2/2.m4a']);
@@ -63,7 +65,7 @@ async function choose(p,word){await p.locator('#open-library').click();await p.l
   const legacy=await context.newPage();await legacy.addInitScript(()=>{HTMLDialogElement.prototype.showModal=undefined;HTMLDialogElement.prototype.close=undefined;});await legacy.goto(base+'#practice');await legacy.locator('#open-library').click();assert.equal(await legacy.locator('.legacy-dialog[open]').count(),1);await legacy.keyboard.press('Escape');await legacy.close();
   // Download only Taffaha media, then verify offline playback, ranges and isolation.
   await p.evaluate(()=>caches.open('taffaha-other-app-sentinel').then(c=>c.put('/sentinel',new Response('ok'))));
-  await p.locator('#go-home').click();await p.locator('#open-offline').click();assert.equal(await p.locator('#offline-dialog button').count(),2);await p.screenshot({path:out+'/'+engine+'-download-popup.png'});await p.locator('#download').click();await p.waitForFunction(()=>!document.getElementById('download').disabled,null,{timeout:75000});assert.match(await p.locator('#download-status').innerText(),/جاهز/);await p.keyboard.press('Escape');await p.locator('#start-practice').click();
+  await p.locator('#go-home').click();await p.locator('#open-offline').click();assert.equal(await p.locator('#offline-dialog button').count(),1);await p.screenshot({path:out+'/'+engine+'-download-popup.png'});await p.locator('#download').click();await p.waitForFunction(()=>!document.getElementById('download').disabled,null,{timeout:75000});assert.equal(await p.locator('#download-status').innerText(),'100%');await p.keyboard.press('Escape');await p.locator('#start-practice').click();
   console.log('Downloaded Taffaha assets; shutting down the server.');
   await closeServer();await p.close();p=await context.newPage();p.on('pageerror',e=>errors.push(e.message));await p.goto(base+'#practice');await p.waitForFunction(()=>document.querySelectorAll('.syllable-circle').length===3);await p.waitForFunction(()=>!document.getElementById('word-image').dataset.loading);assert.ok((await p.locator('#word-image').getAttribute('src')).includes('/taffaha/assets/images/voc/6/1.webp'));
   await p.locator('#original').click();await p.waitForFunction(()=>!document.querySelector('.is-playing'));assert.equal(await p.locator('#status').innerText(),'');

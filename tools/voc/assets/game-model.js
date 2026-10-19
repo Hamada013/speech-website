@@ -22,8 +22,8 @@
         });
     }
     function createSession(mode, items, settings, dataVersion, random = Math.random) {
-        const pool = uniqueItems(items);
-        if (!MODES[mode] || pool.length < MODES[mode].minimum) throw new Error(`اختر ${MODES[mode]?.minimum || 2} بطاقات مختلفة على الأقل.`);
+        const pool = settings.fixedPool ? [...new Map(items.map(item => [item.key, item])).values()] : uniqueItems(items);
+        if (!MODES[mode] || pool.length < (settings.fixedPool ? 1 : MODES[mode].minimum)) throw new Error(`اختر ${MODES[mode]?.minimum || 2} بطاقات مختلفة على الأقل.`);
         const count = mode === 'memory' ? Math.min(settings.level, pool.length) : Math.min(settings.length, pool.length);
         const order = shuffle(pool, random).slice(0, count).map(item => item.key);
         const boards = [];

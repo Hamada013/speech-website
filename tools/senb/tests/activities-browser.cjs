@@ -126,10 +126,11 @@ async function run(browserType, name) {
         for (const viewport of process.env.SENB_ACTIVITY_SMOKE === '1' ? viewports.slice(0, 1) : viewports) {
             const context = await browser.newContext({ viewport, hasTouch: true });
             await context.route('https://**', route => route.abort());
+            await context.addInitScript(() => localStorage.setItem('voc-children-v1', JSON.stringify({ schema: 1, active: 'activity-child', children: [{ id: 'activity-child', name: 'علي', senb: {} }] })));
             const page = await context.newPage();
             const errors = [];
             page.on('pageerror', error => errors.push(error.message));
-            await page.goto(`http://127.0.0.1:${server.address().port}/index.html`, { waitUntil: 'load' });
+            await page.goto(`http://127.0.0.1:${server.address().port}/index.html`, { waitUntil: 'domcontentloaded' });
             assert.equal(await page.locator('.home-menu-card').count(), 4);
             assert.deepEqual(await page.locator('#homeFooter p').allTextContents(), ['SPEECH AND LANGUAGE PATHOLOGY', 'Ahmad Ghanem', 'Latakia - Syria', 'slp.ahmadghanem@gmail.com']);
             assert.deepEqual(await page.locator('.brand-logo, .home-logo').evaluateAll(nodes => nodes.map(node => {
@@ -137,8 +138,8 @@ async function run(browserType, name) {
                 return [style.borderTopWidth, style.backgroundColor, style.backgroundImage, style.boxShadow, style.paddingTop];
             })), Array(2).fill(['0px', 'rgba(0, 0, 0, 0)', 'none', 'none', '0px']), 'Both logos use the original image without a decorative frame');
             assert.equal(await page.locator('#activityHomeBtn').isVisible(), false);
-            assert.equal(await page.locator('.app-header #pwaInstallBtn svg').count(), 1);
-            assert.equal(await page.locator('#pwaInstallBtn').textContent().then(text => text.trim()), '', 'App installation uses an icon button');
+            assert.equal(await page.locator('.app-header #pwaDownloadToggle svg').count(), 1);
+            assert.equal(await page.locator('#pwaInstallBtn, #offlinePauseBtn, #offlineCloseBtn').count(), 0);
             assert.equal(await page.locator('#pwaDownloadToggle, #offlinePanel').count(), 2, 'Header download controls are present');
             if (viewport.width >= 768 && viewport.height >= 600) {
                 const home = await page.locator('#homeView').evaluate(view => {
@@ -153,32 +154,19 @@ async function run(browserType, name) {
             }
             await page.screenshot({ path: `/private/tmp/senb-${name}-${viewport.width}-home.png` });
             if (process.env.SENB_HOME_ONLY === '1') {
-                await page.evaluate(() => {
-                    const event = new Event('beforeinstallprompt', { cancelable: true });
-                    event.prompt = async () => { window.installPromptShown = true; };
-                    event.userChoice = Promise.resolve({ outcome: 'dismissed' });
-                    window.dispatchEvent(event);
-                });
-                await page.locator('#pwaInstallBtn').click();
-                assert.equal(await page.evaluate(() => window.installPromptShown), true);
-                await page.locator('#pwaInstallBtn').click();
-                assert.equal(await page.locator('#pwaInstallHelp').isVisible(), true);
-                assert.equal(await page.locator('#pwaInstallBtn').getAttribute('aria-expanded'), 'true');
-                const help = await page.locator('#pwaInstallHelp').boundingBox();
-                assert.ok(help.x >= 0 && help.x + help.width <= viewport.width, 'Install instructions stay on screen');
+                await page.locator('#pwaDownloadToggle').click();
+                assert.equal(await page.locator('#offlinePanel button').count(), 1);
+                assert.equal(await page.locator('#offlineDownloadBtn').textContent(), 'تنزيل');
                 await page.keyboard.press('Escape');
-                assert.equal(await page.locator('#pwaInstallHelp').isVisible(), false);
+                assert.equal(await page.locator('#offlinePanel').isVisible(), false);
                 await page.locator('#homeWorkplaceBtn').click();
                 assert.equal(await page.locator('#workplaceView').isVisible(), true);
-                assert.equal(await page.locator('#pwaInstallBtn').isVisible(), false);
+                assert.equal(await page.locator('#pwaDownloadToggle').isVisible(), false);
                 await page.locator('.app-brand').click();
                 assert.equal(await page.locator('#homeView').isVisible(), true);
-                assert.equal(await page.locator('#pwaInstallBtn').isVisible(), true);
-                await page.evaluate(() => window.dispatchEvent(new Event('appinstalled')));
-                assert.equal(await page.locator('#pwaInstallBtn').isDisabled(), true);
-                assert.equal(await page.locator('#pwaInstallBtn').getAttribute('aria-label'), 'التطبيق مثبت');
+                assert.equal(await page.locator('#pwaDownloadToggle').isVisible(), true);
                 assert.deepEqual(errors, []);
-                console.log(`PASS ${name} ${viewport.width}x${viewport.height}: home layout, header install icon/prompt/help, menu navigation, header media download`);
+                console.log(`PASS ${name} ${viewport.width}x${viewport.height}: home layout, single download icon/dialog, menu navigation, percentage progress`);
                 await context.close();
                 continue;
             }
@@ -293,7 +281,7 @@ async function run(browserType, name) {
                 await page.locator('#downloadActivityResultsBtn').click();
                 const expressivePdf = await expressiveDownload;
                 await expressivePdf.saveAs(`/private/tmp/senb-${name}-${viewport.width}-expressive-report.pdf`);
-                assert.match(fs.readFileSync(`/private/tmp/senb-${name}-${viewport.width}-expressive-report.pdf`).toString('latin1'), /\/Count [2-9]/, 'The expanded all-subgroup report must paginate');
+                assert.match(fs.readFileSync(`/private/tmp/senb-${name}-${viewport.width}-expressive-report.pdf`).toString('latin1'), /\/Count \d+/, 'The concise subgroup report exports complete PDF pages');
                 assert.equal(await page.evaluate(() => activity.results.every(result => result.words === 2)), true);
                 await assertLayout(page);
                 await page.screenshot({ path: `/private/tmp/senb-${name}-${viewport.width}-result.png` });
@@ -369,10 +357,7 @@ async function run(browserType, name) {
             }
             assert.equal(await page.locator('.activity-result-total').textContent(), '1');
             assert.equal(await page.locator('[data-result-subgroup="1"] td').first().textContent(), '1');
-            assert.equal(await page.locator('[data-word-type="subject"] td').textContent(), '100%');
-            assert.equal(await page.locator('[data-word-type="verb-present"] td').textContent(), '0%');
-            assert.match(await page.locator('.activity-word-findings').textContent(), /فاعل \(100%\)/);
-            assert.match(await page.locator('.activity-word-findings').textContent(), /فعل حاضر \(0%\)/);
+            assert.equal(await page.locator('[data-word-type],.activity-word-findings').count(),0,'Sentence reports omit word details');
             assert.equal(await page.evaluate(() => activity.reportDate.toISOString()), testStartedAt, 'The report uses the test start date');
             assert.match(await page.locator('.activity-report-meta').allTextContents().then(lines => lines.join(' ')), /SLP\.AHMAD GHANEM/);
             if (viewport.width === 320 || viewport.width === 768) {
@@ -456,7 +441,6 @@ async function run(browserType, name) {
             assert.equal(await page.evaluate(() => JSON.stringify(state.row1Slots) === manualBoardBefore), true, 'Activities must preserve the original manual slot assignments');
             await page.evaluate(() => {
                 state.slotCount = 4;
-                if (!state.isMultiline) toggleMultilineRow();
                 const noun = id => ({ ...ITEMS_DATABASE['01 subject'].find(item => item.id === id), categoryId: '01 subject' });
                 const pronoun = id => ({ ...ITEMS_DATABASE['07 Pronoun'].find(item => item.id === id), categoryId: '07 Pronoun' });
                 const and = { categoryId: '08 linking', id: 3, title: 'و' };
@@ -466,19 +450,19 @@ async function run(browserType, name) {
                 renderWorkplace();
             });
             assert.equal(await page.locator('#slot-1-3').getAttribute('aria-label'), await page.evaluate(() => VERB_CONJUGATIONS[14].present.they));
-            assert.equal(await page.locator('#slot-2-3').getAttribute('aria-label'), await page.evaluate(() => VERB_CONJUGATIONS[14].present.we));
-            const clearCorner = page.locator('#slot-1-0 .slot-clear');
-            assert.equal(await clearCorner.locator('svg').count(), 0);
-            assert.equal(await clearCorner.evaluate(node => getComputedStyle(node).backgroundColor), 'rgba(0, 0, 0, 0)');
+            assert.equal(await page.evaluate(() => getDisplayedItemTitle(state.row2Slots[3], 2, 3)), await page.evaluate(() => VERB_CONJUGATIONS[14].present.we));
+            assert.equal(await page.locator('.slot-clear,.featured-clear').count(),0);
             const playedBeforeClear = await page.evaluate(() => playedPaths.length);
-            await clearCorner.tap();
+            await page.locator('#clearBoardBtn').click();
+            const clearCard=await page.locator('#slot-1-0').boundingBox();await page.touchscreen.tap(clearCard.x+clearCard.width/2,clearCard.y+clearCard.height/2);
             assert.equal(await page.evaluate(() => state.row1Slots[0]), null);
-            assert.equal(await page.evaluate(() => playedPaths.length), playedBeforeClear, 'The invisible corner clears without playing the card');
+            assert.equal(await page.evaluate(() => playedPaths.length), playedBeforeClear, 'Delete mode clears the tapped card without playback');
             assert.equal(await page.locator('#slot-1-3').getAttribute('aria-label'), await page.evaluate(() => VERB_CONJUGATIONS[14].present.she));
-            await page.locator('#slot-2-0 .slot-clear').focus();
+            await page.evaluate(() => {state.row1Slots=state.row2Slots.map(item=>({...item}));renderWorkplace();});
+            await page.locator('#slot-1-0').focus();
             await page.keyboard.press('Enter');
-            assert.equal(await page.evaluate(() => state.row2Slots[0]), null, 'The invisible corner also works from the keyboard');
-            assert.equal(await page.locator('#slot-2-3').getAttribute('aria-label'), await page.evaluate(() => VERB_CONJUGATIONS[14].present.youfemale));
+            assert.equal(await page.evaluate(() => state.row1Slots[0]), null, 'Delete mode also works from the keyboard');
+            assert.equal(await page.locator('#slot-1-3').getAttribute('aria-label'), await page.evaluate(() => VERB_CONJUGATIONS[14].present.youfemale));
             assert.deepEqual(errors, []);
             console.log(`PASS ${name} ${viewport.width}x${viewport.height}: activity layout, complete-sentence repetition, stars, auto/pause, test plans/scoring, game touch/drag/hint, navigation cancellation`);
             await context.close();

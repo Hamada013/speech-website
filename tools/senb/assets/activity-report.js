@@ -124,11 +124,7 @@ const SENBReport = (() => {
         table('نتائج المجموعات الفرعية', ['المجموعة الفرعية', expressive ? 'MLU بالكلمات' : 'الإجابات الصحيحة', expressive ? 'المحاولات' : 'النسبة'], summary.groups.map(group => [
             `${group.id}. ${group.name}`, expressive ? group.mlu : `${group.earned} / ${group.possible}`, expressive ? group.trials : `${group.percentage}%`
         ]));
-        if (expressive) {
-            table('الأداء حسب نوع الكلمة', ['نوع الكلمة', 'نسبة الإنتاج'], summary.wordTypes.map(type => [type.label, `${type.percentage}%`]));
-            paragraph('النسبة لكل نوع = الكلمات المحددة من هذا النوع ÷ مرات عرضه في الاختبار');
-            wordFindings(summary).forEach(finding => paragraph(finding));
-        } else paragraph('النسبة = الإجابات الصحيحة ÷ مجموع المحاولات');
+        if (!expressive) paragraph('النسبة = الإجابات الصحيحة ÷ مجموع المحاولات');
         pages.forEach((page, index) => {
             ctx = page.getContext('2d');
             text(`${index + 1} / ${pages.length}`, 620, 1675, 23, '#64748b', 'center', false, 'ltr');

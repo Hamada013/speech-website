@@ -219,3 +219,33 @@
     .fixed-session .activity-slot { max-width: 56px; }
     .fixed-session .game-choice img { height: 34px; }
 }
+
+/* A sentence is one close group; its frame plays the words in RTL order. */
+.expressive-session .activity-slots.expressive-word-cards {
+    direction: rtl; width: min(100%, calc(var(--slot-count) * 160px + (var(--slot-count) - 1) * 8px + 32px));
+    padding: 16px; gap: 8px; border: 2px solid #dceaf4; border-radius: 24px; background: white; cursor: pointer; box-sizing: border-box;
+}
+.expressive-word-cards:focus-visible { outline: 3px solid #e7a83c; outline-offset: 3px; }
+.expressive-session .expressive-word-cards .activity-slot { width: 100%; }
+@media (max-height: 500px) and (orientation: landscape) {
+    .expressive-session .activity-slots.expressive-word-cards { width: min(100%, calc(var(--slot-count) * 100px + (var(--slot-count) - 1) * 6px + 24px)); padding: 12px; gap: 6px; }
+}
+
+/* Spoken cards lift and glow one at a time in the sentence's RTL order. */
+.workplace-word-frame.expression-frame-playing,.expressive-word-cards.expression-frame-playing { border-color: #9dd8c8; }
+.expressive-word-cards .activity-slot.expression-card-playing,
+.session-expression-frame .senb-session-card.expression-card-playing,
+.workplace-word-frame .slot-card.expression-card-playing {
+    border-color: #19a880; background: #edfcf6;
+    box-shadow: 0 0 0 3px #a5ecd9, 0 8px 20px #29b78a35;
+    animation: expression-card-speaking .65s ease-in-out infinite;
+}
+@keyframes expression-card-speaking {
+    0%,100% { transform: translateY(-2px) scale(1.01); }
+    50% { transform: translateY(-6px) scale(1.025); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .expressive-word-cards .activity-slot.expression-card-playing,
+    .session-expression-frame .senb-session-card.expression-card-playing,
+    .workplace-word-frame .slot-card.expression-card-playing { animation: none; transform: none; }
+}
