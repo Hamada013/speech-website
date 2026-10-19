@@ -20,11 +20,18 @@
     view.innerHTML = `<div class="senb-session-bar"><h2 id="sessionHeading" tabindex="-1">جلسة الجمل</h2><div>${button('sessionReplay','play','أعد الاستماع')}${button('sessionPause','pause','إيقاف مؤقت')}${button('sessionStop','close','إنهاء المسار')}</div></div><progress id="senbSessionProgress" aria-label="تقدم المرحلة" max="1" value="0"></progress><p id="sessionStatus" role="status" aria-live="polite"></p><section id="sessionBoard" class="senb-session-board" aria-label="بطاقات الجلسة"></section><div id="sessionActions" class="senb-session-actions"></div>`;
     document.body.append(view);
     const curtain = document.createElement('div'); curtain.className = 'senb-session-curtain'; curtain.hidden = true; curtain.setAttribute('role','status'); curtain.setAttribute('aria-live','assertive'); document.body.append(curtain);
+    const completion = document.createElement('dialog');
+    completion.className = 'suite-dialog'; completion.id = 'sessionCompletion';
+    completion.setAttribute('aria-labelledby','sessionCompletionTitle');
+    completion.innerHTML = '<h2 id="sessionCompletionTitle">نكمل بالألعاب؟</h2><footer class="suite-text-actions"><button id="sessionPlayAgain" type="button">يلا نلعب</button><button id="sessionKeepPracticing" type="button">عودة للتدريب</button></footer>';
+    document.body.append(completion);
+    completion.querySelector('#sessionPlayAgain').onclick=()=>{completion.close();startAutomation();};
+    completion.querySelector('#sessionKeepPracticing').onclick=()=>completion.close();
     function status(message, error = false) { $('#sessionStatus').textContent = message; $('#sessionStatus').classList.toggle('error',error); }
     function wait(ms, ticket = token) { return new Promise(resolve => { const timer = setTimeout(() => { delays.delete(timer); resolve(ticket === token); },ms); delays.set(timer,resolve); }); }
     function cancel() {
         token++; for (const [timer,resolve] of delays) { clearTimeout(timer); resolve(false); } delays.clear();
-        stopAllPlayback(); audioBusy = false; curtain.hidden = true;
+        stopAllPlayback(); audioBusy = false; curtain.hidden = true; completion.close();
         document.querySelectorAll('.session-demo-hand,.session-drag-copy').forEach(el=>el.remove());
         document.querySelectorAll('.session-beat.lit,.session-glow,.expression-card-playing').forEach(el=>el.classList.remove('lit','session-glow','expression-card-playing'));
     }
@@ -85,14 +92,15 @@
             if (!await segments(target.segments,ticket)) { audioBusy=false;$('#sessionReplay').disabled=false;return; }
             if (ticket !== token) return;
             el.classList.add('session-glow');
-            const finger = document.createElement('span'); finger.className='session-finger'; finger.innerHTML='<svg viewBox="0 0 60 70" aria-hidden="true"><path d="M22 39V9c0-8 10-8 10 0v21c4-8 11-3 11 2 5-5 12-1 12 5v14c0 11-9 17-20 17-7 0-11-4-15-10L8 41c-5-8 3-13 9-6l5 4Z" fill="white" stroke="#64748b" stroke-width="2"/></svg>';el.append(finger);
-            if (!await wait(650,ticket)) return;
-            finger.remove(); markPracticed(el); run.practiced.push(target.id);
+            if (!await demonstrateChoice(el,null,ticket)) return;
+            markPracticed(el); run.practiced.push(target.id);
             el.classList.remove('session-glow');run.guideIndex++;save();
             if (run.guideIndex < run.targets.length && !await wait(1000,ticket)) return;
         }
         if (ticket !== token) return;
-        audioBusy=false;run.phase='countdown';save();void countdown();
+        audioBusy=false;
+        if(run.mode==='practice')return finishStandalone();
+        run.phase='countdown';save();void countdown();
     }
     async function countdown() {
         const ticket=token; $('#sessionReplay').hidden=true;
@@ -108,6 +116,7 @@
         if (run.pendingTransition === 'trial') return nextTrial();
         if (run.phase === 'another') return renderAnother();
         if (run.phase === 'finished') return renderFinished();
+        if (run.phase === 'automation-countdown') { base('استعد'); void automationCountdown(); return; }
         if (run.phase === 'automation') return renderAutomation();
         base(run.phase === 'guide' ? 'نجرب معاً' : 'استمع واختر');targetBoard();
         setProgress(run.phase === 'guide' ? run.guideIndex : run.targetIndex,run.targets.length);
@@ -143,6 +152,7 @@
         if(run.targetIndex===run.targets.length){
             log('dynamic','assessment',run.dynamicRecords);
             if(!run.worked.some(s=>s.key===run.current.key&&s.presentation===run.current.presentation))run.worked.push(run.current);
+            if(run.mode==='test')return finishStandalone();
             run.phase='another';save();render();
         }else {save();render();}
     }
@@ -152,15 +162,41 @@
         P.logSession({id,date:ended,started:run.stageStartedAt||run.startedAt||ended,durationMs:Math.max(0,Date.parse(ended)-Date.parse(run.stageStartedAt||run.startedAt||ended)),source,kind,partial,records});run.sessionIds.push(id);return id;
     }
     function beginDynamic(snapshot) {
-        cancel();run.current=snapshot;fillTargetImages(snapshot);run.phase='guide';run.guideIndex=0;run.practiced=[];run.targetIndex=0;run.dynamicRecords=[];run.targetWrong=false;run.pendingTransition=null;run.stageStartedAt=new Date().toISOString();
+        cancel();run.current=snapshot;fillTargetImages(snapshot);run.phase=run.mode==='test'?'countdown':'guide';run.guideIndex=0;run.practiced=[];run.targetIndex=0;run.dynamicRecords=[];run.targetWrong=false;run.pendingTransition=null;run.stageStartedAt=new Date().toISOString();
         save();enter();render();
     }
-    function start() {
+    function start(mode) {
+        window.AppNavigation?.closeSettings();
         const snapshot=getWorkplaceSentence();
         if(!snapshot?.slots?.length){showAudioStatus('أضف بطاقات للجملة أولاً.');return;}
         if(!run){const draft=P.draft();if(draft?.phase==='selecting')run=draft;}
         if(!run||['finished','paused'].includes(run.phase))run={id:`senb-${Date.now()}-${Math.random().toString(36).slice(2)}`,startedAt:new Date().toISOString(),worked:[],sessionIds:[],logIndex:0};
-        beginDynamic(snapshot);
+        run.mode=mode;run.queue=workplaceSentences();run.queueIndex=0;
+        beginDynamic(run.queue[0]||snapshot);
+    }
+    function workplaceSentences() {
+        const split=window.SenbSplit;
+        if(!split?.enabled())return [getWorkplaceSentence()].filter(s=>s?.slots?.length);
+        const selected=split.snapshot().active, sentences=[];
+        try { for(const index of [0,1]){split.activate(index);const s=getWorkplaceSentence();if(s?.slots?.length)sentences.push(s);} }
+        finally {split.activate(selected);}
+        return sentences;
+    }
+    function finishStandalone() {
+        if(++run.queueIndex<run.queue.length){beginDynamic(run.queue[run.queueIndex]);return;}
+        cancel();run.phase='finished';P.saveDraft(null);updateResume();navigateTo('workplace');completion.showModal();
+    }
+    function startAutomation() {
+        const sentences=workplaceSentences();
+        if(!sentences.length){showAudioStatus('أضف بطاقات للجملة أولاً.');return;}
+        cancel();window.AppNavigation?.closeSettings();
+        run={id:`senb-${Date.now()}-${Math.random().toString(36).slice(2)}`,startedAt:new Date().toISOString(),worked:sentences,sessionIds:[],logIndex:0,phase:'automation-countdown',stageIndex:0,stagePosition:0,repeatIndex:0,stageRecords:[],trialWrong:false,stageStartedAt:new Date().toISOString()};
+        save();enter();render();
+    }
+    async function automationCountdown() {
+        const ticket=token;
+        for(const value of [1,2,3]){curtain.innerHTML=`<span class="session-count" data-count="${value}">${value}</span>`;curtain.hidden=false;if(!await wait(800,ticket))return;}
+        curtain.hidden=true;run.phase='automation';save();render();
     }
     function renderAnother() {
         base('نكمل التدريب؟');$('#sessionReplay').hidden=true;$('#sessionPause').hidden=true;$('#sessionStop').hidden=true;
@@ -260,7 +296,7 @@
         if(run.stagePosition>=currentStage.indices.length)return advanceStage();
         const s=sentence();base(stageNames[currentStage.id]);
         setProgress(currentStage.id==='repetition'?run.stagePosition*10+run.repeatIndex:run.stagePosition,currentStage.indices.length*(currentStage.id==='repetition'?10:1));
-        if(currentStage.id==='repetition'){showSentence(s,s.imgPath?'advanced':'slots',$('#sessionBoard'));status(`${run.repeatIndex+1} / 10`);void repetition();}
+        if(currentStage.id==='repetition'){showSentence(s,s.presentation==='advanced'&&s.imgPath?'advanced':'slots',$('#sessionBoard'));status(`${run.repeatIndex+1} / 10`);void repetition();}
         else if(currentStage.id==='missing'){run.trialPhase ||= 'guide';renderMissing(s);void choiceFlow('missing');}
         else if(currentStage.domain==='receptive'){run.trialPhase ||= 'guide';renderComprehension(s,currentStage);}
         else {run.trialPhase ||= 'guide';renderExpression(s,currentStage);if(run.trialPhase!=='test')void expressionModel(s,currentStage.presentation);}
@@ -387,7 +423,7 @@
     function complete() {
         cancel();run.phase='finished';save();P.saveDraft(null);updateResume();
         window.SenbSessionReports?.prepareLesson?.({sentences:run.worked,sessionIds:run.sessionIds});
-        renderFinished();
+        navigateTo('workplace');completion.showModal();
     }
     function renderFinished() {
         base('أحسنت! انتهت الجلسة');$('#sessionReplay').hidden=true;$('#sessionPause').hidden=true;$('#sessionStop').hidden=true;setProgress(1,1);
@@ -419,12 +455,14 @@
         if(run.phase==='guide')void guided();else if(run.phase==='dynamic-test')void playTarget();
         else if(run.phase==='automation'){const currentStage=stage();if(currentStage.id==='repetition')void repetition();else if(currentStage.id==='missing')void choiceFlow('missing');else if(currentStage.domain==='receptive')void promptSentence();else void expressionModel(sentence(),currentStage.presentation);}
     };
-    const startButton=document.createElement('button');startButton.type='button';startButton.id='workplaceDynamicTest';startButton.className='senb-session-icon';startButton.setAttribute('aria-label','تدريب واختبار الجملة');startButton.title='تدريب واختبار الجملة';startButton.innerHTML=svg('test');startButton.onclick=start;$('#workplaceHeaderToolbar').append(startButton);
+    const startButton=document.createElement('button');startButton.type='button';startButton.id='workplaceDynamicTest';startButton.className='senb-session-icon';startButton.setAttribute('aria-label','اختبار الجملة');startButton.title='اختبار الجملة';startButton.innerHTML=svg('test');startButton.onclick=()=>start('test');$('#workplaceHeaderToolbar').append(startButton);
+    const practiceButton=document.createElement('button');practiceButton.type='button';practiceButton.id='workplacePractice';practiceButton.className='senb-session-icon';practiceButton.setAttribute('aria-label','تدريب الجملة');practiceButton.title='تدريب الجملة';practiceButton.innerHTML=svg('repeat');practiceButton.onclick=()=>{window.AppNavigation?.closeSettings();start('practice');};$('#workplaceHeaderToolbar').append(practiceButton);
+    const playButton=$('#sequencePlayBtn');playButton.onclick=startAutomation;playButton.setAttribute('aria-label','تشغيل التدريب التلقائي');playButton.title='تشغيل التدريب التلقائي';
     const resume=document.createElement('button');resume.id='resumeSenbSession';resume.type='button';resume.className='senb-session-icon';resume.setAttribute('aria-label','متابعة الجلسة المحفوظة');resume.title='متابعة الجلسة المحفوظة';resume.innerHTML=svg('play');$('#homeHeaderTools').append(resume);
     function updateResume(){resume.hidden=!P.draft();}
     resume.onclick=()=>{cancel();run=P.draft();if(!run)return;if(run.phase==='selecting'){navigateTo('workplace');return;}run.resumePhase=run.phase==='paused'?run.resumePhase:run.phase;run.phase='paused';enter();render();};updateResume();
     window.addEventListener('senb-profile-memorychange',()=>{cancel();run=null;state.basicLearnedFilter=null;state.advancedLearnedFilter=null;document.querySelectorAll('.picker-learned-button').forEach(button=>button.setAttribute('aria-pressed','false'));initializeWorkplace();renderWorkplace();updateResume();navigateTo('home');});
     document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});window.addEventListener('pagehide',pause);window.addEventListener('senb-profile-open',pause);window.addEventListener('senb-profile-beforechange',()=>{pause();cancel();});
     document.addEventListener('keydown',event=>{if(state.currentView==='session'&&event.key==='Escape'&&!document.querySelector('dialog[open]')){event.preventDefault();pause();}});
-    window.SenbSession={start,pause,stop,state:()=>run,resume:()=>resume.click()};
+    window.SenbSession={start,startAutomation,pause,stop,state:()=>run,resume:()=>resume.click()};
 })();

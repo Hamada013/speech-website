@@ -84,13 +84,14 @@ document.addEventListener('DOMContentLoaded', () => {
             records: records.map(record => ({ key: record.key, correct: record.correct ? 1 : 0, total: 1 })) });
     }
     const exit = app.exitTestMode;
-    app.exitTestMode = function(showMessage = true) { startToken++; window.VocCountdown.cancel(); if (this.state.testState.active) logRun(true); exit.call(this, showMessage); };
+    app.exitTestMode = function(showMessage = true) { startToken++; this.stopCardPlayback(); window.VocCountdown.cancel(); if (this.state.testState.active) logRun(true); exit.call(this, showMessage); };
     const start = app.handleModeButtonClick;
     app.handleModeButtonClick = async function(type) {
         if(this.state.deleteMode)this.setDeleteMode(false);
         if (this.state.testState.active && this.state.mode === type) { start.call(this, type); return; }
         if (!keys().length) { this.showToast('أضف بطاقة للبدء', 'warning'); return; }
         this.exitTestMode(false);
+        this.primeCardAudio();
         const token = ++startToken;
         if (!await window.VocCountdown.start() || token !== startToken) return;
         run = { id: `workplace-${Date.now()}-${Math.random().toString(36).slice(2)}`, started: new Date().toISOString(), mode: type, logged: false };

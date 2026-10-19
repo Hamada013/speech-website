@@ -23,3 +23,11 @@ body.suite-transition-active>:not(#suite-transition):not(script):not(style):not(
 #workplace-view>header:has([data-suite-menu]){height:auto;min-height:68px;flex-wrap:wrap}#workplace-view>header>.overflow-x-auto{flex:1 1 220px}
 @media(max-width:480px){.suite-dialog{padding:16px}.suite-app-grid{gap:6px}.suite-app-grid img{width:52px;height:52px}.suite-app-grid button{font-size:12px;padding:14px 5px}.app-home-tools:has([data-suite-menu]){gap:5px}.topbar:has([data-suite-menu]){padding:8px 10px}.topbar:has([data-suite-menu]) .brand{font-size:17px}.topbar:has([data-suite-menu]) .brand img{width:36px;height:36px}.topbar nav:has([data-suite-menu]){flex:1}.topbar nav:has([data-suite-menu]) .icon{width:44px;height:44px;min-width:44px;min-height:44px;padding:10px}}
 @media(prefers-reduced-motion:reduce){.suite-dialog[open],.suite-activity-menu,.suite-transition img,.suite-transition .suite-count,.suite-arrival>main,.suite-arrival>#home-view,.suite-arrival>#homeView{animation:none}.suite-app-grid button:hover img{transform:none;transition:none}}
+
+/* Physical left controls and centered rewards, independent of RTL text. */
+#workplace-view>header:has([data-suite-menu]){display:grid;direction:ltr;grid-template-columns:44px 44px 44px minmax(0,1fr) 148px;gap:8px;align-items:center}
+#workplace-view>header>[data-suite-settings]{grid-column:1;grid-row:1}
+#workplace-view>header>[data-suite-menu]{grid-column:2;grid-row:1}
+#workplace-view>header>[data-suite-apps]{grid-column:3;grid-row:1}
+#workplace-view>header>#stars-container{grid-column:1/-1;grid-row:1;justify-self:center;direction:rtl;pointer-events:none}
+@media(max-width:680px){#workplace-view>header>#stars-container{grid-row:2;margin:0 auto 4px;max-width:100%;flex-wrap:wrap;justify-content:center}}

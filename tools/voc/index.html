@@ -149,7 +149,7 @@
 
     <div id="workplace-view" class="h-full w-full flex flex-col hidden bg-slate-50">
         
-        <header class="bg-white border-b border-slate-200 px-3 py-2 flex items-center justify-between z-20 shadow-sm gap-2 h-[68px] flex-shrink-0">
+        <header class="bg-white border-b border-slate-200 px-3 py-2 flex items-center justify-start z-20 shadow-sm gap-2 h-[68px] flex-shrink-0">
             
             <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
                 <button onclick="app.switchView('home')" class="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition active:scale-95" title="الرئيسية">
@@ -906,21 +906,33 @@
                 }
             },
 
+            getCardAudio() {
+                if (!this.workplaceAudio) {
+                    this.workplaceAudio = new Audio();
+                    this.workplaceAudio.preload = 'auto';
+                }
+                return this.workplaceAudio;
+            },
+
+            primeCardAudio() {
+                this.stopCardPlayback();
+                const audio = this.getCardAudio();
+                audio.src = 'data:audio/wav;base64,UklGRrQBAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YZABAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA';
+                // Play on the initiating tap, before the asynchronous countdown.
+                audio.play().catch(() => {});
+            },
+
             playAudioForItem(item) {
                 if (!item) return;
-                
                 this.stopCardPlayback();
-                const audio = new Audio(item.audio); this.cardAudio = audio;
-                audio.onended = () => {if(this.cardAudio===audio)this.cardAudio=null;};
-                audio.play().catch(() => {
-                    if (this.cardAudio !== audio || this.state.deleteMode) return;
-                    if ('speechSynthesis' in window) {
-                        window.speechSynthesis.cancel();
-                        const utterance = new SpeechSynthesisUtterance(item.name);
-                        utterance.lang = 'ar-SA';
-                        utterance.rate = 0.9;
-                        window.speechSynthesis.speak(utterance);
-                    }
+                const audio = this.getCardAudio(), ticket = this.cardAudioToken;
+                this.cardAudio = audio;
+                audio.src = item.audio;
+                audio.onended = () => { if (ticket === this.cardAudioToken) this.cardAudio = null; };
+                return audio.play().then(() => ticket === this.cardAudioToken).catch(() => {
+                    if (ticket !== this.cardAudioToken || this.state.deleteMode) return false;
+                    this.showToast('تعذّر تشغيل الصوت. اضغط إعادة الصوت للمحاولة مجدداً.', 'warning');
+                    return false;
                 });
             },
 
@@ -954,7 +966,8 @@
             },
 
             stopCardPlayback() {
-                this.cardAudio?.pause(); this.cardAudio = null;
+                this.cardAudioToken = (this.cardAudioToken || 0) + 1;
+                this.workplaceAudio?.pause(); this.cardAudio = null;
                 window.speechSynthesis?.cancel();
             },
 

@@ -2,6 +2,7 @@
 (() => {
  'use strict';
  const appId=document.currentScript.dataset.app;
+ const stickyLists=['voc','senb'].includes(appId);
  const apps={voc:{name:'كلماتي مع حمادة',logo:'images/logo.webp'},senb:{name:'1 2 3 احكي',logo:'assets/icons/logo.webp'},taffaha:{name:'تف فا حة',logo:'assets/icons/logo.webp'}};
  const base=new URL('../',document.currentScript.src),storageKey='voc-children-v1';
  const urlFor=id=>new URL(`../${id}/index.html`,base);
@@ -19,7 +20,7 @@
  function dialog(id,title){const d=document.createElement('dialog');d.id=id;d.className='suite-dialog';d.dir='rtl';d.setAttribute('aria-labelledby',id+'-title');const header=document.createElement('header'),h=document.createElement('h2');h.id=id+'-title';h.textContent=title;const close=button('إغلاق','close');close.onclick=()=>d.close();header.append(h,close);d.append(header);document.body.append(d);d.addEventListener('click',e=>{if(e.target!==d)return;const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();});return d;}
  let picker,bar,missing,leaving=false,trigger,transitionTimer,settings;
  function pause(){window.dispatchEvent(new Event('suite-navigation-open'));window.dispatchEvent(new Event(`${appId}-profile-open`));}
- function closeBar(){if(!bar)return;bar.hidden=true;document.querySelectorAll('[data-suite-menu]').forEach(b=>b.setAttribute('aria-expanded','false'));}
+ function closeBar(force=false){if(!bar||(stickyLists&&force!==true))return;bar.hidden=true;document.querySelectorAll('[data-suite-menu]').forEach(b=>b.setAttribute('aria-expanded','false'));}
  function travel(url,id){
   if(leaving)return;leaving=true;pause();closeBar();document.querySelectorAll('dialog[open]').forEach(d=>d.close());
   try{sessionStorage.setItem('speech-app-arrival',id);}catch{}
@@ -59,13 +60,13 @@
   return [['الرئيسية',()=>typeof app!=='undefined'?app.switchView('home'):local('index.html')()],['بدء العمل',()=>typeof app!=='undefined'?app.switchView('workplace'):local('index.html?workplace=1')()],['المطابقة',local('matching.html')],['الذاكرة',local('memory.html')],['البطاقات السريعة',local('rapid.html')],['استمع واختر',local('test.html')],['تقرير الطفل',()=>window.VocReports.open()]];
  }
  function openMenu(b){
-  if(bar&&!bar.hidden){closeBar();return;}closeSettings();pause();trigger=b;
+  if(bar&&!bar.hidden){closeBar(true);return;}closeSettings();pause();trigger=b;
   if(!bar){bar=document.createElement('nav');bar.id='suite-activity-menu';bar.className='suite-activity-menu';bar.setAttribute('aria-label','التنقل داخل التطبيق');bar.hidden=true;document.body.append(bar);}
   bar.replaceChildren(...activityItems().map(([label,action])=>{const item=document.createElement('button');item.type='button';item.textContent=label;item.onclick=()=>{closeBar();action();};return item;}));
   bar.hidden=false;bar.style.top=Math.min(b.closest('header')?.getBoundingClientRect().bottom||b.getBoundingClientRect().bottom,innerHeight-60)+'px';b.setAttribute('aria-expanded','true');bar.querySelector('button').focus();
  }
- function closeSettings(restoreFocus=false){
-  if(!settings)return;settings.panel.hidden=true;settings.button.setAttribute('aria-expanded','false');
+ function closeSettings(restoreFocus=false,force=false){
+  if(!settings||(stickyLists&&force!==true))return;settings.panel.hidden=true;settings.button.setAttribute('aria-expanded','false');
   if(restoreFocus)settings.button.focus();
  }
  function initSettings(){
@@ -77,7 +78,7 @@
   const workplace=appId==='taffaha'?document.body:document.getElementById(appId==='senb'?'workplaceView':'workplace-view');
   const isWorkplace=()=>appId==='taffaha'?['practice','test'].includes(document.body.dataset.screen):!workplace.classList.contains('hidden');
   function sync(){
-   const active=isWorkplace();toggle.hidden=!active;if(active===settings.active)return;settings.active=active;closeSettings();
+   const active=isWorkplace();toggle.hidden=!active;if(active===settings.active)return;settings.active=active;closeSettings(false,true);
    if(active){
     const nodes=appId==='senb'?[document.getElementById('clearBoardBtn'),document.getElementById('workplaceHeaderToolbar'),host.querySelector('[data-senb-child-profile]')]:[...host.children].filter(node=>node!==toggle&&!node.matches('[data-suite-apps],[data-suite-menu],#stars-container'));
     settings.entries=nodes.filter(Boolean).map(node=>{const marker=document.createComment('workplace control');node.before(marker);panel.append(node);return {node,marker};});
@@ -85,7 +86,7 @@
    }else{for(const {node,marker}of settings.entries){marker.replaceWith(node);}settings.entries=[];}
   }
   function position(){panel.style.top=Math.min(host.closest('header').getBoundingClientRect().bottom+8,innerHeight-80)+'px';panel.style.maxHeight=Math.max(100,innerHeight-parseFloat(panel.style.top)-16)+'px';}
-  toggle.onclick=()=>{if(!panel.hidden){closeSettings();return;}closeBar();position();panel.hidden=false;toggle.setAttribute('aria-expanded','true');panel.querySelector('button:not([hidden]):not(:disabled)')?.focus();};
+  toggle.onclick=()=>{if(!panel.hidden){closeSettings(false,true);return;}closeBar();position();panel.hidden=false;toggle.setAttribute('aria-expanded','true');panel.querySelector('button:not([hidden]):not(:disabled)')?.focus();};
   document.addEventListener('click',event=>{
    if(panel.hidden)return;
    if(!panel.contains(event.target)&&!toggle.contains(event.target))closeSettings();
@@ -103,7 +104,7 @@
   }
   initSettings();
   document.addEventListener('click',e=>{if(bar&&!bar.hidden&&!bar.contains(e.target)&&!e.target.closest('[data-suite-menu]'))closeBar();});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&bar&&!bar.hidden){closeBar();trigger?.focus();}else if(bar&&!bar.hidden&&['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){const buttons=[...bar.querySelectorAll('button')],index=buttons.indexOf(document.activeElement);if(index<0)return;e.preventDefault();buttons[e.key==='Home'?0:e.key==='End'?buttons.length-1:(index+(e.key==='ArrowLeft'?1:-1)+buttons.length)%buttons.length].focus();}});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&bar&&!bar.hidden&&!stickyLists){closeBar();trigger?.focus();}else if(bar&&!bar.hidden&&['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){const buttons=[...bar.querySelectorAll('button')],index=buttons.indexOf(document.activeElement);if(index<0)return;e.preventDefault();buttons[e.key==='Home'?0:e.key==='End'?buttons.length-1:(index+(e.key==='ArrowLeft'?1:-1)+buttons.length)%buttons.length].focus();}});
   window.addEventListener('resize',closeBar);window.addEventListener('pagehide',()=>{closeBar();clearTimeout(transitionTimer);document.body.classList.remove('suite-transition-active');});window.addEventListener('pageshow',event=>{if(!event.persisted)return;clearTimeout(transitionTimer);leaving=false;document.body.classList.remove('suite-transition-active');document.getElementById('suite-transition')?.remove();});
   try{if(sessionStorage.getItem('speech-app-arrival')===appId){sessionStorage.removeItem('speech-app-arrival');document.body.classList.add('suite-arrival');setTimeout(()=>document.body.classList.remove('suite-arrival'),650);}}catch{}
   function route(){
