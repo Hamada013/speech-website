@@ -16,7 +16,7 @@ assert.equal(p.workspace(), null);
 p.saveWorkspace({ isAdvancedMode: true, row1Slots: [] });
 p.saveDraft({ id: 'resumable', phase: 'repetition', index: 3 });
 voc.saveWorkspace({ slots: ['1_1'] });
-voc.record('receptive', [{ key: '1_1', correct: true }]);
+for(const level of ['easy','moderate','advanced'])voc.record('receptive', [{ key: '1_1', correct: true }],level);
 assert.equal(saved().children.find(child => child.id === childId).senb.draft.index, 3, 'A stale VOC tab must retain SENB data');
 p.saveLesson({ text: 'ماما وبابا، خلّونا نلعب سوا.' });
 assert.deepEqual(saved().children.find(child => child.id === childId).workspace, { slots: ['1_1'] }, 'A stale SENB tab must retain VOC workspace');

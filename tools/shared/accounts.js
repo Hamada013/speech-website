@@ -9,7 +9,9 @@
   if(!isAdmin(owner)||data.active!==ownerId||!target||isAdmin(target))return false;
   data.deletedChildren={...data.deletedChildren,[targetId]:new Date().toISOString()};
   data.children=data.children.filter(child=>child.id!==targetId);if(data.active===targetId)data.active=null;
-  try{storage.setItem(KEY,JSON.stringify(data));return true;}catch{return false;}
+  try{storage.setItem(KEY,JSON.stringify(data));}catch{return false;}
+  for(const app of ['voc','senb','taffaha'])try{storage.removeItem?.(`speech-homework-v1:${app}:${encodeURIComponent(targetId)}`);}catch{}
+  return true;
  }
  if(typeof module!=='undefined')module.exports={remove};
  if(!root.document)return;

@@ -47,25 +47,58 @@ function navigateTo(viewName) {
     window.SenbSplit?.orientation();
 }
 
+let templatePanelBar = null;
+function closeTemplateDropdown(restoreFocus = false) {
+    document.getElementById('templateDropdown').classList.add('hidden');
+    const toggle = document.getElementById('templateToggleBtn');
+    toggle.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) toggle.focus({ preventScroll: true });
+}
+function positionTemplateDropdown() {
+    const dropdown = document.getElementById('templateDropdown');
+    if (dropdown.classList.contains('hidden')) return;
+    const toggle = document.getElementById('templateToggleBtn');
+    const bar = toggle.closest('.suite-settings-panel') || toggle.closest('header');
+    if (!toggle.getClientRects().length || bar?.hidden) { closeTemplateDropdown(); return; }
+    const anchor = toggle.getBoundingClientRect(), bounds = (bar || toggle).getBoundingClientRect();
+    const width = Math.min(280, innerWidth - 24), top = bounds.bottom + 8;
+    Object.assign(dropdown.style, {
+        width: `${width}px`, top: `${top}px`,
+        left: `${Math.max(12, Math.min(anchor.right - width, innerWidth - width - 12))}px`,
+        maxHeight: `${Math.max(44, innerHeight - top - 12)}px`
+    });
+}
 function toggleTemplateDropdown() {
     const dropdown = document.getElementById('templateDropdown');
-    const hidden = dropdown.classList.toggle('hidden');
-    document.getElementById('templateToggleBtn').setAttribute('aria-expanded', String(!hidden));
+    if (!dropdown.classList.contains('hidden')) { closeTemplateDropdown(); return; }
+    // Keep the choices outside the wrapping toolbar and its scroll container.
+    dropdown.classList.add('senb-template-panel');
+    document.body.append(dropdown);
+    dropdown.classList.remove('hidden');
+    document.getElementById('templateToggleBtn').setAttribute('aria-expanded', 'true');
+    const bar = document.getElementById('templateToggleBtn').closest('.suite-settings-panel');
+    if (bar && bar !== templatePanelBar) {
+        templatePanelBar = bar;
+        new MutationObserver(() => { if (bar.hidden) closeTemplateDropdown(); }).observe(bar, { attributes: true, attributeFilter: ['hidden'] });
+    }
+    positionTemplateDropdown();
+    (dropdown.querySelector('[aria-pressed="true"]') || dropdown.querySelector('button'))?.focus({ preventScroll: true });
 }
+window.addEventListener('resize', () => requestAnimationFrame(positionTemplateDropdown));
+document.addEventListener('scroll', positionTemplateDropdown, true);
+window.addEventListener('pagehide', () => closeTemplateDropdown());
 
 document.addEventListener('click', (e) => {
     const dropdown = document.getElementById('templateDropdown');
-    if (!e.target.closest('#templateControl') && dropdown && !dropdown.classList.contains('hidden')) {
-        dropdown.classList.add('hidden');
-        document.getElementById('templateToggleBtn').setAttribute('aria-expanded', 'false');
+    if (!e.target.closest('#templateControl') && dropdown && !dropdown.contains(e.target) && !dropdown.classList.contains('hidden')) {
+        closeTemplateDropdown();
     }
 });
 
 function setSlotCount(count) {
     state.deleteMode=false;
     state.slotCount = count;
-    document.getElementById('templateDropdown').classList.add('hidden');
-    document.getElementById('templateToggleBtn').setAttribute('aria-expanded', 'false');
+    closeTemplateDropdown(true);
     applyWorkplaceSettings({ slotCount: count });
 }
 
@@ -206,6 +239,7 @@ function renderWorkplace({persist = true} = {}) {
     renderSlotRow('slotsRow1', 1);
     renderWorkplaceMetronome();
     renderAdvancedSentenceNavigation();
+    if(state.currentView==='workplace'&&window.SessionHomework){const sentence=getWorkplaceSentence();if(sentence)SessionHomework.record({activity:'بناء الجمل',label:sentence.title,entity:'sentence'});}
     if (persist) { window.SenbSplit?.refresh(); if (workplaceInitialized && window.SenbProgress) SenbProgress.saveWorkspace(workplaceStateSnapshot()); }
 }
 
@@ -752,6 +786,7 @@ function getWorkplaceSentence() {
 
 // Fixed playAudioFilePath to ensure strict synchrony by preventing overlapping double-resolves if a file fails to load
 function playAudioFilePath(path, fallbackSpeechText) {
+    const homeworkActivity=state.currentView==='activity'&&activity?ACTIVITY_NAMES[activity.mode]:'تدريب الكلمات والجمل';
     playbackRequestId++;
     // Stop a previous individual tap and settle its promise before reusing the element.
     if (finishActivePlayback) finishActivePlayback();
@@ -772,6 +807,7 @@ function playAudioFilePath(path, fallbackSpeechText) {
             playbackAudio.onerror = null;
             playbackAudio.pause();
             if (finishActivePlayback === finish) finishActivePlayback = null;
+            if(completed&&fallbackSpeechText)window.SessionHomework?.record({activity:homeworkActivity,label:fallbackSpeechText,entity:String(fallbackSpeechText).trim().includes(' ')?'sentence':'word'});
             resolve(completed);
         };
         // A missing or stalled media response must never leave the play button locked.
@@ -981,10 +1017,10 @@ function showAudioStatus(message) {
 document.addEventListener('keydown', event => {
     const modal = document.querySelector('[role="dialog"]:not(.hidden)');
     if (event.key === 'Escape') {
+        if (!document.getElementById('templateDropdown').classList.contains('hidden')) { closeTemplateDropdown(true); event.preventDefault(); event.stopImmediatePropagation(); return; }
         if(state.deleteMode&&!modal){state.deleteMode=false;renderWorkplace();document.getElementById('clearBoardBtn').focus();event.preventDefault();return;}
         if (modal) closePicker(modal.id);
-        document.getElementById('templateDropdown').classList.add('hidden');
-        document.getElementById('templateToggleBtn').setAttribute('aria-expanded', 'false');
+        closeTemplateDropdown();
         return;
     }
     if (event.key === 'Tab' && modal) {

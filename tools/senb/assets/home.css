@@ -59,7 +59,7 @@
     padding: 11px;
     border: 0;
     border-radius: 15px;
-    background: #edf5fa;
+    background: transparent;
     color: #0278b4;
     cursor: pointer;
 }
@@ -113,11 +113,11 @@
 :is(#homeView, #home-view) .app-home-action > span:last-child { font-size: inherit; line-height: inherit; }
 :is(#homeView, #home-view) .app-home-action:hover { border-color: #92cce6; background: #fbfeff; }
 :is(#homeView, #home-view) .app-home-action:active { transform: scale(.96); }
-:is(#homeView, #home-view) .app-home-action-icon { display: grid; place-items: center; width: clamp(48px, 8dvh, 72px); height: clamp(48px, 8dvh, 72px); flex-shrink: 0; border-radius: 25px; background: #e4f5ff; color: #0284c7; }
+:is(#homeView, #home-view) .app-home-action-icon { display: grid; place-items: center; width: clamp(48px, 8dvh, 72px); height: clamp(48px, 8dvh, 72px); flex-shrink: 0; background: transparent; color: #0284c7; }
 :is(#homeView, #home-view) .app-home-action-icon svg { display: block; width: 36px; height: 36px; stroke-width: 1.6; }
-:is(#homeView, #home-view) .app-home-action:nth-child(2) .app-home-action-icon { background: #e7f7ed; color: #418c60; }
-:is(#homeView, #home-view) .app-home-action:nth-child(3) .app-home-action-icon { background: #fff3d5; color: #a66a00; }
-:is(#homeView, #home-view) .app-home-action:nth-child(4) .app-home-action-icon { background: #f1eafb; color: #8660ad; }
+:is(#homeView, #home-view) .app-home-action:nth-child(2) .app-home-action-icon { color: #418c60; }
+:is(#homeView, #home-view) .app-home-action:nth-child(3) .app-home-action-icon { color: #a66a00; }
+:is(#homeView, #home-view) .app-home-action:nth-child(4) .app-home-action-icon { color: #8660ad; }
 :is(#homeView, #home-view) .app-home-screen--four .app-home-logo { width: clamp(64px, 11dvh, 112px); height: clamp(64px, 11dvh, 112px); }
 :is(#homeView, #home-view) .app-home-screen--four .app-home-action { padding: clamp(10px, 1.8dvh, 18px); font-size: clamp(16px, 2.5dvh, 21px); gap: 8px; }
 :is(#homeView, #home-view) .app-home-screen--four .app-home-action-icon { width: clamp(40px, 6dvh, 56px); height: clamp(40px, 6dvh, 56px); border-radius: 18px; }

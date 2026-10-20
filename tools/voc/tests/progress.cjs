@@ -2,11 +2,31 @@ const assert = require('node:assert/strict');
 const { create, STORAGE } = require('../assets/progress.js');
 const map = new Map(); const storage = { getItem: key => map.get(key), setItem: (key, value) => map.set(key, value) };
 let p = create(storage); p.signIn('  سارة  '); const first = p.active().id;
-p.record('receptive', [{ key: '1_1', correct: true }, { key: '1_1', correct: false }]);
-p.record('expressive', [{ key: '1_1', correct: true }]);
-assert.equal(p.mastered('1_1'), false, '80%/mixed responses cannot earn 100% mastery');
-p.record('receptive', [{ key: '1_1', correct: true }, { key: '1_1', correct: true }]);
-assert.equal(p.mastered('1_1'), true, 'Both domains are required');
+const pass = (domain, level, key = '1_1') => p.record(domain, [{ key, correct: true }], level);
+// Untiered old/workplace scores cannot establish all-difficulty mastery.
+pass('receptive'); pass('expressive');
+assert.equal(p.mastered('1_1'), false);
+for (const level of ['easy', 'moderate', 'advanced']) pass('receptive', level);
+assert.equal(p.mastered('1_1', 'receptive'), true);
+assert.equal(p.mastered('1_1', 'expressive'), false);
+assert.equal(p.mastered('1_1'), false, 'Skills qualify independently');
+assert.equal(p.inLibrary('1_1', 'receptive'), true);
+assert.equal(p.inLibrary('1_1', 'expressive'), false);
+assert.equal(p.inLibrary('1_1', null, 'expressive'), true, 'Keep comprehension-only words available for naming');
+assert.equal(p.inLibrary('1_1', null, 'receptive'), false);
+pass('expressive', 'easy'); pass('expressive', 'moderate');
+p.record('expressive', [{ key: '1_1', correct: true }, { key: '1_1', correct: false }], 'advanced');
+assert.equal(p.mastered('1_1'), false, 'All attempts at every level must pass');
+pass('expressive', 'unknown'); assert.equal(p.mastered('1_1'), false);
+pass('expressive', 'advanced'); assert.equal(p.mastered('1_1'), true);
+p.record('expressive', [{ key: '1_1', correct: false }], 'easy');
+assert.equal(p.mastered('1_1'), true, 'A previously earned pass is retained');
+for (const [index, level] of ['easy', 'moderate', 'advanced'].entries()) {
+ assert.equal(p.assessmentDifficulty('receptive', {level: [2,4,6][index]}, 6), level);
+ assert.equal(p.assessmentDifficulty('expressive', {duration: [6,4,2][index]}, 1), level);
+}
+assert.equal(p.assessmentDifficulty('receptive', {level:6}, 2), null, 'An undersized board cannot earn advanced credit');
+assert.equal(p.assessmentDifficulty('expressive', {duration:0}, 1), null, 'Untimed practice is not a difficulty pass');
 p.saveWorkspace({ slotsCount: 2, slots: ['1_1', '1_2'], practiced: '1_1|1_2' });
 p.signIn('عمر'); assert.equal(p.mastered('1_1'), false); assert.equal(p.active().workspace, null);
 assert.notEqual(p.scope('draft'), `draft-child-${first}`);
@@ -51,3 +71,17 @@ p.startPlan(['1_2'],'easy',['memory']);plan=p.active().plan;p.advancePlan(plan.i
 assert.deepEqual(p.active().homeLesson.evidence,[],'Practice-only plans must not invent assessment results');
 assert.ok(lessonText('عمر',p.active().homeLesson,[{key:'1_2',name:'تفاحة'}]).includes('ما سجّلنا استجابة'));
 console.log('Completed-plan home lessons preserve separate, session-specific comprehension/production evidence.');
+
+// Old combined passed flags lack evidence of the new difficulty criteria.
+const legacy = JSON.parse(map.get(STORAGE));
+legacy.children.find(child => child.id === first).words['1_99'] = {receptive:{passed:true},expressive:{passed:true}};
+map.set(STORAGE, JSON.stringify(legacy)); p = create(storage);
+assert.equal(p.mastered('1_99'), false);
+assert.equal(p.mastered('1_99', 'receptive'), false);
+console.log('Separate learned libraries require all three tested difficulties; legacy flags cannot qualify.');
+
+const tabA = create(storage), tabB = create(storage);
+tabA.record('receptive', [{key:'1_98',correct:true}], 'easy');
+tabB.record('receptive', [{key:'1_98',correct:true}], 'advanced');
+tabA.record('receptive', [{key:'1_98',correct:true}], 'moderate');
+assert.equal(create(storage).mastered('1_98', 'receptive'), true, 'Concurrent tabs retain each earned difficulty');

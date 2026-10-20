@@ -9,7 +9,7 @@
 .suite-settings-panel #templateDropdown>div:last-child{display:grid;grid-template-columns:repeat(5,minmax(44px,1fr))}
 .suite-settings-panel #templateDropdown{width:auto;min-width:260px}
 .suite-settings-panel button:focus-visible{outline:3px solid #0284c7;outline-offset:2px}
-.suite-icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;min-width:44px;width:44px;min-height:44px;height:44px;padding:10px;border:1px solid #dceaf4;border-radius:14px;background:#f2f8fc;color:#22445a;cursor:pointer;box-sizing:border-box}.suite-icon svg{width:23px;height:23px}.suite-icon:focus-visible,.suite-dialog button:focus-visible,.suite-activity-menu button:focus-visible,.suite-report-links button:focus-visible{outline:3px solid #0284c7;outline-offset:2px}
+.suite-icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;min-width:44px;width:44px;min-height:44px;height:44px;padding:10px;border:0;border-radius:12px;background:transparent;color:#22445a;cursor:pointer;box-sizing:border-box}.suite-icon svg{width:23px;height:23px}.suite-icon:focus-visible,.suite-dialog button:focus-visible,.suite-activity-menu button:focus-visible,.suite-report-links button:focus-visible{outline:3px solid #0284c7;outline-offset:2px}
 .suite-dialog{box-sizing:border-box;width:min(560px,calc(100% - 24px));max-height:85dvh;margin:auto;padding:20px;border:1px solid #dceaf4;border-radius:28px;background:white;color:#22445a;font-family:system-ui,-apple-system,Segoe UI,Tahoma,Arial,sans-serif;box-shadow:0 24px 90px #22445a33;overflow:auto}.suite-dialog[open]{animation:suite-pop .3s ease-out}.suite-dialog::backdrop{background:#22445a66;backdrop-filter:blur(5px)}.suite-dialog header{display:flex;justify-content:space-between;align-items:center;gap:12px}.suite-dialog h2{font-size:21px;margin:0}.suite-dialog p{font-size:15px;line-height:1.9}.suite-app-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:22px}.suite-app-grid button{min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;background:#f8fbfd;border:1px solid #dceaf4;border-radius:22px;padding:18px 8px;color:#22445a;font:700 14px/1.6 system-ui;cursor:pointer}.suite-app-grid button:nth-child(2){background:#f0faf4}.suite-app-grid button:nth-child(3){background:#fff8eb}.suite-app-grid button[aria-current]{box-shadow:inset 0 0 0 2px #80b7d2}.suite-app-grid img{width:72px;height:72px;object-fit:contain}.suite-app-grid button:hover img{transform:translateY(-4px) rotate(-5deg);transition:transform .2s}
 .suite-activity-menu{position:fixed;inset-inline:12px;z-index:80;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:8px auto 0;padding:12px;max-width:960px;max-height:60dvh;overflow:auto;border:1px solid #dceaf4;border-radius:20px;background:#fff;box-shadow:0 15px 40px #22445a26;animation:suite-drop .22s ease-out;font-family:system-ui, sans-serif}.suite-activity-menu[hidden]{display:none}.suite-activity-menu button,.suite-create{min-height:44px;padding:10px 16px;border:1px solid #dceaf4;border-radius:13px;background:#f0f7fc;color:#22445a;font:700 14px system-ui;cursor:pointer}.suite-activity-menu button:hover{background:#e3f3ea}
 .suite-report-links{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.suite-report-links button{display:flex;align-items:center;justify-content:center;gap:8px;flex:1 1 120px;min-width:44px;min-height:48px;padding:8px;border:1px solid #dceaf4;border-radius:14px;background:#f8fbfd;font:700 12px/1.5 system-ui;color:#22445a;cursor:pointer}.suite-report-links img{width:30px;height:30px;object-fit:contain}.suite-report-links button[aria-current]{background:#e8f5ee;border-color:#badbc9;opacity:1}.suite-report-links button span{min-width:0}
@@ -31,3 +31,26 @@ body.suite-transition-active>:not(#suite-transition):not(script):not(style):not(
 #workplace-view>header>[data-suite-apps]{grid-column:3;grid-row:1}
 #workplace-view>header>#stars-container{grid-column:1/-1;grid-row:1;justify-self:center;direction:rtl;pointer-events:none}
 @media(max-width:680px){#workplace-view>header>#stars-container{grid-row:2;margin:0 auto 4px;max-width:100%;flex-wrap:wrap;justify-content:center}}
+
+/* Plain action icons throughout the suite. Keep colored artwork, learning
+   cues, answer feedback and selected cards in their app-specific styles. */
+:is(.app-home-action-icon,.home-action-icon,.hub-icon,.home-menu-symbol,.category-symbol,.word-category-symbol,.word-category-chevron,.word-level-mark,.level-mark){background:transparent!important;border-radius:0!important;box-shadow:none!important}
+:is(.suite-icon,[data-suite-control],.app-home-icon,.activity-icon-button,.icon-button,.voc-icon,.icon,.icon-action,.suite-settings-panel button[title]){background:transparent!important;border-color:transparent!important;box-shadow:none!important;color:#22445a!important;touch-action:manipulation}
+:is(.suite-icon,[data-suite-control],.app-home-icon,.activity-icon-button,.icon-button,.voc-icon,.icon,.icon-action,.suite-settings-panel button[title])[aria-pressed=true]{box-shadow:inset 0 -2px #0284c7!important}
+.suite-toolbar{direction:rtl}
+.suite-toolbar [data-suite-control]{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;flex:0 0 44px;width:44px;height:44px;min-width:44px;min-height:44px;max-width:44px;padding:10px;border:0;border-radius:12px;gap:0;text-decoration:none;cursor:pointer}
+.suite-toolbar [data-suite-control][hidden],.suite-toolbar [data-suite-control].hidden{display:none!important}
+.suite-toolbar [data-suite-control]>svg{display:block;width:23px;height:23px;flex-shrink:0}
+.suite-toolbar [data-suite-control]>i,.suite-settings-panel .child-button>i{display:block;background:transparent!important;border-radius:0;padding:0;font-size:21px;color:inherit}
+.suite-toolbar [data-suite-control=profile]>span,.suite-toolbar .game-back>span{display:none}
+.suite-toolbar [data-suite-control]:focus-visible{outline:3px solid #0284c7;outline-offset:2px}
+.game-header.suite-toolbar{justify-content:flex-start;gap:8px;font-family:system-ui,-apple-system,Segoe UI,Tahoma,Arial,sans-serif}
+.game-header.suite-toolbar .game-brand{margin-inline-end:auto;min-width:0}
+.game-header.suite-toolbar .game-brand h1{color:#22445a;font-size:24px;font-weight:800}
+.suite-toolbar #homeHeaderTools{gap:8px}
+.suite-settings-panel :is(.child-button,.senb-child-button){border-color:transparent;background:transparent;color:#22445a}
+.test-mode-grid .home-menu-card{border:1px solid #dceaf4;border-radius:28px;background:white;color:#22445a;box-shadow:0 12px 40px #276b8f0c}
+.test-mode-grid .home-menu-symbol{display:grid;place-items:center;color:#0284c7}
+.test-mode-grid .home-menu-symbol svg{width:36px;height:36px;stroke-width:1.6}
+.test-mode-grid .home-menu-card:nth-child(2) .home-menu-symbol{color:#418c60}
+@media(max-width:480px){.game-header.suite-toolbar .game-brand{flex:1 0 100%}.game-header.suite-toolbar .game-brand h1{font-size:20px}.suite-toolbar #homeHeaderTools{gap:5px}}

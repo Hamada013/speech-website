@@ -1,5 +1,12 @@
 /* Identical feedback and count-up in every speech app. */
 (() => {
+ // Safari may retain :focus-visible when a pointer opens a dialog and script
+ // moves focus. Track the input method without blurring controls or text fields.
+ const setInput = value => { document.documentElement.dataset.suiteInput = value; };
+ document.addEventListener('pointerdown', () => setInput('pointer'), { capture: true, passive: true });
+ document.addEventListener('keydown', event => {
+  if (event.key === 'Tab' || (!event.altKey && !event.ctrlKey && !event.metaKey)) setInput('keyboard');
+ }, true);
  const symbols={yes:'<path d="m5 12 4 4L19 6"/>',no:'<path d="m6 6 12 12M18 6 6 18"/>'};
  const svg=path=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
  let counting=null,feedback=null;

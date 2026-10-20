@@ -15,7 +15,9 @@
     const items = bank.categories.flatMap(category => category.items);
     const byKey = new Map(items.map(item => [item.key, item]));
     const prefix = P.scope(`hamada-game-${mode}`);
-    let learnedOnly = false;
+    let learnedDomain = null;
+    const learningDomain = mode === 'test' ? 'receptive' : mode === 'rapid' ? 'expressive' : null;
+    const inLibrary = item => P.inLibrary(item, learnedDomain, learningDomain);
     let activePlan = null;
     let advanceTimer = null;
     const audio = $('#game-audio');
@@ -53,9 +55,17 @@
     }
     function save() {
         if (!session) return;
+        captureHomework();
         collectTime();
         if (['active', 'feedback', 'between'].includes(phase)) runningSince = performance.now();
         store(`${prefix}-draft`, session);
+    }
+    function captureHomework() {
+        const domain=mode==='test'?'receptive':mode==='rapid'?'expressive':null;
+        window.SessionHomework?.capture({id:session.sessionId||`${mode}-${session.created}`,activity:meta.title||({matching:'المطابقة',memory:'الذاكرة',rapid:'البطاقات السريعة',test:'استمع واختر'})[mode],kind:domain?'assessment':'practice',domain,
+            records:session.records.map(record=>({key:record.key,label:byKey.get(record.key)?.name,
+                correct:Number(mode==='rapid'?record.result==='mastered':record.result==='correct'&&record.attempts===1),
+                total:domain&&!['viewed','skip'].includes(record.result)?1:0,needsHelp:['notMastered','learning','skip'].includes(record.result)||record.attempts>1}))});
     }
     function stopAudio() { ++audioGeneration; cancelAudioEnd?.(); audio.pause(); }
     function clearWork() {
@@ -117,9 +127,10 @@
     function filteredItems() {
         const query = M.normalize($('#word-search').value.trim());
         return (query ? items.filter(item => M.normalize(item.name).includes(query))
-            : bank.categories.find(category => String(category.id) === categoryId).items).filter(item => P.mastered(item) === learnedOnly);
+            : bank.categories.find(category => String(category.id) === categoryId).items).filter(item => inLibrary(item));
     }
     function refreshSelection() {
+        selected = new Set([...selected].filter(key => inLibrary(key)));
         const visible = filteredItems(), pageCount = Math.max(1, Math.ceil(visible.length / 24));
         page = Math.min(page, pageCount - 1);
         $('#selection-grid').replaceChildren();
@@ -144,7 +155,7 @@
     function updatePreview() {
         const visible = filteredItems();
         $('#select-category').setAttribute('aria-pressed', String(visible.length > 0 && visible.every(item => selected.has(item.key))));
-        $('#select-everything').setAttribute('aria-pressed', String(items.filter(item => P.mastered(item) === learnedOnly).every(item => selected.has(item.key))));
+        $('#select-everything').setAttribute('aria-pressed', String(items.filter(item => inLibrary(item)).every(item => selected.has(item.key))));
         const unique = M.uniqueItems(items.filter(item => selected.has(item.key)));
         const config = settings();
         const count = mode === 'memory' ? Math.min(config.level, unique.length) : Math.min(config.length, unique.length);
@@ -276,6 +287,7 @@
         ready = results.every(Boolean);
         phase = session.between ? 'between' : 'active'; runningSince = performance.now();
         if (!ready) { feedback('تعذر تحميل صورة. أعد التحميل أو نزّل المحتوى من الرئيسية. يمكنك إنهاء الجلسة دون احتسابها نجاحاً.', true); $('#reload-media').hidden = false; enableControls(); return; }
+        if(mode!=='memory')window.SessionHomework?.record({activity:({matching:'المطابقة',rapid:'البطاقات السريعة',test:'استمع واختر'})[mode],key:target.key,label:target.name});
         if (session.between) { feedback('أحسنت! أكملت هذه المجموعة.'); if (activePlan) later(() => { session.between = false; void renderCurrent(); }, 650); else $('#next-round').hidden = false; enableControls(); return; }
         if (session.guide && !session.guide.done) { void runGuide(ticket); return; }
         feedback(mode === 'test' ? 'استمع إلى الكلمة ثم المس صورتها.' : meta.description);
@@ -332,6 +344,7 @@
                 if (!$('#game-feedback').classList.contains('error')) feedback('تعذر إكمال الصوت. اضغط «أعد سماع الكلمة» للمحاولة مجدداً.', true);
                 enableControls(); return;
             }
+            window.SessionHomework?.record({activity:`التعرّف على كلمات ${meta.title}`,key,label:byKey.get(key).name});
             if (mode === 'test') all('#game-board > button').forEach(button => button.classList.toggle('guide-glow', button.dataset.key === key));
             await new Promise(resolve => later(resolve, 900));
             if (ticket !== generation) return;
@@ -389,6 +402,7 @@
         const target = session.order[session.position]; session.attempts++;
         const button = all('#game-board > button').find(card => card.dataset.key === key);
         if (key !== target) {
+            window.SessionHomework?.record({activity:meta.title,key:target,label:byKey.get(target).name,needsHelp:true});
             session.mistakes++; session.trialMistakes++; missed(target); button.classList.add('wrong');
             feedback('حاول مرة أخرى. يمكنك سماع الكلمة مجدداً.', true);
             if (mode === 'test') {
@@ -464,6 +478,7 @@
     }
     function flip(index, ticket) {
         if (ticket !== generation || phase !== 'active' || !ready || session.open.includes(index) || session.matched.includes(session.deck[index].key)) return;
+        const item=byKey.get(session.deck[index].key);window.SessionHomework?.record({activity:'الذاكرة',key:item.key,label:item.name});
         session.open.push(index); lastKey = session.deck[index].key;
         if (session.open.length === 2) {
             session.moves++;
@@ -474,6 +489,7 @@
                 if (session.settings.sound) void playWord(first.key);
                 if (session.position === session.order.length) { phase = 'feedback'; later(() => finish(false), 650); }
             } else {
+                for(const card of [first,second])window.SessionHomework?.record({activity:'لعبة الذاكرة',key:card.key,label:byKey.get(card.key).name,needsHelp:true});
                 session.mistakes++; missed(first.key); missed(second.key); session.pendingMismatch = true; phase = 'feedback';
                 feedback('صورتان مختلفتان. تذكّر مكانهما وحاول مجدداً.'); later(closeMismatch, 800);
             }
@@ -527,15 +543,19 @@
     }
     function finish(partial) {
         if (!session || session.finished) return;
+        captureHomework();
         clearWork(); phase = 'results'; session.finished = true;
         const summary = M.summarize(session, partial); store(`${prefix}-last`, summary); store(`${prefix}-draft`, null);
         const domain = mode === 'rapid' ? 'expressive' : mode === 'test' ? 'receptive' : null;
-        P.logSession({ id: session.sessionId || `${mode}-${session.created}`, started: session.created, source: mode, domain, kind: mode === 'test' || (mode === 'rapid' && !session.autoPlay) ? 'assessment' : 'practice', partial,
+        const difficulty = domain ? P.assessmentDifficulty(domain, session.settings, M.uniqueItems(session.pool.map(key => byKey.get(key))).length) : null;
+        P.logSession({ id: session.sessionId || `${mode}-${session.created}`, started: session.created, source: mode, domain, difficulty, kind: mode === 'test' || (mode === 'rapid' && !session.autoPlay) ? 'assessment' : 'practice', partial,
             records: session.records.map(record => ({ key: record.key,
                 correct: domain && !['viewed','skip'].includes(record.result) ? (mode === 'rapid' ? Number(record.result === 'mastered') : Number(record.result === 'correct' && record.attempts === 1)) : 0,
                 total: domain && record.result !== 'viewed' ? 1 : 0 })) });
+        if (mode === 'test' && !partial && !session.review) P.completeWordLevel(P.active()?.workspace?.wordLevel,
+            session.records.map(record => ({ key: record.key, correct: record.result === 'correct' && record.attempts === 1 })), true);
         if (activePlan && !partial) {
-            if (!session.review && domain) P.record(domain, session.records.filter(record => record.result !== 'viewed').map(record => ({ key: record.key, correct: mode === 'rapid' ? record.result === 'mastered' : record.result === 'correct' && record.attempts === 1 })));
+            if (!session.review && domain) P.record(domain, session.records.filter(record => record.result !== 'viewed').map(record => ({ key: record.key, correct: mode === 'rapid' ? record.result === 'mastered' : record.result === 'correct' && record.attempts === 1 })), difficulty);
             P.advancePlan(activePlan.id, activePlan.position, domain ? { domain, records: session.records.filter(record => !['viewed', 'skip'].includes(record.result)).map(record => ({ key: record.key, correct: mode === 'rapid' ? record.result === 'mastered' : record.result === 'correct' && record.attempts === 1 })) } : null);
             show('play'); $('#game-board').replaceChildren(); $('#active-match').replaceChildren();
             location.replace(P.planURL()); return;
@@ -555,7 +575,7 @@
         if (!partial && !session.review && ['rapid', 'test'].includes(mode)) {
             P.record(mode === 'rapid' ? 'expressive' : 'receptive', session.records.filter(record => record.result !== 'viewed').map(record => ({
                 key: record.key, correct: mode === 'rapid' ? record.result === 'mastered' : record.result === 'correct' && record.attempts === 1
-            })));
+            })), difficulty);
         }
         if (activePlan && partial) stopPlan();
         show('results'); $('#results-title').focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: 'instant' });
@@ -574,7 +594,7 @@
         : mode === 'memory' ? 'ابدأ بزوجين، ثم زد العدد تدريجياً. الصور المخفية لا تظهر أسماؤها لقارئ الشاشة.'
             : mode === 'test' ? 'يجب تشغيل الكلمة قبل الإجابة. تُحتسب الدقة من أول اختيار، حتى لو نجح الطفل بعد المحاولة مجدداً.' : 'يمكن المطابقة باللمس أو بالسحب أو بلوحة المفاتيح. كل جلسة تنتهي بنتيجة واضحة.';
     const preferences = read(`${prefix}-preferences`);
-    selected = new Set((Array.isArray(preferences?.selected) ? preferences.selected : bank.categories[0].items.slice(0, 6).map(item => item.key)).filter(key => byKey.has(key) && !P.mastered(key)));
+    selected = new Set((Array.isArray(preferences?.selected) ? preferences.selected : bank.categories[0].items.slice(0, 6).map(item => item.key)).filter(key => byKey.has(key) && inLibrary(key)));
     if (preferences?.settings) {
         const p = preferences.settings;
         if ([2, 4, 6].includes(p.level)) pick('game-level', p.level);
@@ -592,7 +612,7 @@
         const visible = filteredItems(), clear = visible.every(item => selected.has(item.key));
         visible.forEach(item => clear ? selected.delete(item.key) : selected.add(item.key)); refreshSelection(); selectionPreferences();
     });
-    $('#select-everything').addEventListener('click', () => { const available = items.filter(item => P.mastered(item) === learnedOnly); selected = available.every(item => selected.has(item.key)) ? new Set() : new Set(available.map(item => item.key)); refreshSelection(); selectionPreferences(); });
+    $('#select-everything').addEventListener('click', () => { const available = items.filter(item => inLibrary(item)); selected = available.every(item => selected.has(item.key)) ? new Set() : new Set(available.map(item => item.key)); refreshSelection(); selectionPreferences(); });
     $('#rapid-autoplay').addEventListener('click', () => {
         if (mode !== 'rapid' || !session || !['active', 'loading', 'feedback'].includes(phase)) return;
         session.autoPlay = !session.autoPlay; session.rapidRemaining = null; save(); void renderCurrent();
@@ -630,11 +650,20 @@
             const button = all('#game-board > button')[Number(event.key) - 1]; if (button && !button.disabled) { event.preventDefault(); button.click(); }
         }
     });
-    const library = document.createElement('button'); library.type = 'button'; library.className = 'game-button icon-button voc-book';
-    library.id = 'game-learned-library'; library.hidden = P.isAdmin(); library.setAttribute('aria-label', 'البطاقات المتقنة'); library.setAttribute('aria-pressed', 'false');
-    library.innerHTML = '<i class="fas fa-book-open" aria-hidden="true"></i>';
-    $('#word-bank-title').after(library);
-    library.addEventListener('click', () => { learnedOnly = !learnedOnly; library.setAttribute('aria-pressed', String(learnedOnly)); selected.clear(); page = 0; refreshSelection(); selectionPreferences(); });
+    const libraries = [];
+    for (const [domain, label] of [['receptive', 'الكلمات المتقنة في الفهم'], ['expressive', 'الكلمات المتقنة في التعبير']]) {
+        const library = document.createElement('button'); library.type = 'button'; library.className = 'game-button icon-button voc-book';
+        library.id = `game-learned-library-${domain}`; library.dataset.learnedDomain = domain; library.hidden = P.isAdmin();
+        library.setAttribute('aria-label', label); library.title = label; library.setAttribute('aria-pressed', 'false');
+        library.innerHTML = domain === 'receptive' ? '<i class="fas fa-ear-listen" aria-hidden="true"></i>'
+            : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12c3-1 5-5 7-3l2 1 2-1c2-2 4 2 7 3-3 6-15 6-18 0Z"/><path d="M3 12c6 2 12 2 18 0"/></svg>';
+        (libraries.at(-1) || $('#word-bank-title')).after(library); libraries.push(library);
+        library.addEventListener('click', () => {
+            learnedDomain = learnedDomain === domain ? null : domain;
+            libraries.forEach(control => control.setAttribute('aria-pressed', String(control.dataset.learnedDomain === learnedDomain)));
+            selected.clear(); page = 0; refreshSelection(); selectionPreferences();
+        });
+    }
     const planBanner = document.createElement('div'); planBanner.className = 'voc-plan-banner'; planBanner.hidden = true;
     const planText = document.createElement('span'); planText.textContent = 'مسار الألعاب · نفس بطاقات مساحة العمل';
     const cancelPlan = document.createElement('button'); cancelPlan.className = 'voc-choice'; cancelPlan.textContent = 'إيقاف المسار'; cancelPlan.type = 'button';

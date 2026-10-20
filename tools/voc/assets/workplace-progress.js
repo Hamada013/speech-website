@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let practiced = P.active()?.workspace?.practiced || null;
     let worked = P.active()?.workspace?.worked || [];
     let lastResult = P.active()?.workspace?.lastResult || null;
-    let learnedOnly = false;
+    let wordLevel = P.active()?.workspace?.wordLevel || null;
+    let learnedDomain = null;
     let records = [];
     let hadMistake = false;
     let promptQueue = [];
@@ -20,10 +21,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const save = () => {
         if (restoring || changingProfile) return;
         if (practiced !== signature()) practiced = null;
-        P.saveWorkspace({ slotsCount: app.state.slotsCount, slots: app.state.slotsData.map(slot => slot.item ? P.key(slot.item) : null), practiced, lastResult, worked });
+        if (wordLevel && [...wordLevel.keys].sort().join('|') !== signature()) wordLevel = null;
+        P.saveWorkspace({ slotsCount: app.state.slotsCount, slots: app.state.slotsData.map(slot => slot.item ? P.key(slot.item) : null), practiced, lastResult, worked, wordLevel });
     };
     const render = app.renderSlotsContent;
-    app.renderSlotsContent = function() { render.call(this); save(); };
+    app.renderSlotsContent = function() {
+        render.call(this);save();
+        if(this.state.view==='workplace')for(const slot of this.state.slotsData)if(slot.item)window.SessionHomework?.record({activity:'تدريب الكلمات',key:P.key(slot.item),label:slot.item.name});
+    };
     const saved = P.active()?.workspace;
     if (saved && Number.isInteger(saved.slotsCount) && saved.slotsCount >= 1 && saved.slotsCount <= 9) {
         app.state.slotsCount = saved.slotsCount;
@@ -33,28 +38,38 @@ document.addEventListener('DOMContentLoaded', () => {
     app.state.stars = 0; app.renderStars(); restoring = false;
     window.addEventListener('voc-profile-beforechange', () => { if(app.state.deleteMode)app.setDeleteMode(false);save(); app.exitTestMode(false); changingProfile = true; });
     window.addEventListener('pagehide', () => { save(); logRun(true); });
-    window.addEventListener('voc-profile-memorychange', () => { app.state.deleteMode=false;app.syncDeleteMode();changingProfile = false; practiced = null; lastResult = null; worked = []; app.resetSlots(); app.renderSlotsContent(); });
+    window.addEventListener('voc-profile-memorychange', () => { app.state.deleteMode=false;app.syncDeleteMode();changingProfile = false; practiced = null; lastResult = null; worked = []; wordLevel = null; app.resetSlots(); app.renderSlotsContent(); });
+    window.addEventListener('voc-workplace-level-load', event => { practiced = null; lastResult = null; worked = []; wordLevel = event.detail || null; save(); });
     if (new URLSearchParams(location.search).has('workplace')) app.switchView('workplace');
 
     const title = document.querySelector('#category-modal h2');
-    const book = document.createElement('button'); book.type = 'button'; book.className = 'child-button voc-book'; book.id = 'learned-library';
-    book.setAttribute('aria-label', 'البطاقات المتقنة'); book.title = 'البطاقات المتقنة'; book.setAttribute('aria-pressed', 'false'); book.innerHTML = '<i class="fas fa-book-open" aria-hidden="true"></i>';
-    const titleGroup = document.createElement('div'); titleGroup.style.cssText = 'display:flex;align-items:center;gap:10px';
-    title.before(titleGroup); titleGroup.append(title, book); book.hidden = P.isAdmin();
-    book.addEventListener('click', () => {
-        learnedOnly = !learnedOnly; book.setAttribute('aria-pressed', String(learnedOnly));
-        title.textContent = learnedOnly ? 'البطاقات المتقنة' : 'اختر صورة للبطاقة';
-        app.handleSearch(document.querySelector('#search-input').value);
-    });
+    const titleGroup = document.createElement('div'); titleGroup.style.cssText = 'display:flex;align-items:center;gap:8px;flex:1;min-width:0';
+    title.before(titleGroup); titleGroup.append(title); title.style.cssText = 'flex:1;min-width:0';
+    const libraries = [];
+    for (const [domain, label] of [['receptive', 'الكلمات المتقنة في الفهم'], ['expressive', 'الكلمات المتقنة في التعبير']]) {
+        const button = document.createElement('button'); button.type = 'button'; button.className = 'voc-choice voc-icon voc-book';
+        button.id = `learned-library-${domain}`; button.dataset.learnedDomain = domain;
+        button.setAttribute('aria-label', label); button.title = label; button.setAttribute('aria-pressed', 'false');
+        button.innerHTML = domain === 'expressive'
+            ? '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12c3-1 5-5 7-3l2 1 2-1c2-2 4 2 7 3-3 6-15 6-18 0Z"/><path d="M3 12c6 2 12 2 18 0"/></svg>'
+            : '<i class="fas fa-ear-listen" aria-hidden="true"></i>';
+        titleGroup.append(button); libraries.push(button); button.hidden = P.isAdmin();
+        button.addEventListener('click', () => {
+            learnedDomain = learnedDomain === domain ? null : domain;
+            libraries.forEach(control => control.setAttribute('aria-pressed', String(control.dataset.learnedDomain === learnedDomain)));
+            title.textContent = learnedDomain === 'receptive' ? 'كلمات الفهم' : learnedDomain === 'expressive' ? 'كلمات التعبير' : 'اختر صورة للبطاقة';
+            app.handleSearch(document.querySelector('#search-input').value);
+        });
+    }
     const renderItems = app.renderItemsGrid;
-    app.renderItemsGrid = function(items) { renderItems.call(this, items.filter(item => P.mastered(item) === learnedOnly)); };
+    app.renderItemsGrid = function(items) { renderItems.call(this, items.filter(item => P.inLibrary(item, learnedDomain))); };
     const open = app.modals.open;
     app.modals.open = function(id) { if (id === 'category-modal') app.handleSearch(document.querySelector('#search-input').value); open.call(this, id); };
     // Single-card browsing obeys the same learned-library filter as the picker.
     app.navigateTemplateOne = function(direction) {
         if (this.state.slotsCount !== 1 || this.state.testState.active || this.state.deleteMode) return;
         const slot = this.state.slotsData[0];
-        const pool = CATEGORIES.find(c => c.id === (slot.item?.catId || this.state.activeCategory))?.items.filter(item => P.mastered(item) === learnedOnly) || [];
+        const pool = CATEGORIES.find(c => c.id === (slot.item?.catId || this.state.activeCategory))?.items.filter(item => P.inLibrary(item, learnedDomain)) || [];
         if (!pool.length) return;
         const at = pool.findIndex(item => P.key(item) === P.key(slot.item || ''));
         slot.item = pool[(at + direction + pool.length) % pool.length];
@@ -112,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const correct = records.filter(record => record.correct).length;
             const percentage = Math.round(correct / Math.max(1, records.length) * 100);
             if (mode === 'practice') practiced = signature();
-            else { P.record('receptive', records); lastResult = { percentage, correct, total: records.length, date: new Date().toISOString() }; }
+            else { P.record('receptive', records); P.completeWordLevel(wordLevel, records, true); lastResult = { percentage, correct, total: records.length, date: new Date().toISOString() }; }
             logRun(false);
             this.exitTestMode(false); this.state.stars = 0; this.renderStars(); save();
             worked=[...new Set([...worked,...keys()])];save();
@@ -137,6 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const trial = this.state.testState, item = this.state.slotsData[index]?.item;
         if (!trial.active || trial.answering || !item || !trial.targetItem) return;
         const correct = P.key(item) === P.key(trial.targetItem);
+        window.SessionHomework?.record({activity:this.state.mode==='practice'?'تدريب فهم الكلمات':'اختبار فهم الكلمات',key:P.key(trial.targetItem),label:trial.targetItem.name,
+            kind:correct&&this.state.mode!=='practice'?'assessment':'practice',domain:'receptive',correct:Number(!hadMistake),total:correct?1:0,needsHelp:!correct||hadMistake});
         if (correct) { records.push({ key: P.key(trial.targetItem), correct: !hadMistake }); hadMistake = false; }
         else hadMistake = true;
         answer.call(this, index);

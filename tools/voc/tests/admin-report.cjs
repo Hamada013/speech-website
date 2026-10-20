@@ -5,7 +5,7 @@ const map = new Map(); const storage = { getItem: key => map.get(key), setItem: 
 const p = create(storage);
 assert.equal(p.children().find(child=>child.name==='Hamada').role,'admin');
 p.signIn('سارة'); const childId=p.active().id;
-p.record('receptive',[{key:'1_1',correct:true}]);p.record('expressive',[{key:'1_1',correct:true}]);assert.equal(p.mastered('1_1'),true);
+for(const domain of ['receptive','expressive'])for(const level of ['easy','moderate','advanced'])p.record(domain,[{key:'1_1',correct:true}],level);assert.equal(p.mastered('1_1'),true);
 const now=new Date(2026,9,17,14,0);
 const dates=[new Date(2026,9,17,10),new Date(2026,9,12,10),new Date(2026,8,25,10),new Date(2026,7,1,10)];
 for(let i=0;i<dates.length;i++) p.logSession({id:`session-${i}`,date:dates[i].toISOString(),source:'test',kind:'assessment',domain:'receptive',records:[{key:'1_1',correct:i?1:3,total:i?2:4}]});
@@ -15,7 +15,7 @@ p.logSession({id:'session-0',date:dates[0].toISOString(),source:'test',records:[
 assert.equal(p.reportChildren(childId)[0].id,childId,'Each child can read their own report');
 assert.equal(p.reportChildren('another-child')[0].id,childId,'A regular profile cannot select another child report');
 const before=JSON.stringify(p.active().words);p.signIn(' HAMADA ');assert.equal(p.isAdmin(),true);assert.equal(p.mastered('1_1'),false);
-p.record('receptive',[{key:'1_1',correct:true}]);p.record('expressive',[{key:'1_1',correct:true}]);assert.deepEqual(p.active().words,{});
+for(const domain of ['receptive','expressive'])for(const level of ['easy','moderate','advanced'])p.record(domain,[{key:'1_1',correct:true}],level);assert.deepEqual(p.active().words,{});
 const children=p.reportChildren(childId);assert.equal(children.length,1);assert.equal(JSON.stringify(children[0].words),before);
 for(const [period,count]of[['day',3],['week',4],['month',5],['all',6]]){
  const result=R.summarize(children,period,now);assert.equal(result.sessions,count,period);

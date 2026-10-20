@@ -102,8 +102,14 @@
     <link rel="stylesheet" href="assets/flow-ui.css">
     <script defer src="assets/flow-ui.js"></script>
     <script defer src="assets/accounts.js"></script>
+    <link rel="stylesheet" href="assets/session-homework.css">
+    <script defer src="assets/session-homework.js" data-app="voc"></script>
     <link rel="stylesheet" href="assets/app-navigation.css">
     <script defer src="assets/app-navigation.js" data-app="voc"></script>
+    <link rel="stylesheet" href="assets/workplace-levels.css">
+    <script defer src="assets/game-data.js"></script>
+    <script defer src="assets/word-levels.js"></script>
+    <script defer src="assets/workplace-levels.js"></script>
 </head>
 <body class="text-baby-textDark font-sans h-full w-full flex flex-col antialiased bg-slate-50">
 
@@ -928,7 +934,10 @@
                 const audio = this.getCardAudio(), ticket = this.cardAudioToken;
                 this.cardAudio = audio;
                 audio.src = item.audio;
-                audio.onended = () => { if (ticket === this.cardAudioToken) this.cardAudio = null; };
+                audio.onended = () => { if (ticket === this.cardAudioToken) {
+                    this.cardAudio = null;
+                    window.SessionHomework?.record({activity:'التعرّف على الكلمات والاستماع',key:VocProgress.key(item),label:item.name});
+                } };
                 return audio.play().then(() => ticket === this.cardAudioToken).catch(() => {
                     if (ticket !== this.cardAudioToken || this.state.deleteMode) return false;
                     this.showToast('تعذّر تشغيل الصوت. اضغط إعادة الصوت للمحاولة مجدداً.', 'warning');

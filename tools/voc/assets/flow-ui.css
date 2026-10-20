@@ -9,3 +9,7 @@
 .suite-account-list .suite-delete{border:1px solid #f0d7d3;background:#fff5f4;color:#a43c38;cursor:pointer}
 .suite-delete svg{display:block;width:22px;height:22px}
 .suite-account-list button:focus-visible{outline:3px solid #0284c7;outline-offset:2px}
+
+/* Pointer focus is retained for interaction and assistive technology; only the
+   keyboard-style outline is hidden. Text entry and selected/error states stay intact. */
+html[data-suite-input="pointer"] :is(button,a[href],[role="button"],[role="tab"],[role="option"],[tabindex]):focus:not(:is(input,textarea,select,[contenteditable]:not([contenteditable="false"]))) {outline:none!important;}

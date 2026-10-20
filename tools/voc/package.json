@@ -13,12 +13,13 @@
     "test:delete:browser": "node ../tests/delete-mode-browser.cjs",
     "test:report-charts": "node ../tests/acquisition-reports.cjs",
     "test:report-charts:browser": "node ../tests/acquisition-reports-browser.cjs",
-    "test": "node tests/static.cjs && node tests/games-model.cjs && node tests/progress.cjs && node tests/admin-report.cjs",
+    "test": "node tests/static.cjs && node tests/games-model.cjs && node tests/progress.cjs && node tests/admin-report.cjs && node tests/word-levels.cjs",
     "test:browser": "node tests/games-browser.cjs && node tests/pwa-browser.cjs",
     "test:progress:browser": "node tests/progress-browser.cjs && node tests/guided-browser.cjs",
     "test:admin:browser": "node tests/admin-browser.cjs",
     "test:accounts:browser": "node ../tests/accounts-browser.cjs",
-    "test:suite:browser": "node ../tests/suite-navigation-browser.cjs"
+    "test:suite:browser": "node ../tests/suite-navigation-browser.cjs",
+    "test:levels:browser": "node tests/word-levels-browser.cjs"
   },
   "devDependencies": {
     "playwright": "1.56.1",

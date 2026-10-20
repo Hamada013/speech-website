@@ -17,11 +17,15 @@ const server = http.createServer((req,res)=>{
  try{
  const context=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});
  const page=await context.newPage(); page.setDefaultTimeout(15000); page.setDefaultNavigationTimeout(20000); const errors=[]; page.on('pageerror',error=>errors.push(error.message));
+ const openProfile = async () => {
+   if (!await page.locator('[data-child-profile]:visible').count()) await page.locator('[data-suite-settings]').click();
+   await page.locator('[data-child-profile]:visible').first().click(); await solveParentGate(page);
+ };
  await page.goto(origin+'index.html'); await page.locator('#child-dialog[open]').waitFor();
  assert.equal(await page.locator('#child-close').isHidden(),true); await page.keyboard.press('Escape'); assert.equal(await page.locator('#child-dialog').evaluate(dialog=>dialog.open),true);
  await page.locator('#child-name').fill('سارة'); await page.locator('#child-dialog button[type=submit]').click();
  await page.waitForFunction(()=>window.VocProgress?.active()?.name==='سارة'&&!document.querySelector('#child-dialog[open]'));
- assert.equal(await page.locator('[data-child-profile]').first().innerText().then(s=>s.trim()),'سارة');
+ assert.equal(await page.locator('[data-child-profile] span').first().textContent().then(s=>s.trim()),'سارة');
  await page.evaluate(()=>{app.switchView('workplace');app.setTemplate(2);app.state.slotsData.forEach((slot,i)=>slot.item=CATEGORIES[0].items[i]);app.renderSlotsContent();});
  const complete=async(mode,wrong=false)=>page.evaluate(async({mode,wrong})=>{
    await app.handleModeButtonClick(mode);
@@ -62,22 +66,62 @@ const server = http.createServer((req,res)=>{
  await page.waitForFunction(()=>app.state.slotsData[0]?.item);
  assert.equal(await page.evaluate(()=>app.state.slotsCount),2);
  await page.evaluate(()=>{app.state.activeSlotForSelection=0;app.modals.open('category-modal');});
- assert.equal(await page.locator('#items-grid img[src="images/1/1.webp"]').count(),0,'Mastered card hidden from normal bank');
- await page.locator('#learned-library').click(); assert.equal(await page.locator('#items-grid img[src="images/1/1.webp"]').count(),1);
+ assert.equal(await page.locator('#items-grid img[src="images/1/1.webp"]').count(),1,'One advanced naming pass and untiered workplace tests do not establish mastery');
+ assert.deepEqual(await page.evaluate(()=>VocProgress.active().words['1_1'].expressive.levels),{advanced:true},'Completed advanced plan records the naming difficulty');
+ await page.locator('#learned-library-receptive').click();
+ assert.equal(await page.locator('#items-grid img[src="images/1/1.webp"]').count(),0);
+ await page.locator('#learned-library-expressive').click();
+ assert.equal(await page.locator('#learned-library-receptive').getAttribute('aria-pressed'),'false');
+ assert.equal(await page.locator('#items-grid img[src="images/1/1.webp"]').count(),0);
+ await page.evaluate(()=>{for(const level of ['easy','moderate','advanced'])VocProgress.record('receptive',[{key:'1_1',correct:true}],level);});
+ await page.locator('#learned-library-receptive').click();
+ assert.equal(await page.locator('#items-grid img[src="images/1/1.webp"]').count(),1,'Ear library needs only comprehension passes');
+ await page.locator('#learned-library-expressive').click();
+ assert.equal(await page.locator('#items-grid img[src="images/1/1.webp"]').count(),0,'Mouth library remains independent');
+ await page.evaluate(()=>{for(const level of ['easy','moderate'])VocProgress.record('expressive',[{key:'1_1',correct:true}],level);});
+ await page.locator('#learned-library-expressive').click(); // Normal bank
+ assert.equal(await page.locator('#items-grid img[src="images/1/1.webp"]').count(),0,'Both skills completed: move out of ordinary workspace bank');
+ await page.locator('#learned-library-expressive').click();
+ assert.equal(await page.locator('#items-grid img[src="images/1/1.webp"]').count(),1);
  await page.screenshot({path:'/private/tmp/voc-learned-library.png'});
  await page.locator('#items-grid button:has(img[src="images/1/1.webp"])').click();
  await page.waitForTimeout(250);
- await page.locator('#workplace-view [data-child-profile]').click(); await solveParentGate(page);
+ await openProfile();
  await page.locator('#child-name').fill('عمر'); await page.locator('#child-dialog button[type=submit]').click();
  await page.waitForFunction(()=>window.VocProgress?.active()?.name==='عمر');
  assert.equal(await page.evaluate(()=>VocProgress.mastered('1_1')),false);
  assert.equal(await page.evaluate(()=>app.state.slotsData.filter(s=>s.item).length),0,'No workspace leaks between children');
- await page.locator('[data-child-profile]:visible').first().click(); await solveParentGate(page); await page.locator('#saved-children button').filter({hasText:'سارة'}).click();
+ await openProfile(); await page.locator('#saved-children button').filter({hasText:'سارة'}).click();
  await page.waitForFunction(()=>window.VocProgress?.active()?.name==='سارة');
  assert.equal(await page.evaluate(()=>VocProgress.mastered('1_1')),true); assert.equal(await page.evaluate(()=>app.state.slotsCount),2);
+ for(const game of ['test','rapid','matching','memory']) {
+   await page.goto(origin+game+'.html');
+   await page.evaluate(()=>{
+     for(const level of ['easy','moderate','advanced']) {
+       VocProgress.record('receptive',[{key:'1_2',correct:true}],level);
+       VocProgress.record('expressive',[{key:'1_3',correct:true}],level);
+     }
+   });
+   await page.locator('#game-learned-library-receptive').click();
+   assert.equal(await page.locator('#selection-grid [data-key="1_2"]').count(),1);
+   assert.equal(await page.locator('#selection-grid [data-key="1_3"]').count(),0);
+   await page.locator('#game-learned-library-expressive').click();
+   assert.equal(await page.locator('#game-learned-library-receptive').getAttribute('aria-pressed'),'false');
+   assert.equal(await page.locator('#selection-grid [data-key="1_2"]').count(),0);
+   assert.equal(await page.locator('#selection-grid [data-key="1_3"]').count(),1);
+ }
+ await page.goto(origin+'index.html?workplace=1');
+ await page.evaluate(()=>{app.state.activeSlotForSelection=0;app.modals.open('category-modal');});
+ await page.locator('#learned-library-expressive').click();
+ const earBox = await page.locator('#learned-library-receptive').boundingBox(), mouthBox = await page.locator('#learned-library-expressive').boundingBox();
+ assert.ok(Math.abs(earBox.y-mouthBox.y)<2,'Both learned controls stay together on mobile');
+ assert.ok(earBox.width>=44 && mouthBox.width>=44,'Touch targets remain accessible');
+ await page.waitForTimeout(250); // Let the picker opening transition finish before capturing it.
+ await page.screenshot({path:'/private/tmp/voc-learned-library.png'});
+ await page.evaluate(()=>app.modals.close('category-modal')); await page.waitForTimeout(250);
  console.log('Profile persistence and library passed');
  // Switching names must never interpolate markup.
- await page.locator('[data-child-profile]:visible').first().click(); await solveParentGate(page); await page.locator('#child-name').fill('<img src=x onerror=alert(1)>'); await page.locator('#child-dialog button[type=submit]').click();
+ await openProfile(); await page.locator('#child-name').fill('<img src=x onerror=alert(1)>'); await page.locator('#child-dialog button[type=submit]').click();
  await page.waitForFunction(()=>window.VocProgress?.active()?.name.startsWith('<img'));
  assert.equal(await page.locator('[data-child-profile] img').count(),0);
  console.log('Safe profile names passed');

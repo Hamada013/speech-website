@@ -3,6 +3,14 @@
     'use strict';
     const STORAGE = 'voc-children-v1';
     const modes = ['matching', 'memory', 'rapid', 'test'];
+    const difficulties = ['easy', 'moderate', 'advanced'];
+    // Listening difficulty is the actual choice count; naming uses the response timer.
+    function assessmentDifficulty(domain, settings, poolSize) {
+        const index = domain === 'receptive'
+            ? (poolSize >= settings.level ? [2, 4, 6].indexOf(settings.level) : -1)
+            : domain === 'expressive' ? [6, 4, 2].indexOf(settings.duration) : -1;
+        return difficulties[index] || null;
+    }
     function create(storage, onError = () => {}) {
         const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
         const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -23,15 +31,22 @@
                 const before = baseline.children.find(saved => saved.id === child.id);
                 let saved = merged.children.find(entry => entry.id === child.id);
                 if (!saved) { merged.children.push(clone(child)); continue; }
-                for (const field of ['name', 'role', 'created', 'apps', 'words', 'workspace', 'plan', 'sessions', 'homeLesson']) {
+                for (const field of ['name', 'role', 'created', 'apps', 'words', 'workspace', 'plan', 'sessions', 'homeLesson', 'wordLevels']) {
                     if (same(child[field], before?.[field])) continue;
                     if (field === 'apps') { saved.apps = { ...saved.apps, ...Object.fromEntries(Object.entries(child.apps || {}).filter(([, value]) => value === true)) }; }
                     else if (field === 'words') {
                         saved.words ||= {};
                         for (const [key, word] of Object.entries(child.words || {})) {
                             saved.words[key] ||= {};
-                            for (const [domain, result] of Object.entries(word)) if (!same(result, before?.words?.[key]?.[domain])) saved.words[key][domain] = clone(result);
+                            for (const [domain, result] of Object.entries(word)) if (!same(result, before?.words?.[key]?.[domain])) {
+                                // Separate tabs may earn different levels of the same skill.
+                                const levels = { ...saved.words[key][domain]?.levels, ...result.levels };
+                                saved.words[key][domain] = { ...clone(result), levels, passed: difficulties.every(level => levels[level] === true) };
+                            }
                         }
+                    } else if (field === 'wordLevels') {
+                        saved.wordLevels ||= {};
+                        for (const [id, level] of Object.entries(child.wordLevels || {})) if (!same(level, before?.wordLevels?.[id])) saved.wordLevels[id] = clone(level);
                     } else if (field === 'sessions') {
                         const sessions = new Map((saved.sessions || []).map(session => [session.id, session]));
                         for (const session of child.sessions || []) {
@@ -63,11 +78,38 @@
             }
             child.created ||= child.sessions.map(session => session.date).filter(Boolean).sort()[0] || null;
         }
-        if (!data.deletedAdmin && !data.children.some(child => child.role === 'admin')) data.children.push({ id: 'hamada-admin', name: 'Hamada', role: 'admin', created: new Date().toISOString(), words: {}, workspace: null, plan: null, sessions: [] });
+        if (!data.children.some(child => child.role === 'admin')) data.children.push({ id: 'hamada-admin', name: 'Hamada', role: 'admin', created: new Date().toISOString(), words: {}, workspace: null, plan: null, sessions: [] });
         const active = () => data.children.find(child => child.id === data.active) || null;
         const isAdmin = () => active()?.role === 'admin';
         const key = item => typeof item === 'string' ? item : `${item.catId}_${item.id}`;
-        const mastered = item => { const word = !isAdmin() && active()?.words[key(item)]; return !!(word?.receptive?.passed && word?.expressive?.passed); };
+        const mastered = (item, domain) => {
+            const word = !isAdmin() && active()?.words[key(item)];
+            const passed = skill => difficulties.every(level => word?.[skill]?.levels?.[level] === true);
+            return domain ? ['receptive', 'expressive'].includes(domain) && passed(domain) : passed('receptive') && passed('expressive');
+        };
+        const inLibrary = (item, domain = null, learningDomain = null) => domain
+            ? mastered(item, domain) : !mastered(item, learningDomain);
+        const sameKeys = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && [...a].sort().join('|') === [...b].sort().join('|');
+        const wordLevelCompleted = level => {
+            const saved = active()?.wordLevels?.[level?.id];
+            return !isAdmin() && saved?.completed === true && sameKeys(saved.keys, level?.keys);
+        };
+        const wordLevelUnlocked = level => {
+            if (!level || !active()) return false;
+            if (isAdmin() || !level.previousId) return true;
+            const previous = active().wordLevels?.[level.previousId];
+            return previous?.completed === true && sameKeys(previous.keys, level.previousKeys);
+        };
+        function completeWordLevel(level, records, completed = false) {
+            if (!completed || !active() || isAdmin() || !level || typeof level.id !== 'string' || !Array.isArray(level.keys) || level.keys.length < 2 || !wordLevelUnlocked(level)) return false;
+            const workspace = active().workspace;
+            if (workspace?.wordLevel?.id !== level.id || !sameKeys(workspace.slots?.filter(Boolean), level.keys)) return false;
+            if (!Array.isArray(records) || !records.length || records.some(record => !level.keys.includes(record.key) || record.correct !== true)
+                || !level.keys.every(key => records.some(record => record.key === key))) return false;
+            active().wordLevels ||= {};
+            active().wordLevels[level.id] = { completed: true, keys: [...level.keys], categoryId: level.categoryId, date: new Date().toISOString() };
+            return persist();
+        }
         function signIn(name) {
             data.children = data.children.filter(child => !read()?.deletedChildren?.[child.id]);
             name = String(name || '').normalize('NFKC').trim().replace(/\s+/g, ' ').slice(0, 60);
@@ -79,14 +121,16 @@
             child.apps = { ...(child.apps || { voc: !!child.words, senb: !!child.senb, taffaha: !!child.taffaha }), voc: true };
             data.active = child.id; persist(true); return active();
         }
-        function record(domain, records) {
+        function record(domain, records, difficulty = null) {
             if (!['receptive', 'expressive'].includes(domain) || !active() || isAdmin()) return;
             const groups = new Map();
             for (const entry of records) { const k = key(entry.key); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(entry.correct === true); }
             for (const [k, results] of groups) {
                 const word = active().words[k] ||= {};
                 const correct = results.filter(Boolean).length;
-                word[domain] = { passed: word[domain]?.passed === true || correct === results.length,
+                const levels = { ...word[domain]?.levels };
+                if (difficulties.includes(difficulty) && correct === results.length) levels[difficulty] = true;
+                word[domain] = { levels, passed: difficulties.every(level => levels[level] === true),
                     percentage: Math.round(correct / results.length * 100), correct, total: results.length, date: new Date().toISOString() };
             }
             persist();
@@ -129,7 +173,7 @@
             }
             persist(); return currentRound();
         }
-        return { key, active, isAdmin, mastered, signIn, record, logSession, startPlan, currentRound, advancePlan, storageOK: () => storageOK,
+        return { key, active, isAdmin, mastered, inLibrary, assessmentDifficulty, wordLevelCompleted, wordLevelUnlocked, completeWordLevel, signIn, record, logSession, startPlan, currentRound, advancePlan, storageOK: () => storageOK,
             children: () => data.children.map(({ id, name, role }) => ({ id, name, role })),
             reportChildren: id => {
                 if (!active()) return [];

@@ -100,8 +100,8 @@ function renderActivitySetup() {
     if (a.mode === 'test') {
         activityRoot().innerHTML = `<div class="activity-top"><h2 id="activityHeading">اختبار الطفل</h2></div>
             <div class="test-mode-picker"><p class="activity-intro">اختر نوع الاختبار</p><div class="test-mode-grid">
-            <button id="chooseComprehension" class="home-menu-card home-test" onclick="chooseActivityMode('comprehension')"><span class="home-menu-symbol" aria-hidden="true">◉</span><strong>الفهم</strong><span>استمع واختر الجملة المناسبة من أربع صور</span></button>
-            <button id="chooseExpressive" class="home-menu-card home-tasks" onclick="chooseActivityMode('expressive')"><span class="home-menu-symbol" aria-hidden="true">☏</span><strong>التعبير</strong><span>صف الصورة وحدّد الكلمات التي قالها الطفل</span></button></div></div>`;
+            <button id="chooseComprehension" class="home-menu-card home-test" onclick="chooseActivityMode('comprehension')"><span class="home-menu-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5-5 4-5 8a3 3 0 0 1-6 0M10 9a2 2 0 0 1 4 0c0 2-3 2-3 4"/></svg></span><strong>الفهم</strong><span>استمع واختر الجملة المناسبة من أربع صور</span></button>
+            <button id="chooseExpressive" class="home-menu-card home-tasks" onclick="chooseActivityMode('expressive')"><span class="home-menu-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c3-1 5-5 7-3l2 1 2-1c2-2 4 2 7 3-3 2-5 6-9 6s-6-4-9-6Zm0 0h18"/></svg></span><strong>التعبير</strong><span>صف الصورة وحدّد الكلمات التي قالها الطفل</span></button></div></div>`;
         return;
     }
     const cat = ADVANCED_CATEGORIES.find(category => Number(category.folder) === a.folder);
@@ -150,6 +150,7 @@ function slotHTML(sentence, slot, index, action = '', caption = true) {
 }
 function renderActivity() {
     const sentence = currentActivitySentence();
+    if(activity.mode!=='comprehension')window.SessionHomework?.record({activity:ACTIVITY_NAMES[activity.mode],label:sentence.title,entity:'sentence'});
     const group = ADVANCED_CATEGORIES.find(cat => Number(cat.folder) === activity.folder).subcategories.find(sub => String(sub.id) === sentence.subCatId);
     activityRoot().classList.remove('activity-centered');
     document.getElementById('activityView').classList.toggle('comprehension-session', activity.mode === 'comprehension');
@@ -318,6 +319,7 @@ async function answerComprehension(index) {
     const trial = activity.plan[activity.index];
     activity.phase = 'recorded';
     activity.results.push({ subgroup: trial.target.subCatId, item: trial.target.itemNum, chosen: SENBActivities.key(trial.choices[index]), correct: SENBActivities.key(trial.choices[index]) === SENBActivities.key(trial.target) });
+    window.SessionHomework?.record({activity:'اختبار فهم الجمل',label:trial.target.title,entity:'sentence',kind:'assessment',domain:'receptive',correct:Number(activity.results.at(-1).correct),total:1});
     document.querySelectorAll('.comprehension-option').forEach(button => { button.disabled = true; });
     document.querySelector(`[data-choice="${index}"]`).classList.add('answered');
     refreshProgress();
@@ -344,6 +346,7 @@ function toggleExpressiveWord(index, button) {
 function nextExpressiveTrial() {
     const sentence = currentActivitySentence();
     activity.results.push({ subgroup: sentence.subCatId, item: sentence.itemNum, words: activity.wordMarks.filter(Boolean).length, total: activity.folder, marks: [...activity.wordMarks] });
+    window.SessionHomework?.record({activity:'اختبار التعبير بالجمل',label:sentence.title,entity:'sentence',kind:'assessment',domain:'expressive',correct:activity.wordMarks.filter(Boolean).length,total:activity.wordMarks.length});
     stopActivityPlayback();
     if (++activity.index === activity.plan.length) return renderActivitySummary();
     activity.wordMarks = Array(activity.folder).fill(false);
@@ -417,6 +420,7 @@ function attemptGameChoice(index) {
     if (round.solved) return;
     round.attempts++;
     const correct = SENBActivities.imagePath(round.choices[index]) === SENBActivities.imagePath(round.sentence.slots[round.missingIndex]);
+    window.SessionHomework?.record({activity:'لعبة البطاقة الناقصة',label:round.sentence.title,entity:'sentence',needsHelp:!correct});
     if (correct) {
         round.solved = true;
         renderActivity();

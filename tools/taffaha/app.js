@@ -88,6 +88,7 @@ async function playSyllables(container,button,word,signal){
 function cancelFeedback(){clearTimeout(feedbackTimer);feedbackTimer=null;document.body.classList.remove('feedback-visible');if(feedbackOpen())$('answer-feedback').close();}
 $('answer-feedback').addEventListener('close',()=>{if(feedbackOpen())return;clearTimeout(feedbackTimer);feedbackTimer=null;document.body.classList.remove('feedback-visible');for(const el of $('test-answers').querySelectorAll('.is-wrong'))el.classList.remove('is-wrong');locks();});
 function showFeedback(correct,choice){
+ window.SessionHomework?.record({activity:testKind==='count'?'الصورة وعدد المقاطع':'المقاطع والصورة',key:current().id,label:current().label,syllables:current().syllables,count:current().syllableCount,kind:'assessment',domain:testKind,correct:Number(correct),total:1});
  P.record({id:crypto.randomUUID(),word:current(),mode:testKind,level,correct,firstTry:attemptsThisQuestion===0,completed:correct,sessionId});
  attemptsThisQuestion++;preferences.questionCompleted=correct;persist();
  stopPlayback();answered=correct;choice.classList.add(correct?'is-correct':'is-wrong');
@@ -169,6 +170,7 @@ function renderCurrent(){
  stopPlayback();cancelFeedback();questionSerial++;answerPending=false;answered=false;say('');
  attemptsThisQuestion=resumeAttempt?.lastWord===current().id&&resumeAttempt?.testKind===testKind&&resumeAttempt?.testLevel===level?Number(resumeAttempt.testTries)||0:0;resumeAttempt=null;preferences.questionCompleted=false;
  const word=current(),siblings=group(),position=digits(siblings.findIndex(w=>w.id===word.id)+1)+' / '+digits(siblings.length);persist();
+ if(screen!=='home')window.SessionHomework?.record({activity:screen==='practice'?(practiceRhythm?'تدريب إيقاع المقاطع':'تدريب الكلمات والمقاطع'):testKind==='count'?'الصورة وعدد المقاطع':'المقاطع والصورة',key:word.id,label:word.label,syllables:word.syllables,count:word.syllableCount});
  if(screen==='practice'){
   $('practice-screen').dataset.rhythm=String(practiceRhythm);$('rhythm-frame').hidden=!practiceRhythm;
   $('word-label').textContent=word.label;$('category').textContent=countLabel(word.syllableCount);$('position').textContent=position;loadImage($('word-image'),word.image,word.label);fillSyllables($('syllables'),word);

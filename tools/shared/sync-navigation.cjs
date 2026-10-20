@@ -1,5 +1,5 @@
 const fs=require('node:fs'),path=require('node:path');
-for(const app of ['voc','senb','taffaha'])for(const file of ['app-navigation.js','app-navigation.css','flow-ui.js','flow-ui.css','accounts.js']){
+for(const app of ['voc','senb','taffaha'])for(const file of ['app-navigation.js','app-navigation.css','flow-ui.js','flow-ui.css','accounts.js','session-homework.js','session-homework.css']){
  const source=fs.readFileSync(path.join(__dirname,file)),target=path.join(__dirname,'..',app,'assets',file);
  if(process.argv.includes('--check')){if(!fs.existsSync(target)||!source.equals(fs.readFileSync(target)))throw Error('Navigation copy is stale: '+target);}
  else fs.writeFileSync(target,source);

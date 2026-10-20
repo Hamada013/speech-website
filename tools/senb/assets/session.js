@@ -35,7 +35,15 @@
         document.querySelectorAll('.session-demo-hand,.session-drag-copy').forEach(el=>el.remove());
         document.querySelectorAll('.session-beat.lit,.session-glow,.expression-card-playing').forEach(el=>el.classList.remove('lit','session-glow','expression-card-playing'));
     }
-    function save() { if (run) P.saveDraft(JSON.parse(JSON.stringify(run))); updateResume(); }
+    function save() {
+        if (run) {
+            const records=rows=>rows.map(row=>({...row,label:row.title}));
+            window.SessionHomework?.capture({id:`${run.id}:dynamic:${run.currentStartedAt||run.current?.key}`,activity:'اختبار الفهم في مساحة العمل',kind:'assessment',records:records(run.dynamicRecords||[])});
+            window.SessionHomework?.capture({id:`${run.id}:stage:${run.stageIndex}:${run.stageStartedAt}`,activity:'تدريب واختبار الجمل',kind:'assessment',records:records(run.stageRecords||[])});
+            P.saveDraft(JSON.parse(JSON.stringify(run)));
+        }
+        updateResume();
+    }
     function stage() { return M.stages(run.worked)[run.stageIndex]; }
     function sentence() { return run.phase === 'automation' ? run.worked[stage().indices[run.stagePosition]] : run.current; }
     function setProgress(value,max) { $('#senbSessionProgress').max = Math.max(1,max); $('#senbSessionProgress').value = value; }
@@ -142,7 +150,7 @@
         if(run.phase!=='dynamic-test'||!run.answerReady||audioBusy)return;
         run.answerReady=false;$('#sessionBoard').querySelectorAll('button').forEach(el=>el.disabled=true);
         const ticket=token,target=targetAt(),correct=run.targets[index].key===target.key && run.targets[index].entity===target.entity;
-        if(!correct){run.targetWrong=true;save();if(await flash(false,ticket))void playTarget();return;}
+        if(!correct){window.SessionHomework?.record({activity:'اختبار الفهم في مساحة العمل',label:target.title,entity:target.entity,needsHelp:true});run.targetWrong=true;save();if(await flash(false,ticket))void playTarget();return;}
         run.dynamicRecords.push({key:target.key,title:target.title,entity:target.entity,domain:'receptive',presentation:target.entity==='sentence'?'advanced':'slots',correct:Number(!run.targetWrong),total:1});
         run.targetIndex++;run.targetWrong=false;run.pendingTransition='dynamic';save();
         if(await flash(true,ticket))finishDynamicTrial();
@@ -162,7 +170,7 @@
         P.logSession({id,date:ended,started:run.stageStartedAt||run.startedAt||ended,durationMs:Math.max(0,Date.parse(ended)-Date.parse(run.stageStartedAt||run.startedAt||ended)),source,kind,partial,records});run.sessionIds.push(id);return id;
     }
     function beginDynamic(snapshot) {
-        cancel();run.current=snapshot;fillTargetImages(snapshot);run.phase=run.mode==='test'?'countdown':'guide';run.guideIndex=0;run.practiced=[];run.targetIndex=0;run.dynamicRecords=[];run.targetWrong=false;run.pendingTransition=null;run.stageStartedAt=new Date().toISOString();
+        cancel();run.current=snapshot;fillTargetImages(snapshot);run.phase=run.mode==='test'?'countdown':'guide';run.guideIndex=0;run.practiced=[];run.targetIndex=0;run.dynamicRecords=[];run.targetWrong=false;run.pendingTransition=null;run.stageStartedAt=new Date().toISOString();run.currentStartedAt=run.stageStartedAt;
         save();enter();render();
     }
     function start(mode) {
@@ -392,7 +400,7 @@
     async function answerSentence(index) {
         if(audioBusy||!run.answerReady)return;run.answerReady=false;$('#sessionBoard').querySelectorAll('button').forEach(el=>el.disabled=true);
         const ticket=token,s=sentence(),correct=M.sentenceKey(run.currentChoices[index])===M.sentenceKey(s);
-        if(!correct){run.trialWrong=true;save();if(await flash(false,ticket))void promptSentence();return;}
+        if(!correct){window.SessionHomework?.record({activity:'اختبار فهم الجمل',label:s.title,entity:'sentence',needsHelp:true});run.trialWrong=true;save();if(await flash(false,ticket))void promptSentence();return;}
         const currentStage=stage();run.stageRecords.push(M.record(s,'receptive',currentStage.presentation,!run.trialWrong));run.pendingTransition='trial';save();
         if(await flash(true,ticket))nextTrial();
     }

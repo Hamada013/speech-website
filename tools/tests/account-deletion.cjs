@@ -8,7 +8,7 @@ const fixture = () => ({ schema: 1, active: 'admin', children: [
 ] });
 function memory(data = fixture()) {
     const values = new Map([[KEY, JSON.stringify(data)]]);
-    return { getItem: key => values.get(key), setItem: (key, value) => values.set(key, value) };
+    return { getItem: key => values.get(key), setItem: (key, value) => values.set(key, value), removeItem:key=>values.delete(key) };
 }
 (async () => {
     const { createProgress } = await import('../taffaha/progress.js');
@@ -33,7 +33,12 @@ function memory(data = fixture()) {
         app.signIn('علي');
         const latest = JSON.parse(shared.getItem(KEY)); latest.active = 'admin'; shared.setItem(KEY, JSON.stringify(latest));
         const survivor = JSON.stringify(latest.children.find(child => child.id === 'sara'));
+        for(const id of ['ali','sara'])for(const app of ['voc','senb','taffaha'])shared.setItem(`speech-homework-v1:${app}:${id}`,`message for ${id}`);
         assert.equal(remove(shared, 'admin', 'ali'), true);
+        for(const app of ['voc','senb','taffaha']){
+            assert.equal(shared.getItem(`speech-homework-v1:${app}:ali`),undefined,'Deletion removes the child’s parent summaries');
+            assert.equal(shared.getItem(`speech-homework-v1:${app}:sara`),'message for sara','Other children keep their summaries');
+        }
         app.saveWorkspace({ stale: true });
         const saved = JSON.parse(shared.getItem(KEY));
         assert.ok(!saved.children.some(child => child.id === 'ali'), 'A stale app cannot restore a deleted child');

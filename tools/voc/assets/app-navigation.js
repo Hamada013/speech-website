@@ -9,6 +9,14 @@
  const logoURL=id=>new URL(`assets/navigation/${id}.webp`,base).href;
  const svg=path=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
  const icons={settings:svg('<path d="m9 3-.7 2.2-2 .9-2.1-.5-2 3.4 1.5 1.7v2.6L2.2 15l2 3.4 2.1-.5 2 .9L9 21h4l.7-2.2 2-.9 2.1.5 2-3.4-1.5-1.7v-2.6L19.8 9l-2-3.4-2.1.5-2-.9L13 3z"/><circle cx="11" cy="12" r="3"/>'),apps:svg('<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><path d="M14 17.5h7m-3.5-3.5v7"/>'),list:svg('<path d="M9 6h12M9 12h12M9 18h12M3 6h.01M3 12h.01M3 18h.01"/>'),close:svg('<path d="m6 6 12 12M18 6 6 18"/>')};
+ Object.assign(icons,{
+  profile:svg('<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>'),
+  report:svg('<path d="M9 3H5a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-4M9 2h6v4H9zM8 16v-3m4 3V9m4 7v-5"/>'),
+  download:svg('<path d="M12 3v12m-5-5 5 5 5-5M4 16v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/>'),
+  info:svg('<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/>'),
+  home:svg('<path d="M3 11l9-8 9 8M5 10v11h5v-7h4v7h5V10"/>'),
+  games:svg('<path d="M7 7h10a4 4 0 0 1 4 3l1 7a2 2 0 0 1-3 2l-4-3H9l-4 3a2 2 0 0 1-3-2l1-7a4 4 0 0 1 4-3Z"/><path d="M7 10v4m-2-2h4m7-1h.01M18 13h.01"/>')
+ });
  const progress=()=>({voc:window.VocProgress,senb:window.SenbProgress,taffaha:window.TaffahaProgress})[appId];
  function read(){try{return JSON.parse(localStorage.getItem(storageKey));}catch{return null;}}
  const active=()=>progress()?.active();
@@ -17,6 +25,31 @@
  const registered=(child,id)=>!!child&&(child.apps||legacyApps(child))[id]===true;
  function register(){const child=active(),data=read();if(!child||!data)return;const saved=data.children.find(entry=>entry.id===child.id);if(!saved||saved.apps?.[appId])return;saved.apps={...(saved.apps||legacyApps(saved)),[appId]:true};try{localStorage.setItem(storageKey,JSON.stringify(data));}catch{window.dispatchEvent(new Event(`${appId}-storage-error`));}}
  function button(label,icon){const b=document.createElement('button');b.type='button';b.className='suite-icon';b.innerHTML=icons[icon];b.title=label;b.setAttribute('aria-label',label);return b;}
+ // Logical RTL order also defines keyboard order. App-specific tools keep their
+ // own order; shared controls use the same positions on every screen.
+ const controlOrder={back:0,profile:10,report:20,family:25,info:30,end:35,download:40,apps:50,activities:60,settings:70};
+ function controlKind(node){
+  if(node.dataset.suiteControl)return node.dataset.suiteControl;
+  for(const [kind,selector]of Object.entries({back:'.game-back,#go-home,#activityHomeBtn',profile:'[data-child-profile],[data-senb-child-profile],#open-profile',report:'[data-child-report],#open-report,[aria-label="تقرير الطفل"],[aria-label="تقرير جميع الأطفال"]',family:'[aria-label="تدريب العائلة"]',info:'[aria-label="معلومات التطبيق"]',end:'[data-session-end]',download:'[data-open-download],#pwaDownloadToggle,#open-offline',apps:'[data-suite-apps]',activities:'[data-suite-menu]',settings:'[data-suite-settings]'}))if(node.matches(selector))return kind;
+  return null;
+ }
+ function orderControls(host){
+  const homeGroup=host.querySelector('#homeHeaderTools');if(homeGroup)orderControls(homeGroup);
+  const controls=[...host.children].filter(node=>{
+   const kind=controlKind(node);if(kind){
+    node.dataset.suiteControl=kind;const label=node.getAttribute('aria-label')||node.title||node.textContent.trim();node.setAttribute('aria-label',label);if(!node.title)node.title=label;
+    const glyph=kind==='back'?(node.getAttribute('href')==='games.html'?'games':'home'):kind;
+    if(icons[glyph]&&!node.querySelector('[data-suite-glyph]')){
+     const template=document.createElement('template');template.innerHTML=icons[glyph];const icon=template.content.firstElementChild;icon.dataset.suiteGlyph=glyph;
+     const old=node.querySelector('svg,i');if(old)old.replaceWith(icon);else node.prepend(icon);
+    }
+   }
+   return kind||node===homeGroup;
+  });
+  const rank=node=>node===homeGroup?20:controlOrder[node.dataset.suiteControl];
+  const ordered=[...controls].sort((a,b)=>rank(a)-rank(b));
+  if(controls.some((node,index)=>node!==ordered[index]))for(const node of ordered)host.append(node);
+ }
  function dialog(id,title){const d=document.createElement('dialog');d.id=id;d.className='suite-dialog';d.dir='rtl';d.setAttribute('aria-labelledby',id+'-title');const header=document.createElement('header'),h=document.createElement('h2');h.id=id+'-title';h.textContent=title;const close=button('إغلاق','close');close.onclick=()=>d.close();header.append(h,close);d.append(header);document.body.append(d);d.addEventListener('click',e=>{if(e.target!==d)return;const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();});return d;}
  let picker,bar,missing,leaving=false,trigger,transitionTimer,settings;
  function pause(){window.dispatchEvent(new Event('suite-navigation-open'));window.dispatchEvent(new Event(`${appId}-profile-open`));}
@@ -80,10 +113,11 @@
   function sync(){
    const active=isWorkplace();toggle.hidden=!active;if(active===settings.active)return;settings.active=active;closeSettings(false,true);
    if(active){
-    const nodes=appId==='senb'?[document.getElementById('clearBoardBtn'),document.getElementById('workplaceHeaderToolbar'),host.querySelector('[data-senb-child-profile]')]:[...host.children].filter(node=>node!==toggle&&!node.matches('[data-suite-apps],[data-suite-menu],#stars-container'));
+    const nodes=appId==='senb'?[document.getElementById('clearBoardBtn'),document.getElementById('workplaceHeaderToolbar'),host.querySelector('[data-senb-child-profile]')]:[...host.children].filter(node=>node!==toggle&&!node.matches('[data-suite-apps],[data-suite-menu],[data-session-end],#stars-container'));
     settings.entries=nodes.filter(Boolean).map(node=>{const marker=document.createComment('workplace control');node.before(marker);panel.append(node);return {node,marker};});
     for(const control of panel.querySelectorAll('button[title]'))if(!control.hasAttribute('aria-label'))control.setAttribute('aria-label',control.title);
    }else{for(const {node,marker}of settings.entries){marker.replaceWith(node);}settings.entries=[];}
+   orderControls(host);orderControls(panel);
   }
   function position(){panel.style.top=Math.min(host.closest('header').getBoundingClientRect().bottom+8,innerHeight-80)+'px';panel.style.maxHeight=Math.max(100,innerHeight-parseFloat(panel.style.top)-16)+'px';}
   toggle.onclick=()=>{if(!panel.hidden){closeSettings(false,true);return;}closeBar();position();panel.hidden=false;toggle.setAttribute('aria-expanded','true');panel.querySelector('button:not([hidden]):not(:disabled)')?.focus();};
@@ -103,6 +137,7 @@
    const list=button('قائمة الأنشطة','list');list.dataset.suiteMenu='';list.setAttribute('aria-controls','suite-activity-menu');list.setAttribute('aria-expanded','false');list.onclick=()=>openMenu(list);host.append(list);
   }
   initSettings();
+  for(const host of hosts){host.classList.add('suite-toolbar');orderControls(host);new MutationObserver(()=>orderControls(host)).observe(host,{childList:true,subtree:true});}
   document.addEventListener('click',e=>{if(bar&&!bar.hidden&&!bar.contains(e.target)&&!e.target.closest('[data-suite-menu]'))closeBar();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&bar&&!bar.hidden&&!stickyLists){closeBar();trigger?.focus();}else if(bar&&!bar.hidden&&['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){const buttons=[...bar.querySelectorAll('button')],index=buttons.indexOf(document.activeElement);if(index<0)return;e.preventDefault();buttons[e.key==='Home'?0:e.key==='End'?buttons.length-1:(index+(e.key==='ArrowLeft'?1:-1)+buttons.length)%buttons.length].focus();}});
   window.addEventListener('resize',closeBar);window.addEventListener('pagehide',()=>{closeBar();clearTimeout(transitionTimer);document.body.classList.remove('suite-transition-active');});window.addEventListener('pageshow',event=>{if(!event.persisted)return;clearTimeout(transitionTimer);leaving=false;document.body.classList.remove('suite-transition-active');document.getElementById('suite-transition')?.remove();});
