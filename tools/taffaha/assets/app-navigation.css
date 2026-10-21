@@ -36,8 +36,10 @@ body.suite-transition-active>:not(#suite-transition):not(script):not(style):not(
    cues, answer feedback and selected cards in their app-specific styles. */
 :is(.app-home-action-icon,.home-action-icon,.hub-icon,.home-menu-symbol,.category-symbol,.word-category-symbol,.word-category-chevron,.word-level-mark,.level-mark){background:transparent!important;border-radius:0!important;box-shadow:none!important}
 :is(.suite-icon,[data-suite-control],.app-home-icon,.activity-icon-button,.icon-button,.voc-icon,.icon,.icon-action,.suite-settings-panel button[title]){background:transparent!important;border-color:transparent!important;box-shadow:none!important;color:#22445a!important;touch-action:manipulation}
-:is(.suite-icon,[data-suite-control],.app-home-icon,.activity-icon-button,.icon-button,.voc-icon,.icon,.icon-action,.suite-settings-panel button[title])[aria-pressed=true]{box-shadow:inset 0 -2px #0284c7!important}
-.suite-toolbar{direction:rtl}
+/* Header toggles expose their state to assistive technology without a sticky underline. */
+:is(.suite-toolbar,.suite-settings-panel) :is(button,a,[role=button]){box-shadow:none!important;text-decoration:none!important;-webkit-tap-highlight-color:transparent}
+:is(.suite-toolbar,.suite-settings-panel) :is(button,a,[role=button]):not(:active){transform:none!important}
+.suite-toolbar{direction:ltr}
 .suite-toolbar [data-suite-control]{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;flex:0 0 44px;width:44px;height:44px;min-width:44px;min-height:44px;max-width:44px;padding:10px;border:0;border-radius:12px;gap:0;text-decoration:none;cursor:pointer}
 .suite-toolbar [data-suite-control][hidden],.suite-toolbar [data-suite-control].hidden{display:none!important}
 .suite-toolbar [data-suite-control]>svg{display:block;width:23px;height:23px;flex-shrink:0}
@@ -45,12 +47,45 @@ body.suite-transition-active>:not(#suite-transition):not(script):not(style):not(
 .suite-toolbar [data-suite-control=profile]>span,.suite-toolbar .game-back>span{display:none}
 .suite-toolbar [data-suite-control]:focus-visible{outline:3px solid #0284c7;outline-offset:2px}
 .game-header.suite-toolbar{justify-content:flex-start;gap:8px;font-family:system-ui,-apple-system,Segoe UI,Tahoma,Arial,sans-serif}
-.game-header.suite-toolbar .game-brand{margin-inline-end:auto;min-width:0}
+.game-header.suite-toolbar .game-brand{order:2;margin-left:auto;margin-right:0;min-width:0}
 .game-header.suite-toolbar .game-brand h1{color:#22445a;font-size:24px;font-weight:800}
-.suite-toolbar #homeHeaderTools{gap:8px}
+.suite-toolbar #homeHeaderTools{gap:8px;direction:ltr}
 .suite-settings-panel :is(.child-button,.senb-child-button){border-color:transparent;background:transparent;color:#22445a}
 .test-mode-grid .home-menu-card{border:1px solid #dceaf4;border-radius:28px;background:white;color:#22445a;box-shadow:0 12px 40px #276b8f0c}
 .test-mode-grid .home-menu-symbol{display:grid;place-items:center;color:#0284c7}
 .test-mode-grid .home-menu-symbol svg{width:36px;height:36px;stroke-width:1.6}
 .test-mode-grid .home-menu-card:nth-child(2) .home-menu-symbol{color:#418c60}
 @media(max-width:480px){.game-header.suite-toolbar .game-brand{flex:1 0 100%}.game-header.suite-toolbar .game-brand h1{font-size:20px}.suite-toolbar #homeHeaderTools{gap:5px}}
+
+/* Keep SENB's controls together instead of distributing them across grid tracks. */
+.app-header .header-actions.suite-toolbar{display:flex;flex:0 0 auto;align-items:center;justify-content:flex-start;gap:6px;flex-wrap:wrap}
+.app-header .header-inner:has(.suite-toolbar){display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.app-header .home-header-tools{display:flex;align-items:center;gap:6px}
+.suite-toolbar :is(#homeHeaderTools,.home-header-tools).hidden{display:none!important}
+.suite-toolbar .game-brand{direction:rtl}
+.suite-settings-panel{direction:ltr}
+.suite-settings-panel>div{direction:ltr}
+/* The logo itself opens the existing download dialog. */
+button.app-logo-download{display:block;flex-shrink:0;padding:0;border:0;border-radius:20px;background:transparent;box-shadow:none;color:inherit;cursor:pointer;min-width:44px;min-height:44px}
+button.app-logo-download>img{display:block;width:100%;height:100%;object-fit:contain;margin:0}
+button.app-logo-download:focus-visible{outline:3px solid #0284c7;outline-offset:4px}
+.app-home-brand [data-logo-download],.topbar .brand [data-logo-download]{display:block;box-sizing:border-box;border:0;padding:0;background:transparent;box-shadow:none;cursor:pointer;flex-shrink:0;overflow:hidden;border-radius:12px}
+@media(max-width:480px){.app-header .header-actions.suite-toolbar{gap:4px}}
+
+.app-home-brand [data-logo-download],.topbar .brand [data-logo-download]{width:52px;height:52px;min-width:44px;min-height:44px}
+.app-home-brand [data-logo-download] img,.topbar .brand [data-logo-download] img{display:block;width:100%;height:100%;object-fit:contain;margin:0}
+@media(max-width:480px){.app-home-brand [data-logo-download],.topbar .brand [data-logo-download]{width:44px;height:44px}}
+
+.suite-brand-home{border:0;background:transparent;color:inherit;padding:0;min-height:44px;text-align:start;font:inherit}
+
+#workplace-view .workspace-container{padding-top:var(--voc-settings-space,12px);transition:padding-top .15s}
+@media(prefers-reduced-motion:reduce){#workplace-view .workspace-container{transition:none}}
+
+@media(max-width:600px){.game-header.suite-toolbar .game-brand{order:-1;flex:1 0 100%;margin-left:0;margin-right:0;justify-content:flex-start}}
+
+/* One app picker across all five shells and both child groups. */
+#suite-app-picker{line-height:1.6;text-align:start}
+#suite-app-picker>header{margin:0;padding:0;border:0;background:transparent}
+#suite-app-picker h2{font:700 21px/1.4 system-ui,-apple-system,Segoe UI,Tahoma,Arial,sans-serif}
+#suite-app-picker .suite-app-grid img{border:0 solid transparent;border-radius:0;background:transparent;padding:0}
+#suite-app-picker .suite-app-grid[data-count="2"]{grid-template-columns:repeat(2,minmax(0,1fr))}

@@ -31,7 +31,7 @@
 .test-answers{--answer-gap:22px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--answer-gap);margin-top:24px}
 .picture-answer{display:flex;align-items:center;justify-content:center;background:white;border:2px solid var(--line);border-radius:26px;min-height:210px;padding:20px;box-shadow:0 8px 30px #276b8f08}
 .picture-answer img{display:block;width:100%;max-width:240px;height:170px;object-fit:contain}
-.picture-answer:hover,.count-answer:hover{border-color:#91cce5}
+@media(hover:hover){.picture-answer:hover,.count-answer:hover{border-color:#91cce5}}
 .picture-answer.is-correct,.count-answer.is-correct{border-color:#42a96f;background:#f0fbf4;box-shadow:0 0 0 3px #c7edd7}
 .picture-answer.is-wrong,.count-answer.is-wrong{border-color:#df6371}
 .picture-answer:disabled,.count-answer:disabled{opacity:1}

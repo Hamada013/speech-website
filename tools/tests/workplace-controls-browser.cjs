@@ -22,14 +22,17 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
    const header=appId==='voc'?'#workplace-view > header':'.app-header';
    await page.locator(`${header} [data-suite-menu]`).click();
    await page.locator(appId==='voc'?'.workspace-container':'#workplaceView').click({position:{x:2,y:2}});
-   assert.equal(await page.locator('#suite-activity-menu').isVisible(),true);
+   assert.equal(await page.locator('#suite-activity-menu').isVisible(),false);
+   await page.locator(`${header} [data-suite-menu]`).click();
    await page.locator('#suite-activity-menu button').nth(1).click();
-   assert.equal(await page.locator('#suite-activity-menu').isVisible(),true);
+   assert.equal(await page.locator('#suite-activity-menu').isVisible(),false);
+   await page.locator(`${header} [data-suite-menu]`).click();
    await page.locator(`${header} [data-suite-menu]`).click();
    assert.equal(await page.locator('#suite-activity-menu').isVisible(),false);
    await page.locator(`${header} [data-suite-settings]`).click();
    await page.locator(appId==='voc'?'.workspace-container':'#workplaceView').click({position:{x:2,y:2}});
-   assert.equal(await page.locator('#suite-workplace-settings').isVisible(),true);
+   assert.equal(await page.locator('#suite-workplace-settings').isVisible(),false);
+   await page.locator(`${header} [data-suite-settings]`).click();
    if(appId==='senb'){await page.locator(`${header} [data-suite-settings]`).click();continue;}
    await page.evaluate(()=>{
     app.state.slotsData[0].item=CATEGORIES[0].items[0];app.renderSlotsContent();
@@ -44,17 +47,17 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
    for(const mode of ['practice','test']){
     await page.locator(`#btn-${mode}`).click();
     await page.waitForFunction(()=>prompts.length>0);
-    assert.equal(await page.locator('#suite-workplace-settings').isVisible(),true);
+    assert.equal(await page.locator('#suite-workplace-settings').isVisible(),false);
     assert.equal(await page.evaluate(()=>players.size),1,'One player survives mode changes');
     await page.evaluate(()=>{app.exitTestMode(false);prompts=[];});
+    await page.locator(`${header} [data-suite-settings]`).click();
    }
    await page.locator('#btn-test').click();await page.waitForFunction(()=>prompts.length>0);
    await page.evaluate(()=>{window.failPrompt=true;app.replayPromptSound();});
    await page.getByText('تعذّر تشغيل الصوت. اضغط إعادة الصوت للمحاولة مجدداً.',{exact:true}).waitFor();
-   const before=await page.evaluate(()=>prompts.length);await page.locator('#btn-replay-sound').click();
+   const before=await page.evaluate(()=>prompts.length);await page.locator(`${header} [data-suite-settings]`).click();await page.locator('#btn-replay-sound').click();
    await page.waitForFunction(n=>prompts.length>n,before);
    await page.evaluate(()=>app.exitTestMode(false));
-   await page.locator(`${header} [data-suite-settings]`).click();
    for(const width of [390,1280]){
     await page.setViewportSize({width,height:844});
     const layout=await page.locator(header).evaluate(el=>{const rect=s=>{const r=el.querySelector(s).getBoundingClientRect();return {x:r.x,width:r.width};};return {stars:rect('#stars-container'),settings:rect('[data-suite-settings]'),menu:rect('[data-suite-menu]'),apps:rect('[data-suite-apps]')};});
@@ -73,6 +76,6 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
    await page.evaluate(()=>app.exitTestMode(false));
 
   }
-  assert.deepEqual(errors,[]);console.log('PASS: persistent lists, first-attempt primed audio, recovery, left controls and centered stars.');
+  assert.deepEqual(errors,[]);console.log('PASS: dismissable lists, first-attempt primed audio, recovery, left controls and centered stars.');
  }finally{await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(()=>{server.closeAllConnections();server.close();});

@@ -13,7 +13,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
  const origin=`http://127.0.0.1:${server.address().port}/tools/`;
  await page.goto(origin+'voc/index.html',{waitUntil:'domcontentloaded'});
  assert.equal(await page.locator('#parent-gate[open]').count(),0,'The first child does not need a parent calculation');
- await page.locator('#child-name').fill('علي');await page.locator('#child-dialog button[type=submit]').click();await page.waitForFunction(()=>window.VocProgress?.active()?.name==='علي');
+ await page.locator('#suite-welcome-name').fill('علي');await Promise.all([page.waitForEvent('domcontentloaded'),page.locator('#suite-welcome button[type=submit]').click()]);await page.waitForFunction(()=>window.VocProgress?.active()?.name==='علي');
  const ali=await page.evaluate(()=>{VocProgress.logSession({id:'ali-score',date:new Date().toISOString(),source:'test',kind:'assessment',domain:'receptive',records:[{key:'1_1',correct:4,total:5}]});return VocProgress.active().id;});
  assert.equal(await page.locator('[data-child-report]:visible').count(),1);
  const reportUrl=page.url(),appTitle=await page.title();await page.locator('[data-child-report]:visible').click();const report=page;await report.locator('#voc-activity-report[open]').waitFor();await report.waitForFunction(()=>window.VocReports?.current()?.title==='علي');assert.equal(report.url(),reportUrl);assert.equal(await page.title(),appTitle);assert.equal(context.pages().length,1);
@@ -45,7 +45,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
   const outside=await page.locator('.app-header a:visible,.app-header button:visible').evaluateAll(nodes=>nodes.filter(node=>{const b=node.getBoundingClientRect();return b.left < -1||b.right>innerWidth+1||b.width<44||b.height<44;}).map(node=>node.getAttribute('aria-label')));assert.deepEqual(outside,[],`SENB header fits ${width}`);
  }
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/private/tmp/senb-voc-header.png'});
- await page.evaluate(()=>navigateTo('workplace'));await page.locator('#workplaceDynamicTest').click();assert.equal(await page.locator('#vocAppLink').isVisible(),true,'The VOC link remains available during a sentence session');
+ await page.evaluate(()=>navigateTo('workplace'));await page.locator('[data-suite-settings]:visible').click();await page.locator('#workplaceDynamicTest').click();assert.equal(await page.locator('#vocAppLink').isVisible(),true,'The VOC link remains available during a sentence session');
  await page.locator('#vocAppLink').click();await page.locator('[data-suite-app=voc]').click();await page.waitForURL(/voc\/index.html$/);assert.equal(await page.evaluate(()=>VocProgress.active().id),ali);
  for(const width of [320,390,768]){await page.setViewportSize({width,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);const outside=await page.locator('#home-view header a:visible,#home-view header button:visible').evaluateAll(nodes=>nodes.filter(node=>{const b=node.getBoundingClientRect();return b.left < -1||b.right>innerWidth+1;}).map(node=>node.getAttribute('aria-label')));assert.deepEqual(outside,[],`VOC header fits ${width}`);}
  await page.setViewportSize({width:390,height:844});await page.waitForTimeout(120);assert.equal(await page.locator('#workplace-view').isVisible(),false);await page.screenshot({path:'/private/tmp/voc-report-header.png'});

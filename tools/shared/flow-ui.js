@@ -2,6 +2,7 @@
 (() => {
  // Safari may retain :focus-visible when a pointer opens a dialog and script
  // moves focus. Track the input method without blurring controls or text fields.
+ document.documentElement.dataset.suiteInput = 'pointer';
  const setInput = value => { document.documentElement.dataset.suiteInput = value; };
  document.addEventListener('pointerdown', () => setInput('pointer'), { capture: true, passive: true });
  document.addEventListener('keydown', event => {

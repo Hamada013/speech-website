@@ -26,11 +26,11 @@ async function rpc(page,type){return page.evaluate(async type=>(await import('./
 try{
  browser=await chromium.launch({headless:true,channel:'chrome'});
  const origin=`http://127.0.0.1:${server.address().port}`;
- for(const app of process.env.SOUNDS_MIGRATION_ONLY?[]:apps){
+ for(const app of process.env.SOUNDS_MIGRATION_ONLY?[]:apps.filter(app=>!process.env.SOUNDS_APP||app===process.env.SOUNDS_APP)){
   const kind=app==='arabicsounds'?'arabic':'around',total=kind==='arabic'?62:200,context=await browser.newContext({viewport:{width:390,height:844}});
   const page=await context.newPage(),errors=[],foreign=[];
   page.on('pageerror',error=>errors.push(error.message));page.on('request',request=>{const url=new URL(request.url());if(!url.pathname.startsWith('/standalone/'+app+'/')&&url.pathname!=='/favicon.ico')foreign.push(url.pathname);});
-  await page.addInitScript(()=>{window.finishedAudio=0;const native=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){this.addEventListener('ended',()=>window.finishedAudio++,{once:true});return native.call(this);};});
+  await page.addInitScript(()=>{localStorage.setItem('voc-children-v1',JSON.stringify({schema:1,active:'qa-sounds',children:[{id:'qa-sounds',name:'اختبار',role:'child',apps:{},words:{}}]}));window.finishedAudio=0;const Context=window.AudioContext||window.webkitAudioContext;if(Context){const create=Context.prototype.createBufferSource;Context.prototype.createBufferSource=function(...args){const node=create.apply(this,args);node.addEventListener('ended',()=>{if(node.buffer?.length>1)window.finishedAudio++;},{once:true});return node;};}const native=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){this.addEventListener('ended',()=>window.finishedAudio++,{once:true});return native.call(this);};});
   const url=`${origin}/standalone/${app}/index.html`;await page.goto(url);await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
   await page.waitForFunction(()=>!document.getElementById('offline-download').disabled);
   assert.equal(await page.locator('.app-home-action').count(),5);assert.equal(await page.locator('#menu-toggle:visible,#home-link:visible').count(),0);
@@ -40,7 +40,7 @@ try{
    if(width>=768&&height>=600)assert(await page.locator('main').evaluate(main=>main.scrollHeight<=main.clientHeight+1));
    await page.screenshot({path:`/tmp/${app}-${width}-home.png`});
   }
-  await page.setViewportSize({width:390,height:844});await page.locator('#install').click();
+  await page.setViewportSize({width:390,height:844});await page.locator('[data-sound-download]').click();
   assert.equal(await page.locator('#install-dialog button').count(),1);assert.equal(await page.locator('#offline-download').textContent(),'تنزيل');assert.equal(await page.locator('#offline-progress').getAttribute('max'),'100');
   corruptNext=true;await page.locator('#offline-download').click();await page.waitForFunction(()=>!document.getElementById('offline-download').disabled);
   assert(await page.locator('#offline-error').isVisible());assert((await rpc(page,'STATUS')).count<total,'Corrupt files are not counted');
@@ -51,7 +51,7 @@ try{
   if(kind==='arabic'){await page.evaluate(()=>location.hash='/arabic/sounds');await page.waitForFunction(()=>document.querySelectorAll('#selection img').length===31&&[...document.querySelectorAll('#selection img')].every(img=>img.complete&&img.naturalWidth>0));}
   await page.evaluate(kind=>location.hash='/'+kind+(kind==='arabic'?'/pair':'/library'),kind);await page.locator('.picture').first().waitFor();
   assert(await page.locator('#install').isHidden(),'Download icon appears only on home');
-  await page.locator('#menu-toggle').click();assert(await page.locator('#drawer').isVisible());await page.keyboard.press('Escape');
+  await page.locator('[data-suite-menu]').click();assert(await page.locator('#suite-activity-menu').isVisible());await page.keyboard.press('Escape');
   await context.setOffline(true);await page.reload();await page.locator('.picture img').first().waitFor();await page.waitForFunction(()=>[...document.querySelectorAll('.picture img')].every(img=>img.complete&&img.naturalWidth>0));
   await page.locator('.picture').first().click();await page.waitForFunction(()=>window.finishedAudio>0,null,{timeout:20000});
   const range=await page.evaluate(async()=>{const response=await fetch('sounds/1.m4a',{headers:{Range:'bytes=0-31'}});return[response.status,(await response.arrayBuffer()).byteLength];});assert.deepEqual(range,[206,32]);

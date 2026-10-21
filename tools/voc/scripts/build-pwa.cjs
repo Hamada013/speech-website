@@ -27,7 +27,7 @@ const media = groups.map(files => files.map(url => {
     return { url, bytes: body.length, revision: hash(body) };
 }));
 const shell = ['index.html', 'games.html', 'matching.html', 'memory.html', 'rapid.html', 'test.html', 'report.html',
-    'manifest.json', 'images/logo.webp', 'images/placeholder.svg', ...walk('icons'),
+    'manifest.json', 'images/logo.webp', 'images/placeholder.svg', ...walk('images/41'), ...walk('icons'),
     ...walk('assets').filter(file => /\.(css|js|woff2|txt|webp)$/.test(file) && file !== 'assets/pwa-release.js')].sort();
 const integrity = Object.fromEntries(shell.map(url => [url,
     `sha256-${crypto.createHash('sha256').update(fs.readFileSync(path.join(root, url))).digest('base64')}`]));

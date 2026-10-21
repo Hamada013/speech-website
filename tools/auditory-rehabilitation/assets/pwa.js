@@ -1,11 +1,18 @@
 import {MEDIA} from './release.js';
 import './updates.js';
 const $=id=>document.getElementById(id),dialog=$('install-dialog');
-let registration,downloading=false;
+let registration,preparing,downloading=false;
 const mediaURLs=MEDIA.map(entry=>new URL(entry.url,document.baseURI).href);
 window.addEventListener('beforeinstallprompt',event=>event.preventDefault());
 function showError(error){$('offline-error').textContent=error?.message||'تعذر تجهيز التنزيل. اتصل بالإنترنت ثم حاول مجدداً.';$('offline-error').hidden=false;}
-export function request(type,url){return new Promise((resolve,reject)=>{
+async function ready(){
+ if(!('serviceWorker'in navigator)||!isSecureContext)throw Error('افتح التطبيق عبر HTTPS أو localhost لتفعيل التنزيل.');
+ if(registration?.active?.state==='activated'||registration?.active?.state==='activating'&&navigator.serviceWorker.controller===registration.active)return registration;
+ if(preparing)return preparing;
+ preparing=window.AppUpdates.ready();
+ try{registration=await preparing;return registration;}finally{preparing=null;}
+}
+export async function request(type,url){await ready();return new Promise((resolve,reject)=>{
  const controller=navigator.serviceWorker?.controller,script=new URL('sw.js',document.baseURI).href;
  const worker=controller?.scriptURL===script?controller:registration?.active;
  if(!worker){reject(Error('انتظر تجهيز التطبيق ثم أعد المحاولة.'));return;}
@@ -30,18 +37,7 @@ $('offline-download').addEventListener('click',async()=>{
  finally{downloading=false;$('offline-download').disabled=false;window.AppUpdates.setBusy(false);}
 });
 async function init(){
- if(!('serviceWorker'in navigator)||!isSecureContext){showError(Error('افتح التطبيق عبر HTTPS أو localhost لتفعيل التنزيل.'));return;}
- try{
-  const scope=new URL('./',document.baseURI).href;
-  registration=await navigator.serviceWorker.getRegistration(scope);
-  if(registration?.scope!==scope||!registration.active)registration=await navigator.serviceWorker.register('./sw.js',{scope:'./',updateViaCache:'none'});
-  window.AppUpdates.watch(registration,{onFirstControl:()=>sync().catch(showError)});
-  if(!registration.active)await new Promise((resolve,reject)=>{
-   const timer=setTimeout(()=>reject(Error('تعذر تجهيز التطبيق. أعد فتحه ثم حاول مجدداً.')),45000);
-   const check=()=>{if(registration.active){clearTimeout(timer);resolve();}else if(registration.installing?.state==='redundant'){clearTimeout(timer);reject(Error('تعذر تنزيل ملفات التطبيق.'));}};
-   registration.installing?.addEventListener('statechange',check);registration.addEventListener('updatefound',()=>registration.installing?.addEventListener('statechange',check));check();
-  });
-  await sync();$('offline-download').disabled=false;
- }catch(error){showError(error);}
+ try{await sync();}catch(error){showError(error);}
+ finally{if(!downloading)$('offline-download').disabled=false;}
 }
 void init();

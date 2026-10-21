@@ -17,6 +17,7 @@ const control=(id,symbol,label)=>`<button id="${id}" class="icon-button" title="
 const tile=(href,symbol,label,small='')=>`<a href="#/${href}" class="tile">${icon(symbol)}<span>${label}</span>${small?`<small>${small}</small>`:''}</a>`;
 const title=(text,back)=>`<div class="section-heading"><a class="icon-button" href="#/${back}" title="رجوع" aria-label="رجوع">${icon('back')}</a><h1>${text}</h1></div>`;
 const button=(id,text,cls='primary')=>`<button id="${id}" class="button ${cls}">${text}</button>`;
+let listenSession=crypto.randomUUID();
 let epoch=0,session=null,selected=['ب','م'],pairOrder=['ب','م'],pairBack='arabic/sounds',pairController=null,route='';
 const pairPlayer=new AudioEngine();
 const ling=createLing({main,icon,title,pic,control,escape,shuffle,openModal,status});
@@ -34,9 +35,9 @@ export class SoundPlayer{
  });}
 }
 const player=new SoundPlayer();
-function reset(){epoch++;$('#match-feedback')?.remove();ling.reset();pairController?.abort();pairController=null;pairPlayer.stop();if($('#pair-countdown')?.open)$('#pair-countdown').close();main.classList.remove('identification-open');document.querySelectorAll('.demo-ghost').forEach(n=>{n.getAnimations().forEach(a=>a.cancel());n.remove();});timers.forEach(clearTimeout);timers.clear();player.stop();session=null;}
+function reset(){epoch++;listenSession=crypto.randomUUID();$('#match-feedback')?.remove();ling.reset();pairController?.abort();pairController=null;pairPlayer.stop();if($('#pair-countdown')?.open)$('#pair-countdown').close();main.classList.remove('identification-open');document.querySelectorAll('.demo-ghost').forEach(n=>{n.getAnimations().forEach(a=>a.cancel());n.remove();});timers.forEach(clearTimeout);timers.clear();player.stop();session=null;}
 function status(text,error=false){const node=$('#status');if(node){node.textContent=text;node.classList.toggle('error',error);if(main.classList.contains('activity-fit'))node.hidden=!text;}$('#announcement').textContent=text;}
-async function play(kind,id,type='',cue){const e=epoch;try{await player.play(source(kind,id,type),()=>cue?.classList.add('cue'));return e===epoch;}catch(err){if(err.name!=='AbortError'&&e===epoch)status(err.name==='NotAllowedError'?'اضغط تشغيل لمتابعة الصوت.':'تعذر تشغيل الصوت. نزّل المحتوى أو اتصل بالإنترنت ثم أعد المحاولة.',true);return false;}finally{cue?.classList.remove('cue');}}
+async function play(kind,id,type='',cue){const e=epoch,owner=window.SoundProgress?.active()?.id;try{await player.play(source(kind,id,type),()=>cue?.classList.add('cue'));if(e===epoch)window.SoundProgress?.record({owner,sessionId:listenSession,activity:'الاستماع إلى أصوات الكلام',skill:session?.mode||'listening',label:id,kind:'practice'});return e===epoch;}catch(err){if(err.name!=='AbortError'&&e===epoch)status(err.name==='NotAllowedError'?'اضغط تشغيل لمتابعة الصوت.':'تعذر تشغيل الصوت. نزّل المحتوى أو اتصل بالإنترنت ثم أعد المحاولة.',true);return false;}finally{cue?.classList.remove('cue');}}
 function openModal(text,html){$('#modal-title').textContent=text;body.innerHTML=html;modal.showModal();}
 function closeDialog(d){if(d.id==='drawer'&&!matchMedia('(prefers-reduced-motion: reduce)').matches){const animation=d.animate([{transform:'translateX(0)'},{transform:'translateX(-100%)'}],{duration:180,easing:'ease-in'});animation.onfinish=()=>d.close();}else d.close();}
 $$('[data-close]').forEach(b=>{b.innerHTML=icon('close');b.onclick=()=>closeDialog(b.closest('dialog'));});
@@ -48,7 +49,7 @@ $('#menu-toggle').onclick=()=>{if($('#drawer').open)$('#drawer').close();else{$(
 $('#drawer').addEventListener('cancel',event=>{event.preventDefault();closeDialog($('#drawer'));});
 $('#drawer').addEventListener('close',()=>{$('#menu-toggle').setAttribute('aria-expanded','false');$('#menu-toggle').focus();});
 $('#drawer-links').onclick=e=>{if(e.target.closest('a'))$('#drawer').close();};
-function renderHome(){main.innerHTML=`<section class="app-home-screen app-home-screen--many"><img class="app-home-logo" src="images/logo.webp" width="180" height="180" alt=""><h1 class="app-home-title">${APP.title}</h1><p class="app-home-description">${APP.tagline}</p><div class="app-home-actions"><a href="#/arabic/sounds" class="app-home-action"><span class="app-home-action-icon">${icon('sound')}</span><span>اختيار الأصوات</span></a><a href="#/arabic/levels" class="app-home-action"><span class="app-home-action-icon">${icon('cards')}</span><span>المستويات</span></a><button id="ling" class="app-home-action"><span class="app-home-action-icon">${icon('ear')}</span><span>أصوات لينغ</span></button><a href="#/arabic/memory" class="app-home-action"><span class="app-home-action-icon">${icon('memory')}</span><span>الذاكرة</span></a><a href="#/arabic/matching" class="app-home-action"><span class="app-home-action-icon">${icon('match')}</span><span>السحب والمطابقة</span></a></div></section><footer class="app-home-footer" lang="en" dir="ltr"><p>SPEECH AND LANGUAGE PATHOLOGY</p><p><strong>Ahmad Ghanem</strong></p><p>Latakia - Syria</p><p><a href="mailto:slp.ahmadghanem@gmail.com">slp.ahmadghanem@gmail.com</a></p></footer>`;$('#ling').onclick=ling.openSetup;}
+function renderHome(){main.innerHTML=`<section class="app-home-screen app-home-screen--many"><button type="button" class="app-home-logo app-logo-download" data-sound-download aria-label="تنزيل محتوى التطبيق" title="تنزيل محتوى التطبيق" aria-haspopup="dialog"><img src="images/logo.webp" width="180" height="180" alt=""></button><h1 class="app-home-title">${APP.title}</h1><p class="app-home-description">${APP.tagline}</p><div class="app-home-actions"><a href="#/arabic/sounds" class="app-home-action"><span class="app-home-action-icon">${icon('sound')}</span><span>اختيار الأصوات</span></a><a href="#/arabic/levels" class="app-home-action"><span class="app-home-action-icon">${icon('cards')}</span><span>المستويات</span></a><button id="ling" class="app-home-action"><span class="app-home-action-icon">${icon('ear')}</span><span>أصوات لينغ</span></button><a href="#/arabic/memory" class="app-home-action"><span class="app-home-action-icon">${icon('memory')}</span><span>الذاكرة</span></a><a href="#/arabic/matching" class="app-home-action"><span class="app-home-action-icon">${icon('match')}</span><span>السحب والمطابقة</span></a></div></section><footer class="app-home-footer" lang="en" dir="ltr"><p>SPEECH AND LANGUAGE PATHOLOGY</p><p><strong>Ahmad Ghanem</strong></p><p>Latakia - Syria</p><p><a href="mailto:slp.ahmadghanem@gmail.com">slp.ahmadghanem@gmail.com</a></p></footer>`;$('#ling').onclick=ling.openSetup;}
 function render(){
  reset();main.onclick=null;route=location.hash.replace(/^#\/?/,'')||'home';
  const isHome=route==='home'||route===APP.kind;
@@ -65,7 +66,7 @@ function render(){
  document.body.classList.toggle('matching-view',module==='arabic'&&page==='matching');
  document.body.classList.toggle('memory-view',module==='arabic'&&page==='memory');
  if(isHome)renderHome();else if(module===APP.kind)renderArabic(page);else{location.replace('#/home');return;}
- document.querySelectorAll('.drag-ghost').forEach(n=>n.remove());main.focus({preventScroll:true});window.scrollTo(0,0);
+ document.querySelectorAll('.drag-ghost').forEach(n=>n.remove());main.focus({preventScroll:true});window.scrollTo(0,0);window.SoundSuite?.rendered();
 }
 function renderArabic(page){
  if(!page){renderHome();}
@@ -103,7 +104,7 @@ async function pairCountdown(s){
   number.textContent=value;number.dataset.step=value;
   number.getAnimations().forEach(animation=>animation.cancel());
   if(!matchMedia('(prefers-reduced-motion: reduce)').matches)number.animate([{opacity:0,transform:'scale(.55)'},{opacity:1,transform:'scale(1.08)',offset:.45},{opacity:1,transform:'scale(1)'}],{duration:700,easing:'cubic-bezier(.2,.8,.2,1)'});
-  await pairWait(1000,s.signal);
+  await pairWait(800,s.signal);
  }
  s.phase='starting';dialog.close();
 }
@@ -115,11 +116,12 @@ function drawPairSession(s){
 async function playPairSound(s,id,card){
  try{await pairPlayer.play(source('arabic',id),{signal:s.signal,onStart:()=>card?.classList.add('cue')});}
  finally{card?.classList.remove('cue');}
+ if(s.mode==='practice'&&!s.signal.aborted)window.SoundProgress?.record({owner:s.owner,sessionId:s.sessionId,activity:'تدريب تمييز أصوات الكلام',skill:'pair',kind:'practice',label:id});
 }
 function pairFailure(s,error){if(error.name!=='AbortError'&&session===s&&!s.signal.aborted)returnToPair({error});}
 function startPair(mode){
  ensurePairOrder();pairController=new AbortController();
- const s=session={mode,order:[...pairOrder],queue:shuffle([...Array(5).fill(selected[0]),...Array(5).fill(selected[1])]),trial:0,score:0,phase:'starting',signal:pairController.signal};
+ const s=session={mode,order:[...pairOrder],queue:shuffle([...Array(5).fill(selected[0]),...Array(5).fill(selected[1])]),trial:0,score:0,phase:'starting',signal:pairController.signal,sessionId:crypto.randomUUID(),owner:window.SoundProgress?.active()?.id};
  drawPairSession(s);
  void(async()=>{
   await pairCountdown(s);
@@ -133,12 +135,12 @@ function startPair(mode){
     if(index!==1||repetition!==9)await pairWait(1000,s.signal);
    }
   }
-  if(session===s&&!s.signal.aborted)returnToPair();
+  if(session===s&&!s.signal.aborted){window.SoundProgress?.complete(s.sessionId);returnToPair();}
  })().catch(error=>pairFailure(s,error));
 }
 async function pairTrial(s){
  if(s.signal.aborted)return;
- if(s.trial===10){returnToPair({score:s.score});return;}
+ if(s.trial===10){window.SoundProgress?.complete(s.sessionId);returnToPair({score:s.score});return;}
  drawPairSession(s);s.phase='playing';s.target=s.queue[s.trial];
  await playPairSound(s,s.target);
  if(s.signal.aborted)return;
@@ -147,6 +149,7 @@ async function pairTrial(s){
 function answerPair(id){
  const s=session;if(!s||s.mode!=='test'||s.phase!=='answer'||s.signal.aborted)return;
  s.phase='feedback';const correct=id===s.target;s.score+=Number(correct);
+ window.SoundProgress?.record({owner:s.owner,sessionId:s.sessionId,id:String(s.trial),activity:'اختبار تمييز أصوات الكلام',skill:'pair',kind:'assessment',label:s.target,response:id,correct});
  $$('#pair-cards button').forEach(card=>card.disabled=true);$(`#pair-cards [data-sound="${id}"]`).classList.add(correct?'matched':'wrong');
  void(async()=>{await pairWait(650,s.signal);s.trial++;await pairTrial(s);})().catch(error=>pairFailure(s,error));
 }
@@ -187,6 +190,7 @@ function updateMatchCover(){
 }
 function matchAnswer(id){
  const s=session;if(s.locked)return;s.locked=true;player.stop();
+ window.SoundProgress?.record({sessionId:listenSession,activity:'المطابقة',skill:'matching',kind:'practice',label:s.target});
  const correct=id===s.target,card=$(`.match-options [data-sound="${id}"]`);
  card.classList.add(correct?'matched':'wrong');
  $$('.matching-layout button,.matching-toolbar button').forEach(button=>button.disabled=true);
@@ -204,3 +208,6 @@ function flipMemory(index){const s=session;if(s.locked||s.open.includes(index)||
 window.addEventListener('hashchange',()=>{main.onclick=null;render();});window.addEventListener('pagehide',()=>reset());document.addEventListener('visibilitychange',()=>{if(document.hidden){if(pairController)returnToPair();else{ling.hide();player.stop();$$('.cue').forEach(b=>b.classList.remove('cue'));}}});render();
 // Internal activities share a route; returning to that route must rebuild its menu.
 document.addEventListener('click',event=>{const a=event.target.closest('a[href^="#/"]');if(a&&a.getAttribute('href')===location.hash){event.preventDefault();main.onclick=null;render();}});
+
+window.SoundApp={routes:drawerItems.map(([route,,label])=>[label,()=>{location.hash='/'+route;}])};
+window.SoundSuite.bind({stop:()=>{player.stop();pairPlayer.stop();if(pairController)returnToPair();else ling.hide();},render});

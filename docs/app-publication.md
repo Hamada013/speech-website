@@ -1,0 +1,49 @@
+# Final linked apps and GitHub Pages
+
+The primary apps are VOC (`tools/voc/`), SENB (`tools/senb/`) and Taffaha (`tools/taffaha/`). The bundle also includes Arabic Sounds and Auditory Rehabilitation so Hamada's five-app navigation remains complete.
+
+## Publish the final files
+
+1. Merge the bundle's `tools/`, `.github/` and `docs/` contents into the matching locations in `Hamada013/speech-website`, keeping the existing website pages. Commit and push the files to `main`.
+2. On GitHub, open **Settings → Pages → Build and deployment → Source**, then select **GitHub Actions**.
+3. Let **Build and publish website** finish in the Actions tab.
+
+The one-time source setting follows [GitHub's publishing-source instructions](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
+
+Every push to `main`, including edits made in GitHub's browser, then rebuilds the five app release manifests before publishing the complete website. Code, picture and recording changes receive new content hashes. Shared controls are edited in `tools/shared/`; the build synchronizes the app copies. All existing website pages are included in the deployment.
+
+After deployment finishes, an affected app checks on opening, returning to the foreground, reconnecting, and every five minutes while visible. The update popup appears after the new app shell is completely downloaded and verified. **تحديث الآن** activates it and reloads all open windows for that app. **لاحقًا** keeps the current release; reopening offers the update again. A media-only change also triggers the popup. Unchanged downloaded files and locally saved child progress are preserved.
+
+The update popup follows the published release; GitHub's commit time can precede completion of the Pages deployment.
+
+The download readiness check accepts a worker that has already claimed the app while Safari still reports it as activating. It continues to wait when a different worker controls the page. This prevents an update from leaving the download button waiting unnecessarily.
+
+## Build locally
+
+No npm installation is required for the release build:
+
+```sh
+node tools/shared/build-pwa-releases.cjs
+```
+
+Inside a repository checkout, prepare and verify the complete Pages artifact with:
+
+```sh
+node tools/shared/build-pwa-releases.cjs --site
+```
+
+The website is staged in `output/pages/`. This omits repository metadata, local dependencies, tests and previous output archives, and verifies every app's shipped shell and media hashes.
+
+Serve apps over HTTPS or localhost. Keep the five sibling directories under `tools/` so the app links continue to work. Tap the home or header logo, then **تنزيل**, and wait for **100%** to save images and audio for offline use.
+
+## Verification
+
+The end-to-end check uses production workers and real media, covering early download taps, failed-install retries, complete downloads, offline reopening, automatic code/media update popups, postponement, activation in multiple windows, and the replacement recording's actual bytes:
+
+```sh
+APP_PLAYWRIGHT="$PWD/tools/voc/node_modules/playwright" node tools/tests/pwa-controls-browser.cjs
+APP_FULL_CATALOG=1 APP_PLAYWRIGHT="$PWD/tools/voc/node_modules/playwright" node tools/tests/pwa-controls-browser.cjs
+APP_ENGINE=webkit APP_PLAYWRIGHT="$PWD/tools/voc/node_modules/playwright" node tools/tests/pwa-controls-browser.cjs
+```
+
+The second and third commands download all 7,234 media files in VOC, SENB and Taffaha, in Chrome and Safari's browser engine respectively. The full catalogs contain 1,990, 4,884 and 360 files respectively. Safari uses a real stopped origin for offline checks so the test does not depend on Playwright's worker/offline emulation.

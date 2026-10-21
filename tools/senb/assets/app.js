@@ -47,20 +47,19 @@ function navigateTo(viewName) {
     window.SenbSplit?.orientation();
 }
 
-let templatePanelBar = null;
+let templateAnchor = null;
 function closeTemplateDropdown(restoreFocus = false) {
     document.getElementById('templateDropdown').classList.add('hidden');
     const toggle = document.getElementById('templateToggleBtn');
     toggle.setAttribute('aria-expanded', 'false');
-    if (restoreFocus) toggle.focus({ preventScroll: true });
+    if (restoreFocus) (toggle.getClientRects().length?toggle:document.querySelector('[data-suite-settings]'))?.focus({ preventScroll: true });
 }
 function positionTemplateDropdown() {
     const dropdown = document.getElementById('templateDropdown');
     if (dropdown.classList.contains('hidden')) return;
     const toggle = document.getElementById('templateToggleBtn');
     const bar = toggle.closest('.suite-settings-panel') || toggle.closest('header');
-    if (!toggle.getClientRects().length || bar?.hidden) { closeTemplateDropdown(); return; }
-    const anchor = toggle.getBoundingClientRect(), bounds = (bar || toggle).getBoundingClientRect();
+    const anchor = templateAnchor || toggle.getBoundingClientRect(), bounds = templateAnchor || (bar || toggle).getBoundingClientRect();
     const width = Math.min(280, innerWidth - 24), top = bounds.bottom + 8;
     Object.assign(dropdown.style, {
         width: `${width}px`, top: `${top}px`,
@@ -76,11 +75,8 @@ function toggleTemplateDropdown() {
     document.body.append(dropdown);
     dropdown.classList.remove('hidden');
     document.getElementById('templateToggleBtn').setAttribute('aria-expanded', 'true');
-    const bar = document.getElementById('templateToggleBtn').closest('.suite-settings-panel');
-    if (bar && bar !== templatePanelBar) {
-        templatePanelBar = bar;
-        new MutationObserver(() => { if (bar.hidden) closeTemplateDropdown(); }).observe(bar, { attributes: true, attributeFilter: ['hidden'] });
-    }
+    templateAnchor = document.getElementById('templateToggleBtn').getBoundingClientRect();
+    window.AppNavigation?.closePanels();
     positionTemplateDropdown();
     (dropdown.querySelector('[aria-pressed="true"]') || dropdown.querySelector('button'))?.focus({ preventScroll: true });
 }

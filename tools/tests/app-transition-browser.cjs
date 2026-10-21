@@ -19,7 +19,8 @@ const server = http.createServer((req, res) => {
         const context = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
         await context.addInitScript(() => {
             if (localStorage.getItem('voc-children-v1')) return;
-            localStorage.setItem('voc-children-v1', JSON.stringify({ schema: 1, active: 'ali', children: [
+            localStorage.setItem('voc-children-v1', JSON.stringify({ schema: 1, active: 'admin', children: [
+                { id: 'admin', name: 'Hamada', role: 'admin', apps: { voc: true, senb: true, taffaha: true, arabicsounds: true, 'auditory-rehabilitation': true }, words: {}, sessions: [] },
                 { id: 'ali', name: 'علي', role: 'child', apps: { voc: true, senb: true, taffaha: true }, words: {}, sessions: [], senb: { sessions: [] }, taffaha: { attempts: [] } }
             ] }));
         });
@@ -27,7 +28,8 @@ const server = http.createServer((req, res) => {
         const errors = []; page.on('pageerror', error => errors.push(error.message));
         await page.route(/fonts\.(googleapis|gstatic)\.com/, route => route.abort());
         const origin = `http://127.0.0.1:${server.address().port}/tools/`;
-        const ready = app => page.waitForFunction(id => ({ voc: window.VocReports, senb: window.SenbSessionReports, taffaha: window.TaffahaReports })[id] && window.AppNavigation, app);
+        let expectedOwner = 'admin';
+        const ready = app => page.waitForFunction(id => ({ voc: window.VocReports, senb: window.SenbSessionReports, taffaha: window.TaffahaReports,arabicsounds:window.SoundReports,'auditory-rehabilitation':window.SoundReports })[id] && window.AppNavigation, app);
         async function checkTransition(from, to, { reduced = false, screenshot = false } = {}) {
             const curtain = page.locator('#suite-transition[open]');
             for (const value of [1, 2, 3]) {
@@ -59,12 +61,12 @@ const server = http.createServer((req, res) => {
             await page.waitForURL(url => url.pathname.endsWith(`/${to}/index.html`)); await ready(to);
             assert.equal(await page.locator('#suite-transition[open]').count(), 0);
             assert.equal(await page.locator('body.suite-transition-active').count(), 0, 'The destination app is clear');
-            assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('voc-children-v1')).active), 'ali');
+            assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('voc-children-v1')).active), expectedOwner);
         }
-        const apps = ['voc', 'senb', 'taffaha'];
+        const apps = ['voc', 'senb', 'taffaha','arabicsounds','auditory-rehabilitation'];
         const viewports = [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 844, height: 390 }];
         for (const [index, from] of apps.entries()) for (const to of apps.filter(app => app !== from)) {
-            await page.setViewportSize(viewports[index]);
+            await page.setViewportSize(viewports[index % viewports.length]);
             await page.goto(origin + from + '/index.html'); await ready(from);
             await page.locator('[data-suite-apps]:visible').click();
             await page.locator(`[data-suite-app=${to}]`).click();
@@ -75,6 +77,7 @@ const server = http.createServer((req, res) => {
         }
         // Report links use the same transition and preserve the selected child.
         await page.goto(origin + 'voc/index.html'); await ready('voc');
+        await page.evaluate(() => VocProgress.signIn('علي')); await page.reload(); await ready('voc'); expectedOwner = 'ali';
         await page.locator('[data-child-report]:visible').click();
         await page.locator('#voc-activity-report [data-report-app=taffaha]').click();
         await checkTransition('voc', 'taffaha');
@@ -88,7 +91,7 @@ const server = http.createServer((req, res) => {
         await checkTransition('senb', 'voc', { reduced: true });
         assert.deepEqual(errors, []);
         await context.close();
-        console.log('PASS: all six app routes, 1–2–3 count, blurred backdrop, icon-right/count-left layout, mobile/landscape, report identity, duplicate clicks, back navigation and reduced motion.');
+        console.log('PASS: all twenty app routes, 1–2–3 count, blurred backdrop, icon-right/count-left layout, mobile/landscape, report identity, duplicate clicks, back navigation and reduced motion.');
     } catch (error) {
         await page?.screenshot({ path: '/private/tmp/app-transition-error.png', fullPage: true }).catch(() => {}); throw error;
     } finally {

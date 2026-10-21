@@ -16,6 +16,7 @@
         };
         let data = read() || empty();
         let baseline = clone(data);
+        let resetEpochs = { ...data.accountResets };
         let storageOK = true;
         const active = () => data.children.find(child => child.id === data.active) || null;
         const state = child => {
@@ -30,7 +31,9 @@
             let localActive = data.active;
             const merged = read() || empty();
             if (merged.deletedChildren?.[localActive]) localActive = null;
+            if ((merged.accountResets?.[localActive] || null) !== (resetEpochs[localActive] || null)) return false;
             for (const child of data.children) {
+                if((merged.accountResets?.[child.id]||null)!==(resetEpochs[child.id]||null))continue;
                 if (merged.deletedChildren?.[child.id]) continue;
                 const before = baseline.children.find(saved => saved.id === child.id);
                 let saved = merged.children.find(entry => entry.id === child.id);
@@ -73,6 +76,9 @@
             }
         }
         function signIn(name) {
+            const resetData=read();
+            if(JSON.stringify(resetData?.accountResets||{})!==JSON.stringify(resetEpochs)){data=resetData||data;baseline=clone(data);resetEpochs={...data.accountResets};}
+
             data.children = data.children.filter(child => !read()?.deletedChildren?.[child.id]);
             name = normalizeName(name);
             if (!name) return null;

@@ -1,6 +1,9 @@
 // Regenerate after changing the standalone app or its local media.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const root=path.resolve(__dirname,'..'),id=path.basename(root),hash=body=>crypto.createHash('sha256').update(body).digest('hex');
+// Keep frequency grouping aligned when a recording is replaced on GitHub.
+let pitch={};try{pitch=JSON.parse(fs.readFileSync(path.join(root,'assets/sound-pitch.js'),'utf8').match(/export const SOUND_PITCH=(\{[\s\S]*\});\s*$/)[1]);}catch{}
+if(Array.from({length:50},(_,i)=>i+1).some(id=>pitch[id]?.sha256!==hash(fs.readFileSync(path.join(root,`sounds/${id}.m4a`)))))require('node:child_process').execFileSync(process.execPath,[path.join(__dirname,'build-sound-pitch.cjs')],{stdio:'inherit'});
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.webp':'image/webp','.m4a':'audio/mp4','.png':'image/png','.woff2':'font/woff2','.txt':'text/plain; charset=utf-8'};
 const walk=dir=>fs.readdirSync(path.join(root,dir),{withFileTypes:true}).flatMap(entry=>entry.isDirectory()?walk(`${dir}/${entry.name}`):[`${dir}/${entry.name}`]);
 function entry(url){if(url.split('/').includes('..'))throw Error('Cross-app file: '+url);const body=fs.readFileSync(path.join(root,url));return{url,sha:hash(body),bytes:body.length,mime:mime[path.extname(url)]};}

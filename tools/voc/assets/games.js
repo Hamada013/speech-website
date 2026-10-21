@@ -37,6 +37,70 @@
     let runningSince = null;
     let storageWarned = false;
     let guideBusy = false;
+    let beatContext = null, beatRun = null;
+    document.body.classList.add('compact-game');
+    const automaticToolbar=document.createElement('div');automaticToolbar.className='automatic-toolbar';automaticToolbar.hidden=true;
+    const stars=document.createElement('div');stars.id='automatic-stars';stars.className='automatic-stars';stars.setAttribute('role','progressbar');stars.setAttribute('aria-label','تقدم كلمات اللعبة');
+    automaticToolbar.append(stars);$('#play-view').prepend(automaticToolbar);
+    const pauseButton=$('#pause-game');pauseButton.classList.add('icon-button');pauseButton.setAttribute('aria-label','إيقاف مؤقت');pauseButton.title='إيقاف مؤقت';pauseButton.innerHTML='<i class="fas fa-pause" aria-hidden="true"></i>';
+    const actions=document.createElement('div');actions.className='automatic-actions';actions.append(pauseButton,$('#play-word'));automaticToolbar.prepend(actions);
+    for(const [id,icon,label]of [['continue-game','play','متابعة اللعب'],['change-cards','th-large','تغيير البطاقات'],['finish-paused','flag','إنهاء الجلسة'],['review-missed','redo','مراجعة الكلمات'],['play-again','redo','جلسة جديدة'],['return-setup','th-large','اختيار بطاقات أخرى'],['next-round','play','الجولة التالية']]){
+        const control=$('#'+id);control.classList.add('icon-button');control.setAttribute('aria-label',label);control.title=label;control.innerHTML=`<i class="fas fa-${icon}" aria-hidden="true"></i>`;
+    }
+    const gamesLink=$('#results-view .game-back');gamesLink.setAttribute('aria-label','قائمة الألعاب');gamesLink.title='قائمة الألعاب';gamesLink.innerHTML='<i class="fas fa-gamepad" aria-hidden="true"></i>';
+    function stopBeats(){
+        beatRun?.abort();beatRun=null;
+        $('#play-production-beats').setAttribute('aria-busy','false');
+        $('#production-rhythm').classList.remove('is-playing');
+        all('.production-beat.lit').forEach(beat=>beat.classList.remove('lit'));
+    }
+    async function clickBeat(signal){
+        beatContext ||= new (window.AudioContext||window.webkitAudioContext)();
+        await beatContext.resume();if(signal.aborted)return;
+        const tone=beatContext.createOscillator(),gain=beatContext.createGain(),now=beatContext.currentTime;
+        tone.frequency.value=1000;gain.gain.setValueAtTime(.18,now);gain.gain.exponentialRampToValueAtTime(.001,now+.1);tone.connect(gain);gain.connect(beatContext.destination);
+        const stop=()=>{try{tone.stop();}catch{}};
+        signal.addEventListener('abort',stop,{once:true});tone.onended=()=>{signal.removeEventListener('abort',stop);tone.disconnect();gain.disconnect();};tone.start(now);tone.stop(now+.1);
+    }
+    function beatGap(ms,signal){return new Promise(resolve=>{if(signal.aborted){resolve();return;}const done=()=>{clearTimeout(timer);signal.removeEventListener('abort',done);resolve();},timer=setTimeout(done,ms);signal.addEventListener('abort',done,{once:true});});}
+    async function playProductionBeats(index=null){
+        if(!ready||phase!=='active')return;
+        const wasPlaying=!!beatRun;stopBeats();stopAudio();
+        if(wasPlaying&&index===null)return;
+        const controller=new AbortController();beatRun=controller;
+        const sequence=index===null?all('.production-beat'):[all('.production-beat')[index]];
+        $('#production-rhythm').classList.add('is-playing');$('#play-production-beats').setAttribute('aria-busy','true');
+        try{
+            for(const beat of sequence){
+                if(controller.signal.aborted)break;
+                beat.classList.add('lit');await clickBeat(controller.signal);await beatGap(350,controller.signal);beat.classList.remove('lit');
+                if(beat!==sequence.at(-1))await beatGap(600,controller.signal);
+            }
+        }catch{if(!controller.signal.aborted)feedback('تعذر تشغيل الإيقاع.',true);}
+        finally{if(beatRun===controller)stopBeats();}
+    }
+    $('#play-production-beats').onclick=()=>void playProductionBeats();
+    function fitBoard(){
+        if($('#play-view').hidden)return;
+        const board=$('#game-board'), count=board.children.length;if(!count)return;
+        const {width,height}=board.getBoundingClientRect();
+        let best={size:0,columns:1,rows:count};
+        for(let columns=1;columns<=Math.min(count,6);columns++){
+            const rows=Math.ceil(count/columns),size=Math.min((width-(columns-1)*10)/columns,(height-(rows-1)*10)/rows);
+            if(size>best.size)best={size,columns,rows};
+        }
+        board.style.setProperty('--board-columns',best.columns);board.style.setProperty('--board-rows',best.rows);
+    }
+    new ResizeObserver(fitBoard).observe($('#game-board'));
+    function productionBeats(item){
+        const row=$('#production-beats');row.replaceChildren();
+        if(mode!=='rapid')return;
+        for(let i=0;i<item.syllableCount;i++){
+            const beat=document.createElement('button');beat.type='button';beat.className='production-beat';
+            beat.setAttribute('aria-label',`المقطع ${i+1} من ${item.syllableCount}${item.syllables?.[i]?' · '+item.syllables[i]:''}`);
+            beat.onclick=()=>void playProductionBeats(i);row.append(beat);
+        }
+    }
     const preview = document.createElement('dialog'); preview.id = 'word-preview'; preview.className = 'word-preview'; preview.hidden = true;
     preview.setAttribute('aria-label', 'نتعرّف على الكلمات');
     preview.addEventListener('cancel', event => { event.preventDefault(); pause(); });
@@ -44,7 +108,7 @@
     const timers = new Set();
 
     function alert(text) { $('#game-alert').textContent = text; $('#game-alert').hidden = false; }
-    function feedback(text, error = false) { const status = preview.querySelector('[role=status]'); if (status) status.textContent = text; $('#game-feedback').textContent = text; $('#game-feedback').classList.toggle('error', error); }
+    function feedback(text, error = false) { const status = preview.querySelector('[role=status]'); if (status) {status.textContent = text;status.classList.toggle('error',error);} $('#game-feedback').textContent = text; $('#game-feedback').classList.toggle('error', error); }
     function store(key, value) {
         try { localStorage.setItem(key, JSON.stringify(value)); return true; }
         catch { if (!storageWarned) { storageWarned = true; alert('التخزين المحلي غير متاح. يمكنك اللعب، لكن قد لا يُحفظ التقدم بعد إغلاق الصفحة.'); } return false; }
@@ -60,20 +124,30 @@
         if (['active', 'feedback', 'between'].includes(phase)) runningSince = performance.now();
         store(`${prefix}-draft`, session);
     }
+    // A stopped production trial still owns the observations already entered.
+    function observedRecords(){
+        if(mode!=='rapid')return session.records;
+        const key=session.order[session.position],history=session.ratingHistory?.[key];
+        if(!history?.length || session.records.some(record=>record.key===key))return session.records;
+        const rating=history.at(-1);
+        return [...session.records,{key,result:rating===0?'notMastered':'learning',productionRating:rating,ratingHistory:[...history]}];
+    }
     function captureHomework() {
         const domain=mode==='test'?'receptive':mode==='rapid'?'expressive':null;
         window.SessionHomework?.capture({id:session.sessionId||`${mode}-${session.created}`,activity:meta.title||({matching:'المطابقة',memory:'الذاكرة',rapid:'البطاقات السريعة',test:'استمع واختر'})[mode],kind:domain?'assessment':'practice',domain,
-            records:session.records.map(record=>({key:record.key,label:byKey.get(record.key)?.name,
+            records:observedRecords().map(record=>({key:record.key,label:byKey.get(record.key)?.name,
                 correct:Number(mode==='rapid'?record.result==='mastered':record.result==='correct'&&record.attempts===1),
                 total:domain&&!['viewed','skip'].includes(record.result)?1:0,needsHelp:['notMastered','learning','skip'].includes(record.result)||record.attempts>1}))});
     }
     function stopAudio() { ++audioGeneration; cancelAudioEnd?.(); audio.pause(); }
     function clearWork() {
-        collectTime(); ++generation;
+        collectTime(); ++generation;stopBeats();
         for (const timer of timers) clearTimeout(timer);
         timers.clear(); stopAudio(); ready = false; deadline = null;
         $('#play-view').classList.remove('listening-replay', 'production-preview');
         preview.close(); preview.hidden = true; guideBusy = false;
+        if(document.documentElement.dataset.suiteInput!=='keyboard')document.activeElement?.blur();
+        if(beatContext?.state==='running')void beatContext.suspend();
     }
     function later(action, delay) {
         const ticket = generation;
@@ -82,7 +156,10 @@
     }
     function show(view) {
         for (const id of ['setup', 'play', 'pause', 'results']) $(`#${id}-view`).hidden = id !== view;
-        $('#rapid-autoplay').hidden = mode !== 'rapid' || view !== 'play';
+        $('#rapid-autoplay').hidden = !!activePlan || mode !== 'rapid' || view !== 'play';
+        automaticToolbar.hidden=view!=='play';
+        document.body.classList.toggle('compact-playing',view==='play');
+        document.body.classList.toggle('automatic-playing',!!activePlan&&view==='play');
     }
     function settings() {
         return { level: Number(picked('game-level')), length: Number(picked('game-length')), duration: Number(picked('game-duration')),
@@ -177,7 +254,8 @@
             value.settings && [2, 4, 6].includes(value.settings.level) && Array.isArray(value.records) && Array.isArray(value.deck) && Array.isArray(value.open) && Array.isArray(value.matched);
     }
     function stopPlan() {
-        clearTimeout(advanceTimer); P.cancelPlan(); activePlan = null; planBanner.hidden = true;
+        clearTimeout(advanceTimer); P.cancelPlan(); activePlan = null; planBanner.hidden = true; document.body.classList.remove('automatic-plan','automatic-playing');
+        automaticToolbar.hidden=$('#play-view').hidden;
         all('[data-child-profile]').forEach(button => { button.disabled = false; });
     }
     function begin(pool = null, review = false, round = null) {
@@ -189,7 +267,7 @@
         session.review = review;
         if (activePlan) { session.planId = activePlan.id; session.planPosition = activePlan.position; }
         $('#game-alert').hidden = true;
-        if (mode === 'memory' || mode === 'test' || (mode === 'rapid' && activePlan)) session.guide = { index: 0, done: false };
+        if (['memory','test','rapid'].includes(mode)) session.guide = { index: 0, done: false };
         selectionPreferences(); save(); void launch();
     }
     async function launch() {
@@ -200,6 +278,16 @@
         void renderCurrent();
     }
     function updateStats() {
+        {
+            const plan=activePlan?P.active().plan:null;
+            const completed=new Set((plan?.rounds||[]).slice(0,activePlan?.position||0).filter(round=>round.mode===mode).flatMap(round=>round.keys));
+            session.records.filter(record=>!['viewed','skip'].includes(record.result)).forEach(record=>completed.add(record.key));
+            stars.replaceChildren(...(plan?.keys||session.order).map(key=>{
+                const star=document.createElement('span');star.className=completed.has(key)?'earned':'';star.textContent='★';star.setAttribute('aria-hidden','true');return star;
+            }));
+            stars.setAttribute('aria-valuemin','0');stars.setAttribute('aria-valuemax',String(stars.children.length));stars.setAttribute('aria-valuenow',String(completed.size));
+            stars.setAttribute('aria-valuetext',`${completed.size} من ${stars.children.length} كلمات`);
+        }
         $('#session-progress').max = session.order.length; $('#session-progress').value = session.position;
         $('#session-counter').textContent = `${mode === 'memory' ? 'الأزواج' : 'الكلمات'}: ${session.position} / ${session.order.length}${session.review ? ' · مراجعة' : ''}`;
         $('#attempt-counter').textContent = mode === 'memory' ? `المحاولات: ${session.moves}` : mode === 'rapid' ? `تم تقييم: ${session.records.filter(record => record.result !== 'viewed' && record.result !== 'skip').length}` : `الاختيارات: ${session.attempts}`;
@@ -243,11 +331,12 @@
         $('#rapid-autoplay').disabled = false;
         $('#rapid-autoplay').setAttribute('aria-pressed', String(!!session.autoPlay));
         $('#rapid-controls').hidden = mode !== 'rapid' || session.autoPlay; $('#next-round').hidden = true; $('#reload-media').hidden = true;
-        $('#skip-word').hidden = !['rapid', 'test'].includes(mode) || session.autoPlay;
+        $('#skip-word').hidden = !!activePlan || !['rapid', 'test'].includes(mode) || session.autoPlay;
         feedback('جاري تحميل الصور…');
         const loading = [];
         const target = byKey.get(session.order[session.position]);
         lastKey = mode === 'memory' ? null : target.key;
+        productionBeats(target);
         if (mode === 'memory') {
             if (session.order.length <= 2) $('#game-board').classList.add('two-columns');
             else if (session.order.length === 3) $('#game-board').classList.add('three-columns');
@@ -281,19 +370,20 @@
                 attachDrag(source.element, ticket); $('#active-match').append(source.element);
             }
         }
-        enableControls(); save();
+        $('#game-board').dataset.count=$('#game-board').children.length;
+        fitBoard();enableControls(); save();
         const results = await Promise.all(loading); // At most 12 memory cards / 7 matching images.
         if (ticket !== generation) return;
         ready = results.every(Boolean);
         phase = session.between ? 'between' : 'active'; runningSince = performance.now();
         if (!ready) { feedback('تعذر تحميل صورة. أعد التحميل أو نزّل المحتوى من الرئيسية. يمكنك إنهاء الجلسة دون احتسابها نجاحاً.', true); $('#reload-media').hidden = false; enableControls(); return; }
         if(mode!=='memory')window.SessionHomework?.record({activity:({matching:'المطابقة',rapid:'البطاقات السريعة',test:'استمع واختر'})[mode],key:target.key,label:target.name});
-        if (session.between) { feedback('أحسنت! أكملت هذه المجموعة.'); if (activePlan) later(() => { session.between = false; void renderCurrent(); }, 650); else $('#next-round').hidden = false; enableControls(); return; }
+        if (session.between) { feedback('أحسنت! أكملت هذه المجموعة.'); later(() => { session.between = false; void renderCurrent(); }, 650); enableControls(); return; }
         if (session.guide && !session.guide.done) { void runGuide(ticket); return; }
         feedback(mode === 'test' ? 'استمع إلى الكلمة ثم المس صورتها.' : meta.description);
         if (mode === 'memory' && session.pendingMismatch) { phase = 'feedback'; later(closeMismatch, 800); }
         if (mode === 'rapid' && session.autoPlay) { enableControls(); void autoAdvance(ticket); return; }
-        if (mode === 'rapid') startObservation(session.rapidRemaining ?? session.settings.duration * 1000);
+        if (mode === 'rapid') startObservation(activePlan?0:session.rapidRemaining??session.settings.duration*1000);
         enableControls();
         if (mode === 'test' || (mode === 'rapid' && session.settings.sound)) await playWord(target.key, mode === 'test');
         if (ticket === generation) enableControls();
@@ -307,30 +397,18 @@
         const guide = session.guide;
         const keys = mode === 'test' ? [session.order[0]] : session.order;
         if (mode === 'memory') updateMemory();
-        if (mode === 'rapid') $('#play-view').classList.add('production-preview');
+
         while (guide.index < keys.length && ticket === generation) {
             const key = keys[guide.index]; lastKey = key;
             feedback(mode === 'memory' ? 'شاهد الزوج واستمع.' : mode === 'test' ? 'نجرب مرة معاً.' : 'استمع وشاهد.');
             all('#game-board > button').forEach(button => button.classList.toggle('guide-glow', mode === 'memory' && button.dataset.key === key));
             if (mode === 'rapid') {
                 const card = picture(byKey.get(key), true, 'picture-button', 'div');
-                const toolbar = document.createElement('div'); toolbar.className = 'preview-toolbar';
-                for (const [icon, label, action, replay] of [
-                    ['pause', 'إيقاف مؤقت', pause], ['times', 'إنهاء الجلسة', () => finish(true)],
-                    ['play', 'أعد سماع الكلمة', () => { void runGuide(generation); }, true]
-                ]) {
-                    const button = document.createElement('button'); button.type = 'button'; button.className = 'game-button icon-button';
-                    button.setAttribute('aria-label', label); button.title = label; button.innerHTML = `<i class="fas fa-${icon}" aria-hidden="true"></i>`;
-                    if (replay) button.dataset.guideReplay = '';
-                    button.onclick = action; toolbar.append(button);
-                }
-                const status = document.createElement('p'); status.className = 'preview-status'; status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
-                preview.replaceChildren(toolbar, card.element, status); preview.hidden = false;
-                if (!preview.open) preview.showModal();
+                $('#game-board').replaceChildren(card.element);productionBeats(byKey.get(key));fitBoard();
                 if (!await card.loaded || ticket !== generation) {
                     if (ticket === generation) {
                         guideBusy = false; feedback('تعذر تحميل الصورة. اضغط زر إعادة المحاولة.', true);
-                        const retry = preview.querySelector('[data-guide-replay]'); retry.setAttribute('aria-label', 'إعادة المحاولة'); retry.title = 'إعادة المحاولة';
+                        const retry = preview.querySelector('[data-guide-replay]')||$('#play-word'); retry.setAttribute('aria-label', 'إعادة المحاولة'); retry.title = 'إعادة المحاولة';
                         enableControls();
                     }
                     return;
@@ -341,7 +419,7 @@
             if (ticket !== generation) return;
             if (!played) {
                 guideBusy = false;
-                if (!$('#game-feedback').classList.contains('error')) feedback('تعذر إكمال الصوت. اضغط «أعد سماع الكلمة» للمحاولة مجدداً.', true);
+                if (!$('#game-feedback').classList.contains('error')) feedback('اضغط ▶ لإعادة الصوت.', true);
                 enableControls(); return;
             }
             window.SessionHomework?.record({activity:`التعرّف على كلمات ${meta.title}`,key,label:byKey.get(key).name});
@@ -351,6 +429,7 @@
             guide.index++; save();
         }
         if (ticket !== generation) return;
+        if (mode === 'test' && session.currentChoices) session.currentChoices = M.shuffleAfterDemo(session.currentChoices, session.currentChoices.indexOf(session.order[session.position]));
         guide.done = true; guideBusy = false; $('#rapid-autoplay').disabled = false;
         save(); void renderCurrent();
     }
@@ -377,7 +456,7 @@
     }
     async function playWord(key, required = false, waitUntilEnded = false) {
         if (!byKey.has(key) || !ready) return false;
-        stopAudio();
+        stopBeats();stopAudio();
         const ticket = generation, audioTicket = audioGeneration;
         audio.src = byKey.get(key).audio; lastKey = key;
         const completion = waitUntilEnded ? waitForAudioEnd() : null;
@@ -391,7 +470,7 @@
             if (completion) return await completion.promise && ticket === generation && audioTicket === audioGeneration;
             return true;
         } catch {
-            if (ticket === generation && audioTicket === audioGeneration) { audio.pause(); feedback('اضغط «أعد سماع الكلمة» لتشغيل الصوت. إذا لم يتوفر، عد للرئيسية لتنزيل المحتوى.', true); }
+            if (ticket === generation && audioTicket === audioGeneration) { audio.pause(); feedback('اضغط ▶ لإعادة الصوت.', true); }
             return false;
         } finally { clearTimeout(timer); completion?.cancel(); }
     }
@@ -423,6 +502,7 @@
         if (!session.trialMistakes) session.firstCorrect++;
         session.records.push({ key: target, result: 'correct', attempts: session.trialMistakes + 1 });
         session.position++; session.trialMistakes = 0; session.currentChoices = null;
+        if(document.documentElement.dataset.suiteInput!=='keyboard')document.activeElement?.blur();
         button.classList.add('matched'); feedback(`أحسنت! ${byKey.get(target).name}`); enableControls();
         save(); updateStats();
         const feedbackStarted = performance.now();
@@ -494,6 +574,7 @@
                 feedback('صورتان مختلفتان. تذكّر مكانهما وحاول مجدداً.'); later(closeMismatch, 800);
             }
         } else feedback('اختر البطاقة الثانية.');
+        if(document.documentElement.dataset.suiteInput!=='keyboard')document.activeElement?.blur();
         updateMemory(); updateStats(); save();
     }
     function closeMismatch() { session.open = []; session.pendingMismatch = false; phase = 'active'; updateMemory(); save(); }
@@ -525,9 +606,23 @@
         }, (session.settings.duration || 2) * 1000);
     }
     function grade(result) {
-        if (phase !== 'active' || !ready || !gradeReady || session.autoPlay || !['notMastered', 'learning', 'mastered'].includes(result)) return;
-        const key = session.order[session.position]; phase = 'feedback';
-        session.records.push({ key, result }); if (result !== 'mastered') missed(key);
+        if (phase !== 'active' || !ready || !gradeReady || session.autoPlay || !['notMastered', 'learning', 'syllables', 'mastered'].includes(result)) return;
+        stopBeats();
+        const rating=['notMastered','learning','syllables','mastered'].indexOf(result);
+        session.ratingHistory ||= {};
+        (session.ratingHistory[session.order[session.position]] ||= []).push(rating);
+        const key = session.order[session.position];
+        if (activePlan && result !== 'mastered') {
+            session.trialMistakes++; missed(key); feedback('حاول مرة أخرى.', true);
+            window.SessionHomework?.record({activity:meta.title,key,label:byKey.get(key).name,needsHelp:true});
+            save(); void playWord(key); return;
+        }
+        phase = 'feedback';
+        // A corrected response advances, but does not become first-attempt success.
+        if (activePlan && session.trialMistakes) result = 'learning';
+        session.trialMistakes = 0;
+        if(result==='syllables')result='learning';
+        session.records.push({ key, result, productionRating:rating, ratingHistory:[...session.ratingHistory[key]] }); if (result !== 'mastered') missed(key);
         session.position++; session.rapidRemaining = null; feedback('تم تسجيل الاستجابة.'); enableControls(); save(); updateStats(); later(() => { void renderCurrent(); }, 250);
     }
     function skip() {
@@ -549,9 +644,10 @@
         const domain = mode === 'rapid' ? 'expressive' : mode === 'test' ? 'receptive' : null;
         const difficulty = domain ? P.assessmentDifficulty(domain, session.settings, M.uniqueItems(session.pool.map(key => byKey.get(key))).length) : null;
         P.logSession({ id: session.sessionId || `${mode}-${session.created}`, started: session.created, source: mode, domain, difficulty, kind: mode === 'test' || (mode === 'rapid' && !session.autoPlay) ? 'assessment' : 'practice', partial,
-            records: session.records.map(record => ({ key: record.key,
+            records: observedRecords().map(record => ({ key: record.key,
                 correct: domain && !['viewed','skip'].includes(record.result) ? (mode === 'rapid' ? Number(record.result === 'mastered') : Number(record.result === 'correct' && record.attempts === 1)) : 0,
-                total: domain && record.result !== 'viewed' ? 1 : 0 })) });
+                total: domain && record.result !== 'viewed' ? 1 : 0,
+                ...(record.ratingHistory ? { productionRating:record.productionRating, ratingHistory:record.ratingHistory } : {}) })) });
         if (mode === 'test' && !partial && !session.review) P.completeWordLevel(P.active()?.workspace?.wordLevel,
             session.records.map(record => ({ key: record.key, correct: record.result === 'correct' && record.attempts === 1 })), true);
         if (activePlan && !partial) {
@@ -666,7 +762,7 @@
     }
     const planBanner = document.createElement('div'); planBanner.className = 'voc-plan-banner'; planBanner.hidden = true;
     const planText = document.createElement('span'); planText.textContent = 'مسار الألعاب · نفس بطاقات مساحة العمل';
-    const cancelPlan = document.createElement('button'); cancelPlan.className = 'voc-choice'; cancelPlan.textContent = 'إيقاف المسار'; cancelPlan.type = 'button';
+    const cancelPlan = document.createElement('button'); cancelPlan.className = 'game-button icon-button'; cancelPlan.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>'; cancelPlan.type = 'button';cancelPlan.setAttribute('aria-label','إيقاف المسار');cancelPlan.title='إيقاف المسار';
     cancelPlan.addEventListener('click', stopPlan);
     planBanner.append(planText, cancelPlan); $('#game-main').prepend(planBanner);
     window.addEventListener('voc-profile-open', pause);
@@ -677,7 +773,7 @@
         if (round.mode !== mode) { location.replace(P.planURL()); return; }
         const pool = round.keys.map(key => byKey.get(key));
         if (pool.some(item => !item)) { P.cancelPlan(); alert('إحدى البطاقات غير متاحة. اختر البطاقات مجدداً من مساحة العمل.'); return; }
-        const plan = P.active().plan; activePlan = { id: plan.id, position: plan.position }; planBanner.hidden = false;
+        const plan = P.active().plan; activePlan = { id: plan.id, position: plan.position }; planBanner.hidden = true; document.body.classList.add('automatic-plan');
         selected = new Set(round.keys);
         const draft = read(`${prefix}-draft`);
         if (validDraft(draft) && draft.planId === plan.id && draft.planPosition === plan.position) { session = draft; phase = 'paused'; show('pause'); $('#pause-description').textContent = 'حُفظ المسار. اضغط المتابعة لإكماله.'; }

@@ -6,15 +6,16 @@ const normalize = value => String(value || '').normalize('NFKC').trim().replace(
 export function createProgress(storage, onError = () => {}) {
  const empty = () => ({schema:1, active:null, children:[]});
  const read = () => {try {const data=JSON.parse(storage.getItem(STORAGE));return data?.schema===1&&Array.isArray(data.children)?data:empty();} catch {return empty();}};
- let data=read(), owner=data.active, ok=true;
+ let data=read(), owner=data.active, ok=true, resetEpochs={...data.accountResets};
  const active=()=>data.children.find(child=>child.id===owner)||null;
  // Read before every mutation, preserving progress written by other apps/tabs.
  function write(change, activate=false) {
   const latest=read();
+  if(!activate&&(latest.accountResets?.[owner]||null)!==(resetEpochs[owner]||null))return false;
   if(latest.deletedChildren?.[owner]&&!activate){data=latest;owner=null;return false;}
   for(const child of data.children)if(!latest.deletedChildren?.[child.id]&&!latest.children.some(saved=>saved.id===child.id))latest.children.push(clone(child));
-  if(!ok){const saved=latest.children.find(child=>child.id===owner);if(saved&&active()?.taffaha)saved.taffaha=clone(active().taffaha);}
-  change(latest);if(activate)latest.active=owner;data=latest;
+  if(!ok&&(latest.accountResets?.[owner]||null)===(resetEpochs[owner]||null)){const saved=latest.children.find(child=>child.id===owner);if(saved&&active()?.taffaha)saved.taffaha=clone(active().taffaha);}
+  change(latest);if(activate){latest.active=owner;resetEpochs={...latest.accountResets};}data=latest;
   try {storage.setItem(STORAGE,JSON.stringify(data));ok=true;return true;} catch {ok=false;onError();return false;}
  }
  function signIn(name) {

@@ -40,7 +40,8 @@ export function lingSummary(record){
   `<p class="ling-error-pattern">${a.pattern==='multiple'?`الأخطاء موزعة على مجموعات تردد متعددة: ${a.affected.map(group=>`${group.label} (${group.missed.join('، ')})`).join('؛ ')}`:`الأخطاء في مجموعة الترددات ال${a.affected[0].label}: ${a.affected[0].missed.join('، ')}`}.</p>`:
   '<p class="ling-error-pattern">لا توجد أخطاء مسجلة في الأصوات المفحوصة.</p>';
  const coverage=a.groups.map(group=>`${group.label}: ${group.total?`<bdi dir="ltr">${group.correct} / ${group.total}</bdi>`:'لم تُفحص'}`).join(' · ');
- return `<section class="ling-report-summary" aria-label="ملخص الجلسة"><h2>ملخص الجلسة</h2>${outcome}${missed}<p class="ling-frequency-coverage">الاستجابات الصحيحة حسب المجموعة: ${coverage}</p><p class="ling-summary-note">النتيجة تخص الأصوات المفحوصة في هذه الجلسة؛ مجموعات التردد تقريبية ولا تحدد سبب الخطأ أو تشخّص ضعف السمع.</p></section>`;
+ const catchSummary=record.catchTrials?.length?`<p class="ling-catch-summary">جولات السكوت: ${record.catchTrials.filter(row=>row.correct).length} / ${record.catchTrials.length} استجابات صحيحة؛ الإبلاغ عن صوت أثناء السكوت: ${record.catchTrials.filter(row=>row.response).length}.</p>`:'';
+ return `<section class="ling-report-summary" aria-label="ملخص الجلسة"><h2>ملخص الجلسة</h2>${outcome}${catchSummary}${missed}<p class="ling-frequency-coverage">الاستجابات الصحيحة حسب المجموعة: ${coverage}</p><p class="ling-summary-note">النتيجة تخص الأصوات المفحوصة في هذه الجلسة؛ مجموعات التردد تقريبية ولا تحدد سبب الخطأ أو تشخّص ضعف السمع.</p></section>`;
 }
 
 export function lingTables(record){

@@ -14,6 +14,7 @@
     let registration;
     let status;
     let running = false;
+    let starting = false;
     let fault = false;
 
     function showError(message) {
@@ -42,7 +43,7 @@
         progress.setAttribute('aria-valuetext', `${percent}%`);
         statusText.textContent = `${percent}%`;
         card.dataset.state = status.ready ? 'ready' : status.wanted ? 'downloading' : 'idle';
-        button.disabled = status.ready || running || (status.wanted && navigator.onLine);
+        button.disabled = status.ready || starting || running || (status.wanted && navigator.onLine);
     }
 
     function worker() {
@@ -101,16 +102,21 @@
 
     window.addEventListener('beforeinstallprompt', event => event.preventDefault());
     button?.addEventListener('click', async () => {
-        if (running) return;
+        if (running || starting) return;
+        starting = true;
         button.disabled = true;
+        button.setAttribute('aria-busy', 'true');
         try {
-            if (!registration?.active) await initialize();
-            if (!registration?.active) return;
+            if (registration?.active?.state !== 'activated' && !await initialize()) return;
             try { void navigator.storage?.persist?.()?.catch(() => {}); } catch {}
             render(await send('VOC_START'));
             void pump();
         } catch {
             showError('تعذر بدء التنزيل. تحقق من الاتصال ثم أعد المحاولة.');
+        } finally {
+            starting = false;
+            button.setAttribute('aria-busy', 'false');
+            button.disabled = running || (!fault && !!status?.ready);
         }
     });
 
@@ -118,27 +124,15 @@
         if (!('serviceWorker' in navigator) || !window.isSecureContext) {
             showError('يتطلب التنزيل دون اتصال فتح التطبيق عبر HTTPS أو localhost.');
             if (button) button.disabled = true;
-            return;
+            return false;
         }
         try {
-            registration = await navigator.serviceWorker.register('./sw.js', { scope: './', updateViaCache: 'none' });
-            window.AppUpdates.watch(registration);
-            if (!registration.active) {
-                // ready alone never rejects if shell installation fails (e.g. 404).
-                await new Promise((resolve, reject) => {
-                    const timer = setTimeout(() => reject(new Error('Installation timeout')), 45000);
-                    const check = () => {
-                        if (registration.active) { clearTimeout(timer); resolve(); }
-                        else if (registration.installing?.state === 'redundant') { clearTimeout(timer); reject(new Error('Installation failed')); }
-                    };
-                    registration.installing?.addEventListener('statechange', check);
-                    registration.addEventListener('updatefound', () => registration.installing?.addEventListener('statechange', check));
-                    check();
-                });
-            }
+            registration = await window.AppUpdates.ready();
             await sync();
+            return true;
         } catch {
             showError('تعذر تجهيز التطبيق دون اتصال. تحقق من الاتصال وأعد المحاولة.');
+            return false;
         }
     }
 
@@ -153,5 +147,6 @@
     window.addEventListener('offline', () => { if (status) render(status); });
     window.addEventListener('pageshow', () => { void sync(); });
     document.addEventListener('visibilitychange', () => { if (!document.hidden) void sync(); });
+    if (button && 'serviceWorker' in navigator && window.isSecureContext) button.disabled = false;
     void initialize();
 })();

@@ -2,7 +2,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     'use strict';
     const P = window.VocProgress;
-    window.VocHomeLesson.mount(CATEGORIES.flatMap(category => category.items.map(item => ({ key: P.key(item), name: item.name }))));
     const find = key => CATEGORIES.flatMap(category => category.items).find(item => P.key(item) === key);
     let changingProfile = false;
     let restoring = true;
@@ -15,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let hadMistake = false;
     let promptQueue = [];
     let run = null;
+    let automaticChoice = null;
+    let planStartMode = 'practice';
     let startToken = 0;
     const keys = () => [...new Set(app.state.slotsData.filter(slot => slot.item).map(slot => P.key(slot.item)))];
     const signature = () => [...keys()].sort().join('|');
@@ -36,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         app.renderSlotsLayout();
     }
     app.state.stars = 0; app.renderStars(); restoring = false;
-    window.addEventListener('voc-profile-beforechange', () => { if(app.state.deleteMode)app.setDeleteMode(false);save(); app.exitTestMode(false); changingProfile = true; });
+    window.addEventListener('voc-profile-beforechange', () => { automaticChoice=null;document.body.classList.remove('voc-automatic-workplace');if(app.state.deleteMode)app.setDeleteMode(false);save(); app.exitTestMode(false); changingProfile = true; });
     window.addEventListener('pagehide', () => { save(); logRun(true); });
     window.addEventListener('voc-profile-memorychange', () => { app.state.deleteMode=false;app.syncDeleteMode();changingProfile = false; practiced = null; lastResult = null; worked = []; wordLevel = null; app.resetSlots(); app.renderSlotsContent(); });
     window.addEventListener('voc-workplace-level-load', event => { practiced = null; lastResult = null; worked = []; wordLevel = event.detail || null; save(); });
@@ -80,6 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const iconButton = (attributes, icon, label, extra = '') => `<button type="button" class="voc-choice voc-icon" ${attributes} aria-label="${label}" title="${label}"><i class="fas fa-${icon}" aria-hidden="true"></i>${extra}</button>`;
     modal.innerHTML = `<h2 id="automation-title">نكمل بالألعاب؟</h2><div class="voc-choices" id="plan-levels" role="group" aria-label="المستوى">${iconButton('data-difficulty="easy" aria-pressed="true"', 'seedling', 'سهل')}${iconButton('data-difficulty="moderate" aria-pressed="false"', 'walking', 'متوسط')}${iconButton('data-difficulty="advanced" aria-pressed="false"', 'running', 'متقدم')}</div><div class="voc-choices" id="plan-games" role="group" aria-label="الألعاب التالية">${iconButton('data-mode="matching" aria-pressed="true"', 'puzzle-piece', 'المطابقة')}${iconButton('data-mode="memory" aria-pressed="true"', 'brain', 'الذاكرة')}${iconButton('data-mode="rapid" aria-pressed="true"', 'bolt', 'البطاقات السريعة')}${iconButton('data-mode="test" aria-pressed="true"', 'headphones', 'استمع واختر')}</div><footer class="suite-text-actions"><button type="button" id="start-plan">يلا نلعب</button><button type="button" id="dismiss-plan">عودة للتدريب</button></footer>`;
     document.body.append(modal);
+    const autoButton=document.createElement('button');autoButton.type='button';autoButton.id='start-automatic-path';autoButton.className='suite-icon';autoButton.title='المسار التلقائي';autoButton.setAttribute('aria-label',autoButton.title);autoButton.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 5 11 7-11 7z"/></svg>';
+    document.querySelector('#workplace-view > header > div').append(autoButton);
+    autoButton.onclick=()=>{window.AppNavigation?.closeSettings();planStartMode='practice';app.exitTestMode(false);modal.showModal();};
     modal.querySelectorAll('[data-difficulty]').forEach(button => button.addEventListener('click', () => modal.querySelectorAll('[data-difficulty]').forEach(b => b.setAttribute('aria-pressed', String(b === button)))));
     modal.querySelectorAll('[data-mode]').forEach(button => button.addEventListener('click', () => {
         button.setAttribute('aria-pressed', String(button.getAttribute('aria-pressed') !== 'true'));
@@ -90,7 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
     modal.querySelector('#start-plan').onclick = () => {
         const modes = [...modal.querySelectorAll('[data-mode][aria-pressed=true]')].map(button => button.dataset.mode);
         const difficulty = modal.querySelector('[data-difficulty][aria-pressed=true]').dataset.difficulty;
-        if (P.startPlan([...new Set([...worked,...keys()])], difficulty, modes) && P.storageOK()) { worked=[];save(); location.href = P.planURL(); }
+        if(!planStartMode){if(P.startPlan([...new Set([...worked,...keys()])],difficulty,modes)&&P.storageOK()){worked=[];save();location.href=P.planURL();}return;}
+        automaticChoice={difficulty,modes};modal.close();
+        document.body.classList.add('voc-automatic-workplace');
+        void app.handleModeButtonClick(planStartMode);
     };
     function logRun(partial) {
         if (!run || run.logged || !records.length) return;
@@ -99,13 +106,21 @@ document.addEventListener('DOMContentLoaded', () => {
             records: records.map(record => ({ key: record.key, correct: record.correct ? 1 : 0, total: 1 })) });
     }
     const exit = app.exitTestMode;
-    app.exitTestMode = function(showMessage = true) { startToken++; this.stopCardPlayback(); window.VocCountdown.cancel(); if (this.state.testState.active) logRun(true); exit.call(this, showMessage); };
+    app.exitTestMode = function(showMessage = true) { if(showMessage){automaticChoice=null;document.body.classList.remove('voc-automatic-workplace');}startToken++; this.stopCardPlayback(); window.VocCountdown.cancel(); if (this.state.testState.active) logRun(true); exit.call(this, showMessage); };
     const start = app.handleModeButtonClick;
     app.handleModeButtonClick = async function(type) {
         if(this.state.deleteMode)this.setDeleteMode(false);
         if (this.state.testState.active && this.state.mode === type) { start.call(this, type); return; }
         if (!keys().length) { this.showToast('أضف بطاقة للبدء', 'warning'); return; }
         this.exitTestMode(false);
+        if (type === 'test' && practiced === signature()) {
+            const filled = this.state.slotsData.filter(slot => slot.item);
+            if (filled.length > 1) {
+                const items = filled.map(slot => slot.item), shift = 1 + Math.floor(Math.random() * (filled.length - 1));
+                filled.forEach((slot, index) => { slot.item = items[(index + shift) % items.length]; });
+                this.renderSlotsContent();
+            }
+        }
         this.primeCardAudio();
         const token = ++startToken;
         if (!await window.VocCountdown.start() || token !== startToken) return;
@@ -131,7 +146,14 @@ document.addEventListener('DOMContentLoaded', () => {
             logRun(false);
             this.exitTestMode(false); this.state.stars = 0; this.renderStars(); save();
             worked=[...new Set([...worked,...keys()])];save();
+            if (mode === 'practice' && automaticChoice) { void this.handleModeButtonClick('test'); return; }
+            if (mode === 'test' && automaticChoice) {
+                const {difficulty,modes}=automaticChoice;automaticChoice=null;
+                if(P.startPlan([...new Set([...worked,...keys()])],difficulty,modes)&&P.storageOK()){worked=[];save();location.href=P.planURL();}
+                return;
+            }
             if (mode === 'test' || mode === 'practice') {
+                planStartMode=mode==='practice'?'test':null;
                 modal.querySelectorAll('[data-mode]').forEach(button => button.setAttribute('aria-pressed', 'true'));
                 modal.querySelector('#start-plan').disabled = false; modal.showModal();
             } else this.showToast(mode === 'practice' ? 'اكتمل التدريب' : `نتيجة الاختبار: ${percentage}%`, 'success');

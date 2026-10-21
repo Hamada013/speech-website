@@ -7,7 +7,7 @@ const server=http.createServer((req,res)=>{
  const file=path.resolve(root,'.'+decodeURIComponent(pathname));if(!file.startsWith(root+path.sep))return res.writeHead(403).end();
  fs.readFile(file,(error,data)=>{if(error)return res.writeHead(404).end();res.setHeader('Content-Type',types[path.extname(file)]||'application/octet-stream');res.end(data);});
 });
-const rank={back:0,profile:10,report:20,family:25,info:30,end:35,download:40,apps:50,activities:60,settings:70};
+const rank={settings:0,activities:10,apps:20,download:30,end:35,info:40,family:45,report:50,profile:60,back:70};
 async function toolbar(page){
  await page.waitForFunction(()=>[...document.querySelectorAll('link[rel="stylesheet"]')].filter(link=>new URL(link.href).origin===location.origin).every(link=>link.sheet));
  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
@@ -19,7 +19,7 @@ async function toolbar(page){
  for(const controls of result){
   const kinds=controls.map(control=>control.kind);assert.deepEqual(kinds,[...kinds].sort((a,b)=>rank[a]-rank[b]),'DOM and keyboard order match across apps');
   for(const control of controls){assert.equal(control.background,'rgba(0, 0, 0, 0)',control.kind);assert.equal(control.color,'rgb(34, 68, 90)',control.kind);assert.equal(control.width,44,control.kind);assert.equal(control.height,44,control.kind);assert.ok(control.label,control.kind);}
-  for(let i=1;i<controls.length;i++)if(Math.abs(controls[i].y-controls[i-1].y)<3)assert.ok(controls[i].x<controls[i-1].x,'Visual RTL order matches DOM order');
+  for(let i=1;i<controls.length;i++)if(Math.abs(controls[i].y-controls[i-1].y)<3)assert.ok(controls[i].x>controls[i-1].x,'Visual LTR order matches DOM order');
  }
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'No horizontal overflow');
  return result.flat().map(control=>control.kind);
@@ -41,7 +41,7 @@ async function plainIcons(page,selector){
    for(const app of ['voc','senb','taffaha']){
     await page.goto(origin+app+'/index.html',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.AppNavigation&&document.querySelector('[data-suite-control="profile"]'));
     await toolbar(page);await plainIcons(page,app==='taffaha'?'.home-action-icon':'.app-home-action-icon');await photo(app+'-home');
-    for(const kind of ['profile','report','download']){
+    for(const kind of ['profile','report']){
      const markup=await page.locator(`[data-suite-control="${kind}"] svg`).first().evaluate(svg=>svg.outerHTML);
      if(glyphs.has(kind))assert.equal(markup,glyphs.get(kind),`${kind}: identical outline icon across apps`);else glyphs.set(kind,markup);
     }

@@ -38,10 +38,14 @@ const configs = [
             await page.route(/fonts\.(googleapis|gstatic)\.com/, route => route.abort());
             await page.goto(`http://127.0.0.1:${server.address().port}/tools/${config.app}/index.html`);
             await page.locator(config.profile).first().click(); await solveParentGate(page);
-            const dialog = page.locator(config.dialog); await dialog.locator('.suite-account-list').waitFor();
+            const dialog = page.locator(config.dialog); await dialog.locator('.suite-account-browser').waitFor();
             assert.equal(await dialog.locator('[role=listitem]').count(), 4);
             assert.equal(await dialog.locator('[data-delete-child=admin]').count(), 0, config.app + ': no Hamada delete control');
             assert.equal(await dialog.locator('[data-delete-child]').count(), 3);
+            const avatars=await dialog.locator('.suite-account-avatar').evaluateAll(nodes=>nodes.map(node=>node.dataset.avatar));
+            assert.equal(new Set(avatars).size,3,'Child fruit/animal icons never repeat');
+            assert.equal(await dialog.locator('.suite-account-avatar svg').count(),3,'Every child has a local outline SVG icon');
+            assert.equal(await dialog.locator('.suite-account-avatar').allTextContents().then(texts=>texts.join('')),'','Avatar drawings contain no emoji text');
             assert.deepEqual(await dialog.locator('[data-delete-child]').evaluateAll(nodes => nodes.map(node => ({ text: node.textContent, icon: !!node.querySelector('svg'), label: !!node.getAttribute('aria-label') }))), Array(3).fill({ text: '', icon: true, label: true }));
             for (const width of [320, 390, 768]) {
                 await page.setViewportSize({ width, height: 844 });
@@ -50,7 +54,7 @@ const configs = [
                 }));
                 rows.forEach((row, index) => {
                     assert.ok(row.left >= 0 && row.right <= width, config.app + ': list fits screen');
-                    if (index) assert.ok(row.top >= rows[index - 1].bottom, config.app + ': one account per row');
+                    for(const prior of rows.slice(0,index))assert.ok(row.right<=prior.left||row.left>=prior.right||row.bottom<=prior.top||row.top>=prior.bottom,config.app+': avatar cards do not overlap');
                 });
                 assert.ok(await dialog.locator('[data-delete-child]').evaluateAll(nodes => nodes.every(node => {
                     const r = node.getBoundingClientRect(); return r.width >= 44 && r.height >= 44 && r.left >= 0 && r.right <= innerWidth;
@@ -77,7 +81,7 @@ const configs = [
             assert.deepEqual(errors, [], config.app + ': no page errors');
             await context.close();
         }
-        console.log('PASS: protected Hamada account, vertical account lists, accessible trash icons, cancel/confirm deletion and child restrictions in VOC, SENB and Taffaha.');
+        console.log('PASS: protected Hamada account, searchable avatar grids, accessible trash icons, cancel/confirm deletion and child restrictions in VOC, SENB and Taffaha.');
     } catch (error) {
         await page?.screenshot({ path: '/private/tmp/account-deletion-error.png', fullPage: true }).catch(() => {}); throw error;
     } finally {

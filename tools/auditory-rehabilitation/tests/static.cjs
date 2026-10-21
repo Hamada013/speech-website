@@ -11,4 +11,14 @@ assert(html.includes('lang="ar" dir="rtl"'));assert(!/http-equiv="refresh"/.test
 assert(arabic?!data.includes('SOUND_NAMES'):!data.includes('LETTER_MAP'));
 for(const file of release.shell.filter(entry=>entry.url.endsWith('.js')))cp.execFileSync(process.execPath,['--check',path.join(root,file.url)]);
 assert(release.shell.some(entry=>entry.url==='assets/updates.js'));assert(release.shell.some(entry=>entry.url==='images/logo.webp'));
+if(!arabic){
+ const pitch=JSON.parse(fs.readFileSync(path.join(root,'assets/sound-pitch.js'),'utf8').match(/export const SOUND_PITCH=(\{[\s\S]*\});\s*$/)[1]);
+ assert.equal(Object.keys(pitch).length,50);
+ for(let id=1;id<=50;id++){assert(['low','middle','high'].includes(pitch[id].band));assert.equal(pitch[id].sha256,hash(fs.readFileSync(path.join(root,`sounds/${id}.m4a`))));assert.ok(Math.abs(pitch[id].energy.reduce((a,b)=>a+b,0)-1)<.002);}
+ const {classify}=require('../scripts/build-sound-pitch.cjs');
+ const tone=(hz,amplitude=1)=>Float32Array.from({length:16000},(_,i)=>amplitude*Math.sin(2*Math.PI*hz*i/16000));
+ for(const [hz,band]of [[250,'low'],[1000,'middle'],[4000,'high']]){assert.equal(classify(tone(hz)).band,band);assert.equal(classify(tone(hz,.01)).band,band,'Loudness does not change the frequency group');}
+ const low=tone(250),high=tone(4000,.2);assert.equal(classify(low.map((value,i)=>value+high[i])).band,'low','Broadband mixtures follow the strongest energy band');
+ assert.throws(()=>classify(new Float32Array(16000)),/Empty/);
+}
 console.log(`PASS ${app}: independent app shell, ${release.media.length} local media hashes, scoped manifest, installation icons, isolated activity data, JavaScript syntax.`);

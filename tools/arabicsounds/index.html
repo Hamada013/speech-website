@@ -5,12 +5,12 @@
 <meta name="description" content="أصواتي العربية: استماع وتدريب وألعاب وفحص أصوات لينغ."><title>أصواتي العربية</title>
 <link rel="manifest" href="manifest.json"><link rel="icon" href="icons/icon-192.png" type="image/png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/styles.css"><link rel="stylesheet" href="assets/home.css"><link rel="stylesheet" href="assets/pairs.css"><link rel="stylesheet" href="assets/matching.css"><link rel="stylesheet" href="assets/ling.css"><link rel="stylesheet" href="assets/activities.css"><link rel="stylesheet" href="assets/pwa.css"><link rel="stylesheet" href="assets/updates.css">
-<script src="assets/vendor/html2canvas.min.js" defer></script><script src="assets/vendor/jspdf.umd.min.js" defer></script><script type="module" src="assets/app.js"></script><script type="module" src="assets/pwa.js"></script>
+<script src="assets/vendor/html2canvas.min.js" defer></script><script src="assets/vendor/jspdf.umd.min.js" defer></script><link rel="stylesheet" href="assets/parent-gate.css"><link rel="stylesheet" href="assets/flow-ui.css"><link rel="stylesheet" href="assets/app-navigation.css"><link rel="stylesheet" href="assets/sound-suite.css"><link rel="stylesheet" href="assets/detection-game.css"><script defer src="assets/sound-progress.js"></script><script defer src="assets/parent-gate.js"></script><script defer src="assets/accounts.js"></script><script defer src="assets/sound-suite.js" data-app="arabicsounds"></script><script defer src="assets/flow-ui.js"></script><script defer src="assets/app-navigation.js" data-app="arabicsounds"></script><script type="module" src="assets/app.js"></script><script type="module" src="assets/pwa.js"></script>
 </head><body class="app-home-shell" data-screen="home">
 <a class="skip" href="#workspace">إلى المحتوى</a>
 <header class="app-header app-home-topbar"><div class="header-inner app-home-bar">
 <a class="brand app-home-brand" href="#/home" aria-label="أصواتي العربية، الرئيسية"><img src="images/logo.webp" width="52" height="52" alt=""><span><strong>أصواتي العربية</strong><small>نسمع أصوات لغتنا</small></span></a>
-<div class="header-actions app-home-tools"><button id="install" class="icon-button app-home-icon" title="تنزيل" aria-label="تنزيل" aria-haspopup="dialog"></button><a id="home-link" class="icon-button" href="#/home" title="الرئيسية" aria-label="الرئيسية" hidden></a><button id="menu-toggle" class="icon-button" title="القائمة" aria-label="فتح القائمة" aria-controls="drawer" aria-expanded="false" hidden></button></div>
+<div class="header-actions app-home-tools"><a id="home-link" class="icon-button" href="#/home" title="الرئيسية" aria-label="الرئيسية" hidden></a><button id="menu-toggle" class="icon-button" title="القائمة" aria-label="فتح القائمة" aria-controls="drawer" aria-expanded="false" hidden></button></div>
 </div></header>
 <dialog id="drawer" class="drawer" aria-labelledby="drawer-title"><div class="dialog-heading"><h2 id="drawer-title">أصواتي العربية</h2><button class="icon-button" data-close title="إغلاق" aria-label="إغلاق"></button></div><nav id="drawer-links" aria-label="أقسام التطبيق"></nav></dialog>
 <main id="workspace" class="app-home-main" tabindex="-1"></main>
@@ -20,4 +20,4 @@
 <div id="announcement" class="sr-only" aria-live="polite"></div>
 <dialog id="modal" aria-labelledby="modal-title"><div class="dialog-heading"><h2 id="modal-title"></h2><button class="icon-button" data-close title="إغلاق" aria-label="إغلاق"></button></div><div id="modal-body"></div></dialog>
 <dialog id="install-dialog" class="download-dialog" aria-labelledby="install-title"><h2 id="install-title">تنزيل</h2><button id="offline-download" class="button primary" disabled>تنزيل</button><p id="offline-status" dir="ltr" role="status" aria-live="polite">0%</p><progress id="offline-progress" value="0" max="100" aria-label="تقدم التنزيل"></progress><p id="offline-error" role="alert" hidden></p></dialog>
-</body></html>
+<button id="install" class="sound-download-trigger" hidden title="تنزيل" aria-label="تنزيل" aria-haspopup="dialog"></button></body></html>

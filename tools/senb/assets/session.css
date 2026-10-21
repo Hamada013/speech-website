@@ -68,3 +68,8 @@
 .session-beat.lit {background:#24b38c;border-color:#179775;box-shadow:0 0 0 7px #a5ecd966;}
 .session-beat:disabled {opacity:1;cursor:default;}
 @media(prefers-reduced-motion:reduce){.session-drag-copy {transition:none;}}
+
+.senb-automation-actions{display:flex;justify-content:center;gap:28px;margin:16px 0 4px}.senb-automation-actions button{width:56px;height:56px;border:0;background:transparent;color:#22445a}.senb-automation-actions svg{width:30px;height:30px}
+#advItemsGrid .picker-card[aria-pressed=true]{border:2px solid #179774;background:#eefbf5;position:relative}#advItemsGrid .picker-card[aria-pressed=true]::after{content:'✓';position:absolute;top:6px;right:8px;color:#087b59;font-weight:900}
+
+#senbSelectionPlay[hidden]{display:none!important}

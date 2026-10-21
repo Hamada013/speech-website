@@ -20,13 +20,16 @@
         };
         let data = read() || { schema: 1, active: null, children: [] };
         let baseline = clone(data);
+        let resetEpochs = { ...data.accountResets };
         let storageOK = true;
         const persist = (activate = false) => {
             let localActive = data.active;
             const merged = read() || { schema: 1, active: null, children: [] };
             if (merged.deletedChildren?.[localActive]) localActive = null;
+            if ((merged.accountResets?.[localActive] || null) !== (resetEpochs[localActive] || null)) return false;
             // SENB owns child.senb. Never replace it with a stale VOC tab's copy.
             for (const child of data.children) {
+                if((merged.accountResets?.[child.id]||null)!==(resetEpochs[child.id]||null))continue;
                 if (merged.deletedChildren?.[child.id]) continue;
                 const before = baseline.children.find(saved => saved.id === child.id);
                 let saved = merged.children.find(entry => entry.id === child.id);
@@ -111,6 +114,9 @@
             return persist();
         }
         function signIn(name) {
+            const resetData=read();
+            if(JSON.stringify(resetData?.accountResets||{})!==JSON.stringify(resetEpochs)){data=resetData||data;baseline=clone(data);resetEpochs={...data.accountResets};}
+
             data.children = data.children.filter(child => !read()?.deletedChildren?.[child.id]);
             name = String(name || '').normalize('NFKC').trim().replace(/\s+/g, ' ').slice(0, 60);
             if (!name) return null;
@@ -182,7 +188,7 @@
                 try { const latest = JSON.parse(storage.getItem(STORAGE)); if (Array.isArray(latest?.children)) children = latest.children; } catch {}
                 return children.filter(child => child.role !== 'admin' && child.name?.toLocaleLowerCase() !== 'hamada' && (!id || child.id === id)).map(child => JSON.parse(JSON.stringify({ ...child, sessions: Array.isArray(child.sessions) ? child.sessions : data.children.find(saved => saved.id === child.id)?.sessions || [] })));
             },
-            scope: name => active() ? `${name}-child-${active().id}` : name,
+            scope: name => active() ? `${name}-child-${active().id}${data.accountResets?.[active().id]?`-reset-${data.accountResets[active().id]}`:''}` : name,
             saveWorkspace: workspace => { if (active()) { active().workspace = workspace; persist(); } },
             cancelPlan: () => { if (active()) { active().plan = null; persist(); } },
             planURL: () => currentRound() ? `${currentRound().mode}.html?plan=1` : 'index.html?workplace=1' };

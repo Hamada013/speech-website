@@ -86,7 +86,7 @@ body.game-page { margin:0; min-height:100vh; min-height:100dvh; height:auto; ove
 .picture-button { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:150px; width:100%; padding:.7rem; border:2px solid #cddfe9; border-radius:1.1rem; background:#fff; color:var(--game-ink); position:relative; }
 .picture-button img { width:100%; height:clamp(110px,19vh,185px); object-fit:contain; pointer-events:none; }
 .picture-button span { font-size:.85rem; font-weight:800; line-height:1.5; margin-top:.4rem; }
-.picture-button:not(:disabled):hover { border-color:#38bdf8; background:#f4fbff; }
+@media(hover:hover){.picture-button:not(:disabled):hover { border-color:#38bdf8; background:#f4fbff; }}
 .picture-button.matched { border-color:#34ad80; background:#e9faf1; opacity:1; }
 .picture-button.matched::after { content:'✓'; position:absolute; top:.4rem; inset-inline-end:.6rem; font-weight:900; color:var(--game-green); }
 .picture-button.wrong { border-color:#db8b34; background:#fff7e9; }
@@ -155,3 +155,73 @@ body[data-game=test] .wrong { animation:wrong-shake .4s ease-in-out; }
 .word-preview img { height:calc(100% - 3rem); min-height:0; max-height:420px; }
 .word-preview span { font-size:1.35rem; }
 .preview-status { margin:0; font-size:.85rem; line-height:1.6; color:#49657b; }
+
+/* An automatic path presents the task with only pause and audio replay. */
+.compact-game :is(.game-intro,.voc-plan-banner,.game-stats,#play-title,#finish-game,#skip-word,#rapid-autoplay,#observation-progress,#show-grading){display:none!important}
+.compact-game #game-feedback:not(.error){position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.compact-game .game-play-header{justify-content:flex-end;margin-bottom:8px}
+.compact-game .preview-status:not(.error){position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.compact-game .preview-toolbar button[aria-label="إنهاء الجلسة"]{display:none}
+/* Automatic games use the viewport left after the shared header. */
+.automatic-toolbar{display:flex;align-items:center;gap:12px;direction:ltr;flex:none;min-height:48px;position:relative}
+.automatic-actions{display:flex;gap:4px;flex:none}
+.automatic-stars{display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(2px,.6vw,8px);margin:auto;max-width:calc(100% - 112px);line-height:1;color:#dce5ee;font:clamp(16px,2.5vw,27px)/1.2 system-ui}
+.automatic-stars .earned{color:#f4be14}
+body.compact-playing{height:100dvh;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.compact-playing .game-header{flex:none;padding-block:8px;min-height:60px}
+.compact-playing .game-brand img{width:40px;height:40px}
+.compact-playing .game-brand h1{font-size:clamp(15px,2vw,24px)}
+.compact-playing .game-shell{display:flex;flex:1;min-height:0;width:100%;max-width:1180px;margin:0 auto;padding:8px 12px max(12px,env(safe-area-inset-bottom))}
+.compact-playing #play-view{display:flex;flex-direction:column;gap:8px;flex:1;min-height:0;min-width:0}
+.compact-playing :is(.game-play-header,#session-progress){display:none!important}
+.compact-playing #play-view>.game-buttons:has(>button[hidden]):not(:has(>button:not([hidden]))){display:none}
+.compact-playing .game-status.error{font-size:13px;line-height:1.5;min-height:0;margin:0;text-align:center;flex:none}
+.compact-playing .game-workspace{display:grid;grid-template-rows:minmax(0,1fr);gap:12px;width:100%;max-width:100%;flex:1;min-height:0}
+.compact-playing[data-game=matching] .game-workspace:has(.match-source){grid-template-rows:minmax(0,1fr) minmax(65px,25%)}
+.compact-playing #game-board{display:grid;grid-template-columns:repeat(var(--board-columns,2),minmax(0,1fr));grid-template-rows:repeat(var(--board-rows,1),minmax(0,1fr));gap:10px;min-height:0;min-width:0;width:100%;max-width:100%;height:100%;margin:0}
+.compact-playing :is(#game-board>.picture-button,#game-board>.memory-card){min-height:0;min-width:0;height:100%;aspect-ratio:auto;padding:8px;overflow:hidden}
+.compact-playing :is(#game-board,#active-match) .picture-button img{flex:1;min-height:0;height:100%;width:100%;max-width:100%;object-fit:contain}
+.compact-playing .picture-button>span:not(.memory-back){flex:none;margin:2px 0 0;font-size:clamp(12px,2vw,18px)}
+.compact-playing .memory-front{display:flex;flex-direction:column;min-height:0;height:100%}
+.compact-playing #active-match:empty{display:none}
+.compact-playing #active-match{display:flex;justify-content:center;min-height:0}
+.compact-playing .match-source{margin:0;width:100%;max-width:200px;height:100%;min-height:0;padding:6px}
+.compact-playing #rapid-controls{flex:none;min-height:0}
+.compact-playing .rapid-toolbar{margin:6px 0 0}
+.rapid-toolbar .production-rating{flex:0 1 68px;display:grid;place-items:center;width:68px;height:68px;min-width:44px;min-height:44px;padding:3px;border:0;background:transparent;box-shadow:none;border-radius:50%}
+.production-rating img{width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:50%}
+.production-beats{display:flex;justify-content:center;flex-wrap:wrap;gap:4px;direction:rtl;margin:4px auto}
+.production-beat{display:grid;place-items:center;width:44px;height:44px;min-width:44px;min-height:44px;border:0;background:transparent;position:relative;padding:8px;touch-action:manipulation}
+.production-beat::after{content:'';display:block;width:28px;height:28px;aspect-ratio:1;border:2px solid #79b8ca;border-radius:50%;background:#eef8fb}
+.production-beat.lit::after{background:#43b7a0;border-color:#168c77}
+.compact-playing .production-beats{flex-wrap:wrap;gap:0}
+.compact-playing .production-beat{width:44px;min-width:44px;flex:none}
+/* Hover on a replaced target must never resemble a retained answer. */
+.compact-game .picture-button:not(.matched):not(.wrong):not(.guide-glow):hover{border-color:#cddfe9;background:#fff}
+html[data-suite-input=pointer] .game-page :is(.icon-button,.production-rating,.picture-button):focus{outline:0;box-shadow:none}
+@media(orientation:landscape){
+ .compact-playing[data-game=matching] .game-workspace:has(.match-source){grid-template-columns:minmax(0,1fr) minmax(100px,22%);grid-template-rows:minmax(0,1fr);align-items:stretch}
+ .compact-playing .match-source{max-width:100%}
+}
+@media(max-height:500px){
+ .compact-playing .game-header{min-height:48px;padding-block:2px}
+ .compact-playing .game-shell{padding-block:2px}
+ .compact-playing #play-view{gap:2px}
+ .compact-playing .automatic-toolbar{min-height:44px}
+ .compact-playing[data-game=rapid] .game-workspace{min-height:0}
+ .compact-playing .production-beats{margin:0}
+ .compact-playing .rapid-toolbar{margin:0}
+ .compact-playing .production-rating{height:48px;width:48px;flex-basis:48px;min-height:44px}
+}
+
+/* A whole-frame metronome follows the same interaction as Taffaha. */
+.production-rhythm{position:relative;isolation:isolate;border:1px solid #dceaf4;border-radius:22px;background:#fff;padding:10px;margin:0 auto;max-width:650px}
+.production-frame-play{position:absolute;inset:0;z-index:0;width:100%;height:100%;min-height:44px;border:0;border-radius:inherit;background:transparent;cursor:pointer}
+.production-rhythm.is-playing{box-shadow:inset 0 0 0 3px #b9dff1}
+.production-rhythm .production-beats{position:relative;z-index:1;pointer-events:none;margin:0;gap:4px}
+.production-rhythm .production-beat{pointer-events:auto}
+.production-frame-play:focus-visible{outline:3px solid #0284c7;outline-offset:3px}
+.compact-game :is(#pause-description,#results-description,#result-details,#result-metrics){display:none}
+.compact-game #setup-view :is(.game-intro p,#settings-help,#session-preview){display:none}
+.compact-game #results-view .game-back{font-size:0;min-width:44px}.compact-game #results-view .game-back>i{font-size:23px}
+@media(max-height:500px){.production-rhythm{padding:4px}.production-rhythm .production-beat{height:38px;min-height:38px}}

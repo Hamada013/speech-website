@@ -1,3 +1,4 @@
+import {createDetectionGame} from './detection-game.js';
 import {AudioEngine} from './audio.js';
 import {showAnswerFeedback} from './feedback.js';
 import {LETTER_MAP} from './data.js';
@@ -16,13 +17,13 @@ export function createLing({main,icon,title,pic,control,escape,shuffle,openModal
  const modeName=mode=>mode==='identification'?'التعرف على الصوت':'اكتشاف الصوت';
  const cross='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12 M18 6 6 18"/></svg>';
  function stop(){controller?.abort();controller=null;audio.stop();clearTimeout(feedbackTimer);$('#ling-feedback')?.remove();}
- function reset(){stop();current=null;for(const id of ['ling-setup','ling-levels'])if($('#'+id).open)$('#'+id).close();}
+ function reset(){current?.game?.destroy();stop();current=null;for(const id of ['ling-setup','ling-levels'])if($('#'+id).open)$('#'+id).close();}
  function openSetup(){
-  $('#ling-name').value=meta.name||'';
+  $('#ling-name').value=window.SoundProgress?.active()?.name||'';$('#ling-name').readOnly=true;
   $('#ling-setup').showModal();$('#ling-name').focus();
  }
  for(const mode of ['detection','identification'])$('#ling-'+mode).onclick=()=>{
-  audio.unlock();meta={name:$('#ling-name').value.trim(),mode,date:new Date().toISOString()};
+  audio.unlock();meta={name:window.SoundProgress?.active()?.name||'',owner:window.SoundProgress?.active()?.id,sessionId:crypto.randomUUID(),mode,date:new Date().toISOString()};
   $('#ling-setup').close();location.hash='/arabic/ling';
  };
  function heading(mode,extra=''){
@@ -32,42 +33,40 @@ export function createLing({main,icon,title,pic,control,escape,shuffle,openModal
  async function playCurrent(){
   const s=current;if(!s||s.phase==='feedback')return;
   stop();controller=new AbortController();const signal=controller.signal;
-  s.phase='playing';$('#ling-play').disabled=true;
+  s.phase='playing';if($('#ling-play'))$('#ling-play').disabled=true;s.game?.playing(true);
   $$('.ling-response,.ling-choices button').forEach(b=>b.disabled=true);
   $('#status').hidden=true;
   try{
-   await audio.play(`sounds/${LETTER_MAP[s.target]}.m4a`,{signal});
+   if(s.mode==='detection'&&!s.present)await new Promise((resolve,reject)=>{const timer=setTimeout(resolve,2500);signal.addEventListener('abort',()=>{clearTimeout(timer);reject(new DOMException('Cancelled','AbortError'));},{once:true});});
+   else await audio.play(`sounds/${LETTER_MAP[s.target]}.m4a`,{signal});
    if(signal.aborted||current!==s)return;
-   s.phase='answer';$$('.ling-response,.ling-choices button').forEach(b=>b.disabled=false);
+   s.phase='answer';s.game?.enable();$$('.ling-response,.ling-choices button').forEach(b=>b.disabled=false);
   }catch(error){
    if(error.name==='AbortError'||current!==s)return;
-   s.phase='error';$('#status').hidden=false;status('تعذر تشغيل الصوت. تحقق من تنزيل الأصوات ثم أعد المحاولة.',true);
-  }finally{if(!signal.aborted&&current===s)$('#ling-play').disabled=false;}
+   s.phase='error';s.game?.retry();$('#status').hidden=false;status('تعذر تشغيل الصوت. تحقق من تنزيل الأصوات ثم أعد المحاولة.',true);
+  }finally{if(!signal.aborted&&current===s&&$('#ling-play'))$('#ling-play').disabled=false;}
  }
  function bindReplay(){$('#ling-play').onclick=()=>{audio.unlock();void playCurrent();};}
  function start(){
-  if(!meta.mode)meta={name:'',mode:'detection',date:new Date().toISOString()};
+  if(!meta.mode||meta.owner!==window.SoundProgress?.active()?.id)meta={name:window.SoundProgress?.active()?.name||'',owner:window.SoundProgress?.active()?.id,sessionId:crypto.randomUUID(),mode:'detection',date:new Date().toISOString()};
+  meta={...meta,name:window.SoundProgress?.active()?.name||'',owner:window.SoundProgress?.active()?.id,sessionId:crypto.randomUUID(),date:new Date().toISOString()};
   main.classList.add('ling-workspace');
   if(meta.mode==='detection'){
-   current={mode:'detection',index:0,answers:Array(6).fill(null),phase:'starting'};drawDetection();
+   current={mode:'detection',index:0,answers:Array(6).fill(null),catchTrials:[],queue:shuffle([...LING_SOUNDS.map(sound=>({sound,present:true})),...LING_SOUNDS.map(sound=>({sound,present:false}))]),phase:'starting'};drawDetection();
   }else{
    current={mode:'identification',size:2,options:LING_SOUNDS.slice(0,2),trial:0,answers:[],phase:'setup'};
    drawIdentification();openLevels();
   }
  }
  function drawDetection(){
-  const s=current;stop();s.target=LING_SOUNDS[s.index];
-  main.innerHTML=heading('detection',control('ling-report','test','التقرير'))+`<div class="ling-detection-stage activity-board"><div class="ling-detection-layout"><div class="ling-detection-card">${pic('arabic',s.target)}</div><div class="ling-responses">${[['yes',icon('check'),'استجاب'],['no',cross,'لم يستجب'],['none','<span aria-hidden="true">?</span>','لا استجابة']].map(([value,symbol,label])=>`<button class="ling-response ${value}" data-response="${value}" aria-label="${label}" title="${label}" aria-pressed="${s.answers[s.index]===value}">${symbol}</button>`).join('')}</div><nav class="ling-navigation" aria-label="بطاقات الأصوات" dir="ltr"><button id="ling-previous" class="icon-button" aria-label="الصوت السابق" ${s.index===0?'disabled':''}>${icon('back')}</button><span dir="ltr">${s.index+1} / 6</span><button id="ling-next" class="icon-button" aria-label="الصوت التالي" ${s.index===5?'disabled':''}>${icon('back')}</button></nav></div></div>${errorNode()}`;
-  $('.ling-detection-card button').disabled=true;
-  $('#ling-report').disabled=s.answers.some(value=>value===null);
-  $('#ling-report').onclick=()=>finish();
-  for(const [id,step] of [['previous',-1],['next',1]])$('#ling-'+id).onclick=()=>{audio.unlock();s.index+=step;drawDetection();};
-  $$('.ling-response').forEach(b=>b.onclick=()=>{
-   if(s.phase!=='answer')return;s.answers[s.index]=b.dataset.response;
-   $$('.ling-response').forEach(card=>card.setAttribute('aria-pressed',String(card===b)));
-   $('#ling-report').disabled=s.answers.some(value=>value===null);
-  });
-  bindReplay();void playCurrent();
+  const s=current;stop();s.phase='starting';s.game?.destroy();const trial=s.queue[s.index];s.target=trial.sound;s.present=trial.present;
+  main.innerHTML=`<div class="ling-heading">${title('اكتشاف أصوات لينغ','arabic')}</div><div class="ling-trial"><progress value="${s.index}" max="12" aria-label="المحاولات المكتملة"></progress></div><div class="ling-detection-stage activity-board" id="ling-detect-stage"></div>${errorNode()}`;
+  s.game=createDetectionGame({host:$('#ling-detect-stage'),icon,round:s.index,onReplay:()=>{audio.unlock();void playCurrent();},onAnswer:value=>{
+   if(s.phase!=='answer')return;s.phase='feedback';const correct=value===s.present;
+   if(s.present)s.answers[LING_SOUNDS.indexOf(s.target)]=value?'yes':'no';else s.catchTrials.push({sound:s.target,response:value,correct});
+   window.SoundProgress?.record({owner:meta.owner,sessionId:meta.sessionId,id:String(s.index),activity:'اكتشاف أصوات لينغ',skill:'ling-detection',kind:'assessment',label:s.present?s.target:'سكوت',target:s.present?s.target:'silence',present:s.present,response:value,correct});
+   const mark=showAnswerFeedback(correct,'ling-feedback');feedbackTimer=setTimeout(()=>{mark.remove();if(current!==s)return;s.index++;if(s.index===s.queue.length){finish();return;}drawDetection();},800);
+  }});void playCurrent();
  }
  function drawIdentification(){
   const s=current;
@@ -90,7 +89,7 @@ export function createLing({main,icon,title,pic,control,escape,shuffle,openModal
    audio.unlock();stop();
    const options=sets[Number(b.dataset.set)];
    current={mode:'identification',size,options,trial:0,answers:[],phase:'starting',queue:shuffle(Array.from({length:10},(_,i)=>options[i%options.length]))};
-   meta.date=new Date().toISOString();$('#ling-levels').close();nextTrial();
+   meta.date=new Date().toISOString();meta.sessionId=crypto.randomUUID();$('#ling-levels').close();nextTrial();
   });
  }
  $('#ling-levels').addEventListener('close',()=>{
@@ -107,17 +106,20 @@ export function createLing({main,icon,title,pic,control,escape,shuffle,openModal
   const s=current;if(!s||s.phase!=='answer')return;
   s.phase='feedback';const correct=sound===s.target;
   s.answers.push({sound:s.target,choice:sound,correct,options:[...s.options]});
+  window.SoundProgress?.record({owner:meta.owner,sessionId:meta.sessionId,id:String(s.trial),activity:'التعرف على أصوات لينغ',skill:'ling-identification',kind:'assessment',label:s.target,response:sound,correct});
   $$('.ling-choices button,.ling-tools button').forEach(b=>b.disabled=true);
   const feedback=showAnswerFeedback(correct,'ling-feedback');
   feedbackTimer=setTimeout(()=>{feedback.remove();if(current!==s)return;s.trial++;nextTrial();},650);
  }
  function finish(){
   const s=current;stop();
-  last={...meta,size:s.size,answers:s.mode==='detection'?LING_SOUNDS.map((sound,index)=>({sound,response:s.answers[index]||'missing'})):[...s.answers]};
+  last={...meta,catchTrials:s.catchTrials,size:s.size,answers:s.mode==='detection'?LING_SOUNDS.map((sound,index)=>({sound,response:s.answers[index]||'missing'})):[...s.answers]};
+  window.SoundProgress?.complete(meta.sessionId);window.SoundProgress?.saveDetail('ling',last);
   location.hash='/arabic/ling-result';
  }
  function result(){
-  if(!last){main.innerHTML=title('فحص لينغ','arabic')+'<p>لا توجد نتيجة لهذه الجلسة.</p>';return;}
+  last=window.SoundProgress?.detail('ling')||last;
+  if(!last||last.owner!==window.SoundProgress?.active()?.id){main.innerHTML=title('فحص لينغ','arabic')+'<p>لا توجد نتيجة لهذه الجلسة.</p>';return;}
   main.innerHTML=title('نتيجة فحص لينغ','arabic')+`<div class="panel ling-result"><h2>${modeName(last.mode)}</h2><p>اسم الطفل: ${escape(last.name)||'—'}<br>التاريخ: <bdi dir="ltr">${lingDate(last.date)}</bdi></p>${lingSummary(last)}${lingTables(last)}<label class="field">ملاحظات<textarea id="ling-notes" maxlength="600"></textarea></label><div class="actions"><button id="ling-pdf" class="button primary">${icon('download')}تنزيل التقرير PDF</button></div><p id="status" class="status" role="status"></p></div>`;
   $('#ling-notes').value=last.notes||'';$('#ling-pdf').onclick=pdf;
  }
@@ -138,9 +140,10 @@ export function createLing({main,icon,title,pic,control,escape,shuffle,openModal
   if(!current)return;
   const s=current;stop();
   // A response already recorded during feedback advances exactly once on return.
-  if(s.phase==='feedback'){s.trial++;if(s.trial===10){finish();return;}s.target=s.queue[s.trial];drawIdentification();}
+  if(s.phase==='feedback'&&s.mode==='detection'){s.index++;if(s.index===s.queue.length){finish();return;}drawDetection();stop();}
+  if(s.phase==='feedback'&&s.mode!=='detection'){s.trial++;if(s.trial===10){finish();return;}s.target=s.queue[s.trial];drawIdentification();}
   if(s.phase==='settings'||s.phase==='setup')return;
-  s.phase='paused';$$('.ling-response,.ling-choices button').forEach(b=>b.disabled=true);$('#ling-play').disabled=false;
+  s.phase='paused';s.game?.playing(false);s.game?.retry();$$('.ling-response,.ling-choices button').forEach(b=>b.disabled=true);if($('#ling-play'))$('#ling-play').disabled=false;
  }
  return {openSetup,start,result,reset,hide};
 }

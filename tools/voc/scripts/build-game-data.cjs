@@ -10,12 +10,17 @@ const start = source.indexOf('const RAW_CATEGORIES =');
 const end = source.indexOf('const app =', start);
 if (start < 0 || end < 0) throw new Error('Vocabulary labels not found');
 const categories = vm.runInNewContext(`${source.slice(start, end)}; JSON.parse(JSON.stringify(CATEGORIES));`, {}, { timeout: 1000 });
+const production = JSON.parse(fs.readFileSync(path.join(root, 'assets/production-counts.json'), 'utf8'));
 const missing = [];
 for (const category of categories) {
     category.items = category.items.filter(item => {
         const absent = [item.image, item.audio].filter(url => !fs.existsSync(path.join(root, url)));
         if (absent.length) { missing.push({ key: `${category.id}_${item.id}`, name: item.name, absent }); return false; }
         item.key = `${category.id}_${item.id}`;
+        const entry = production[item.key];
+        if (!entry || entry.name !== item.name || !Number.isInteger(entry.count) || entry.count < 1) throw Error(`Missing syllable count: ${item.key} ${item.name}`);
+        item.syllableCount = entry.count;
+        if (entry.syllables) item.syllables = entry.syllables;
         item.imageHash = crypto.createHash('sha256').update(fs.readFileSync(path.join(root, item.image))).digest('hex').slice(0, 16);
         return true;
     });

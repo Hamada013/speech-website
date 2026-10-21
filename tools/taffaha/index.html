@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
+    <link rel="stylesheet" href="assets/welcome.css">
+    <script defer src="assets/welcome.js" data-app="taffaha"></script>
  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
  <meta name="theme-color" content="#0284c7"><meta name="mobile-web-app-capable" content="yes">
  <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -26,12 +28,11 @@
    <button id="toggle-rhythm" class="icon" data-icon="music" aria-label="تدريب الإيقاع" title="تدريب الإيقاع" aria-pressed="false" hidden></button>
    <button id="open-mode" class="icon test-tool" data-icon="count" aria-label="نوع الاختبار" title="نوع الاختبار" aria-haspopup="dialog" hidden></button>
    <button id="open-level" class="icon test-tool" data-icon="level" aria-label="المستوى: سهل" title="المستوى: سهل" hidden></button>
-   <button id="open-offline" class="icon" data-icon="download" aria-label="تنزيل" title="تنزيل"></button>
   </nav>
  </header>
  <main aria-label="نلعب بالمقاطع">
   <section id="home-screen" class="home-screen" aria-labelledby="home-title">
-   <img class="home-logo" src="assets/icons/logo.webp" width="180" height="180" alt="">
+   <button type="button" id="open-offline" class="home-logo app-logo-download" aria-label="تنزيل محتوى التطبيق" title="تنزيل محتوى التطبيق" aria-haspopup="dialog"><img src="assets/icons/logo.webp" width="180" height="180" alt=""></button>
    <h1 id="home-title">تف فا حة</h1><p>نلعب بالمقاطع <span id="profile-name"></span></p>
    <div class="home-actions">
     <button id="start-practice" class="home-action" disabled><span class="home-action-icon" data-icon="sequence"></span><span>ابدأ</span></button>
@@ -87,7 +88,7 @@
   <p id="download-status" class="status" dir="ltr" role="status" aria-live="polite">0%</p><progress id="download-progress" value="0" max="100" aria-label="تقدم التنزيل"></progress>
   <p id="download-error" role="alert" hidden></p>
  </dialog>
- <dialog id="taffaha-child-dialog" aria-labelledby="taffaha-child-title"><div class="dialog-title"><h2 id="taffaha-child-title">ملف الطفل</h2><button class="icon" data-icon="close" data-close aria-label="إغلاق"></button></div><form><label for="taffaha-child-name">اسم الطفل</label><input id="taffaha-child-name" name="name" autocomplete="off" maxlength="60" required><div id="taffaha-saved-children" class="filters"></div><p>يُحفظ التقدم على هذا الجهاز لهذا الاسم.</p><button class="primary" type="submit">دخول</button></form></dialog>
+ <dialog id="taffaha-child-dialog" aria-labelledby="taffaha-child-title"><div class="dialog-title"><h2 id="taffaha-child-title">ملف الطفل</h2><button class="icon" data-icon="close" data-close aria-label="إغلاق"></button></div><form><label for="taffaha-child-name">اسم الطفل</label><input id="taffaha-child-name" name="name" autocomplete="off" maxlength="60" required><div id="taffaha-saved-children" class="filters"></div><button class="primary" type="submit">دخول</button></form></dialog>
  <dialog id="taffaha-report" aria-labelledby="taffaha-report-title"><header class="dialog-title"><h2 id="taffaha-report-title">تقرير التقدم</h2><button id="taffaha-report-download" class="icon" data-icon="download" aria-label="تنزيل تقرير PDF" title="تنزيل تقرير PDF"></button><button class="icon" data-icon="close" data-close aria-label="إغلاق"></button></header><nav id="taffaha-report-apps"></nav><nav id="taffaha-report-periods" aria-label="فترة التقرير"></nav><div id="taffaha-report-body"></div><p id="taffaha-report-error" role="alert"></p></dialog>
  <p id="profile-error" role="alert" hidden>تعذّر حفظ التقدم على الجهاز. تحقق من مساحة التخزين وإعدادات المتصفح.</p>
  <noscript><p>يرجى تفعيل JavaScript للاستماع للمقاطع.</p></noscript>

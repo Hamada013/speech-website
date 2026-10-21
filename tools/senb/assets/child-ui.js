@@ -6,7 +6,7 @@
     function init() {
         const dialog = document.createElement('dialog');
         dialog.id = 'senb-child-dialog'; dialog.className = 'senb-child-dialog'; dialog.setAttribute('aria-labelledby', 'senb-child-title');
-        dialog.innerHTML = '<h2 id="senb-child-title">ملف الطفل</h2><form><label for="senb-child-name">اسم الطفل</label><input id="senb-child-name" name="name" autocomplete="off" maxlength="60" required><div class="senb-saved-children"></div><p class="senb-child-note">نفس الملف في كلماتي وبناء الجمل وتف فا حة على هذا الجهاز.</p><footer><button type="button" data-child-close>إغلاق</button><button type="submit" class="senb-child-enter">دخول</button></footer></form>';
+        dialog.innerHTML = '<h2 id="senb-child-title">ملف الطفل</h2><form><label for="senb-child-name">اسم الطفل</label><input id="senb-child-name" name="name" autocomplete="off" maxlength="60" required><div class="senb-saved-children"></div><footer><button type="button" data-child-close>إغلاق</button><button type="submit" class="senb-child-enter">دخول</button></footer></form>';
         document.body.append(dialog);
         const input = dialog.querySelector('input');
         let authorized = false, opening = false;
@@ -31,7 +31,7 @@
             const previous = P.active()?.id;
             if (!P.signIn(name)) return;
             window.AppNavigation?.register();
-            if (previous !== P.active().id && P.storageOK()) location.reload();
+            if (previous !== P.active().id && P.storageOK()) { window.SuiteWelcome?.skipNextLoad(); location.reload(); }
             else {
                 dialog.close(); update();
                 window.dispatchEvent(new Event('senb-profile-memorychange'));
@@ -51,16 +51,11 @@
                 dialog.querySelector('[data-child-close]').hidden = !P.active();
                 const savedChildren = dialog.querySelector('.senb-saved-children');
                 const admin = P.active()?.role === 'admin';
-                savedChildren.classList.toggle('suite-account-list', admin);
-                if (admin) { savedChildren.setAttribute('role', 'list'); savedChildren.setAttribute('aria-label', 'الحسابات'); }
-                else { savedChildren.removeAttribute('role'); savedChildren.removeAttribute('aria-label'); }
-                dialog.querySelector('#senb-child-title').textContent = admin ? 'Hamada' : 'ملف الطفل';
-                savedChildren.replaceChildren(...P.children().map(child => {
-                    const saved = document.createElement('button'); saved.type = 'button'; saved.textContent = child.name;
-                    saved.setAttribute('aria-pressed', String(child.id === P.active()?.id));
-                    saved.addEventListener('click', () => enter(child.name));
-                    return admin ? window.SuiteAccounts.row(child, saved) : saved;
-                }));
+                dialog.querySelector('#senb-child-title').textContent=admin?'Hamada':'ملف الطفل';
+                window.SuiteAccounts.render(savedChildren,P.children(),child=>{
+                    const saved=document.createElement('button');saved.type='button';saved.textContent=child.name;saved.onclick=()=>enter(child.name);
+                    return window.SuiteAccounts.row(child,saved);
+                });
                 if (!dialog.open) dialog.showModal();
                 input.focus(); input.select();
             } finally { opening = false; }
@@ -93,7 +88,8 @@
             refresh(); window.addEventListener('senb-progress-change', refresh); window.addEventListener('senb-profile-memorychange', refresh);
         }
         window.SenbProfile = { open };
-        if (!P.active() && !new URLSearchParams(location.search).has('reportChild') && !new URLSearchParams(location.search).has('createProfile')) open();
+        const welcoming=window.SuiteWelcome?.connect(P,name=>{authorized=true;enter(name);});
+        if (!welcoming && !P.active() && !new URLSearchParams(location.search).has('reportChild') && !new URLSearchParams(location.search).has('createProfile')) open();
     }
     window.addEventListener('senb-storage-error', () => {
         if (document.querySelector('.senb-storage-error')) return;

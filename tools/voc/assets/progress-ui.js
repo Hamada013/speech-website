@@ -4,7 +4,7 @@
     function init() {
         const dialog = document.createElement('dialog'); dialog.className = 'voc-dialog'; dialog.id = 'child-dialog';
         dialog.setAttribute('aria-labelledby', 'child-title');
-        dialog.innerHTML = `<div class="voc-dialog-heading"><h2 id="child-title">ملف الطفل</h2><button type="button" class="voc-choice voc-icon" id="admin-all-report" aria-label="تقرير جميع الأطفال" title="تقرير جميع الأطفال" hidden><i class="fas fa-chart-bar" aria-hidden="true"></i></button></div><form><label for="child-name">اسم الطفل</label><input id="child-name" name="name" autocomplete="off" maxlength="60" required><div id="saved-children" class="voc-choices"></div><p class="voc-note">يُحفظ التقدم على هذا الجهاز لهذا الاسم.</p><footer><button type="button" class="voc-choice" id="child-close">إغلاق</button><button class="voc-action" type="submit">دخول</button></footer></form>`;
+        dialog.innerHTML = `<div class="voc-dialog-heading"><h2 id="child-title">ملف الطفل</h2><button type="button" class="voc-choice voc-icon" id="admin-all-report" aria-label="تقرير جميع الأطفال" title="تقرير جميع الأطفال" hidden><i class="fas fa-chart-bar" aria-hidden="true"></i></button></div><form><label for="child-name">اسم الطفل</label><input id="child-name" name="name" autocomplete="off" maxlength="60" required><div id="saved-children" class="voc-choices"></div><footer><button type="button" class="voc-choice" id="child-close">إغلاق</button><button class="voc-action" type="submit">دخول</button></footer></form>`;
         document.body.append(dialog);
         let authorized = false, opening = false;
         const enter = name => {
@@ -17,7 +17,7 @@
             const previous = P.active()?.id;
             if (!P.signIn(name)) return;
             window.AppNavigation?.register();
-            if (previous !== P.active().id && P.storageOK()) location.reload();
+            if (previous !== P.active().id && P.storageOK()) { window.SuiteWelcome?.skipNextLoad(); location.reload(); }
             else {
                 dialog.close();
                 document.querySelectorAll('[data-child-profile]').forEach(button => { button.querySelector('span').textContent = P.active().name; button.setAttribute('aria-label', `ملف الطفل: ${P.active().name}`); });
@@ -40,19 +40,14 @@
                 dialog.querySelector('#child-title').textContent = P.isAdmin() ? 'Hamada' : 'ملف الطفل';
                 dialog.querySelector('#admin-all-report').hidden = !P.isAdmin();
                 const savedChildren = dialog.querySelector('#saved-children');
-                savedChildren.classList.toggle('suite-account-list', P.isAdmin());
-                if (P.isAdmin()) { savedChildren.setAttribute('role', 'list'); savedChildren.setAttribute('aria-label', 'الحسابات'); }
-                else { savedChildren.removeAttribute('role'); savedChildren.removeAttribute('aria-label'); }
-                savedChildren.replaceChildren(...P.children().map(child => {
-                    const button = document.createElement('button'); button.type = 'button'; button.className = 'voc-choice'; button.textContent = child.name;
-                    button.addEventListener('click', () => enter(child.name));
-                    if (!P.isAdmin()) return button;
-                    const report = document.createElement('button'); report.type = 'button'; report.className = 'voc-choice voc-icon'; report.dataset.reportChild = child.id;
-                    report.setAttribute('aria-label', `تقرير ${child.name}`); report.title = `تقرير ${child.name}`;
-                    report.innerHTML = '<i class="fas fa-chart-bar" aria-hidden="true"></i>';
-                    report.addEventListener('click', () => { dialog.close(); window.VocReports.open(child.id); });
-                    return window.SuiteAccounts.row(child, button, [report]);
-                }));
+                window.SuiteAccounts.render(savedChildren,P.children(),child=>{
+                    const button=document.createElement('button');button.type='button';button.className='voc-choice';button.textContent=child.name;button.onclick=()=>enter(child.name);
+                    const actions=[];
+                    if(P.isAdmin()){
+                        const report=document.createElement('button');report.type='button';report.className='voc-choice voc-icon';report.dataset.reportChild=child.id;report.setAttribute('aria-label',`تقرير ${child.name}`);report.title=`تقرير ${child.name}`;report.innerHTML='<i class="fas fa-chart-bar" aria-hidden="true"></i>';report.onclick=()=>{dialog.close();window.VocReports.open(child.id);};actions.push(report);
+                    }
+                    return window.SuiteAccounts.row(child,button,actions);
+                });
                 dialog.showModal();
             } finally { opening = false; }
         };
@@ -78,7 +73,8 @@
             document.querySelector('.app-home-tools, .game-header')?.append(resume);
         }
         window.VocProfile = { open };
-        if (!P.active() && !new URLSearchParams(location.search).has('reportChild') && !new URLSearchParams(location.search).has('createProfile')) open();
+        const welcoming=window.SuiteWelcome?.connect(P,name=>{authorized=true;enter(name);});
+        if (!welcoming && !P.active() && !new URLSearchParams(location.search).has('reportChild') && !new URLSearchParams(location.search).has('createProfile')) open();
     }
     window.addEventListener('voc-storage-error', () => {
         if (document.querySelector('.voc-storage-error')) return;

@@ -12,6 +12,17 @@
         for (let i = result.length - 1; i > 0; i--) { const j = Math.floor(random() * (i + 1)); [result[i], result[j]] = [result[j], result[i]]; }
         return result;
     }
+    // Keep the demonstrated answer from remaining in the same choice position.
+    function shuffleAfterDemo(choices, targetIndex, random = Math.random) {
+        if (choices.length < 2 || targetIndex < 0 || targetIndex >= choices.length) return [...choices];
+        const result = [...choices], target = choices[targetIndex];
+        for (let i = result.length - 1; i > 0; i--) { const j = Math.floor(random() * (i + 1)); [result[i], result[j]] = [result[j], result[i]]; }
+        if (result.indexOf(target) === targetIndex) {
+            const next = (targetIndex + 1 + Math.floor(random() * (result.length - 1))) % result.length;
+            [result[targetIndex], result[next]] = [result[next], result[targetIndex]];
+        }
+        return result;
+    }
     const normalize = word => word.normalize('NFKC').replace(/[\u064B-\u065F\u0670\u0640\s]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي');
     function uniqueItems(items) {
         const words = new Set(), pictures = new Set();
@@ -57,7 +68,7 @@
             moves: session.moves, matched: session.matched.length, elapsedMs: session.elapsedMs,
             partial, review: session.review, date: new Date().toISOString(), planned: session.order.length };
     }
-    const api = { MODES, shuffle, normalize, uniqueItems, createSession, choices, summarize };
+    const api = { shuffleAfterDemo, MODES, shuffle, normalize, uniqueItems, createSession, choices, summarize };
     root.VocGameModel = api;
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(globalThis);

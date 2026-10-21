@@ -23,3 +23,9 @@
 .voc-report-dialog .voc-report-toolbar .voc-icon {width:46px;height:46px;min-width:44px;min-height:44px;}
 .voc-report-dialog .report-identity h3 {overflow-wrap:anywhere;}
 @media(max-width:450px){.voc-report-dialog .voc-report-toolbar {top:-16px;}.voc-report-dialog #report-title {font-size:18px;}.voc-report-dialog .voc-report-periods {gap:6px;}}
+
+.voc-automatic-workplace #status-bar{display:none}
+
+/* Explicit choices remain visible; transient header presses have no selected styling. */
+#automation-dialog .voc-choice[aria-pressed=true]{border-color:#169b7b!important;position:relative}
+#automation-dialog .voc-choice[aria-pressed=true]::after{content:'✓';position:absolute;inset-inline-end:3px;top:0;color:#087b59;font:700 13px system-ui}

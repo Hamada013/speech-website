@@ -4,7 +4,6 @@
     const node = id => document.getElementById(id);
     const supported = window.isSecureContext && 'serviceWorker' in navigator && 'caches' in window;
     let registration, downloadController, offlineCatalog;
-    const bootReady = new Promise(resolve => window.addEventListener('senb-pwa-ready', resolve, { once: true }));
     async function getOfflineCatalog() {
         if (!offlineCatalog) {
             const response = await fetch(new URL('assets/offline-assets.json', base));
@@ -40,14 +39,11 @@
         if (downloadController || !supported) return;
         downloadController = new AbortController();
         node('offlineDownloadBtn').disabled = true;
+        node('offlineDownloadBtn').setAttribute('aria-busy', 'true');
         node('offlineError').hidden = true;
         window.AppUpdates.setBusy(true);
         try {
-            let readyTimeout;
-            try {
-                await Promise.race([bootReady, new Promise((_, reject) => { readyTimeout = setTimeout(() => reject(new Error('Service worker timeout')), 30000); })]);
-            } finally { clearTimeout(readyTimeout); }
-            if (!registration?.active || !navigator.serviceWorker.controller) throw new Error('Service worker not ready');
+            if (!await boot()) throw new Error('Service worker not ready');
             navigator.storage?.persist?.().catch(() => {});
             await SENBOffline.download(await getOfflineCatalog(), base, { signal: downloadController.signal, onProgress: showOfflineProgress });
         } catch (error) {
@@ -55,20 +51,16 @@
         } finally {
             downloadController = null;
             node('offlineDownloadBtn').disabled = false;
+            node('offlineDownloadBtn').setAttribute('aria-busy', 'false');
             window.AppUpdates.setBusy(false);
         }
     });
     async function boot() {
-        if (!supported) return;
+        if (!supported) return false;
         try {
-            registration = await navigator.serviceWorker.getRegistration(base);
-            if (registration?.scope !== base || !registration.active) {
-                registration = await navigator.serviceWorker.register(new URL('sw.js', base), { scope: base, updateViaCache: 'none' });
-            }
-            window.AppUpdates.watch(registration, { buttonId: 'pwaUpdateBtn' });
-            await navigator.serviceWorker.ready;
-            if (!navigator.serviceWorker.controller) await new Promise(resolve => navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true }));
-        } catch { /* The current cached app remains usable. */ }
+            if (registration?.active?.state !== 'activated') registration = await window.AppUpdates.ready({ buttonId: 'pwaUpdateBtn' });
+            return true;
+        } catch { showError('تعذر تجهيز التطبيق دون اتصال. تحقق من الاتصال ثم أعد المحاولة.'); return false; }
         finally { window.dispatchEvent(new Event('senb-pwa-ready')); }
     }
     window.addEventListener('beforeinstallprompt', event => event.preventDefault());

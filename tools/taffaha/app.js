@@ -157,7 +157,7 @@ function renderTest(){
  }
 }
 function updateToolbar(){
- $('open-profile').hidden=screen!=='home';$('open-report').hidden=screen!=='home';$('open-offline').hidden=screen!=='home';document.querySelector('.contact-footer').hidden=screen!=='home';
+ $('open-profile').hidden=screen!=='home';$('open-report').hidden=screen!=='home';document.querySelector('.contact-footer').hidden=screen!=='home';
  $('go-home').hidden=screen==='home';$('open-library').hidden=screen==='home';
  $('toggle-rhythm').hidden=screen!=='practice';$('toggle-rhythm').setAttribute('aria-pressed',String(practiceRhythm));
  for(const id of ['open-mode','open-level'])$(id).hidden=screen!=='test';
@@ -246,10 +246,11 @@ window.addEventListener('taffaha-profile-change',()=>{
  const saved=P.workspace()||{};for(const key of Object.keys(preferences))delete preferences[key];Object.assign(preferences,saved);
  level=LEVELS.includes(saved.testLevel)?saved.testLevel:'easy';testKind=saved.testKind==='count'?'count':'picture';practiceRhythm=saved.practiceRhythm===true;
  index=Math.max(0,words.findIndex(word=>word.id===(saved.lastWord||'voc-6-1')));sessionId=saved.sessionId||crypto.randomUUID();resumeAttempt=saved;attemptsThisQuestion=Number(saved.testTries)||0;learnedFilter=null;
- if(saved.questionCompleted){const siblings=group();index=words.indexOf(siblings[(siblings.indexOf(current())+1)%siblings.length]);resumeAttempt=null;attemptsThisQuestion=0;preferences.questionCompleted=false;}
+ if(saved.questionCompleted&&words.length){const siblings=group();index=words.indexOf(siblings[(siblings.indexOf(current())+1)%siblings.length]);resumeAttempt=null;attemptsThisQuestion=0;preferences.questionCompleted=false;}
  goTo('home');window.AppNavigation?.register();
 });
 async function init(){
+ initProfile();
  try{
   words=await loadWords();index=words.findIndex(w=>w.id===(preferences.lastWord||'voc-6-1'));if(index<0)index=0;
   if(preferences.questionCompleted){const siblings=group();index=words.indexOf(siblings[(siblings.indexOf(current())+1)%siblings.length]);resumeAttempt=null;}
@@ -258,7 +259,7 @@ async function init(){
    const b=document.createElement('button');b.textContent=String(n);b.dataset.count=n;b.setAttribute('aria-label',countLabel(n));
    b.onclick=()=>{index=words.findIndex(w=>w.syllableCount===n);$('test-category-dialog').close();renderCurrent();};$('test-categories').append(b);
   }
-  initReports(words);initProfile();
+  initReports(words);
   activateScreen(location.hash.slice(1)||preferences.screen);
   window.dispatchEvent(new Event('taffaha-ready'));
  }catch(e){say(e.message);$('word-label').textContent='تعذر تحميل البطاقات';}

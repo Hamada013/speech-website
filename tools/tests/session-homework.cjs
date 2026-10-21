@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {create}=require('../shared/session-homework.js');
+const {create,homeActivity}=require('../shared/session-homework.js');
 const values=new Map([['voc-children-v1','existing progress stays untouched']]);
 const storage={getItem:key=>values.get(key),setItem:(key,value)=>values.set(key,value),removeItem:key=>values.delete(key)};
 let child={id:'ali',name:'علي'};
@@ -31,3 +31,6 @@ values.set('voc-children-v1',JSON.stringify({deletedChildren:{ali:'deleted'}}));
 let failures=0;const failed=create({app:'voc',owner:()=>child,storage:{getItem(){return null;},setItem(){throw Error('full');}},onError:()=>failures++});failed.record({activity:'تدريب',label:'بيت'});assert.match(failed.finish().text,/بيت/);assert.equal(failed.storageOK(),false);assert.ok(failures>0,'A storage failure retains a copyable message in memory');
 child=null;make('voc').record({label:'لا تحفظ'});assert.equal(make('voc').finish(),null);
 console.log('PASS: explicit session boundaries, reloads, edits, per-child/app isolation, ungraded practice, accurate results, syllable homework, resumed-game deduplication and storage failure.');
+
+for(const app of ['voc','senb','taffaha']){const sample={label:app==='senb'?'ولد يأكل تفاحة':'تفاحة',entity:app==='senb'?'sentence':'word',syllables:['تُف','فا','حة'],count:3};const variants=Array.from({length:10},(_,i)=>homeActivity(app,[sample],i));assert.equal(new Set(variants).size,10);for(const text of variants){assert.ok(text.includes(sample.label));assert.ok(text.split(/\s+/).length<85);assert.doesNotMatch(text,/undefined|أتقنت/);}}
+console.log('PASS: ten distinct short home activities per app, each tied to a real session target.');

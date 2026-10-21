@@ -3,7 +3,47 @@
 (() => {
     let registration, settings, dialog, accept, later, offeredWorker;
     let busy = false, reloading = false, controlled = false, lastCheck = 0;
+    let preparing;
+    // Wait for this app's worker, including a first install. Unlike the global
+    // serviceWorker.ready promise, a failed shell install rejects and can retry.
+    async function ready(options = {}) {
+        if (preparing) return preparing;
+        preparing = (async () => {
+            const base = new URL('./', document.baseURI);
+            const next = await navigator.serviceWorker.register(new URL('sw.js', base), { scope: base.href, updateViaCache: 'none' });
+            await new Promise((resolve, reject) => {
+                const workers = new Set();
+                const finish = error => {
+                    clearTimeout(timer);
+                    next.removeEventListener('updatefound', check);
+                    navigator.serviceWorker.removeEventListener('controllerchange', check);
+                    for (const worker of workers) worker.removeEventListener('statechange', check);
+                    error ? reject(error) : resolve();
+                };
+                const check = () => {
+                    for (const worker of [next.installing, next.waiting, next.active].filter(Boolean)) {
+                        if (!workers.has(worker)) { workers.add(worker); worker.addEventListener('statechange', check); }
+                    }
+                    // Safari can keep the claimed worker in "activating" while
+                    // its new page opens. It can already serve requests then.
+                    const active=next.active,claimed=active?.state==='activating'&&navigator.serviceWorker.controller===active;
+                    if (active?.state === 'activated' || claimed) finish();
+                    else if ([...workers].some(worker => worker.state === 'redundant') && (!next.installing || next.installing.state === 'redundant')) finish(new Error('Offline installation failed'));
+                };
+                const timer = setTimeout(() => finish(new Error('Offline installation timed out')), 45000);
+                next.addEventListener('updatefound', check);
+                navigator.serviceWorker.addEventListener('controllerchange', check);
+                check();
+            });
+            watch(next, options);
+            return next;
+        })();
+        try { return await preparing; }
+        catch { throw new Error('تعذر تجهيز التطبيق دون اتصال. تحقق من الاتصال ثم أعد المحاولة.'); }
+        finally { preparing = null; }
+    }
     function showAvailable() {
+        if (window.SuiteWelcome?.pending) return;
         const waiting = registration?.waiting;
         if (!controlled || !registration.active || !waiting || waiting === registration.active || waiting === offeredWorker) return;
         offeredWorker = waiting;
@@ -49,7 +89,7 @@
             const ours = navigator.serviceWorker.controller?.scriptURL === new URL('sw.js', document.baseURI).href;
             if (!ours) return;
             // Every open window reloads together after one accepts the update.
-            if (controlled && !reloading) { reloading = true; location.reload(); }
+            if (controlled && !reloading) { reloading = true; window.SuiteWelcome?.skipNextLoad(); location.reload(); }
             else { controlled = true; options.onFirstControl?.(); showAvailable(); }
         });
         registration.addEventListener('updatefound', () => watchWorker(registration.installing));
@@ -61,5 +101,6 @@
         setInterval(check, 5 * 60 * 1000);
         if (controlled) void check();
     }
-    window.AppUpdates = { watch, setBusy(value) { busy = value; if (accept) accept.disabled = value; } };
+    window.addEventListener('suite-welcome-done', showAvailable);
+    window.AppUpdates = { watch, ready, setBusy(value) { busy = value; if (accept) accept.disabled = value; } };
 })();

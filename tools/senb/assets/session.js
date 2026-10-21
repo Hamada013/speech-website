@@ -6,6 +6,7 @@
     let run = null, token = 0, audioBusy = false;
     const delays = new Map();
     const icons = {
+        more: '<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM17 14v6M14 17h6"/>',
         play: '<path d="m8 5 11 7-11 7z"/>', pause: '<path d="M8 5v14M16 5v14"/>',
         repeat: '<path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"/>',
         close: '<path d="m6 6 12 12M18 6 6 18"/>', next: '<path d="m15 5-7 7 7 7"/>',
@@ -82,7 +83,8 @@
     function targetBoard() {
         const board = $('#sessionBoard'); board.classList.add('dynamic-board');
         const words = document.createElement('div'); words.className = 'session-target-words';
-        for (const [index,target] of run.targets.entries()) {
+        for (const index of run.targetDisplayOrder || run.targets.map((_,i)=>i)) {
+            const target=run.targets[index];
             const el = card(target.image,run.phase === 'guide' ? target.title : `البطاقة ${index+1}`,()=>answerTarget(index),target.entity === 'sentence' ? 'session-advanced' : '');
             el.dataset.target = index; el.disabled = true; (target.entity === 'sentence' ? board : words).append(el);
             if (run.phase === 'guide' && run.practiced.includes(target.id)) markPracticed(el);
@@ -113,6 +115,9 @@
     async function countdown() {
         const ticket=token; $('#sessionReplay').hidden=true;
         for (const value of [1,2,3]) { curtain.innerHTML=`<span class="session-count" data-count="${value}">${value}</span>`;curtain.hidden=false;if(!await wait(700,ticket))return; }
+        const words=run.targets.map((target,index)=>target.entity==='word'?index:null).filter(index=>index!==null);
+        const shift=words.length>1?1+Math.floor(Math.random()*(words.length-1)):0;
+        run.targetDisplayOrder=run.targets.map((target,index)=>target.entity==='word'?words[(words.indexOf(index)+shift)%words.length]:index);
         curtain.hidden=true;run.phase='dynamic-test';run.targetIndex=0;run.testOrder=SENBActivities.shuffle(run.targets.map((_,index)=>index));run.dynamicRecords=[];run.targetWrong=false;save();render();
     }
     function render() {
@@ -170,7 +175,7 @@
         P.logSession({id,date:ended,started:run.stageStartedAt||run.startedAt||ended,durationMs:Math.max(0,Date.parse(ended)-Date.parse(run.stageStartedAt||run.startedAt||ended)),source,kind,partial,records});run.sessionIds.push(id);return id;
     }
     function beginDynamic(snapshot) {
-        cancel();run.current=snapshot;fillTargetImages(snapshot);run.phase=run.mode==='test'?'countdown':'guide';run.guideIndex=0;run.practiced=[];run.targetIndex=0;run.dynamicRecords=[];run.targetWrong=false;run.pendingTransition=null;run.stageStartedAt=new Date().toISOString();run.currentStartedAt=run.stageStartedAt;
+        cancel();run.current=snapshot;fillTargetImages(snapshot);run.targetDisplayOrder=null;run.phase=run.mode==='test'?'countdown':'guide';run.guideIndex=0;run.practiced=[];run.targetIndex=0;run.dynamicRecords=[];run.targetWrong=false;run.pendingTransition=null;run.stageStartedAt=new Date().toISOString();run.currentStartedAt=run.stageStartedAt;
         save();enter();render();
     }
     function start(mode) {
@@ -194,8 +199,53 @@
         if(++run.queueIndex<run.queue.length){beginDynamic(run.queue[run.queueIndex]);return;}
         cancel();run.phase='finished';P.saveDraft(null);updateResume();navigateTo('workplace');completion.showModal();
     }
-    function startAutomation() {
-        const sentences=workplaceSentences();
+    // Capture both visible boards before opening a picker; browsing never edits them.
+    let automationSelection = null, automationBase = new Set();
+    const automationPrompt=document.createElement('dialog');automationPrompt.id='senbAutomationPrompt';automationPrompt.className='suite-dialog';
+    automationPrompt.setAttribute('aria-labelledby','senbAutomationPromptTitle');
+    automationPrompt.innerHTML=`<h2 id="senbAutomationPromptTitle">نلعب أو نختار أكثر؟</h2><div class="senb-automation-actions">${button('senbAutomationPlay','play','ابدأ بالبطاقات المعروضة')}${button('senbAutomationMore','more','اختر بطاقات إضافية')}</div>`;
+    document.body.append(automationPrompt);
+    const selectionPlay=document.createElement('button');selectionPlay.type='button';selectionPlay.id='senbSelectionPlay';selectionPlay.className='senb-session-icon';selectionPlay.hidden=true;selectionPlay.innerHTML=svg('play');
+    document.querySelector('#advancedModal .picker-header').append(selectionPlay);
+    function selectionSummary(){
+        selectionPlay.setAttribute('aria-label',`ابدأ اللعب · ${automationSelection.size} جمل`);selectionPlay.title=selectionPlay.getAttribute('aria-label');
+        document.querySelectorAll('#advItemsGrid .picker-card').forEach((card,index)=>{
+            const item=getAdvancedItemData(state.advFolder,state.advSubCatId,Number(card.dataset.automationItem)||index+1);
+            const key=`s:${item.folder}/${item.subCatId}/${item.itemNum}`;card.setAttribute('aria-pressed',String(automationSelection.has(key)));card.setAttribute('aria-disabled',String(automationBase.has(key)));
+        });
+    }
+    const renderPicker=renderAdvItemsGrid;
+    renderAdvItemsGrid=function(folder,subgroup){renderPicker(folder,subgroup);if(automationSelection){
+        // Filtered banks need the actual source number, not the visible index.
+        const allowed=Array.from({length:24},(_,i)=>getAdvancedItemData(folder,subgroup,i+1)).filter(item=>!state.advancedLearnedFilter||isSenbLearned(`s:${item.folder}/${item.subCatId}/${item.itemNum}`,state.advancedLearnedFilter));
+        document.querySelectorAll('#advItemsGrid .picker-card').forEach((card,i)=>card.dataset.automationItem=allowed[i].itemNum);selectionSummary();
+    }};
+    const selectSentence=selectAdvancedSentenceItem;
+    selectAdvancedSentenceItem=function(item){
+        if(!automationSelection){selectSentence(item);return;}
+        const key=`s:${item.folder}/${item.subCatId}/${item.itemNum}`;
+        if(automationBase.has(key))return;
+        if(automationSelection.has(key))automationSelection.delete(key);
+        else {
+            const saved=workplaceBoardSnapshot();
+            try{loadAdvancedSentence(item);automationSelection.set(key,getWorkplaceSentence());}
+            finally{Object.assign(state,saved);}
+        }
+        selectionSummary();selectionPlay.disabled=!automationSelection.size;
+    };
+    const closeSentencePicker=closePicker;
+    closePicker=function(id){closeSentencePicker(id);if(id==='advancedModal'){automationSelection=null;selectionPlay.hidden=true;}};
+    function promptAutomation(){
+        const sentences=workplaceSentences();if(!sentences.length){showAudioStatus('أضف بطاقات للجملة أولاً.');return;}
+        window.AppNavigation?.closeSettings();automationSelection=new Map(sentences.map(s=>[s.key,s]));automationBase=new Set(automationSelection.keys());automationPrompt.showModal();
+    }
+    automationPrompt.querySelector('#senbAutomationPlay').onclick=()=>{const sentences=[...automationSelection.values()];automationPrompt.close();automationSelection=null;startAutomation(sentences);};
+    automationPrompt.querySelector('#senbAutomationMore').onclick=()=>{automationPrompt.close();selectionPlay.hidden=false;selectionPlay.disabled=false;openAdvancedCategoryModal();selectionSummary();};
+    automationPrompt.addEventListener('cancel',()=>{automationSelection=null;});
+    automationPrompt.addEventListener('click',event=>{if(event.target!==automationPrompt)return;const r=automationPrompt.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom){automationPrompt.close();automationSelection=null;}});
+    selectionPlay.onclick=()=>{const sentences=[...automationSelection.values()];closeAdvancedModal();startAutomation(sentences);};
+    function startAutomation(chosen = null) {
+        const sentences=Array.isArray(chosen)?chosen:workplaceSentences();
         if(!sentences.length){showAudioStatus('أضف بطاقات للجملة أولاً.');return;}
         cancel();window.AppNavigation?.closeSettings();
         run={id:`senb-${Date.now()}-${Math.random().toString(36).slice(2)}`,startedAt:new Date().toISOString(),worked:sentences,sessionIds:[],logIndex:0,phase:'automation-countdown',stageIndex:0,stagePosition:0,repeatIndex:0,stageRecords:[],trialWrong:false,stageStartedAt:new Date().toISOString()};
@@ -264,6 +314,7 @@
             const index=kind==='missing'?run.missing.choices.findIndex(slot=>M.wordKey(slot)===run.missing.wanted):run.currentChoices.findIndex(option=>M.sentenceKey(option)===M.sentenceKey(s));
             const source=$(`[data-${kind==='missing'?'missing':'sentence'}-choice="${index}"]`);
             if(!await demonstrateChoice(source,kind==='missing'?$('.session-gap'):null,ticket))return;
+            moveDemonstratedChoice(kind,index);
             if(!await trialCountdown(ticket))return;
             // Replay the prompt without the demonstration for the child's own turn.
             if(!await segments(kind==='missing'?slotSegments(s,run.missing.index):wholeSegments(s),ticket)){
@@ -272,6 +323,20 @@
         }
         if(ticket!==token)return;
         audioBusy=false;run.answerReady=true;$('#sessionReplay').hidden=false;$('#sessionReplay').disabled=false;lockTrial(false);status('');
+    }
+    function moveDemonstratedChoice(kind, targetIndex) {
+        const missing=kind==='missing',before=missing?run.missing.choices:run.currentChoices;
+        const after=M.shuffleAfterDemo(before,targetIndex),container=$(missing?'.session-missing-options':'#sessionBoard');
+        const nodes=[...container.querySelectorAll(missing?'[data-missing-choice]':'[data-sentence-choice]')];
+        after.forEach((option,index)=>{
+            const node=nodes[before.indexOf(option)];
+            node.dataset[missing?'missingChoice':'sentenceChoice']=index;
+            node.setAttribute('aria-label',`${missing?'البطاقة':'الخيار'} ${index+1}`);
+            if(missing)enableMissingDrag(node,index);else node.onclick=()=>void answerSentence(index);
+            container.append(node);
+        });
+        if(missing)run.missing.choices=after;else run.currentChoices=after;
+        save();
     }
     async function expressionModel(s,presentation,index) {
         if(audioBusy||run.expressionBusy)return;
@@ -465,12 +530,12 @@
     };
     const startButton=document.createElement('button');startButton.type='button';startButton.id='workplaceDynamicTest';startButton.className='senb-session-icon';startButton.setAttribute('aria-label','اختبار الجملة');startButton.title='اختبار الجملة';startButton.innerHTML=svg('test');startButton.onclick=()=>start('test');$('#workplaceHeaderToolbar').append(startButton);
     const practiceButton=document.createElement('button');practiceButton.type='button';practiceButton.id='workplacePractice';practiceButton.className='senb-session-icon';practiceButton.setAttribute('aria-label','تدريب الجملة');practiceButton.title='تدريب الجملة';practiceButton.innerHTML=svg('repeat');practiceButton.onclick=()=>{window.AppNavigation?.closeSettings();start('practice');};$('#workplaceHeaderToolbar').append(practiceButton);
-    const playButton=$('#sequencePlayBtn');playButton.onclick=startAutomation;playButton.setAttribute('aria-label','تشغيل التدريب التلقائي');playButton.title='تشغيل التدريب التلقائي';
+    const playButton=$('#sequencePlayBtn');playButton.onclick=promptAutomation;playButton.setAttribute('aria-label','تشغيل التدريب التلقائي');playButton.title='تشغيل التدريب التلقائي';
     const resume=document.createElement('button');resume.id='resumeSenbSession';resume.type='button';resume.className='senb-session-icon';resume.setAttribute('aria-label','متابعة الجلسة المحفوظة');resume.title='متابعة الجلسة المحفوظة';resume.innerHTML=svg('play');$('#homeHeaderTools').append(resume);
     function updateResume(){resume.hidden=!P.draft();}
     resume.onclick=()=>{cancel();run=P.draft();if(!run)return;if(run.phase==='selecting'){navigateTo('workplace');return;}run.resumePhase=run.phase==='paused'?run.resumePhase:run.phase;run.phase='paused';enter();render();};updateResume();
     window.addEventListener('senb-profile-memorychange',()=>{cancel();run=null;state.basicLearnedFilter=null;state.advancedLearnedFilter=null;document.querySelectorAll('.picker-learned-button').forEach(button=>button.setAttribute('aria-pressed','false'));initializeWorkplace();renderWorkplace();updateResume();navigateTo('home');});
-    document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});window.addEventListener('pagehide',pause);window.addEventListener('senb-profile-open',pause);window.addEventListener('senb-profile-beforechange',()=>{pause();cancel();});
+    document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});window.addEventListener('pagehide',pause);window.addEventListener('senb-profile-open',pause);window.addEventListener('senb-profile-beforechange',()=>{pause();cancel();automationPrompt.close();if(automationSelection)closeAdvancedModal();automationSelection=null;});
     document.addEventListener('keydown',event=>{if(state.currentView==='session'&&event.key==='Escape'&&!document.querySelector('dialog[open]')){event.preventDefault();pause();}});
     window.SenbSession={start,startAutomation,pause,stop,state:()=>run,resume:()=>resume.click()};
 })();

@@ -9,10 +9,8 @@ export function initProfile() {
    if((P.active()||P.children().some(child=>child.role!=='admin'))&&!await window.ChildAccountGate.request())return;
    authorized=true;dialog.querySelector('[data-close]').hidden=!P.active();input.value=typeof name==='string'?name:P.active()?.name||'';
    const admin=P.active()?.role==='admin',savedChildren=$('taffaha-saved-children');
-   savedChildren.classList.toggle('suite-account-list',admin);
-   if(admin){savedChildren.setAttribute('role','list');savedChildren.setAttribute('aria-label','الحسابات');}else{savedChildren.removeAttribute('role');savedChildren.removeAttribute('aria-label');}
    $('taffaha-child-title').textContent=admin?'Hamada':'ملف الطفل';
-   savedChildren.replaceChildren(...P.children().map(child=>{const button=document.createElement('button');button.type='button';button.textContent=child.name;button.onclick=()=>enter(child.name);return admin?window.SuiteAccounts.row(child,button):button;}));
+   window.SuiteAccounts.render(savedChildren,P.children(),child=>{const button=document.createElement('button');button.type='button';button.textContent=child.name;button.onclick=()=>enter(child.name);return window.SuiteAccounts.row(child,button);});
    dialog.showModal();input.focus();input.select();
   }finally{opening=false;}
  }
@@ -23,8 +21,8 @@ export function initProfile() {
  $('open-profile').onclick=()=>open();update();window.TaffahaProfile={open};
  window.addEventListener('storage',e=>{if(e.key!==STORAGE||!e.newValue)return;try{if(JSON.parse(e.newValue).active!==P.active()?.id){window.dispatchEvent(new Event('taffaha-profile-beforechange'));location.reload();}}catch{}});
  window.addEventListener('taffaha-storage-error',()=>{$('profile-error').hidden=false;});
- // Match the other apps: the first visit opens the local name picker.
- if(!P.active()&&!new URLSearchParams(location.search).has('reportChild')&&!new URLSearchParams(location.search).has('createProfile'))open();
+ const welcoming=window.SuiteWelcome?.connect(P,name=>{authorized=true;enter(name);});
+ if(!welcoming&&!P.active()&&!new URLSearchParams(location.search).has('reportChild')&&!new URLSearchParams(location.search).has('createProfile'))open();
 }
 export const periods={all:'منذ إنشاء الحساب',halfyear:'آخر 6 أشهر',quarter:'آخر 3 أشهر',month:'آخر 30 يوماً',week:'آخر 7 أيام',day:'اليوم'};
 export function summarize(child,words,period='all',now=new Date()) {
