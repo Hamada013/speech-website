@@ -1,6 +1,6 @@
 # VSS and GitHub Pages
 
-VSS (`tools/VSS/`) contains VOC, SENB, and Taffaha as one installable app with VOC's icon. Arabic Sounds and Auditory Rehabilitation remain separate; Hamada's five-area navigation remains available.
+VSS (`tools/VSS/`) contains VOC, SENB, and Taffaha as one installable app with VOC's icon. VSS app switching and report links stay within these three areas for every account, including Hamada. Arabic Sounds and Auditory Rehabilitation remain separate.
 
 ## Publish the final files
 

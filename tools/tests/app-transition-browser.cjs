@@ -65,10 +65,11 @@ const server = http.createServer((req, res) => {
         }
         const apps = ['voc', 'senb', 'taffaha','arabicsounds','auditory-rehabilitation'];
         const viewports = [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 844, height: 390 }];
-        for (const [index, from] of apps.entries()) for (const to of apps.filter(app => app !== from)) {
+        for (const [index, from] of apps.entries()) for (const to of apps.filter(app => app !== from && (index >= 3 || apps.indexOf(app) < 3))) {
             await page.setViewportSize(viewports[index % viewports.length]);
             await page.goto(origin + (['voc','senb','taffaha'].includes(from)?'VSS/':'') + from + '/index.html'); await ready(from);
             await page.locator('[data-suite-apps]:visible').click();
+            if (index < 3) assert.deepEqual(await page.locator('#suite-app-picker [data-suite-app]').evaluateAll(nodes => nodes.map(node => node.dataset.suiteApp)), apps.slice(0, 3), 'VSS only offers its three activity areas, including for Hamada');
             await page.locator(`[data-suite-app=${to}]`).click();
             // A second queued click must not start another transition or change its destination.
             await page.evaluate(other => document.querySelector(`[data-suite-app=${other}]`).click(), apps.find(app => app !== from && app !== to));
@@ -91,7 +92,7 @@ const server = http.createServer((req, res) => {
         await checkTransition('senb', 'voc', { reduced: true });
         assert.deepEqual(errors, []);
         await context.close();
-        console.log('PASS: all twenty app routes, 1–2–3 count, blurred backdrop, icon-right/count-left layout, mobile/landscape, report identity, duplicate clicks, back navigation and reduced motion.');
+        console.log('PASS: all six VSS routes stay within the suite; eight sound-app admin routes, 1–2–3 count, mobile/landscape, report identity, duplicate clicks, back navigation and reduced motion.');
     } catch (error) {
         await page?.screenshot({ path: '/private/tmp/app-transition-error.png', fullPage: true }).catch(() => {}); throw error;
     } finally {

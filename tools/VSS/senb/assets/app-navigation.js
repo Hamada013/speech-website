@@ -21,8 +21,10 @@
  const progress=()=>({voc:window.VocProgress,senb:window.SenbProgress,taffaha:window.TaffahaProgress,arabicsounds:window.SoundProgress,'auditory-rehabilitation':window.SoundProgress})[appId];
  function read(){try{return JSON.parse(localStorage.getItem(storageKey));}catch{return null;}}
  const active=()=>progress()?.active();
- const availableApps=()=>String(active()?.name||'').normalize('NFKC').trim().toLocaleLowerCase()==='hamada'
-  ?Object.keys(apps):soundApp?['arabicsounds','auditory-rehabilitation']:['voc','senb','taffaha'];
+ // VSS navigation always stays inside its installed scope, including Hamada.
+ const availableApps=()=>!soundApp?['voc','senb','taffaha']
+  :String(active()?.name||'').normalize('NFKC').trim().toLocaleLowerCase()==='hamada'
+   ?Object.keys(apps):['arabicsounds','auditory-rehabilitation'];
  const children=()=>read()?.children||[];
  const legacyApps=child=>({voc:!!child.words,senb:!!child.senb,taffaha:!!child.taffaha});
  const registered=(child,id)=>!!child&&(child.apps||legacyApps(child))[id]===true;

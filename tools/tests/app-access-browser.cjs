@@ -1,4 +1,4 @@
-// The app picker has one design, two child groups, and a typed Hamada sign-in.
+// VSS always offers its three areas; sound apps retain their account rules.
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
 const {chromium,webkit}=require(path.resolve(__dirname,'../VSS/voc/node_modules/playwright'));
 const {solveParentGate}=require('./solve-parent-gate.cjs');
@@ -69,8 +69,9 @@ const server=http.createServer((req,res)=>{
    await profile.locator('.suite-account-search').fill('');
    await page.locator(config.input).fill('Hamada');await profile.locator('button[type=submit]').click();
    await page.waitForFunction(api=>window[api]?.active()?.name==='Hamada',config.api);
-   await picker(apps,'admin');
-   assert.deepEqual(await page.evaluate(()=>{const host=document.createElement('nav');AppNavigation.reportLinks(host,{id:'ali'});return [...host.children].map(node=>node.dataset.reportApp);}),apps);
+   const adminDestinations=apps.indexOf(app)<3?group:apps;
+   await picker(adminDestinations,'admin');
+   assert.deepEqual(await page.evaluate(()=>{const host=document.createElement('nav');AppNavigation.reportLinks(host,{id:'ali'});return [...host.children].map(node=>node.dataset.reportApp);}),adminDestinations);
    await page.locator(config.profile).first().click();await solveParentGate(page);await profile.waitFor({state:'visible'});
    await profile.locator('[data-account-id=ali] .suite-account-select').click();
    await page.waitForFunction(api=>window[api]?.active()?.id==='ali',config.api);

@@ -16,7 +16,7 @@ tools/VSS/
   tests/                     Suite integrity and PWA lifecycle checks
 ```
 
-The existing app picker and 1–2–3 countdown switch activity areas in the same window. Child accounts, reports, parent gates, and progress retain their existing storage keys. No browser data is deleted by the merge. The two sound apps remain outside VSS and retain Hamada's existing access rules.
+The app picker and report links inside VSS offer only VOC, SENB, and Taffaha for every account, including Hamada. The 1–2–3 countdown switches activity areas in the same window. Child accounts, reports, parent gates, and progress retain their existing storage keys. No browser data is deleted by the merge. The two sound apps remain outside VSS and retain their existing access rules.
 
 Tapping any activity logo opens the same VSS download: all 7,234 media files (about 144 MB) across the three areas. Downloads resume on another VSS screen and reuse unchanged files after updates. Installation saves the complete interface; media downloads remain opt-in. Updates install the complete suite before offering **تحديث الآن / لاحقًا**, and activation reloads every open VSS window.
 
