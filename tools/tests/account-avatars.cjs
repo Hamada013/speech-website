@@ -21,7 +21,7 @@ for(const [id,icon]of first)assert.equal(added.get(id),icon,'New children never 
 assert(!added.get('new-child').includes(' '),'Use remaining individual icons before combinations');
 assert.equal(new Set(added.values()).size,added.size);
 for(const app of ['voc','senb','taffaha']){
- const context={module:{exports:{}}};vm.runInNewContext(fs.readFileSync(path.resolve(__dirname,`../${app}/assets/accounts.js`),'utf8'),context);
+ const context={module:{exports:{}}};vm.runInNewContext(fs.readFileSync(path.resolve(__dirname,`../VSS/${app}/assets/accounts.js`),'utf8'),context);
  assert.deepEqual(Object.fromEntries(context.module.exports.assignAvatars(storage,children)),Object.fromEntries(first),app+': the same child keeps its icon');
 }
 const different=assignAvatars(store(),children,()=>.73);

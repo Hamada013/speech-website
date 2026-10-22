@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
-const {chromium,webkit}=require(process.env.SENB_PLAYWRIGHT||path.resolve(__dirname,'../voc/node_modules/playwright'));
+const {chromium,webkit}=require(process.env.SENB_PLAYWRIGHT||path.resolve(__dirname,'../VSS/voc/node_modules/playwright'));
 const root=path.resolve(__dirname,'../..');
 const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.m4a':'audio/mp4','.json':'application/json'};
 const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}fs.readFile(file,(error,bytes)=>{if(error){res.writeHead(404).end();return;}if(file.endsWith('/index.html'))bytes=Buffer.from(bytes.toString().replace(/<link[^>]+(?:googleapis|gstatic)[^>]*>/g,''));res.setHeader('Content-Type',mime[path.extname(file)]||'application/octet-stream');res.end(bytes);});});
@@ -15,9 +15,9 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
    document.addEventListener('DOMContentLoaded',()=>new MutationObserver(changes=>{for(const change of changes)for(const node of change.addedNodes)if(node.nodeType===1){if(node.matches('.session-finger'))events.push({kind:'hand'});const count=node.matches('.session-count')?node:node.querySelector('.session-count');if(count)events.push({kind:'count',value:count.textContent});}}).observe(document.body,{childList:true,subtree:true}));
   });
   const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));page.setDefaultTimeout(20000);
-  await page.goto(`http://127.0.0.1:${server.address().port}/tools/senb/index.html`,{waitUntil:'domcontentloaded'});
+  await page.goto(`http://127.0.0.1:${server.address().port}/tools/VSS/senb/index.html`,{waitUntil:'domcontentloaded'});
   for(const appId of ['voc','senb']){
-   await page.goto(`http://127.0.0.1:${server.address().port}/tools/${appId}/index.html`,{waitUntil:'domcontentloaded'});
+   await page.goto(`http://127.0.0.1:${server.address().port}/tools/VSS/${appId}/index.html`,{waitUntil:'domcontentloaded'});
    await page.evaluate(id=>id==='voc'?app.switchView('workplace'):navigateTo('workplace'),appId);
    const header=appId==='voc'?'#workplace-view > header':'.app-header';
    await page.locator(`${header} [data-suite-menu]`).click();

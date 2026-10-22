@@ -1,10 +1,10 @@
 // Exact 1–40 inventories, including gaps and unused but supplied media. Assets
-// remain in tools/voc: no duplicated source files, CDN or production build needed.
+// remain in tools/VSS/voc: no duplicated source files, CDN or production build needed.
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const root = path.resolve(__dirname, '..');
-const mediaRoot = path.resolve(root, '../../tools/voc');
+const mediaRoot = path.resolve(root, '../../tools/VSS/voc');
 const hash = value => crypto.createHash('sha256').update(value).digest('hex');
 const media = Array.from({ length: 40 }, (_, i) => {
     const folder = i + 1;
@@ -12,10 +12,10 @@ const media = Array.from({ length: 40 }, (_, i) => {
         .filter(name => new RegExp(`^\\d+\\.${kind === 'images' ? 'webp' : 'm4a'}$`).test(name))
         .sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).map(name => {
             const body = fs.readFileSync(path.join(mediaRoot, kind, String(folder), name));
-            return { url: `../../tools/voc/${kind}/${folder}/${name}`, bytes: body.length, revision: hash(body) };
+            return { url: `../../tools/VSS/voc/${kind}/${folder}/${name}`, bytes: body.length, revision: hash(body) };
         }));
 });
-const shell = ['../../tools/voc/images/logo.webp', 'index.html', 'styles.css', 'app.js', 'validation.js', 'reporting.js', 'storage.js', 'offline.js',
+const shell = ['../../tools/VSS/voc/images/logo.webp', 'index.html', 'styles.css', 'app.js', 'validation.js', 'reporting.js', 'storage.js', 'offline.js',
     'manifest.json', 'data/vocabulary.json', ...fs.readdirSync(path.join(root, 'assets')).filter(name => !name.startsWith('pwa-release')).map(name => `assets/${name}`),
     ...fs.readdirSync(path.join(root, 'icons')).map(name => `icons/${name}`)].sort();
 const integrity = Object.fromEntries(shell.map(file => [file,

@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
-const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../voc/node_modules/playwright'));
+const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../VSS/voc/node_modules/playwright'));
 const root=path.resolve(__dirname,'../..'),out=path.join(root,'tmp/pdfs/acquisition-reports');
 const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.webp':'image/webp','.woff2':'font/woff2'};
 const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}fs.readFile(file,(err,bytes)=>{if(err){res.writeHead(404).end();return;}if(file.endsWith('.html'))bytes=Buffer.from(bytes.toString().replace(/<link[^>]+(?:googleapis|gstatic)[^>]*>/g,''));res.setHeader('Content-Type',types[path.extname(file)]||'application/octet-stream');res.end(bytes);});});
@@ -17,7 +17,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
   localStorage.setItem('voc-children-v1',JSON.stringify({schema:1,active:'charts',children:[child]}));
  });
  const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));page.setDefaultTimeout(20000);
- const origin=`http://127.0.0.1:${server.address().port}/tools/`;
+ const origin=`http://127.0.0.1:${server.address().port}/tools/VSS/`;
  await page.goto(origin+'voc/report.html',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>VocReports.current()?.acquisition?.length===1);
  const voc=await page.evaluate(()=>({row:VocReports.current().acquisition[0],total:VOC_GAME_DATA.categories[0].items.length}));assert.equal(voc.row.total,voc.total);assert.equal(voc.row.receptive.acquired,5);assert.equal(voc.row.receptive.percentage,Math.round(5/voc.total*10000)/100);assert.equal(voc.row.expressive.percentage,voc.row.receptive.percentage);
  assert.equal(await page.locator('[data-acquisition-details]').getAttribute('open'),null);await page.locator('[data-acquisition-details]>summary').click();assert.equal(await page.locator('.acq-pie').count(),2);assert.equal(await page.locator('.acq-chart rect[data-domain]').count(),2);assert.match(await page.locator('.acq-chart svg').textContent(),/100%/);

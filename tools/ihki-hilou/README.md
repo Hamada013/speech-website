@@ -2,7 +2,7 @@
 
 An Arabic, local-only practice PWA for children ages 6+, built as a new app in `tools/ihki-hilou`. White backgrounds, rounded cards, flat SVG scenes, RTL typography and large touch controls follow VOC/SENB's visual style. The app ships without a backend, CDN, remote font or runtime build dependency.
 
-Serve the **repository root** over HTTPS (or localhost), then open `/tools/ihki-hilou/`. Keep `tools/voc`, `tools/senb` and `tools/arabicsounds` at their current sibling paths. Opening an HTML file directly does not provide the required PWA/microphone environment.
+Serve the **repository root** over HTTPS (or localhost), then open `/tools/ihki-hilou/`. Keep `tools/VSS/voc`, `tools/VSS/senb` and `tools/arabicsounds` at their documented paths. Opening an HTML file directly does not provide the required PWA/microphone environment.
 
 ## Practice flow
 

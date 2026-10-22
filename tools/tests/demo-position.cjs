@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-for(const [name,model]of [['VOC',require('../voc/assets/game-model.js')],['SENB',require('../senb/assets/session-model.js')]]){
+for(const [name,model]of [['VOC',require('../VSS/voc/assets/game-model.js')],['SENB',require('../VSS/senb/assets/session-model.js')]]){
  for(let length=2;length<=9;length++)for(let target=0;target<length;target++)for(const random of [()=>0,()=>.25,()=>.5,()=>.999]){
   const cards=Array.from({length},(_,i)=>({id:i})),copy=[...cards],result=model.shuffleAfterDemo(cards,target,random);
   assert.notEqual(result.indexOf(cards[target]),target,`${name}: answer must move even if shuffle returns its old position`);

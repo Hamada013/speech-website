@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0284c7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="VSS">
+  <meta name="description" content="كلمات وجمل ومقاطع — نتعلّم مع حمادة">
+  <title>VSS — كلمات وجمل ومقاطع</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="assets/home.css">
+  <link rel="stylesheet" href="assets/pwa.css">
+  <link rel="stylesheet" href="assets/updates.css">
+  <link rel="stylesheet" href="assets/welcome.css">
+  <link rel="stylesheet" href="voc/assets/parent-gate.css">
+  <script defer src="assets/welcome.js" data-app="vss"></script>
+  <script defer src="voc/assets/parent-gate.js"></script>
+  <script defer src="voc/assets/progress.js"></script>
+  <script defer src="assets/home.js"></script>
+  <script defer src="assets/updates.js"></script>
+  <script defer src="assets/pwa.js"></script>
+</head>
+<body>
+  <header class="vss-header"><a href="./" aria-label="الرئيسية VSS"><img src="voc/images/logo.webp" width="48" height="48" alt=""><strong dir="ltr">VSS</strong></a></header>
+  <main>
+    <button class="vss-logo" data-open-download type="button" aria-label="تنزيل محتوى التطبيق" title="تنزيل محتوى التطبيق" aria-haspopup="dialog"><img src="voc/images/logo.webp" width="180" height="180" alt=""></button>
+    <h1 dir="ltr">VSS</h1>
+    <p class="vss-subtitle">كلمات وجمل ومقاطع</p>
+    <nav class="vss-activities" aria-label="اختر النشاط">
+      <a href="voc/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m3 16 5-5 5 5 3-3 5 5"/><circle cx="15" cy="8" r="1.5"/></svg><span>كلماتي مع حمادة</span></a>
+      <a href="senb/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8l-6 4v-4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/><path d="M7 9h10M7 13h7"/></svg><span>1 2 3 احكي</span></a>
+      <a href="taffaha/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="3"/><circle cx="12" cy="12" r="3"/><circle cx="19" cy="12" r="3"/></svg><span>تف فا حة</span></a>
+    </nav>
+  </main>
+  <footer dir="ltr"><span>SPEECH AND LANGUAGE PATHOLOGY</span><strong>Ahmad Ghanem</strong><span>Latakia - Syria</span><a href="mailto:slp.ahmadghanem@gmail.com">slp.ahmadghanem@gmail.com</a></footer>
+  <dialog class="offline-dialog" data-offline-dialog aria-labelledby="offline-title"><h2 id="offline-title">تنزيل</h2><section data-offline-card data-state="idle"><button type="button" data-offline-download>تنزيل</button><p data-offline-status dir="ltr" role="status" aria-live="polite">0%</p><progress max="100" value="0" aria-label="تقدم التنزيل"></progress><p data-offline-error role="alert" hidden></p></section></dialog>
+</body>
+</html>

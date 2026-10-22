@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
-const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../voc/node_modules/playwright'));
+const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../VSS/voc/node_modules/playwright'));
 const root=path.resolve(__dirname,'../..'),types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.webp':'image/webp','.woff2':'font/woff2','.m4a':'audio/mp4'};
 const server=http.createServer((req,res)=>{let pathname=new URL(req.url,'http://localhost').pathname;if(pathname.endsWith('/'))pathname+='index.html';const file=path.resolve(root,'.'+decodeURIComponent(pathname));if(!file.startsWith(root+path.sep))return res.writeHead(403).end();fs.readFile(file,(error,data)=>{if(error)return res.writeHead(404).end();res.setHeader('Content-Type',types[path.extname(file)]||'application/octet-stream');res.end(data);});});
 (async()=>{
@@ -17,7 +17,7 @@ const server=http.createServer((req,res)=>{let pathname=new URL(req.url,'http://
    let page;const errors=[];
    const freshPage=async()=>{await page?.close();page=await context.newPage();page.setDefaultTimeout(20000);page.on('pageerror',error=>errors.push(error.message));await page.route('https://**',route=>route.abort());};
    await freshPage();
-   const base=`http://127.0.0.1:${server.address().port}/tools/`;
+   const base=`http://127.0.0.1:${server.address().port}/tools/VSS/`;
    const goto=async app=>{await page.goto(base+app+'/index.html',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.SessionHomework&&window.AppNavigation&&document.querySelector('[data-session-end]:not(:disabled)'));};
    const open=async()=>{await page.locator('[data-session-end]:visible').click();await page.locator('#session-homework-dialog[open]').waitFor();};
    const text=()=>page.locator('#session-homework-dialog textarea').inputValue();

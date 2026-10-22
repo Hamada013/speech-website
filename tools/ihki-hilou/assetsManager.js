@@ -1,4 +1,4 @@
-export const LIBRARIES={voc:'../voc/',senb:'../senb/',arabicsounds:'../arabicsounds/','arabic-sound-app':'../arabicsounds/',local:'./assets/'};
+export const LIBRARIES={voc:'../VSS/voc/',senb:'../VSS/senb/',arabicsounds:'../arabicsounds/','arabic-sound-app':'../arabicsounds/',local:'./assets/'};
 export const PLACEHOLDER=new URL('assets/placeholder.svg',import.meta.url).href;
 export function assetURL(asset){
  if(!asset||!Object.prototype.hasOwnProperty.call(LIBRARIES,asset.library)||typeof asset.path!=='string'||asset.path.startsWith('/')||asset.path.split('/').includes('..')||/[?#\\]/.test(asset.path))return null;

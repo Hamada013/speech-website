@@ -1,6 +1,6 @@
 /* Child-facing automatic layouts and the workplace-to-plan selection boundary. */
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
-const {chromium,webkit}=require(path.resolve(__dirname,'../voc/node_modules/playwright'));
+const {chromium,webkit}=require(path.resolve(__dirname,'../VSS/voc/node_modules/playwright'));
 const root=path.resolve(__dirname,'../..'),types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.webp':'image/webp','.woff2':'font/woff2','.m4a':'audio/mp4'};
 const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!file.startsWith(root+path.sep))return res.writeHead(403).end();fs.readFile(file,(e,b)=>{if(e)return res.writeHead(404).end();res.setHeader('Content-Type',types[path.extname(file)]||'application/octet-stream');res.end(b);});});
 (async()=>{await new Promise(r=>server.listen(0,'127.0.0.1',r));let browser,page;
@@ -10,7 +10,7 @@ try{
   if(!localStorage.getItem('voc-children-v1'))localStorage.setItem('voc-children-v1',JSON.stringify({schema:1,active:'ali',children:[{id:'ali',name:'علي',role:'child',words:{},sessions:[],apps:{voc:true,senb:true}}]}));
   const native=setTimeout.bind(window);window.setTimeout=(fn,ms,...args)=>native(fn,[650,800,900].includes(ms)?30:ms,...args);
   window.qaPlayed=[];HTMLMediaElement.prototype.play=function(){window.qaPlayed.push(this.src);clearTimeout(this.qaTimer);this.qaTimer=native(()=>this.dispatchEvent(new Event('ended')),25);return Promise.resolve();};HTMLMediaElement.prototype.pause=function(){clearTimeout(this.qaTimer);};
- });page=await context.newPage();page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(30000);const visit=url=>page.goto(url,{waitUntil:'domcontentloaded'});const errors=[];page.on('pageerror',e=>errors.push(e.message));const base=`http://127.0.0.1:${server.address().port}/tools/`;
+ });page=await context.newPage();page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(30000);const visit=url=>page.goto(url,{waitUntil:'domcontentloaded'});const errors=[];page.on('pageerror',e=>errors.push(e.message));const base=`http://127.0.0.1:${server.address().port}/tools/VSS/`;
  await visit(base+'senb/index.html');await page.evaluate(()=>{navigateTo('workplace');loadAdvancedSentence(getAdvancedItemData('3',4,5));renderWorkplace();});
  await page.locator('[data-suite-settings]:visible').click();await page.locator('#sequencePlayBtn').click();assert.equal(await page.locator('#senbAutomationPrompt button').count(),2);await page.waitForTimeout(350);await page.screenshot({path:'/private/tmp/senb-automation-prompt.png'});
  await page.locator('#senbAutomationMore').click();assert.equal(await page.evaluate(()=>[state.advFolder,state.advSubCatId].join('/')),'3/4');await page.locator('#advancedModal:not(.hidden)').waitFor();

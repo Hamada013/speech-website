@@ -1,6 +1,6 @@
 /* Shared icon treatment and navigation order across home and activity screens. */
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
-const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../voc/node_modules/playwright'));
+const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../VSS/voc/node_modules/playwright'));
 const root=path.resolve(__dirname,'../..'),types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.webp':'image/webp','.woff2':'font/woff2','.m4a':'audio/mp4'};
 const server=http.createServer((req,res)=>{
  let pathname=new URL(req.url,'http://localhost').pathname;if(pathname.endsWith('/'))pathname+='index.html';
@@ -37,7 +37,7 @@ async function plainIcons(page,selector){
    const context=await browser.newContext({viewport,hasTouch:true,serviceWorkers:'block'});
    await context.addInitScript(()=>localStorage.setItem('voc-children-v1',JSON.stringify({schema:1,active:'ali',children:[{id:'ali',name:'علي',role:'child',apps:{voc:true,senb:true,taffaha:true},words:{},sessions:[],senb:{sessions:[]},taffaha:{attempts:[]}}]})));
    const page=await context.newPage();page.setDefaultTimeout(15000);const errors=[],glyphs=new Map();page.on('pageerror',error=>errors.push(error.message));await page.route('https://**',route=>route.abort());
-   const origin=`http://127.0.0.1:${server.address().port}/tools/`,photo=async label=>page.screenshot({path:`/private/tmp/icons-${name}-${viewport.width}-${label}.png`,fullPage:true});
+   const origin=`http://127.0.0.1:${server.address().port}/tools/VSS/`,photo=async label=>page.screenshot({path:`/private/tmp/icons-${name}-${viewport.width}-${label}.png`,fullPage:true});
    for(const app of ['voc','senb','taffaha']){
     await page.goto(origin+app+'/index.html',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.AppNavigation&&document.querySelector('[data-suite-control="profile"]'));
     await toolbar(page);await plainIcons(page,app==='taffaha'?'.home-action-icon':'.app-home-action-icon');await photo(app+'-home');

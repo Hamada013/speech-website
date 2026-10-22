@@ -5,7 +5,8 @@
  const soundApp=['arabicsounds','auditory-rehabilitation'].includes(appId);
  const apps={voc:{name:'كلماتي مع حمادة',logo:'images/logo.webp'},senb:{name:'1 2 3 احكي',logo:'assets/icons/logo.webp'},taffaha:{name:'تف فا حة',logo:'assets/icons/logo.webp'},arabicsounds:{name:'أصواتي العربية',logo:'images/logo.webp'},'auditory-rehabilitation':{name:'أصوات من حولي',logo:'images/logo.webp'}};
  const base=new URL('../',document.currentScript.src),storageKey='voc-children-v1';
- const urlFor=id=>new URL(`../${id}/index.html`,base);
+ const toolsBase=new URL(soundApp?'../':'../../',base);
+ const urlFor=id=>new URL(`${['voc','senb','taffaha'].includes(id)?'VSS/':''}${id}/index.html`,toolsBase);
  const logoURL=id=>new URL(`assets/navigation/${id}.webp`,base).href;
  const svg=path=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
  const icons={settings:svg('<path d="m9 3-.7 2.2-2 .9-2.1-.5-2 3.4 1.5 1.7v2.6L2.2 15l2 3.4 2.1-.5 2 .9L9 21h4l.7-2.2 2-.9 2.1.5 2-3.4-1.5-1.7v-2.6L19.8 9l-2-3.4-2.1.5-2-.9L13 3z"/><circle cx="11" cy="12" r="3"/>'),apps:svg('<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><path d="M14 17.5h7m-3.5-3.5v7"/>'),list:svg('<path d="M9 6h12M9 12h12M9 18h12M3 6h.01M3 12h.01M3 18h.01"/>'),close:svg('<path d="m6 6 12 12M18 6 6 18"/>')};

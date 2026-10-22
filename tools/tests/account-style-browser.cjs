@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
-const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../voc/node_modules/playwright'));
+const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../VSS/voc/node_modules/playwright'));
 const {solveParentGate}=require('./solve-parent-gate.cjs');
 const root=path.resolve(__dirname,'../..');
 const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.webp':'image/webp','.woff2':'font/woff2'};
@@ -29,7 +29,7 @@ const apps=[['voc','VocProfile','#child-dialog'],['senb','SenbProfile','#senb-ch
   page=await context.newPage();page.setDefaultTimeout(10000);const errors=[];page.on('pageerror',error=>errors.push(error.message));
   let firstAvatars;
   for(const [app,profile,selector]of apps){
-   await page.goto(`http://127.0.0.1:${server.address().port}/tools/${app}/index.html`,{waitUntil:'domcontentloaded'});
+   await page.goto(`http://127.0.0.1:${server.address().port}/tools/VSS/${app}/index.html`,{waitUntil:'domcontentloaded'});
    await page.waitForFunction(profile=>window[profile],profile);
    if(app==='taffaha')await page.waitForFunction(()=>window.TaffahaApp);
    await page.evaluate(profile=>{void window[profile].open();},profile);await solveParentGate(page);

@@ -3,9 +3,10 @@ const root=path.resolve(__dirname,'..'),sha=b=>crypto.createHash('sha256').updat
 function walk(base,dir=''){return fs.readdirSync(path.join(base,dir),{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(base,path.join(dir,e.name)):[path.join(dir,e.name).split(path.sep).join('/')]);}
 const media=[];
 for(const library of ['voc','senb','arabicsounds']){
- const base=path.resolve(root,'..',library);
+ const directory=['voc','senb'].includes(library)?`VSS/${library}`:library;
+ const base=path.resolve(root,'..',directory);
  for(const file of walk(base).filter(f=>/^(images|sounds)\//.test(f)&&/\.(webp|png|m4a|mp3|wav|ogg)$/.test(f))){
-  const body=fs.readFileSync(path.join(base,file));media.push({library,url:`../${library}/${file}`,bytes:body.length,revision:sha(body)});
+  const body=fs.readFileSync(path.join(base,file));media.push({library,url:`../${directory}/${file}`,bytes:body.length,revision:sha(body)});
  }
 }
 const shell=['index.html','styles.css','app.js','fluencyGames.js','assetsManager.js','audio.js','storage.js','offline.js','dialogs.js','manifest.json',...walk(path.join(root,'assets')).map(f=>'assets/'+f).filter(f=>f!=='assets/pwa-release.js'&&/\.(svg|webp|png|json)$/.test(f))].sort();

@@ -1,5 +1,5 @@
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
-const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../voc/node_modules/playwright'));
+const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../VSS/voc/node_modules/playwright'));
 const {solveParentGate}=require('./solve-parent-gate.cjs');
 const root=path.resolve(__dirname,'../..'),types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.json':'application/json','.woff2':'font/woff2','.m4a':'audio/mp4'};
 const server=http.createServer((req,res)=>{let relative=decodeURIComponent(new URL(req.url,'http://localhost').pathname);if(relative.endsWith('/'))relative+='index.html';const file=path.resolve(root,'.'+relative);if(!file.startsWith(root+path.sep))return res.writeHead(403).end();fs.readFile(file,(error,body)=>{if(error)return res.writeHead(404).end();res.setHeader('Content-Type',types[path.extname(file)]||'application/octet-stream');res.end(body);});});
@@ -9,7 +9,7 @@ const apps=[['voc','VocProgress'],['senb','SenbProgress'],['taffaha','TaffahaPro
  const browser=await engine.launch({headless:true,...(engine===chromium?{channel:'chrome'}:{})});let page;
  const errors=[];
  async function context(options={}){const context=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block',reducedMotion:'no-preference',...options});await context.route('https://**',route=>route.abort());return context;}
- const base=`http://127.0.0.1:${server.address().port}/tools/`;
+ const base=`http://127.0.0.1:${server.address().port}/tools/VSS/`;
  const account=()=>({schema:1,active:'ali',children:[{id:'ali',name:'علي',role:'child',apps:{voc:true,senb:true,taffaha:true},words:{keep:{receptive:true}},sessions:[],senb:{sessions:[],mastery:{keep:true}},taffaha:{attempts:[]}}]});
  try{
   for(const [app,api]of apps){
@@ -53,7 +53,7 @@ const apps=[['voc','VocProgress'],['senb','SenbProgress'],['taffaha','TaffahaPro
   // Slow logo delivery cannot consume the animation before the image is ready.
   const slow=await context({reducedMotion:'reduce'});await slow.addInitScript(data=>localStorage.setItem('voc-children-v1',JSON.stringify(data)),account());
   let releaseLogo;const logoGate=new Promise(resolve=>releaseLogo=resolve);
-  await slow.route('**/tools/voc/images/logo.webp',async route=>{await logoGate;await route.continue();});
+  await slow.route('**/tools/VSS/voc/images/logo.webp',async route=>{await logoGate;await route.continue();});
   page=await slow.newPage();await page.goto(base+'voc/index.html',{waitUntil:'domcontentloaded'});
   try{await page.locator('#suite-welcome').waitFor();assert.equal(await page.locator('#suite-welcome').getAttribute('data-phase'),'loading');assert.equal(await page.locator('[data-welcome-word]').textContent(),'');}finally{releaseLogo();}
   await page.waitForFunction(()=>!SuiteWelcome.pending);await slow.close();

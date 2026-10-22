@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
-const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../voc/node_modules/playwright'));
+const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../VSS/voc/node_modules/playwright'));
 const root=path.resolve(__dirname,'../..');
 const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.webp':'image/webp','.woff2':'font/woff2'};
 const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}fs.readFile(file,(err,bytes)=>{if(err){res.writeHead(404).end();return;}if(file.endsWith('.html'))bytes=Buffer.from(bytes.toString().replace(/<link[^>]+(?:googleapis|gstatic)[^>]*>/g,''));res.setHeader('Content-Type',types[path.extname(file)]||'application/octet-stream');res.end(bytes);});});
@@ -13,7 +13,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
   window.played=[];HTMLMediaElement.prototype.play=function(){played.push(this.src);clearTimeout(this.qaTimer);this.qaTimer=setTimeout(()=>{this.onended?.();this.dispatchEvent(new Event('ended'));},30);return Promise.resolve();};HTMLMediaElement.prototype.pause=function(){clearTimeout(this.qaTimer);};
  });
  const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);
- const origin=`http://127.0.0.1:${server.address().port}/tools/`;
+ const origin=`http://127.0.0.1:${server.address().port}/tools/VSS/`;
  const tap=async selector=>{const r=await page.locator(selector).boundingBox();await page.touchscreen.tap(r.x+r.width/2,r.y+r.height/2);};
  const active=async selector=>{assert.equal(await page.locator(selector).getAttribute('aria-pressed'),'true');await page.waitForFunction(selector=>getComputedStyle(document.querySelector(selector)).backgroundColor==='rgb(223, 75, 85)',selector);assert.equal(await page.locator(selector).evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(223, 75, 85)');};
  const motion=async selector=>{assert.equal(await page.locator(selector).evaluate(el=>getComputedStyle(el).animationName),'workplace-delete-wiggle');};

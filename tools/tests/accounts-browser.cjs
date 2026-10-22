@@ -1,5 +1,5 @@
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
-const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../voc/node_modules/playwright'));
+const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../VSS/voc/node_modules/playwright'));
 const {solveParentGate}=require('./solve-parent-gate.cjs');
 const root=path.resolve(__dirname,'../..');
 const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.woff2':'font/woff2','.m4a':'audio/mp4','.json':'application/json'};
@@ -10,7 +10,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
  const browser=await engine.launch({headless:true,...(engine===chromium?{channel:'chrome'}:{})});
  try{
  const context=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block',acceptDownloads:true});const page=await context.newPage();page.setDefaultTimeout(15000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
- const origin=`http://127.0.0.1:${server.address().port}/tools/`;
+ const origin=`http://127.0.0.1:${server.address().port}/tools/VSS/`;
  await page.goto(origin+'voc/index.html',{waitUntil:'domcontentloaded'});
  assert.equal(await page.locator('#parent-gate[open]').count(),0,'The first child does not need a parent calculation');
  await page.locator('#suite-welcome-name').fill('علي');await Promise.all([page.waitForEvent('domcontentloaded'),page.locator('#suite-welcome button[type=submit]').click()]);await page.waitForFunction(()=>window.VocProgress?.active()?.name==='علي');

@@ -36,6 +36,7 @@ jobs:
         run: node tools/shared/build-pwa-releases.cjs --site
       - name: Verify accounts and app integrity
         run: |
+          node tools/VSS/tests/static.cjs
           node tools/tests/update-readiness.cjs
           node tools/tests/welcome-launch.cjs
           node tools/tests/account-avatars.cjs

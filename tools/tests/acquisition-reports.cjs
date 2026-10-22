@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const VOC=require('../voc/assets/reports.js'),SENB=require('../senb/assets/session-reports.js');
+const VOC=require('../VSS/voc/assets/reports.js'),SENB=require('../VSS/senb/assets/session-reports.js');
 const now=new Date('2026-10-18T18:00:00Z'),date='2026-10-18T09:00:00Z';
 const session=(id,domain,records,extra={})=>({id,date,domain,kind:'assessment',records,...extra});
 const bank=[{id:1,name:'أفعال',items:Array.from({length:100},(_,i)=>({id:i+1}))},{id:2,name:'حروف',items:Array.from({length:5},(_,i)=>({id:i+1}))},{id:3,name:'لم تبدأ',items:[{id:1}]}];

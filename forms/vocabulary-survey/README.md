@@ -2,7 +2,7 @@
 
 The new app lives in `forms/vocabulary-survey/`. The Vocabulary Assessment card in `forms/language/index.html` points here. Existing language-development forms and the deleted files in `forms/language/Vocabulary-survey/` are preserved as found.
 
-Serve the **repository root**, because the app reads media from `../../tools/voc/images/` and `../../tools/voc/sounds/`. For local development, run `python3 -m http.server 8000` at the repository root and open `http://localhost:8000/forms/vocabulary-survey/`. Production needs HTTPS. Deploy this app and the existing `tools/voc` media together at the same relative paths. No application backend, CDN or production build service is required.
+Serve the **repository root**, because the app reads media from `../../tools/VSS/voc/images/` and `../../tools/VSS/voc/sounds/`. For local development, run `python3 -m http.server 8000` at the repository root and open `http://localhost:8000/forms/vocabulary-survey/`. Production needs HTTPS. Deploy this app and the existing `tools/VSS/voc` media together at the same relative paths. No application backend, CDN or production build service is required.
 
 ## Modules
 
@@ -12,7 +12,7 @@ Serve the **repository root**, because the app reads media from `../../tools/voc
 - `reporting.js`: accuracy, expressive weighted index, choice-error proportions, matched-item deltas, defensive JSON/CSV parsing, export, charts and native print/PDF.
 - `storage.js`: IndexedDB session and setting persistence. No child record is sent to a server. Export files are your portable copy; clearing browser storage removes local sessions.
 - `offline.js`, `sw.js`, `manifest.json`: installation and a resumable, explicitly started offline download.
-- `data/vocabulary.json`: generated labels, numbered paths, revisions and missing-media inventory. Labels come from the **current** `tools/voc/index.html` category definitions; numeric filenames cannot independently validate spoken content.
+- `data/vocabulary.json`: generated labels, numbered paths, revisions and missing-media inventory. Labels come from the **current** `tools/VSS/voc/index.html` category definitions; numeric filenames cannot independently validate spoken content.
 
 ## Clinical interpretation
 

@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
-const {chromium,webkit}=require(path.resolve(__dirname,'../voc/node_modules/playwright'));
+const {chromium,webkit}=require(path.resolve(__dirname,'../VSS/voc/node_modules/playwright'));
 const {solveParentGate}=require('./solve-parent-gate.cjs');
 const root=path.resolve(__dirname,'../..'),KEY='voc-children-v1',types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.webp':'image/webp','.woff2':'font/woff2','.m4a':'audio/mp4'};
 const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!file.startsWith(root+path.sep))return res.writeHead(403).end();fs.readFile(file,(e,b)=>{if(e)return res.writeHead(404).end();res.setHeader('Content-Type',types[path.extname(file)]||'application/octet-stream');res.end(b);});});
@@ -17,7 +17,7 @@ try{
   if(!localStorage.getItem('voc-children-v1'))localStorage.setItem('voc-children-v1',JSON.stringify({schema:1,active:'ali',children:[{id:'ali',name:'علي',role:'child',words:{},sessions:[],apps:{voc:true}}]}));
   const native=setTimeout.bind(window);window.setTimeout=(fn,ms,...args)=>native(fn,[650,800,900].includes(ms)?30:ms,...args);
   HTMLMediaElement.prototype.play=function(){clearTimeout(this.qaTimer);this.qaTimer=native(()=>this.dispatchEvent(new Event('ended')),25);return Promise.resolve();};HTMLMediaElement.prototype.pause=function(){clearTimeout(this.qaTimer);};
- });page=await context.newPage();page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(30000);const errors=[];page.on('pageerror',e=>errors.push(e.message));const base=`http://127.0.0.1:${server.address().port}/tools/`,visit=url=>page.goto(url,{waitUntil:'domcontentloaded'});
+ });page=await context.newPage();page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(30000);const errors=[];page.on('pageerror',e=>errors.push(e.message));const base=`http://127.0.0.1:${server.address().port}/tools/VSS/`,visit=url=>page.goto(url,{waitUntil:'domcontentloaded'});
  await visit(base+'voc/games.html');const logo=await page.locator('.game-brand img').boundingBox(),controls=await page.locator('.game-header [data-suite-control]').evaluateAll(nodes=>nodes.filter(n=>n.getClientRects().length).map(n=>n.getBoundingClientRect().right));assert.ok(controls.every(x=>x<logo.x),'Game hub controls are physically left of the logo');
  for(const mode of ['matching','memory','rapid','test']){
   await visit(base+`voc/${mode}.html`);await page.evaluate(()=>{document.querySelector('[name=game-level][value="6"]').checked=true;document.querySelector('[name=game-duration][value="0"]').checked=true;});await page.locator('#start-game').click();

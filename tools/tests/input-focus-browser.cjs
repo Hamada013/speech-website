@@ -1,6 +1,6 @@
 /* Reproduce script-focused dialogs after text entry, pointer taps, and keyboard use. */
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
-const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../voc/node_modules/playwright'));
+const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../VSS/voc/node_modules/playwright'));
 const root=path.resolve(__dirname,'../..'),types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.webp':'image/webp','.woff2':'font/woff2','.m4a':'audio/mp4'};
 const server=http.createServer((req,res)=>{
  const file=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));
@@ -17,7 +17,7 @@ const server=http.createServer((req,res)=>{
    await context.addInitScript(()=>localStorage.setItem('voc-children-v1',JSON.stringify({schema:1,active:'hamada-admin',children:[{id:'hamada-admin',name:'Hamada',role:'admin',apps:{voc:true,senb:true,taffaha:true},words:{},sessions:[],senb:{sessions:[]},taffaha:{attempts:[]}}]})));
    const page=await context.newPage();page.setDefaultTimeout(10000);const errors=[];page.on('pageerror',error=>errors.push(error.message));await page.route('https://**',route=>route.abort());
    for(const app of ['voc','senb','taffaha']){
-    await page.goto(`http://127.0.0.1:${server.address().port}/tools/${app}/index.html`,{waitUntil:'domcontentloaded'});
+    await page.goto(`http://127.0.0.1:${server.address().port}/tools/VSS/${app}/index.html`,{waitUntil:'domcontentloaded'});
     await page.waitForFunction(()=>window.ChildAccountGate&&window.FlowUI);
     await page.evaluate(()=>{
      const host=document.createElement('div');host.id='qa-focus-host';host.style.cssText='position:fixed;bottom:0;left:0;z-index:99999;background:white;padding:8px;display:flex;gap:8px;';

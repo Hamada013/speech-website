@@ -1,5 +1,5 @@
 const fs = require('node:fs'), path = require('node:path'), http = require('node:http'), assert = require('node:assert/strict');
-const { chromium, webkit } = require(process.env.APP_PLAYWRIGHT || path.resolve(__dirname, '../voc/node_modules/playwright'));
+const { chromium, webkit } = require(process.env.APP_PLAYWRIGHT || path.resolve(__dirname, '../VSS/voc/node_modules/playwright'));
 const root = path.resolve(__dirname, '../..');
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.woff2': 'font/woff2', '.json': 'application/json' };
 const server = http.createServer((req, res) => {
@@ -67,7 +67,7 @@ const server = http.createServer((req, res) => {
         const viewports = [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 844, height: 390 }];
         for (const [index, from] of apps.entries()) for (const to of apps.filter(app => app !== from)) {
             await page.setViewportSize(viewports[index % viewports.length]);
-            await page.goto(origin + from + '/index.html'); await ready(from);
+            await page.goto(origin + (['voc','senb','taffaha'].includes(from)?'VSS/':'') + from + '/index.html'); await ready(from);
             await page.locator('[data-suite-apps]:visible').click();
             await page.locator(`[data-suite-app=${to}]`).click();
             // A second queued click must not start another transition or change its destination.
@@ -76,7 +76,7 @@ const server = http.createServer((req, res) => {
             await checkTransition(from, to, { screenshot: to === apps[(index + 1) % apps.length] });
         }
         // Report links use the same transition and preserve the selected child.
-        await page.goto(origin + 'voc/index.html'); await ready('voc');
+        await page.goto(origin + 'VSS/voc/index.html'); await ready('voc');
         await page.evaluate(() => VocProgress.signIn('علي')); await page.reload(); await ready('voc'); expectedOwner = 'ali';
         await page.locator('[data-child-report]:visible').click();
         await page.locator('#voc-activity-report [data-report-app=taffaha]').click();
@@ -85,7 +85,7 @@ const server = http.createServer((req, res) => {
         assert.equal(await page.evaluate(() => TaffahaReports.current().childId), 'ali');
         await page.goBack(); await ready('voc');
         assert.equal(await page.locator('#suite-transition[open]').count(), 0, 'Back navigation clears the old transition');
-        await page.goto(origin + 'senb/index.html'); await ready('senb');
+        await page.goto(origin + 'VSS/senb/index.html'); await ready('senb');
         await page.emulateMedia({ reducedMotion: 'reduce' });
         await page.locator('[data-suite-apps]:visible').click(); await page.locator('[data-suite-app=voc]').click();
         await checkTransition('senb', 'voc', { reduced: true });

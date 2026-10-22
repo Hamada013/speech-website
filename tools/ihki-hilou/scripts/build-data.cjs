@@ -1,6 +1,6 @@
 // Resolve labels from the authoritative libraries; never guess numbered paths.
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const root=path.resolve(__dirname,'..'),voc=path.resolve(root,'../voc'),senb=path.resolve(root,'../senb');
+const root=path.resolve(__dirname,'..'),voc=path.resolve(root,'../VSS/voc'),senb=path.resolve(root,'../VSS/senb');
 const source=fs.readFileSync(path.join(voc,'index.html'),'utf8'),start=source.indexOf('const RAW_CATEGORIES ='),end=source.indexOf('const app =',start);
 if(start<0||end<0)throw Error('VOC labels not found');
 const categories=vm.runInNewContext(source.slice(start,end)+';JSON.parse(JSON.stringify(CATEGORIES))',{}, {timeout:1000});

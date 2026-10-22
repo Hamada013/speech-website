@@ -99,7 +99,7 @@ async function run(name, engine, origin) {
         assert.equal(await page.locator('html').getAttribute('dir'), 'rtl');
         assert.equal(await page.locator('#dashboard-view button').count(), 3);
         assert.equal(await page.locator('#dashboard-view p').count(), 0);
-        assert.equal(await page.locator('.brand img').getAttribute('src'), '../../tools/voc/images/logo.webp');
+        assert.equal(await page.locator('.brand img').getAttribute('src'), '../../tools/VSS/voc/images/logo.webp');
         // Manual shortcut help leads to the separate, opt-in offline prompt.
         await page.locator('[data-offline-install]').click();
         await page.locator('[data-install-help]').waitFor({ state: 'visible' });
@@ -234,7 +234,7 @@ async function run(name, engine, origin) {
         await page.locator('#report-view').waitFor({ state: 'visible' });
         assert.match(await page.locator('#report-content').textContent(), /جزئي/);
         const range = await page.evaluate(async () => {
-            const response = await fetch('../../tools/voc/sounds/1/1.m4a', { headers: { Range: 'bytes=0-99' } });
+            const response = await fetch('../../tools/VSS/voc/sounds/1/1.m4a', { headers: { Range: 'bytes=0-99' } });
             return { status: response.status, length: (await response.arrayBuffer()).byteLength };
         });
         assert.deepEqual(range, { status: 206, length: 100 });

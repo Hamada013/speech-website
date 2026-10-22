@@ -9,7 +9,8 @@
   if(valid(transfer)||navigation==='reload'&&valid(reload))return false;
   if(navigation==='navigate'&&referrer){
    try{
-    const from=new URL(referrer),parent=new URL('../',scope);
+    const from=new URL(referrer),parent=new URL('../',scope),tools=new URL('../',parent);
+    if(from.origin===scope.origin&&(from.pathname===parent.pathname+'index.html'||from.pathname===parent.pathname||['arabicsounds','auditory-rehabilitation'].some(id=>from.pathname.startsWith(tools.pathname+id+'/'))))return false;
     if(from.origin===scope.origin&&(from.pathname.startsWith(scope.pathname)||['voc','senb','taffaha','arabicsounds','auditory-rehabilitation'].some(id=>from.pathname.startsWith(parent.pathname+id+'/'))))return false;
    }catch{}
   }
@@ -18,7 +19,7 @@
  if(typeof module!=='undefined')module.exports={shouldWelcome};
  if(!root.document)return;
  const script=document.currentScript,app=script.dataset.app,base=new URL('../',script.src);
- const brands={voc:['كلماتي مع حمادة','images/logo.webp'],senb:['1 2 3 احكي','assets/icons/logo.webp'],taffaha:['تف فا حة','assets/icons/logo.webp']};
+ const brands={vss:['VSS','voc/images/logo.webp'],voc:['كلماتي مع حمادة','images/logo.webp'],senb:['1 2 3 احكي','assets/icons/logo.webp'],taffaha:['تف فا حة','assets/icons/logo.webp']};
  if(!brands[app])return;
  let transfer,reload;
  try{transfer=JSON.parse(sessionStorage.getItem(TRANSFER));reload=JSON.parse(sessionStorage.getItem(RELOAD));sessionStorage.removeItem(TRANSFER);sessionStorage.removeItem(RELOAD);}catch{}

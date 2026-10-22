@@ -1,6 +1,6 @@
 // The app picker has one design, two child groups, and a typed Hamada sign-in.
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
-const {chromium,webkit}=require(path.resolve(__dirname,'../voc/node_modules/playwright'));
+const {chromium,webkit}=require(path.resolve(__dirname,'../VSS/voc/node_modules/playwright'));
 const {solveParentGate}=require('./solve-parent-gate.cjs');
 const root=path.resolve(__dirname,'../..');
 const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.webp':'image/webp','.png':'image/png','.woff2':'font/woff2','.m4a':'audio/mp4'};
@@ -35,7 +35,7 @@ const server=http.createServer((req,res)=>{
     ]}));
    });
    const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));page.setDefaultTimeout(15000);
-   const url=`http://127.0.0.1:${server.address().port}/tools/${app}/index.html`;
+   const url=`http://127.0.0.1:${server.address().port}/tools/${['voc','senb','taffaha'].includes(app)?'VSS/':''}${app}/index.html`;
    await page.goto(url,{waitUntil:'domcontentloaded'});
    await page.waitForFunction(api=>window[api]&&window.AppNavigation,config.api);
    const group=apps.slice(apps.indexOf(app)<3?0:3,apps.indexOf(app)<3?3:5);

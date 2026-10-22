@@ -100,5 +100,5 @@ for (const file of release.shell) assert.equal(release.integrity[file], `sha256-
 const expectedVersion = crypto.createHash('sha256').update(JSON.stringify({ integrity: release.integrity, media: release.media,
     worker: crypto.createHash('sha256').update(fs.readFileSync(path.join(root, 'sw.js'))).digest('hex') })).digest('hex').slice(0, 20);
 assert.equal(release.version, expectedVersion, 'Rebuild the PWA release after editing worker/app files');
-assert.ok(!release.shell.some(file => file.includes('tools/voc/images/1/')));
+assert.ok(!release.shell.some(file => file.includes('tools/VSS/voc/images/1/')));
 console.log(`PASS: ${data.items.length} source items, ${tested} complete receptive matrices, age overrides, scoring, safe imports, JSON/CSV round trips, matched-item deltas and PWA integrity.`);

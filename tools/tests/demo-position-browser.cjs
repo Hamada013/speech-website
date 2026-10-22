@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
-const {chromium,webkit}=require(path.resolve(__dirname,'../voc/node_modules/playwright'));
+const {chromium,webkit}=require(path.resolve(__dirname,'../VSS/voc/node_modules/playwright'));
 const root=path.resolve(__dirname,'../..'),types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.webp':'image/webp','.woff2':'font/woff2','.m4a':'audio/mp4'};
 const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!file.startsWith(root+path.sep))return res.writeHead(403).end();fs.readFile(file,(err,body)=>{if(err)return res.writeHead(404).end();res.setHeader('Content-Type',types[path.extname(file)]||'application/octet-stream');res.end(body);});});
 (async()=>{await new Promise(r=>server.listen(0,'127.0.0.1',r));let browser,debugPage;
@@ -8,7 +8,7 @@ await context.route('https://**',route=>route.abort());await context.addInitScri
  if(!localStorage.getItem('voc-children-v1'))localStorage.setItem('voc-children-v1',JSON.stringify({schema:1,active:'ali',children:[{id:'ali',name:'علي',role:'child',words:{},sessions:[],apps:{voc:true,senb:true}}]}));
  const native=setTimeout.bind(window);window.setTimeout=(fn,ms,...args)=>native(fn,ms===900?600:ms===650?200:[400,450,700,800,850,1000].includes(ms)?35:ms,...args);
  HTMLMediaElement.prototype.play=function(){clearTimeout(this.testTimer);this.testTimer=native(()=>this.dispatchEvent(new Event('ended')),25);return Promise.resolve();};HTMLMediaElement.prototype.pause=function(){clearTimeout(this.testTimer);};
-});const page=debugPage=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);const base=`http://127.0.0.1:${server.address().port}/tools/`;
+});const page=debugPage=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);const base=`http://127.0.0.1:${server.address().port}/tools/VSS/`;
 await page.goto(base+'voc/index.html');await page.evaluate(()=>VocProgress.startPlan(['1_1','1_2','1_3'],'moderate',['test']));await page.goto(base+'voc/test.html?plan=1');
 await page.locator('#game-board .guide-glow').waitFor();const before=await page.evaluate(()=>{const s=JSON.parse(localStorage.getItem(VocProgress.scope('hamada-game-test')+'-draft'));return {target:s.order[0],index:s.currentChoices.indexOf(s.order[0])};});
 await page.locator('#game-board>button:enabled').first().waitFor();const after=await page.evaluate(()=>JSON.parse(localStorage.getItem(VocProgress.scope('hamada-game-test')+'-draft')).currentChoices);assert.notEqual(after.indexOf(before.target),before.index);

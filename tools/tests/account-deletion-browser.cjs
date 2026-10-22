@@ -1,5 +1,5 @@
 const fs = require('node:fs'), path = require('node:path'), http = require('node:http'), assert = require('node:assert/strict');
-const { chromium, webkit } = require(process.env.APP_PLAYWRIGHT || path.resolve(__dirname, '../voc/node_modules/playwright'));
+const { chromium, webkit } = require(process.env.APP_PLAYWRIGHT || path.resolve(__dirname, '../VSS/voc/node_modules/playwright'));
 const { solveParentGate } = require('./solve-parent-gate.cjs');
 const root = path.resolve(__dirname, '../..'), KEY = 'voc-children-v1';
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.woff2': 'font/woff2', '.json': 'application/json' };
@@ -36,7 +36,7 @@ const configs = [
             page = await context.newPage(); page.setDefaultTimeout(10000);
             const errors = []; page.on('pageerror', error => errors.push(error.message));
             await page.route(/fonts\.(googleapis|gstatic)\.com/, route => route.abort());
-            await page.goto(`http://127.0.0.1:${server.address().port}/tools/${config.app}/index.html`);
+            await page.goto(`http://127.0.0.1:${server.address().port}/tools/VSS/${config.app}/index.html`);
             await page.locator(config.profile).first().click(); await solveParentGate(page);
             const dialog = page.locator(config.dialog); await dialog.locator('.suite-account-browser').waitFor();
             assert.equal(await dialog.locator('[role=listitem]').count(), 4);

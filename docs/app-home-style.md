@@ -1,6 +1,6 @@
 # Default app home style
 
-The user selected the `tools/taffaha` home-screen style as the project default for future apps. Existing examples are `tools/taffaha/index.html`, `tools/voc/index.html`, and `tools/senb/index.html`.
+The user selected the `tools/VSS/taffaha` home-screen style as the project default for future apps. Existing examples are `tools/VSS/taffaha/index.html`, `tools/VSS/voc/index.html`, and `tools/VSS/senb/index.html`.
 
 - Use a light background (`#f8fafc`) with soft green and blue radial washes. Use dark blue text (`#22445a`), muted secondary text (`#5c7285`), and pale borders (`#dceaf4`).
 - Use the system font stack: system-ui, -apple-system, Segoe UI, Tahoma, Arial, sans-serif.
@@ -11,8 +11,8 @@ The user selected the `tools/taffaha` home-screen style as the project default f
 - Keep shared header controls in this physical left-to-right order when present: workspace settings, activity list, apps, end session, information, family practice, report, profile, and home/back. Apply the matching DOM order in RTL so keyboard navigation follows the layout. Edit `tools/shared/app-navigation.js` and `tools/shared/app-navigation.css`, then sync the three local copies.
 - Show the contact footer in four centered lines: SPEECH AND LANGUAGE PATHOLOGY, Ahmad Ghanem, Latakia - Syria, and the email link.
 - Scale logo sizes and spacing with viewport height. Adapt to short landscape screens and allow vertical scrolling when needed. Keep safe-area insets and reduced-motion preferences.
-- Keep home styling scoped so activity screens retain their existing layout. `tools/voc/assets/home.css` and `tools/senb/assets/home.css` are identical local copies of the reusable home pattern; keep them synchronized. Local copies let each app remain independently hostable and available offline.
-- After editing a PWA shell, regenerate that app's release manifest with its existing build script, then run the relevant checks.
+- Keep home styling scoped so activity screens retain their existing layout. `tools/VSS/voc/assets/home.css` and `tools/VSS/senb/assets/home.css` are identical local copies of the reusable home pattern; keep them synchronized. The three activity areas share the VSS manifest, worker, offline download, and update release.
+- After editing any VSS activity, run `npm run build --prefix tools/VSS` to regenerate the complete suite release, then run the relevant checks.
 
 ## Download and update controls
 
@@ -20,11 +20,11 @@ Use the app logo on the home screen (and the header logo) to open the download d
 
 Use the local `assets/updates.js` and `assets/updates.css` pattern to check for a new complete service-worker release on app opening. Offer «تحديث الآن» and «لاحقًا» in a separate modal. Keep the existing release active when postponed; reload all open app windows after acceptance. Check the published site rather than GitHub commits, since a commit may not have deployed yet. Regenerate release manifests for every publication.
 
-The shared browser regression check is `tools/tests/pwa-controls-browser.cjs`. From the repository root, run `APP_PLAYWRIGHT="$PWD/tools/voc/node_modules/playwright" node tools/tests/pwa-controls-browser.cjs` after installing VOC's dev dependencies. It uses small catalogs of real media to verify download completion, offline reopening, update deferral, and activation across multiple open windows.
+The shared browser regression check is `tools/tests/pwa-controls-browser.cjs`. From the repository root, run `APP_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node tools/tests/pwa-controls-browser.cjs` after installing VOC's dev dependencies. It uses small catalogs of real media to verify download completion, offline reopening, update deferral, and activation across multiple open windows.
 
 `tools/shared/updates.js` also owns the worker-readiness helper used by VOC, SENB and Taffaha downloads. An early download tap waits for the app's own worker; failed installation leaves a usable retry in the same tab. Keep its five local copies synchronized. The browser check covers early taps and failed-install retries; use `APP_FULL_CATALOG=1` to verify complete production catalogs, or `APP_ENGINE=webkit` for Safari's browser engine.
 
-For GitHub Pages publication, use `.github/workflows/pages.yml` and `node tools/shared/build-pwa-releases.cjs --site` to rebuild the five app manifests and verify the staged website before deployment. Select GitHub Actions as the Pages source once; see `docs/app-publication.md`. `node tools/tests/update-readiness.cjs` also verifies Safari's already-claimed activating worker, correct controller identity, failed setup and retry.
+For GitHub Pages publication, use `.github/workflows/pages.yml` and `node tools/shared/build-pwa-releases.cjs --site` to rebuild VSS and the two sound app manifests and verify the staged website before deployment. Select GitHub Actions as the Pages source once; see `docs/app-publication.md`. `node tools/tests/update-readiness.cjs` also verifies Safari's already-claimed activating worker, correct controller identity, failed setup and retry.
 
 The split sound apps (`tools/arabicsounds` and `tools/auditory-rehabilitation`) use the same home/download/update conventions. Their five-action home grids use compact spacing, while each app retains its own activity engine, media catalog, manifest, logo, icons, and scoped caches. The old `tools/aswati` entry handles saved-link migration only.
 
@@ -72,7 +72,7 @@ Arabic Sounds' Ling detection uses an ear on the physical left and toy/bucket on
 
 Auditory Rehabilitation uses tick/cross detection with a more visible animated ear and accepts responses during playback. Its ten detection rounds remain balanced. Both discrimination levels and every identification set allow live dragging, show the dropped image and tick/cross feedback, and keep all choices visible during a white-glove practice demonstration. Short duration cards and timelines are yellow, long ones blue; include stripes and corner dots, wider timelines, and shuffled test positions. Memory automatically counts to three, introduces every pair together with gentle highlighting, then covers the cards. Use three colored frequency columns in the library, with pagination on small screens rather than page scrolling. Its reports use actual-record charts with practice and models separate from assessment accuracy. See [auditory-rehabilitation.md](auditory-rehabilitation.md) for frequency-analysis details, build dependencies and browser/download verification.
 
-Validate with `node tools/tests/sound-suite.cjs`, `node tools/tests/sound-suite-browser.cjs` (also `APP_ENGINE=webkit`), `node tools/tests/app-transition-browser.cjs`, and `SOUNDS_PLAYWRIGHT="$PWD/tools/voc/node_modules/playwright" node tools/tests/split-sounds-browser.cjs`. Rebuild each affected offline release after syncing.
+Validate with `node tools/tests/sound-suite.cjs`, `node tools/tests/sound-suite-browser.cjs` (also `APP_ENGINE=webkit`), `node tools/tests/app-transition-browser.cjs`, and `SOUNDS_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node tools/tests/split-sounds-browser.cjs`. Rebuild each affected offline release after syncing.
 
 In VOC and SENB, move the demonstrated answer to a different choice position before the child’s turn whenever another position exists. A random shuffle alone is insufficient because it can leave the target unchanged. Persist the new choice order through pause/reload, and keep answer indices and drag handlers aligned with the visible cards.
 
@@ -87,3 +87,7 @@ VOC standalone games and tests share the same compact, viewport-fitted layout as
 Only the active Hamada account can reset its own VOC, SENB and Taffaha activity from its account bar. Confirm in a dialog with only cross/tick icons and an explicit Hamada-only description. Keep every child account and all child progress, Hamada's identity and sound-app data, and downloaded media intact. Reset revisions block stale tabs from restoring cleared work; invalidate scoped game drafts and Hamada's three parent summaries. Never use a whole-origin storage clear.
 
 Shared account grid/reset sources are `tools/shared/accounts.js` and `tools/shared/flow-ui.css`; each app supplies its native account/report actions. Validate with `node tools/tests/hamada-reset.cjs` and `node tools/tests/compact-games-accounts-browser.cjs` (also `APP_ENGINE=webkit`), then sync and rebuild the affected offline releases.
+
+## VSS installation
+
+VOC, SENB and Taffaha live under `tools/VSS/` and form one installable app named VSS, using VOC's icon. Every activity references `../manifest.webmanifest`. Keep one root worker and one complete release; never register separate module workers. The root home follows the same Taffaha visual style. The shared download saves media from all three areas, and the update offer activates the complete suite across all open windows. See [VSS README](../tools/VSS/README.md).

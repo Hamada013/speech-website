@@ -11,8 +11,8 @@ function memory(data = fixture()) {
     return { getItem: key => values.get(key), setItem: (key, value) => values.set(key, value), removeItem:key=>values.delete(key) };
 }
 (async () => {
-    const { createProgress } = await import('../taffaha/progress.js');
-    const createApps = [require('../voc/assets/progress.js').create, require('../senb/assets/child-progress.js').create, createProgress];
+    const { createProgress } = await import('../VSS/taffaha/progress.js');
+    const createApps = [require('../VSS/voc/assets/progress.js').create, require('../VSS/senb/assets/child-progress.js').create, createProgress];
     for (const name of ['Hamada', 'HAMADA', ' hamada ', 'Ｈａｍａｄａ']) {
         const data = fixture(); data.children[0].name = name; delete data.children[0].role;
         const storage = memory(data), before = storage.getItem(KEY);

@@ -8,7 +8,7 @@ const fixture=()=>({schema:1,active:'admin',extra:'keep',children:[
 {id:'sara',name:'سارة',role:'child',created:'2021-01-01',words:{keep:true}}]});
 function storage(data=fixture()) {const values=new Map([[KEY,JSON.stringify(data)]]);return{getItem:k=>values.get(k),setItem:(k,v)=>values.set(k,v),removeItem:k=>values.delete(k)};}
 (async()=>{
- const {createProgress}=await import('../taffaha/progress.js');const makers=[require('../voc/assets/progress.js').create,require('../senb/assets/child-progress.js').create,createProgress];
+ const {createProgress}=await import('../VSS/taffaha/progress.js');const makers=[require('../VSS/voc/assets/progress.js').create,require('../VSS/senb/assets/child-progress.js').create,createProgress];
  for(const create of makers){
   const s=storage(),p=create(s);p.signIn('Hamada');
   const notes=homework({app:'voc',storage:s,owner:()=>p.active()});notes.record({label:'old',activity:'test'});

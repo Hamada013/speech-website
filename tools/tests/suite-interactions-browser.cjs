@@ -1,7 +1,7 @@
 /* Covers the actual mobile regressions: exclusive menus, standalone templates,
    logo downloads, lesson controls, pointer states, and corrected automatic answers. */
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
-const {chromium,webkit}=require(path.resolve(__dirname,'../voc/node_modules/playwright'));
+const {chromium,webkit}=require(path.resolve(__dirname,'../VSS/voc/node_modules/playwright'));
 const root=path.resolve(__dirname,'../..'),types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.webp':'image/webp','.woff2':'font/woff2','.m4a':'audio/mp4'};
 const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!file.startsWith(root+path.sep))return res.writeHead(403).end();fs.readFile(file,(error,data)=>{if(error)return res.writeHead(404).end();res.setHeader('Content-Type',types[path.extname(file)]||'application/octet-stream');res.end(data);});});
 (async()=>{
@@ -14,7 +14,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
   HTMLMediaElement.prototype.play=function(){clearTimeout(this.qaTimer);this.qaTimer=setTimeout(()=>this.dispatchEvent(new Event('ended')),40);return Promise.resolve();};HTMLMediaElement.prototype.pause=function(){clearTimeout(this.qaTimer);};
  });
  const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));page.setDefaultTimeout(15000);await page.route('https://**',route=>route.abort());
- const origin=`http://127.0.0.1:${server.address().port}/tools/`;
+ const origin=`http://127.0.0.1:${server.address().port}/tools/VSS/`;
  for(const appId of ['voc','senb','taffaha']){
   await page.goto(origin+appId+'/index.html',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.AppNavigation&&window.SessionHomework);
   const logo=page.locator('.app-logo-download');await logo.click();const download=page.locator(appId==='voc'?'[data-offline-dialog]':appId==='senb'?'#offlinePanel':'#offline-dialog');await download.waitFor({state:'visible'});await page.keyboard.press('Escape');

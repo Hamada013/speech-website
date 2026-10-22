@@ -1,13 +1,13 @@
 // The worker must be usable after a claim, without accepting an old controller.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const source=fs.readFileSync(path.resolve(__dirname,'../shared/updates.js'),'utf8');
-const scriptURL='https://example.test/tools/voc/sw.js';
+const scriptURL='https://example.test/tools/VSS/voc/sw.js';
 function worker(state){return Object.assign(new EventTarget(),{state,scriptURL});}
 function setup({active=null,controller=null,installing=null}={}){
  const registration=Object.assign(new EventTarget(),{active,installing,waiting:null,update:async()=>{}});
  let registrations=0;
  const serviceWorker=Object.assign(new EventTarget(),{controller,register:async()=>{registrations++;return registration;}});
- const window=new EventTarget(),document={baseURI:'https://example.test/tools/voc/index.html',hidden:false,body:{append(){}},addEventListener(){},createElement(){
+ const window=new EventTarget(),document={baseURI:'https://example.test/tools/VSS/voc/index.html',hidden:false,body:{append(){}},addEventListener(){},createElement(){
   return {open:false,hidden:true,setAttribute(){},addEventListener(){},querySelector(){return {addEventListener(){}};},showModal(){this.open=true;}};
  }};
  vm.runInNewContext(source,{window,document,navigator:{serviceWorker,onLine:false},URL,setTimeout,clearTimeout,setInterval(){}});

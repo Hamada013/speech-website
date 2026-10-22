@@ -1,19 +1,19 @@
 // One build entrypoint for GitHub Pages and the final app bundle. No npm install required.
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto'),cp=require('node:child_process');
 const ROOT=path.resolve(__dirname,'../..');
-const APPS=['voc','senb','taffaha','arabicsounds','auditory-rehabilitation'];
+const APPS=['VSS','arabicsounds','auditory-rehabilitation'];
 const sha=(body,encoding='hex')=>crypto.createHash('sha256').update(body).digest(encoding);
 function inventory(app,root=ROOT){
  const base=path.join(root,'tools',app),context={self:{}};
  let release,media,shell;
- if(['voc','senb','taffaha'].includes(app)){
+ if(app==='VSS'){
   vm.runInNewContext(fs.readFileSync(path.join(base,'assets/pwa-release.js'),'utf8'),context);
-  release=context.self[{voc:'VOC_RELEASE',senb:'SENB_RELEASE',taffaha:'TAFFAHA_RELEASE'}[app]];
-  media=app==='senb'?JSON.parse(fs.readFileSync(path.join(base,'assets/offline-assets.json'))).assets:release.media.flat();
+  release=context.self.VSS_RELEASE;
+  media=release.media;
   shell=[...release.shell,'sw.js','assets/pwa-release.js'];
   for(const file of release.shell){
    const expected=release.integrity[file],body=fs.readFileSync(path.join(base,file));
-   if(expected!==(app==='taffaha'?sha(body):'sha256-'+sha(body,'base64')))throw Error(`Stale shell: ${app}/${file}`);
+   if(expected!=='sha256-'+sha(body,'base64'))throw Error(`Stale shell: ${app}/${file}`);
   }
  }else{
   release=vm.runInNewContext(fs.readFileSync(path.join(base,'assets/release-worker.js'),'utf8')+';RELEASE;',context);
@@ -52,6 +52,7 @@ function stageSite(releases){
   const target=path.join(destination,file);fs.mkdirSync(path.dirname(target),{recursive:true});fs.copyFileSync(source,target);total++;
  }
  fs.writeFileSync(path.join(destination,'.nojekyll'),'');
+ require('../VSS/scripts/legacy-redirects.cjs').writeRedirects(destination);
  for(const release of releases)inventory(release.app,destination);
  console.log(`Pages artifact: ${total} files in output/pages; every app shell and media revision verified.`);
  return destination;

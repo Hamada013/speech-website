@@ -4,12 +4,14 @@
     let registration, settings, dialog, accept, later, offeredWorker;
     let busy = false, reloading = false, controlled = false, lastCheck = 0;
     let preparing;
+    // Every VSS activity uses the manifest at the suite root and one worker.
+    const base = new URL('./', document.querySelector?.('link[rel="manifest"]')?.href || document.baseURI);
+    const workerURL = new URL('sw.js', base).href;
     // Wait for this app's worker, including a first install. Unlike the global
     // serviceWorker.ready promise, a failed shell install rejects and can retry.
     async function ready(options = {}) {
         if (preparing) return preparing;
         preparing = (async () => {
-            const base = new URL('./', document.baseURI);
             const next = await navigator.serviceWorker.register(new URL('sw.js', base), { scope: base.href, updateViaCache: 'none' });
             await new Promise((resolve, reject) => {
                 const workers = new Set();
@@ -64,7 +66,7 @@
         if (registration) return;
         registration = next;
         settings = options;
-        controlled = !!navigator.serviceWorker.controller && navigator.serviceWorker.controller.scriptURL === new URL('sw.js', document.baseURI).href;
+        controlled = !!navigator.serviceWorker.controller && navigator.serviceWorker.controller.scriptURL === workerURL;
         dialog = document.createElement('dialog');
         dialog.className = 'app-update-dialog';
         dialog.id = options.dialogId || 'app-update-dialog';
@@ -86,7 +88,7 @@
             registration.waiting.postMessage({ type: settings.command || 'ACTIVATE_UPDATE' });
         });
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-            const ours = navigator.serviceWorker.controller?.scriptURL === new URL('sw.js', document.baseURI).href;
+            const ours = navigator.serviceWorker.controller?.scriptURL === workerURL;
             if (!ours) return;
             // Every open window reloads together after one accepts the update.
             if (controlled && !reloading) { reloading = true; window.SuiteWelcome?.skipNextLoad(); location.reload(); }

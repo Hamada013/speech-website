@@ -37,7 +37,7 @@ node tools/auditory-rehabilitation/tests/browser.cjs
 SOUNDS_ENGINE=webkit node tools/auditory-rehabilitation/tests/browser.cjs
 node tools/auditory-rehabilitation/tests/native.cjs
 SOUNDS_ENGINE=webkit node tools/auditory-rehabilitation/tests/native.cjs
-SOUNDS_APP=auditory-rehabilitation SOUNDS_PLAYWRIGHT="$PWD/tools/voc/node_modules/playwright" node tools/tests/split-sounds-browser.cjs
+SOUNDS_APP=auditory-rehabilitation SOUNDS_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node tools/tests/split-sounds-browser.cjs
 ```
 
 The native check verifies a failed worker and same-tab retry, an early download tap, corrupted-media rejection/retry, all 200 files, all 150 AAC metadata decoders, library/audio/range requests after stopping the actual HTTP origin, and native offline memory-pair playback after its three-second countdown. The browser check covers early answers, glove models, feedback, memory, five responsive library sizes, graphical reports and hidden typed admin access.

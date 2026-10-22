@@ -1,5 +1,5 @@
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
-const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../voc/node_modules/playwright'));
+const {chromium,webkit}=require(process.env.APP_PLAYWRIGHT||path.resolve(__dirname,'../VSS/voc/node_modules/playwright'));
 const {solveParentGate}=require('./solve-parent-gate.cjs');
 const root=path.resolve(__dirname,'../..'),types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.woff2':'font/woff2','.m4a':'audio/mp4','.json':'application/json'};
 const server=http.createServer((req,res)=>{let pathname=new URL(req.url,'http://localhost').pathname;if(pathname.endsWith('/'))pathname+='index.html';const file=path.resolve(root,'.'+decodeURIComponent(pathname));if(!file.startsWith(root+path.sep))return res.writeHead(403).end();fs.readFile(file,(error,body)=>{if(error)return res.writeHead(404).end();res.setHeader('Content-Type',types[path.extname(file)]||'application/octet-stream');res.end(body);});});
@@ -8,7 +8,7 @@ const server=http.createServer((req,res)=>{let pathname=new URL(req.url,'http://
  const browser=await engine.launch({headless:true,...(engine===chromium?{channel:'chrome'}:{})});let page;
  try{
  const context=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block',acceptDownloads:true});page=await context.newPage();page.setDefaultTimeout(15000);const errors=[];page.on('pageerror',error=>errors.push(error.message));await page.route(/fonts\.(googleapis|gstatic)\.com/,route=>route.abort());
- const origin=`http://127.0.0.1:${server.address().port}/tools/`;
+ const origin=`http://127.0.0.1:${server.address().port}/tools/VSS/`;
  const audio=()=>page.evaluate(async()=>{const {AudioEngine}=await import('./audio.js');for(const method of ['play','beat'])AudioEngine.prototype[method]=function(...args){const {signal}=args.at(-1)||{};return new Promise((resolve,reject)=>{const timer=setTimeout(resolve,12);signal?.addEventListener('abort',()=>{clearTimeout(timer);reject(new DOMException('Cancelled','AbortError'));},{once:true});});};});
  const ready=()=>page.waitForFunction(()=>window.TaffahaReports&&window.TaffahaProgress?.active());
  const closeReport=()=>page.locator('#taffaha-report [data-close]').click();
@@ -18,7 +18,7 @@ const server=http.createServer((req,res)=>{let pathname=new URL(req.url,'http://
  await page.reload();await ready();await audio();assert.equal(await page.locator('#test-screen').getAttribute('data-word-id'),word);
  await page.locator(`.picture-answer[data-word-id="${word}"]`).click();await page.locator('#answer-feedback[open]').waitFor();assert.equal(await page.evaluate(id=>TaffahaProgress.learned(id,'picture'),word),false,'A reload does not erase an earlier wrong answer');await page.locator('#answer-feedback[open]').waitFor({state:'hidden'});
  word=await page.locator('#test-screen').getAttribute('data-word-id');await page.locator(`.picture-answer[data-word-id="${word}"]`).click();await page.locator('#answer-feedback[open]').waitFor();assert.ok(await page.evaluate(id=>TaffahaProgress.learned(id,'picture'),word));await page.locator('#answer-feedback[open]').waitFor({state:'hidden'});
- await page.locator('#open-mode').click();await page.locator('[data-mode=count]').click();const countWord=await page.locator('#test-screen').getAttribute('data-word-id');const bank=JSON.parse(fs.readFileSync(path.join(root,'tools/taffaha/assets/words.json'))).words;const count=bank.find(entry=>entry.id===countWord).syllableCount;
+ await page.locator('#open-mode').click();await page.locator('[data-mode=count]').click();const countWord=await page.locator('#test-screen').getAttribute('data-word-id');const bank=JSON.parse(fs.readFileSync(path.join(root,'tools/VSS/taffaha/assets/words.json'))).words;const count=bank.find(entry=>entry.id===countWord).syllableCount;
  await page.locator(`.count-answer[data-count="${count}"]`).click();await page.locator('#answer-feedback[open]').waitFor();assert.ok(await page.evaluate(id=>TaffahaProgress.learned(id,'count'),countWord));await page.locator('#answer-feedback[open]').waitFor({state:'hidden'});
  await page.locator('#go-home').click();await page.locator('[data-open-learned=picture]').click();assert.equal(await page.locator('#word-library button').count(),1);await page.locator('[data-learned-mode=count]').click();assert.equal(await page.locator('#word-library button').count(),1);await page.locator('#library-dialog [data-close]').click();
  await page.locator('#open-report').click();assert.equal(await page.evaluate(()=>TaffahaReports.current().entries.length),4);assert.equal(await page.locator('#taffaha-report [data-report-app]').count(),5);
