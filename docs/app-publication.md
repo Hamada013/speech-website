@@ -14,6 +14,8 @@ Every push to `main`, including edits made in GitHub's browser, then rebuilds VS
 
 After deployment finishes, an affected app checks on opening, returning to the foreground, reconnecting, and every five minutes while visible. The update popup appears after the new app shell is completely downloaded and verified. **تحديث الآن** activates it and reloads all open windows for that app. **لاحقًا** keeps the current release; reopening offers the update again. A media-only change also triggers the popup. Unchanged downloaded files and locally saved child progress are preserved.
 
+Accepting an update immediately shows **جارٍ التحديث…**. VSS releases the old worker's download queue without cancelling the saved request; the new release resumes it. A browser-managed background transfer continues across the update, with changed revisions fetched afterward. Failed or stalled activation restores the update/later controls and shows a retry message. Returning shortcuts also check for a controller change they may have missed while suspended.
+
 The update popup follows the published release; GitHub's commit time can precede completion of the Pages deployment.
 
 The download readiness check accepts a worker that has already claimed the app while Safari still reports it as activating. It continues to wait when a different worker controls the page. This prevents an update from leaving the download button waiting unnecessarily.
@@ -47,3 +49,5 @@ APP_ENGINE=webkit APP_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" no
 ```
 
 The second command downloads all 7,234 VSS media files; add `APP_FULL_CATALOG=1` to the WebKit command for the same complete check in Safari's browser engine. The full catalogs contain 1,990, 4,884 and 360 files respectively. Safari uses a real stopped origin for offline checks so the test does not depend on Playwright's worker/offline emulation.
+
+`node tools/tests/update-activation.cjs` covers immediate feedback, queued downloads, duplicate taps, failed messages, activation timeouts, and returning shortcuts. `APP_NATIVE_FETCH=1 node tools/VSS/tests/pwa-browser.cjs` also verifies a real Chrome background transfer across a release update while two windows are open.

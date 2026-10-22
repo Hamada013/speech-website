@@ -24,3 +24,11 @@ body {
 .offline-dialog progress::-webkit-progress-bar { background: #eaf5ff; border-radius: 999px; }
 .offline-dialog progress::-webkit-progress-value { background: #0284c7; border-radius: 999px; }
 .offline-dialog progress::-moz-progress-bar { background: #0284c7; border-radius: 999px; }
+.offline-dialog:has([data-state="ready"]) { border-color: #bbebce; }
+.offline-dialog:has([data-state="ready"]) h2,
+.offline-dialog [data-state="ready"] [data-offline-status] { color: #15803d; }
+.offline-dialog [data-offline-complete] { display: block; width: 64px; height: 64px; margin: 20px auto 8px; color: #16a34a; }
+.offline-dialog [data-state="ready"] progress { accent-color: #16a34a; background: #eaf8ef; }
+.offline-dialog [data-state="ready"] progress::-webkit-progress-bar { background: #eaf8ef; }
+.offline-dialog [data-state="ready"] progress::-webkit-progress-value { background: #16a34a; }
+.offline-dialog [data-state="ready"] progress::-moz-progress-bar { background: #16a34a; }

@@ -8,7 +8,7 @@ function setup({active=null,controller=null,installing=null}={}){
  let registrations=0;
  const serviceWorker=Object.assign(new EventTarget(),{controller,register:async()=>{registrations++;return registration;}});
  const window=new EventTarget(),document={baseURI:'https://example.test/tools/VSS/voc/index.html',hidden:false,body:{append(){}},addEventListener(){},createElement(){
-  return {open:false,hidden:true,setAttribute(){},addEventListener(){},querySelector(){return {addEventListener(){}};},showModal(){this.open=true;}};
+  return {open:false,hidden:true,setAttribute(){},addEventListener(){},querySelector(){return {addEventListener(){},setAttribute(){}};},showModal(){this.open=true;}};
  }};
  vm.runInNewContext(source,{window,document,navigator:{serviceWorker,onLine:false},URL,setTimeout,clearTimeout,setInterval(){}});
  return {api:window.AppUpdates,serviceWorker,registration,count:()=>registrations};

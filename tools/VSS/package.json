@@ -6,7 +6,7 @@
     "build": "node ../shared/sync-navigation.cjs && node scripts/build-pwa.cjs",
     "build:pwa": "npm run build",
     "check": "node scripts/build-pwa.cjs --check",
-    "test": "node tests/static.cjs && npm test --prefix voc && npm test --prefix senb && npm test --prefix taffaha",
+    "test": "node tests/static.cjs && node tests/download-worker.cjs && node ../tests/update-readiness.cjs && node ../tests/update-activation.cjs && npm test --prefix voc && npm test --prefix senb && npm test --prefix taffaha",
     "test:browser": "node tests/pwa-browser.cjs",
     "test:migration": "node tests/migration-browser.cjs"
   }
