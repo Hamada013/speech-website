@@ -89,3 +89,12 @@ button.app-logo-download:focus-visible{outline:3px solid #0284c7;outline-offset:
 #suite-app-picker h2{font:700 21px/1.4 system-ui,-apple-system,Segoe UI,Tahoma,Arial,sans-serif}
 #suite-app-picker .suite-app-grid img{border:0 solid transparent;border-radius:0;background:transparent;padding:0}
 #suite-app-picker .suite-app-grid[data-count="2"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+
+/* Keep controls at the physical left, including when they wrap below the brand. */
+.app-home-shell .app-home-bar:has(.suite-toolbar),.app-header .header-inner:has(.suite-toolbar),.topbar:has(.suite-toolbar){direction:rtl}
+.app-home-shell .app-home-tools.suite-toolbar,.app-header .header-actions.suite-toolbar,.topbar nav.suite-toolbar{direction:ltr;justify-content:flex-start;margin-right:auto;margin-left:0;max-width:100%}
+.app-home-logo>img{display:block;width:100%;height:100%;object-fit:contain;margin:0}
+@media(max-width:600px){
+ .app-home-shell .app-home-tools.suite-toolbar,.app-header .header-actions.suite-toolbar,.topbar nav.suite-toolbar{flex:1 1 100%;justify-content:flex-start}
+ .game-header.suite-toolbar .game-brand{justify-content:flex-end}
+}

@@ -151,7 +151,7 @@
     async function pdfFor(report) {
         const jsPDF = await loadPDF(); await document.fonts.load('700 32px Cairo'); await document.fonts.ready;
         const doc = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
-        doc.setProperties({ title: `VOC - ${report.title} - ${report.date}`, creator: 'كلماتي مع حمادة', subject: report.periodLabel });
+        doc.setProperties({ title: `VOC - ${report.title} - ${report.date}`, creator: 'كلمة', subject: report.periodLabel });
         const pages = [], width = 1240, height = 1754, margin = 80;
         let canvas, c, y;
         const text = (str, x, yy, size = 28, color = '#18394b', align = 'right', maxWidth) => {
@@ -164,7 +164,7 @@
         const newPage = () => {
             canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height; c = canvas.getContext('2d'); c.fillStyle = '#fff'; c.fillRect(0,0,width,height); pages.push(canvas);
             box(margin, 60, width - margin*2, 195, '#f1f8fc');
-            text('كلماتي مع حمادة', width-margin-28, 110, 26, '#0284c7'); text(report.title, width-margin-28, 165, 36, '#18394b', 'right', width-margin*2-56);
+            text('كلمة', width-margin-28, 110, 26, '#0284c7'); text(report.title, width-margin-28, 165, 36, '#18394b', 'right', width-margin*2-56);
             text(report.periodLabel, width-margin-28, 220, 23, '#587082'); text(report.date, margin+28, 110, 25, '#587082', 'left'); y = 295;
         };
         newPage();

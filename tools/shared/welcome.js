@@ -19,7 +19,7 @@
  if(typeof module!=='undefined')module.exports={shouldWelcome};
  if(!root.document)return;
  const script=document.currentScript,app=script.dataset.app,base=new URL('../',script.src);
- const brands={vss:['VSS','voc/images/logo.webp'],voc:['كلماتي مع حمادة','images/logo.webp'],senb:['1 2 3 احكي','assets/icons/logo.webp'],taffaha:['تف فا حة','assets/icons/logo.webp']};
+ const brands={vss:['احكي حلو','voc/images/logo.webp'],voc:['كلمة','images/logo.webp'],senb:['جملة','assets/icons/logo.webp'],taffaha:['مقطع','assets/icons/logo.webp']};
  if(!brands[app])return;
  let transfer,reload;
  try{transfer=JSON.parse(sessionStorage.getItem(TRANSFER));reload=JSON.parse(sessionStorage.getItem(RELOAD));sessionStorage.removeItem(TRANSFER);sessionStorage.removeItem(RELOAD);}catch{}

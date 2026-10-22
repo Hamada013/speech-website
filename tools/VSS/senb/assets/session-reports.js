@@ -295,7 +295,7 @@
         function newPage() {
             canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height; ctx = canvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, width, height); pages.push(canvas);
             box(margin, 60, width - margin * 2, 215, '#edf7fc');
-            text('1 2 3 احكي', width - margin - 25, 106, 28, '#0284c7', 'right', true);
+            text('جملة', width - margin - 25, 106, 28, '#0284c7', 'right', true);
             text('تقرير الفهم والتعبير', width - margin - 25, 158, 38, '#22445a', 'right', true);
             text(model.title || 'الطفل', width - margin - 25, 210, 29, '#22445a', 'right', true);
             text(`${model.periodLabel} · ${dateText(model.date)}`, width - margin - 25, 250, 22, '#5c7285');

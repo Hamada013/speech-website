@@ -3,7 +3,7 @@
  'use strict';
  const appId=document.currentScript.dataset.app;
  const soundApp=['arabicsounds','auditory-rehabilitation'].includes(appId);
- const apps={voc:{name:'كلماتي مع حمادة',logo:'images/logo.webp'},senb:{name:'1 2 3 احكي',logo:'assets/icons/logo.webp'},taffaha:{name:'تف فا حة',logo:'assets/icons/logo.webp'},arabicsounds:{name:'أصواتي العربية',logo:'images/logo.webp'},'auditory-rehabilitation':{name:'أصوات من حولي',logo:'images/logo.webp'}};
+ const apps={voc:{name:'كلمة',logo:'images/logo.webp'},senb:{name:'جملة',logo:'assets/icons/logo.webp'},taffaha:{name:'مقطع',logo:'assets/icons/logo.webp'},arabicsounds:{name:'أصواتي العربية',logo:'images/logo.webp'},'auditory-rehabilitation':{name:'أصوات من حولي',logo:'images/logo.webp'}};
  const base=new URL('../',document.currentScript.src),storageKey='voc-children-v1';
  const toolsBase=new URL(soundApp?'../':'../../',base);
  const urlFor=id=>new URL(`${['voc','senb','taffaha'].includes(id)?'VSS/':''}${id}/index.html`,toolsBase);
@@ -31,7 +31,7 @@
  function register(){const child=active(),data=read();if(!child||!data)return;const saved=data.children.find(entry=>entry.id===child.id);if(!saved||saved.apps?.[appId])return;saved.apps={...(saved.apps||legacyApps(saved)),[appId]:true};try{localStorage.setItem(storageKey,JSON.stringify(data));}catch{window.dispatchEvent(new Event(`${appId}-storage-error`));}}
  function button(label,icon){const b=document.createElement('button');b.type='button';b.className='suite-icon';b.innerHTML=icons[icon];b.title=label;b.setAttribute('aria-label',label);return b;}
  // Physical left-to-right order also defines keyboard order in every app.
- const controlOrder={settings:0,activities:10,apps:20,download:30,end:35,info:40,family:45,report:50,profile:60,back:70};
+ const controlOrder={settings:0,activities:10,apps:20,download:30,end:35,info:40,family:45,report:50,profile:60,back:70,suiteHome:80};
  function controlKind(node){
   if(node.dataset.suiteControl)return node.dataset.suiteControl;
   for(const [kind,selector]of Object.entries({back:'.game-back,#go-home,#activityHomeBtn,#home-link',profile:'[data-child-profile],[data-senb-child-profile],#open-profile',report:'[data-child-report],#open-report,[aria-label="تقرير الطفل"],[aria-label="تقرير جميع الأطفال"]',family:'[data-family-lesson],[aria-label="تدريب العائلة"]',info:'[aria-label="معلومات التطبيق"]',end:'[data-session-end]',download:'[data-open-download],#pwaDownloadToggle,#open-offline,#install',apps:'[data-suite-apps]',activities:'[data-suite-menu]',settings:'[data-suite-settings]'}))if(node.matches(selector))return kind;
@@ -42,7 +42,7 @@
   const controls=[...host.children].filter(node=>{
    const kind=controlKind(node);if(kind){
     node.dataset.suiteControl=kind;const label=node.getAttribute('aria-label')||node.title||node.textContent.trim();node.setAttribute('aria-label',label);if(!node.title)node.title=label;
-    const glyph=kind==='back'?(node.getAttribute('href')==='games.html'?'games':'home'):kind;
+    const glyph=kind==='suiteHome'?'home':kind==='back'?(node.getAttribute('href')==='games.html'?'games':'home'):kind;
     if(icons[glyph]&&!node.querySelector('[data-suite-glyph]')){
      const template=document.createElement('template');template.innerHTML=icons[glyph];const icon=template.content.firstElementChild;icon.dataset.suiteGlyph=glyph;
      const old=node.querySelector('svg,i');if(old)old.replaceWith(icon);else node.prepend(icon);
@@ -175,7 +175,7 @@
   if(brand?.matches('a')){const replacement=document.createElement('div');replacement.className=brand.className;const link=document.createElement('a');link.href=brand.href;const image=brand.querySelector('img');if(image)replacement.append(image);while(brand.firstChild)link.append(brand.firstChild);replacement.append(link);brand.replaceWith(replacement);brand=replacement;}
   const image=brand?.querySelector('img');
   const download=document.querySelector('[data-open-download],#pwaDownloadToggle,#open-offline,#install');
-  if(image&&download){
+  if(soundApp&&image&&download){
    const logo=document.createElement('button');logo.type='button';logo.dataset.logoDownload='';logo.setAttribute('aria-label','تنزيل محتوى التطبيق');logo.title='تنزيل محتوى التطبيق';logo.setAttribute('aria-haspopup','dialog');
    image.before(logo);logo.append(image);
    // Avoid nesting a button in a link/button; brand text keeps home navigation.
@@ -184,6 +184,7 @@
   }
   const hosts=appId==='taffaha'?document.querySelectorAll('.topbar nav'):(appId==='senb'||soundApp)?document.querySelectorAll('.header-actions'):document.querySelectorAll('.app-home-tools,#workplace-view > header,.game-header');
   for(const host of hosts){
+   if(!soundApp){const home=document.createElement('a');home.href=new URL('VSS/index.html',toolsBase).href;home.className='suite-icon';home.dataset.suiteControl='suiteHome';home.setAttribute('aria-label','احكي حلو');home.title='احكي حلو';host.append(home);}
    const old=host.querySelector('a[href="../senb/index.html"],#vocAppLink');const appsButton=old||button('التطبيقات','apps');appsButton.innerHTML=icons.apps;appsButton.classList.add('suite-icon');appsButton.dataset.suiteApps='';appsButton.setAttribute('aria-label','التطبيقات');appsButton.title='التطبيقات';appsButton.setAttribute('aria-haspopup','dialog');appsButton.onclick=e=>{e.preventDefault();openApps();};if(!old)host.append(appsButton);
    const list=button('قائمة الأنشطة','list');list.dataset.suiteMenu='';list.setAttribute('aria-controls','suite-activity-menu');list.setAttribute('aria-expanded','false');list.onclick=()=>openMenu(list);host.append(list);
   }

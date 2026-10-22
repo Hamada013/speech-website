@@ -139,7 +139,7 @@
   const child=current();if(!isAdmin(child)||!['VocProgress','SenbProgress','TaffahaProgress'].some(name=>root[name]))return;
   if(!resetDialog){
    resetDialog=document.createElement('dialog');resetDialog.id='reset-hamada-dialog';resetDialog.className='suite-dialog';resetDialog.setAttribute('aria-labelledby','reset-hamada-title');
-   resetDialog.innerHTML=`<h2 id="reset-hamada-title">مسح بيانات حمادة؟</h2><p>مسح تدريب حمادة وتقاريره ومساحات عمله في كلماتي وبناء الجمل وتف فا حة. تبقى حسابات الأطفال وتقدّمهم والتنزيلات.</p><div class="suite-reset-actions"><button type="button" data-reset-cancel aria-label="إلغاء" title="إلغاء">${glyph('<path d="m6 6 12 12M18 6 6 18"/>')}</button><button type="button" data-reset-confirm aria-label="نعم، امسح بيانات حمادة" title="نعم، امسح بيانات حمادة">${glyph('<path d="m5 12 4 4L19 6"/>')}</button></div><p role="alert"></p>`;
+   resetDialog.innerHTML=`<h2 id="reset-hamada-title">مسح بيانات حمادة؟</h2><p>مسح تدريب حمادة وتقاريره ومساحات عمله في كلمة وجملة ومقطع. تبقى حسابات الأطفال وتقدّمهم والتنزيلات.</p><div class="suite-reset-actions"><button type="button" data-reset-cancel aria-label="إلغاء" title="إلغاء">${glyph('<path d="m6 6 12 12M18 6 6 18"/>')}</button><button type="button" data-reset-confirm aria-label="نعم، امسح بيانات حمادة" title="نعم، امسح بيانات حمادة">${glyph('<path d="m5 12 4 4L19 6"/>')}</button></div><p role="alert"></p>`;
    document.body.append(resetDialog);resetDialog.querySelector('[data-reset-cancel]').onclick=()=>resetDialog.close();
   }
   const owner=child.id;resetDialog.querySelector('[role=alert]').textContent='';

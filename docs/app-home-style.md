@@ -16,7 +16,7 @@ The user selected the `tools/VSS/taffaha` home-screen style as the project defau
 
 ## Download and update controls
 
-Use the app logo on the home screen (and the header logo) to open the download dialog, with an accessible «تنزيل محتوى التطبيق» label. Do not show a separate home-header download icon. Its dialog contains only a «تنزيل» action, a 0–100% progress bar, and the percentage. Keep error feedback hidden unless a download fails. Omit installation help, install buttons, file/size details, and extra download actions.
+For the VSS suite (احكي حلو), show one compact download icon at the physical left of the suite homepage header, labeled «تنزيل محتوى التطبيقات الثلاثة». Activity logos in كلمة, جملة and مقطع are artwork or home navigation only; they never open downloads. Their headers link back to احكي حلو. The separate sound apps retain logo downloads. Its dialog contains only a «تنزيل» action, a 0–100% progress bar, and the percentage. Keep error feedback hidden unless a download fails. Omit installation help, install buttons, file/size details, and extra download actions.
 
 Use the local `assets/updates.js` and `assets/updates.css` pattern to check for a new complete service-worker release on app opening. Offer «تحديث الآن» and «لاحقًا» in a separate modal. Keep the existing release active when postponed; reload all open app windows after acceptance. Check the published site rather than GitHub commits, since a commit may not have deployed yet. Regenerate release manifests for every publication.
 
@@ -90,4 +90,4 @@ Shared account grid/reset sources are `tools/shared/accounts.js` and `tools/shar
 
 ## VSS installation
 
-VOC, SENB and Taffaha live under `tools/VSS/` and form one installable app named VSS, using VOC's icon. Every activity references `../manifest.webmanifest`. Keep one root worker and one complete release; never register separate module workers. The root home follows the same Taffaha visual style. The shared download saves media from all three areas, and the update offer activates the complete suite across all open windows. See [VSS README](../tools/VSS/README.md).
+VOC, SENB and Taffaha live under `tools/VSS/` and form one installable app named احكي حلو, using VOC's icon. Every activity references `../manifest.webmanifest`. Keep one root worker and one complete release; never register separate module workers. The root home follows the same Taffaha visual style, with «مع حمادة» as its only subtitle. The activity names are كلمة (VOC), جملة (SENB), and مقطع (Taffaha). The shared download saves media from all three areas, and the update offer activates the complete suite across all open windows. See [VSS README](../tools/VSS/README.md).

@@ -3,7 +3,7 @@ import {applyIcons,icon} from './icons.js';
 import {loadWords,loadImage,assetURL} from './assetsManager.js';
 import {AudioEngine} from './audio.js';
 import {readPreferences,savePreferences} from './storage.js';
-import {initOffline,refreshOffline} from './offline.js';
+import {initOffline} from './offline.js';
 import {progress as P} from './progress.js';
 import {initProfile,initReports} from './profile-ui.js';
 import {LEVELS,pictureChoices,countChoices} from './test-model.js';
@@ -237,7 +237,6 @@ $('search').oninput=renderLibrary;$('open-library').onclick=()=>{
   $('test-category-dialog').showModal();
  }else{libraryCount=current().syllableCount;$('search').value='';renderLibrary();$('library-dialog').showModal();}
 };
-$('open-offline').onclick=()=>{$('offline-dialog').showModal();refreshOffline();};
 window.TaffahaApp={go:goTo,test:kind=>{testKind=kind;goTo('test');}};
 window.addEventListener('taffaha-profile-open',background);
 window.addEventListener('suite-navigation-open',background);

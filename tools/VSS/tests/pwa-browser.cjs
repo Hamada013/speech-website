@@ -29,7 +29,15 @@ async function offline(ctx,value){
  if(value&&server.listening)await new Promise(resolve=>{server.close(resolve);server.closeAllConnections();});
  else if(!value&&!server.listening)await new Promise(resolve=>server.listen(port,'127.0.0.1',resolve));
 }
-const controls={voc:['[data-open-download]','[data-offline-dialog]','[data-offline-status]'],senb:['#pwaDownloadToggle','#offlinePanel','#offlineStatus'],taffaha:['#open-offline','#offline-dialog','#download-status']};
+async function leftControls(page,selector){
+ const layout=await page.locator(selector).evaluate(header=>{
+  const controls=[...header.querySelectorAll('[data-suite-control],.vss-icon')].filter(node=>node.getBoundingClientRect().width&&node.getBoundingClientRect().height);
+  const rect=header.getBoundingClientRect();
+  return {left:Math.min(...controls.map(node=>node.getBoundingClientRect().left))-rect.left,overflow:document.documentElement.scrollWidth>innerWidth};
+ });
+ assert.ok(layout.left>=0&&layout.left<=32,`Header controls stay on the physical left: ${JSON.stringify(layout)}`);
+ assert.equal(layout.overflow,false,'No horizontal header overflow');
+}
 (async()=>{
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));port=server.address().port;
  const base=`http://127.0.0.1:${port}${prefix}`,engine=process.env.APP_ENGINE==='webkit'?webkit:chromium;
@@ -50,11 +58,12 @@ const controls={voc:['[data-open-download]','[data-offline-dialog]','[data-offli
  try{
   await page.goto(base,{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>!window.SuiteWelcome?.pending);
-  assert.equal(await page.title(),'VSS — كلمات وجمل ومقاطع');
+  assert.equal(await page.title(),'احكي حلو');
   for(const viewport of [{width:320,height:568},{width:390,height:844},{width:844,height:390}]){
    await page.setViewportSize(viewport);
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Home fits the viewport');
    assert.equal(await page.locator('.vss-activities a').count(),3);
+   await leftControls(page,'.vss-header');
   }
   await page.setViewportSize({width:390,height:844});
   await page.waitForTimeout(200);
@@ -76,9 +85,21 @@ const controls={voc:['[data-open-download]','[data-offline-dialog]','[data-offli
    await page.waitForFunction(()=>window.AppNavigation&&window.VSSOffline&&!window.SuiteWelcome?.pending);
    assert.equal(await page.evaluate(()=>document.querySelector('link[rel=manifest]').href),base+'manifest.webmanifest');
    assert.equal(await page.evaluate(()=>navigator.serviceWorker.controller.scriptURL),base+'sw.js');
-   const [toggle,,status]=controls[module];await page.locator(toggle).click();
-   await page.waitForFunction(selector=>document.querySelector(selector).textContent==='100%',status);
-   await page.keyboard.press('Escape');
+   assert.equal(await page.locator('[data-open-download],#pwaDownloadToggle,#open-offline,[data-logo-download]').count(),0,'Activity logos never download');
+   assert.equal(await page.locator('[data-offline-dialog],#offlinePanel,#offline-dialog').count(),0,'Only the suite home has a download dialog');
+   assert.equal(await page.locator('#home-title').textContent(),{voc:'كلمة',senb:'جملة',taffaha:'مقطع'}[module]);
+   assert.equal((await page.evaluate(async()=>VSSOffline.send('VSS_STATUS'))).ready,true,'All apps share the complete download');
+   for(const viewport of [{width:320,height:568},{width:390,height:844},{width:844,height:390},{width:1280,height:900}]){
+    await page.setViewportSize(viewport);
+    await leftControls(page,module==='taffaha'?'.topbar':module==='senb'?'.header-inner':'.app-home-bar');
+   }
+   await page.setViewportSize({width:390,height:844});
+   await page.screenshot({path:`/private/tmp/vss-${module}-${process.env.APP_ENGINE||'chrome'}.png`,fullPage:true});
+   if(module==='voc'){
+    await page.locator('.app-home-action').first().click();
+    await leftControls(page,'#workplace-view>header');
+    await page.evaluate(()=>app.switchView('home'));
+   }
    const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem('voc-children-v1')));
    assert.equal(stored.active,'vss-qa');assert.equal(stored.children[0].words['1_1'].custom,'preserve');
   }
@@ -117,6 +138,7 @@ const controls={voc:['[data-open-download]','[data-offline-dialog]','[data-offli
   await page.waitForFunction(async()=>window.VSSOffline&&(await VSSOffline.send('VSS_STATUS')).version==='vss-updated');
   await second.waitForFunction(async()=>window.VSSOffline&&(await VSSOffline.send('VSS_STATUS')).version==='vss-updated');
   const next=await page.evaluate(async()=>VSSOffline.send('VSS_STATUS'));assert.equal(next.done,next.total-1,'Only the changed media needs downloading again');
+  await page.locator('[data-suite-control=suiteHome]:visible').click();await page.waitForURL(base+'index.html');
   await page.locator('[data-open-download]').click();await page.locator('[data-offline-download]').click();await page.waitForFunction(()=>document.querySelector('[data-offline-status]').textContent==='100%');
   assert.deepEqual(await page.evaluate(async url=>[...new Uint8Array(await(await fetch(url)).arrayBuffer())],base+clip.url),[...replacement]);
   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('voc-children-v1')).children[0].words['1_1'].custom),'preserve');
@@ -129,6 +151,6 @@ const controls={voc:['[data-open-download]','[data-offline-dialog]','[data-offli
   await first.waitForFunction(()=>!window.SuiteWelcome.pending);await first.locator('a[href="voc/index.html"]').click();
   await first.waitForFunction(()=>window.VocProgress?.active()?.name==='نور');assert.equal(await first.locator('#suite-welcome[open]').count(),0);
   await fresh.close();
-  console.log(`PASS: VSS home, first child, early download/failure/retry, one worker, three shared downloads (${release.media.length} files), same-window switching, offline activities/audio ranges, deferred/atomic updates in two windows, changed-media reuse and saved progress.`);
+  console.log(`PASS: VSS home, first child, early download/failure/retry, one worker, one shared download (${release.media.length} files), left headers and renamed apps, same-window switching, offline activities/audio ranges, deferred/atomic updates in two windows, changed-media reuse and saved progress.`);
  }finally{openGate?.();await new Promise(resolve=>{server.close(resolve);server.closeAllConnections();});await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

@@ -6,8 +6,8 @@
  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
  <meta name="theme-color" content="#0284c7"><meta name="mobile-web-app-capable" content="yes">
  <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
- <meta name="apple-mobile-web-app-title" content="VSS"><meta name="description" content="نلعب بالمقاطع ونستمع للكلمات — تدريب عربي للأطفال">
- <title>تف فا حة — نلعب بالمقاطع</title><link rel="manifest" href="../manifest.webmanifest">
+ <meta name="apple-mobile-web-app-title" content="احكي حلو"><meta name="description" content="نلعب بالمقاطع ونستمع للكلمات — تدريب عربي للأطفال">
+ <title>مقطع — نلعب بالمقاطع</title><link rel="manifest" href="../manifest.webmanifest">
  <link rel="icon" type="image/png" href="../icons/icon-192.png"><link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="assets/profile.css"><link rel="stylesheet" href="assets/parent-gate.css"><script defer src="assets/parent-gate.js"></script><link rel="stylesheet" href="assets/updates.css"><script type="module" src="app.js"></script>
     <link rel="stylesheet" href="assets/flow-ui.css">
@@ -19,7 +19,7 @@
     <script defer src="assets/app-navigation.js" data-app="taffaha"></script>
 </head>
 <body>
- <header class="topbar"><a href="./" class="brand"><img src="assets/icons/logo.webp" width="52" height="52" alt=""><span>تف فا حة<small>نلعب بالمقاطع</small></span></a>
+ <header class="topbar"><a href="./" class="brand"><img src="assets/icons/logo.webp" width="52" height="52" alt=""><span>مقطع<small>نلعب بالمقاطع</small></span></a>
   <nav aria-label="أدوات التطبيق">
    <button id="open-profile" class="icon" data-icon="profile" aria-label="ملف الطفل" title="ملف الطفل"></button>
    <button id="open-report" class="icon" data-icon="report" aria-label="تقرير الطفل" title="تقرير الطفل"></button>
@@ -32,8 +32,8 @@
  </header>
  <main aria-label="نلعب بالمقاطع">
   <section id="home-screen" class="home-screen" aria-labelledby="home-title">
-   <button type="button" id="open-offline" class="home-logo app-logo-download" aria-label="تنزيل محتوى التطبيق" title="تنزيل محتوى التطبيق" aria-haspopup="dialog"><img src="assets/icons/logo.webp" width="180" height="180" alt=""></button>
-   <h1 id="home-title">تف فا حة</h1><p>نلعب بالمقاطع <span id="profile-name"></span></p>
+   <div class="home-logo app-home-logo"><img src="assets/icons/logo.webp" width="180" height="180" alt=""></div>
+   <h1 id="home-title">مقطع</h1><p>نلعب بالمقاطع <span id="profile-name"></span></p>
    <div class="home-actions">
     <button id="start-practice" class="home-action" disabled><span class="home-action-icon" data-icon="sequence"></span><span>ابدأ</span></button>
     <button id="start-test" class="home-action" disabled><span class="home-action-icon" data-icon="test"></span><span>اختبار</span></button>
@@ -83,11 +83,6 @@
  <dialog id="library-dialog" aria-labelledby="library-title"><div class="dialog-title"><h2 id="library-title">اختر عدد المقاطع</h2><div class="learned-controls" role="group" aria-label="الكلمات المكتسبة">
  <button class="icon" data-learned-mode="count" data-icon="picture" aria-label="المكتسب: الصورة وعدد المقاطع" title="المكتسب: الصورة وعدد المقاطع" aria-pressed="false"></button>
  <button class="icon" data-learned-mode="picture" data-icon="count" aria-label="المكتسب: المقاطع والصورة" title="المكتسب: المقاطع والصورة" aria-pressed="false"></button></div><button data-close class="icon" data-icon="close" aria-label="إغلاق"></button></div><label for="search">ابحث عن كلمة</label><input id="search" type="search" placeholder="تفاحة، موزة…"><div id="category-filters" class="filters" aria-label="عدد المقاطع"></div><div id="word-library" class="word-library"></div></dialog>
- <dialog id="offline-dialog" aria-labelledby="offline-title"><div class="dialog-title"><h2 id="offline-title">تنزيل</h2></div>
-  <div class="offline-actions"><button id="download" class="primary">تنزيل</button></div>
-  <p id="download-status" class="status" dir="ltr" role="status" aria-live="polite">0%</p><progress id="download-progress" value="0" max="100" aria-label="تقدم التنزيل"></progress>
-  <p id="download-error" role="alert" hidden></p>
- </dialog>
  <dialog id="taffaha-child-dialog" aria-labelledby="taffaha-child-title"><div class="dialog-title"><h2 id="taffaha-child-title">ملف الطفل</h2><button class="icon" data-icon="close" data-close aria-label="إغلاق"></button></div><form><label for="taffaha-child-name">اسم الطفل</label><input id="taffaha-child-name" name="name" autocomplete="off" maxlength="60" required><div id="taffaha-saved-children" class="filters"></div><button class="primary" type="submit">دخول</button></form></dialog>
  <dialog id="taffaha-report" aria-labelledby="taffaha-report-title"><header class="dialog-title"><h2 id="taffaha-report-title">تقرير التقدم</h2><button id="taffaha-report-download" class="icon" data-icon="download" aria-label="تنزيل تقرير PDF" title="تنزيل تقرير PDF"></button><button class="icon" data-icon="close" data-close aria-label="إغلاق"></button></header><nav id="taffaha-report-apps"></nav><nav id="taffaha-report-periods" aria-label="فترة التقرير"></nav><div id="taffaha-report-body"></div><p id="taffaha-report-error" role="alert"></p></dialog>
  <p id="profile-error" role="alert" hidden>تعذّر حفظ التقدم على الجهاز. تحقق من مساحة التخزين وإعدادات المتصفح.</p>

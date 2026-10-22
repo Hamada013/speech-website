@@ -1,6 +1,6 @@
 # VSS
 
-VOC (words), SENB (sentences), and Taffaha (syllables) are activity areas inside one installable PWA. Open `/tools/VSS/` on HTTPS or localhost. Install **VSS** from that page or any activity page; all use the same manifest, identity, scope, and VOC icon.
+VOC (words), SENB (sentences), and Taffaha (syllables) are activity areas inside one installable PWA. Open `/tools/VSS/` on HTTPS or localhost. Install **احكي حلو** from that page or any activity page; all use the same manifest, identity, scope, and VOC icon.
 
 ```text
 tools/VSS/
@@ -18,7 +18,7 @@ tools/VSS/
 
 The app picker and report links inside VSS offer only VOC, SENB, and Taffaha for every account, including Hamada. The 1–2–3 countdown switches activity areas in the same window. Child accounts, reports, parent gates, and progress retain their existing storage keys. No browser data is deleted by the merge. The two sound apps remain outside VSS and retain their existing access rules.
 
-Tapping any activity logo opens the same VSS download: all 7,234 media files (about 144 MB) across the three areas. Downloads resume on another VSS screen and reuse unchanged files after updates. Installation saves the complete interface; media downloads remain opt-in. Updates install the complete suite before offering **تحديث الآن / لاحقًا**, and activation reloads every open VSS window.
+The download icon at the left of the احكي حلو homepage header opens one shared 0–100% download: all 7,234 media files (about 144 MB) across the three areas. Activity logos do not start downloads. Their header home icon returns to احكي حلو. Downloads resume on another VSS screen and reuse unchanged files after updates. Installation saves the complete interface; media downloads remain opt-in. Updates install the complete suite before offering **تحديث الآن / لاحقًا**, and activation reloads every open VSS window.
 
 Build and check from the repository root:
 

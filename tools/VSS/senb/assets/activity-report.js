@@ -64,7 +64,7 @@ const SENBReport = (() => {
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.textBaseline = 'middle';
             pages.push(canvas);
-            text('1 2 3 احكي', 1160, 80, 34, '#0284c7', 'right', true);
+            text('جملة', 1160, 80, 34, '#0284c7', 'right', true);
             text(expressive ? 'تقرير اختبار التعبير' : 'تقرير اختبار الفهم', 1160, 145, 44, '#075985', 'right', true);
             text(clinicianName, 1160, 210, 28, '#334155', 'right', true, 'ltr');
             text(`تاريخ الاختبار: ${formatDate(date)}`, 1160, 260, 25);

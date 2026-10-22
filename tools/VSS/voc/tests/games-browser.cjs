@@ -91,7 +91,7 @@ async function run(name, engine, origin) {
 
         await page.goto(`${origin}/tools/VSS/voc/index.html`);
         await page.screenshot({path:`/private/tmp/voc-${name}-new-home.png`, fullPage:true});
-        assert.equal(await page.locator('#home-view h1').textContent().then(text=>text.trim()), 'كلماتي مع حمادة');
+        assert.equal(await page.locator('#home-view h1').textContent().then(text=>text.trim()), 'كلمة');
         assert.equal(await page.locator('#home-view [data-offline-card], a[href="res/1.pdf"]').count(), 0);
         await page.evaluate(() => app.switchView('workplace'));
         for (const size of [{width:768,height:1024},{width:1024,height:768},{width:1366,height:768},{width:640,height:480}]) {

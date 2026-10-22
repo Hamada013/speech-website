@@ -76,12 +76,15 @@ const server=http.createServer((req,res)=>{
    await profile.locator('[data-account-id=ali] .suite-account-select').click();
    await page.waitForFunction(api=>window[api]?.active()?.id==='ali',config.api);
    await picker(group,'returned-child');
-   // The entire header logo fills its button, including Taffaha on narrow screens.
+   // Suite logos are artwork; the two sound apps retain logo downloads.
+   const suite=apps.indexOf(app)<3;
+   if(suite)assert.equal(await page.locator('[data-logo-download]').count(),0);
    for(const width of [320,390,1024]){
     await page.setViewportSize({width,height:844});
-    assert(await page.locator('[data-logo-download]').evaluate(button=>{
-     const img=button.querySelector('img'),a=button.getBoundingClientRect(),b=img.getBoundingClientRect(),s=getComputedStyle(button);
-     return img.complete&&img.naturalWidth>0&&s.padding==='0px'&&Math.abs(a.width-b.width)<1&&Math.abs(a.height-b.height)<1&&getComputedStyle(img).objectFit==='contain';
+    const selector=suite?'.app-home-brand img,.topbar .brand img':'[data-logo-download]';
+    assert(await page.locator(selector).first().evaluate(element=>{
+     const img=element.matches('img')?element:element.querySelector('img'),a=element.getBoundingClientRect(),b=img.getBoundingClientRect();
+     return img.complete&&img.naturalWidth>0&&b.width>0&&b.height>0&&getComputedStyle(img).objectFit==='contain'&&(element===img||(getComputedStyle(element).padding==='0px'&&Math.abs(a.width-b.width)<1&&Math.abs(a.height-b.height)<1));
     }),`${app}: complete logo at ${width}`);
    }
    assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('voc-children-v1')).children.find(child=>child.id==='ali').words),{keep:true});

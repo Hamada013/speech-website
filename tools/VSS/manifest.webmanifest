@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "VSS",
-  "short_name": "VSS",
-  "description": "كلمات وجمل ومقاطع — نتعلّم مع حمادة",
+  "name": "احكي حلو",
+  "short_name": "احكي حلو",
+  "description": "احكي حلو — مع حمادة",
   "lang": "ar",
   "dir": "rtl",
   "start_url": "./index.html",
@@ -17,8 +17,8 @@
     { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "كلماتي مع حمادة", "url": "./voc/index.html" },
-    { "name": "1 2 3 احكي", "url": "./senb/index.html" },
-    { "name": "تف فا حة", "url": "./taffaha/index.html" }
+    { "name": "كلمة", "url": "./voc/index.html" },
+    { "name": "جملة", "url": "./senb/index.html" },
+    { "name": "مقطع", "url": "./taffaha/index.html" }
   ]
 }

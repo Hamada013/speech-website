@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const root=path.resolve(__dirname,'..');
 const release=require('../scripts/build-pwa.cjs').build({check:true});
 const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.webmanifest')));
-assert.equal(manifest.name,'VSS');assert.equal(manifest.short_name,'VSS');assert.equal(manifest.scope,'./');assert.equal(manifest.start_url,'./index.html');assert.equal(manifest.display,'standalone');
+assert.equal(manifest.name,'احكي حلو');assert.equal(manifest.short_name,'احكي حلو');assert.equal(manifest.scope,'./');assert.equal(manifest.start_url,'./index.html');assert.equal(manifest.display,'standalone');
 for(const shortcut of manifest.shortcuts)assert.ok(fs.existsSync(path.join(root,shortcut.url)));
 for(const icon of [...manifest.icons,{src:'icons/apple-touch-icon.png',sizes:'180x180'}]){
  const bytes=fs.readFileSync(path.join(root,icon.src)),[w,h]=icon.sizes.split('x').map(Number);
@@ -20,7 +20,7 @@ for(const file of release.shell.filter(file=>file.endsWith('.html'))){
  const source=fs.readFileSync(path.join(root,file),'utf8');
  const href=source.match(/<link rel="manifest" href="([^"]+)"/)[1];
  assert.equal(path.resolve(root,path.dirname(file),href),path.join(root,'manifest.webmanifest'),file);
- assert.ok(source.includes('name="apple-mobile-web-app-title" content="VSS"'));
+ assert.ok(source.includes('name="apple-mobile-web-app-title" content="احكي حلو"'));
  // Check local script, style, image and link references, including ../ suite files.
  for(const [,ref]of source.matchAll(/(?:src|href)="([^"]+)"/g)){
   if(/^(https?:|data:|mailto:|#|javascript:)/.test(ref)||/[{}]/.test(ref))continue;
