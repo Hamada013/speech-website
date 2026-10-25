@@ -28,5 +28,11 @@ for(const file of release.shell.filter(file=>file.endsWith('.html'))){
   if(/\.(js|css|html|webmanifest|png|svg|webp|woff2)$/.test(target))assert.ok(fs.existsSync(target),file+': '+ref);
  }
 }
-for(const file of release.shell.filter(file=>file.endsWith('.js')&&!file.startsWith('taffaha/')))new vm.Script(fs.readFileSync(path.join(root,file),'utf8'),{filename:file});
+for(const file of release.shell.filter(file=>file.endsWith('.js')&&!file.startsWith('taffaha/'))){
+ const source=fs.readFileSync(path.join(root,file),'utf8');
+ if(file==='assets/home.js'){
+  const check=require('node:child_process').spawnSync(process.execPath,['--input-type=module','--check'],{input:source,encoding:'utf8'});
+  assert.equal(check.status,0,check.stderr);
+ }else new vm.Script(source,{filename:file});
+}
 console.log('PASS: one VSS identity, VOC icons, all activity links, 7,234 media files and a complete verified release.');

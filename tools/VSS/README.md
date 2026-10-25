@@ -18,6 +18,8 @@ tools/VSS/
 
 The app picker and report links inside VSS offer only VOC, SENB, and Taffaha for every account, including Hamada. The 1–2–3 countdown switches activity areas in the same window. Child accounts, reports, parent gates, and progress retain their existing storage keys. No browser data is deleted by the merge. The two sound apps remain outside VSS and retain their existing access rules.
 
+The homepage shows the active child's name and **الحسابات**. Parents can create or select an account there after the parent gate. Both first-time welcome and homepage account entry register one shared identity, with the same name, in VOC, SENB, and Taffaha automatically. Existing accounts are enrolled when returning to the homepage without replacing any progress. Saved avatars, search/sort, protected Hamada controls, and the individual activity profile controls remain available. Accounts and progress are local to this device/browser.
+
 The download icon at the left of the احكي حلو homepage header opens one shared 0–100% download: all 7,234 media files (about 144 MB) across the three areas. Activity logos do not start downloads. Their header home icon returns to احكي حلو. Downloads resume on another VSS screen and reuse unchanged files after updates. Installation saves the complete interface; media downloads remain opt-in. Updates install the complete suite before offering **تحديث الآن / لاحقًا**, and activation reloads every open VSS window.
 
 Downloads belong to the service worker rather than a visible page. Where available, Background Fetch hands the files to the browser so they keep downloading after all app windows close. Other browsers use a six-file worker queue that continues while background execution is allowed. A phone can suspend a browser or home-screen shortcut; returning to any VSS screen or reconnecting automatically resumes the saved request without downloading saved revisions again. Fully closed/suspended downloads cannot be guaranteed on browsers without Background Fetch. Completion is verified against Cache Storage, saved across reopening, and shown on the suite home as a green check and 100%; the dialog closes after 1.8 visible seconds. Error feedback stays available for retry.
@@ -27,6 +29,7 @@ Build and check from the repository root:
 ```sh
 npm run build --prefix tools/VSS
 node tools/VSS/tests/static.cjs
+node tools/VSS/tests/accounts-browser.cjs
 node tools/VSS/tests/pwa-browser.cjs
 APP_NATIVE_FETCH=1 node tools/VSS/tests/pwa-browser.cjs
 APP_ENGINE=webkit node tools/VSS/tests/pwa-browser.cjs
