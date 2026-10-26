@@ -1,11 +1,18 @@
-/* Sound-app evidence shares account identities, never vocabulary/grammar mastery. */
+/* Each sound app owns its accounts and evidence. Legacy data is copied once. */
 ((root)=>{
  'use strict';
- const KEY='voc-children-v1',APPS=['arabicsounds','auditory-rehabilitation'];
- const registrations=child=>child.apps||{voc:!!child.words,senb:!!child.senb,taffaha:!!child.taffaha,...Object.fromEntries(APPS.map(app=>[app,!!child.soundApps?.[app]]))};
+ const APPS=['arabicsounds','auditory-rehabilitation'];
+ const registrations=child=>child.apps||{};
  const admin=child=>child?.role==='admin'||String(child?.name||'').normalize('NFKC').trim().toLowerCase()==='hamada';
  function create({app,storage}){
   if(!APPS.includes(app))throw Error('Unknown sound app');
+  const KEY=`${app}-children-v1`;
+  // Snapshot only this app’s existing accounts; never modify or follow the old store.
+  try{if(storage.getItem(KEY)===null){
+   const legacy=JSON.parse(storage.getItem('voc-children-v1'));
+   const children=(legacy?.children||[]).filter(c=>!legacy.deletedChildren?.[c.id]&&(c.apps?.[app]===true||c.soundApps?.[app])).map(c=>({id:c.id,name:c.name,role:c.role,created:c.created,apps:{[app]:true},soundApps:c.soundApps?.[app]?{[app]:structuredClone(c.soundApps[app])}:{}}));
+   storage.setItem(KEY,JSON.stringify({schema:1,active:children.some(c=>c.id===legacy?.active)?legacy.active:null,children}));
+  }}catch{}
   let memory={schema:1,active:null,children:[]},storageOK=true;
   function read(){if(!storageOK)return structuredClone(memory);try{const saved=JSON.parse(storage.getItem(KEY));if(saved?.schema===1&&Array.isArray(saved.children))memory=saved;}catch{}return structuredClone(memory);}
   function write(data){memory=structuredClone(data);try{storage.setItem(KEY,JSON.stringify(data));storageOK=true;}catch{storageOK=false;}root.dispatchEvent?.(new Event('sound-progress-change'));}

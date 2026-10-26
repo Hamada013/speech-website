@@ -51,5 +51,30 @@
       "name": "السحب والمطابقة",
       "url": "./index.html#/arabic/matching"
     }
+  ],
+  "orientation": "any",
+  "prefer_related_applications": false,
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "screenshots": [
+    {
+      "src": "screenshots/home-narrow.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "أصواتي العربية — الرئيسية"
+    },
+    {
+      "src": "screenshots/home-wide.png",
+      "sizes": "1280x640",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "أصواتي العربية — الرئيسية"
+    }
   ]
 }

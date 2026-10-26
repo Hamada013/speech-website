@@ -14,7 +14,7 @@ const server=http.createServer(async(req,res)=>{
  try{
   const context=await browser.newContext({viewport:{width:390,height:844}});
   await context.addInitScript(()=>{
-   if(!localStorage.getItem('voc-children-v1'))localStorage.setItem('voc-children-v1',JSON.stringify({schema:1,active:'child',children:[{id:'child',name:'طفل',role:'child',words:{preserve:true},apps:{}}]}));
+   if(!localStorage.getItem('auditory-rehabilitation-children-v1'))localStorage.setItem('auditory-rehabilitation-children-v1',JSON.stringify({schema:1,active:'child',children:[{id:'child',name:'طفل',role:'child',words:{preserve:true},apps:{}}]}));
    window.audioEnds=0;const Context=window.AudioContext||window.webkitAudioContext;if(Context){const original=Context.prototype.createBufferSource;Context.prototype.createBufferSource=function(...args){const node=original.apply(this,args);node.addEventListener('ended',()=>{if(node.buffer?.length>1)window.audioEnds++;});return node;};}
   });
   page=await context.newPage();page.setDefaultTimeout(15000);const errors=[];page.on('pageerror',error=>errors.push(error.message));

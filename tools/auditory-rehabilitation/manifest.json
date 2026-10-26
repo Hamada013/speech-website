@@ -55,5 +55,30 @@
       "name": "مكتبة الأصوات",
       "url": "./index.html#/around/library"
     }
+  ],
+  "orientation": "any",
+  "prefer_related_applications": false,
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "screenshots": [
+    {
+      "src": "screenshots/home-narrow.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "أصوات من حولي — الرئيسية"
+    },
+    {
+      "src": "screenshots/home-wide.png",
+      "sizes": "1280x640",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "أصوات من حولي — الرئيسية"
+    }
   ]
 }

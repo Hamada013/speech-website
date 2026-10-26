@@ -10,7 +10,7 @@ for(const image of images){
  const body=fs.readFileSync(path.join(root,'assets/images',image));
  if(body.toString('ascii',0,4)!=='RIFF'||body.toString('ascii',8,12)!=='WEBP')throw new Error('Not a valid WebP file: '+image);
 }
-const shell=['index.html','manifest.webmanifest','assets/styles.css',...['stimuli','browser','phonology','reporting','dropdowns','app','pwa'].map(name=>`assets/${name}.js`),'assets/icons/icon.svg','assets/icons/icon-192.png','assets/icons/icon-512.png','assets/icons/icon-maskable-512.png','assets/icons/apple-touch-icon.png',...images.map(name=>'assets/images/'+name)];
+const shell=['index.html','manifest.webmanifest','assets/styles.css','assets/experience.css','research/google-link.json','cloud/config.json',...['stimuli','browser','phonology','diagnosis','research-schema','reporting','dropdowns','icons','cloud-model','cases','app','workspace','case-ui','cloud','research-share','pwa'].map(name=>`assets/${name}.js`),'assets/icons/icon.svg','assets/icons/icon-192.png','assets/icons/icon-512.png','assets/icons/icon-maskable-512.png','assets/icons/apple-touch-icon.png','assets/screenshots/home-narrow.png','assets/screenshots/home-wide.png',...images.map(name=>'assets/images/'+name)];
 const integrity=Object.fromEntries(shell.map(file=>[file,'sha256-'+crypto.createHash('sha256').update(fs.readFileSync(path.join(root,file))).digest('base64')]));
 const version=crypto.createHash('sha256').update(JSON.stringify(integrity)).update(fs.readFileSync(path.join(root,'sw.js'))).digest('hex').slice(0,16);
 const totalBytes=shell.reduce((bytes,file)=>bytes+fs.statSync(path.join(root,file)).size,0);

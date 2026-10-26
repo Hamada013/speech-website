@@ -1,8 +1,9 @@
-/* Account deletion is shared across all three apps, with tombstones for old tabs. */
+/* Standalone sound-app account controls; deletions affect this app only. */
 ((root)=>{
- const KEY='voc-children-v1';
+ const APP=root.document?.currentScript?.dataset.app;
+ const KEY=`${APP}-children-v1`;
  const isAdmin=child=>child?.role==='admin'||String(child?.name||'').normalize('NFKC').trim().toLocaleLowerCase()==='hamada';
- const AVATAR_KEY='speech-account-avatars-v1';
+ const AVATAR_KEY=`${APP}-account-avatars-v1`;
  // Local outline drawings keep the same simple appearance on every device.
  // Store names, never platform emoji glyphs, separately from learning progress.
  const AVATAR_DRAWINGS={
@@ -104,24 +105,8 @@
   data.deletedChildren={...data.deletedChildren,[targetId]:new Date().toISOString()};
   data.children=data.children.filter(child=>child.id!==targetId);if(data.active===targetId)data.active=null;
   try{storage.setItem(KEY,JSON.stringify(data));}catch{return false;}
-  for(const app of ['voc','senb','taffaha','arabicsounds','auditory-rehabilitation'])try{storage.removeItem?.(`speech-homework-v1:${app}:${encodeURIComponent(targetId)}`);}catch{}
-  try{for(let i=storage.length-1;i>=0;i--){const key=storage.key(i);if(['arabicsounds','auditory-rehabilitation'].some(app=>key?.startsWith(`speech-sound-lesson:${app}:${targetId}:`)))storage.removeItem(key);}}catch{}
-  return true;
- }
- // Reset only the protected owner's activity; identities, children and media stay intact.
- function resetHamada(storage,ownerId){
-  let data;try{data=JSON.parse(storage.getItem(KEY));}catch{return false;}
-  if(data?.schema!==1||!Array.isArray(data.children)||data.active!==ownerId)return false;
-  const owner=data.children.find(child=>child.id===ownerId);
-  if(!isAdmin(owner)||String(owner.name||'').normalize('NFKC').trim().toLocaleLowerCase()!=='hamada')return false;
-  const previousReset=data.accountResets?.[ownerId];
-  Object.assign(owner,{words:{},workspace:null,plan:null,sessions:[],homeLesson:null,wordLevels:{},senb:{sessions:[],mastery:{},workspace:null,draft:null,lesson:null},taffaha:{attempts:[],workspace:null,flow:null}});
-  data.accountResets={...data.accountResets,[ownerId]:`${Date.now()}-${Math.random().toString(36).slice(2)}`};
-  try{storage.setItem(KEY,JSON.stringify(data));}catch{return false;}
-  // Old VOC drafts are also invalidated by the revision in VocProgress.scope().
-  const keys=['voc','senb','taffaha'].flatMap(app=>{const key=`speech-homework-v1:${app}:${encodeURIComponent(ownerId)}`;return previousReset?[key,`${key}:reset-${previousReset}`]:[key];});
-  for(const mode of ['matching','memory','rapid','test'])for(const revision of [null,previousReset].filter((value,index)=>index===0||value))for(const suffix of ['draft','last','preferences'])keys.push(`hamada-game-${mode}-child-${ownerId}${revision?'-reset-'+revision:''}-${suffix}`);
-  for(const key of keys)try{storage.removeItem?.(key);}catch{}
+  for(const app of [APP])try{storage.removeItem?.(`speech-homework-v1:${app}:${encodeURIComponent(targetId)}`);}catch{}
+  try{for(let i=storage.length-1;i>=0;i--){const key=storage.key(i);if([APP].some(app=>key?.startsWith(`speech-sound-lesson:${app}:${targetId}:`)))storage.removeItem(key);}}catch{}
   return true;
  }
  const normalizeName=name=>String(name||'').normalize('NFKC').replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[أإآٱ]/g,'ا').trim().toLocaleLowerCase();
@@ -130,25 +115,12 @@
   const list=children.map((child,index)=>({...child,position:index})).filter(child=>!isAdmin(child)&&normalizeName(child.name).includes(needle));
   return list.sort((a,b)=>sort==='alphabet'?collator.compare(a.name,b.name)||a.position-b.position:(sort==='newest'?-1:1)*(((Date.parse(a.created)||0)-(Date.parse(b.created)||0))||a.position-b.position));
  }
- if(typeof module!=='undefined')module.exports={remove,resetHamada,orderedChildren,assignAvatars};
+ if(typeof module!=='undefined')module.exports={remove,orderedChildren,assignAvatars};
  if(!root.document)return;
- const current=()=>root.VocProgress?.active()||root.SenbProgress?.active()||root.TaffahaProgress?.active()||root.SoundProgress?.active();
- let dialog,resetDialog,openSort,sortSerial=0,avatars=new Map();
+ const current=()=>root.SoundProgress?.active();
+ let dialog,openSort,sortSerial=0,avatars=new Map();
  const glyph=path=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
- function requestReset(){
-  const child=current();if(!isAdmin(child)||!['VocProgress','SenbProgress','TaffahaProgress'].some(name=>root[name]))return;
-  if(!resetDialog){
-   resetDialog=document.createElement('dialog');resetDialog.id='reset-hamada-dialog';resetDialog.className='suite-dialog';resetDialog.setAttribute('aria-labelledby','reset-hamada-title');
-   resetDialog.innerHTML=`<h2 id="reset-hamada-title">مسح بيانات حمادة؟</h2><p>مسح تدريب حمادة وتقاريره ومساحات عمله في كلمة وجملة ومقطع. تبقى حسابات الأطفال وتقدّمهم والتنزيلات.</p><div class="suite-reset-actions"><button type="button" data-reset-cancel aria-label="إلغاء" title="إلغاء">${glyph('<path d="m6 6 12 12M18 6 6 18"/>')}</button><button type="button" data-reset-confirm aria-label="نعم، امسح بيانات حمادة" title="نعم، امسح بيانات حمادة">${glyph('<path d="m5 12 4 4L19 6"/>')}</button></div><p role="alert"></p>`;
-   document.body.append(resetDialog);resetDialog.querySelector('[data-reset-cancel]').onclick=()=>resetDialog.close();
-  }
-  const owner=child.id;resetDialog.querySelector('[role=alert]').textContent='';
-  resetDialog.querySelector('[data-reset-confirm]').onclick=()=>{
-   let ok=false;try{ok=resetHamada(localStorage,owner);}catch{}
-   if(ok){resetDialog.close();location.reload();}else resetDialog.querySelector('[role=alert]').textContent='تعذّر مسح البيانات. لم يتغيّر الحساب؛ أعد المحاولة.';
-  };
-  resetDialog.showModal();resetDialog.querySelector('[data-reset-cancel]').focus();
- }
+
  function avatar(child){
   const icon=avatars.get(child.id),parts=icon.split(' ');
   let seed=0;for(const letter of icon)seed=(seed+letter.codePointAt(0))>>>0;
@@ -195,7 +167,7 @@
  function request(child){
   if(!isAdmin(current())||!child||isAdmin(child))return;
   if(!dialog){dialog=document.createElement('dialog');dialog.id='delete-account-dialog';dialog.className='suite-dialog';dialog.setAttribute('aria-labelledby','delete-account-title');dialog.innerHTML='<h2 id="delete-account-title">حذف الحساب</h2><p data-delete-message></p><div class="suite-text-actions"><button type="button" data-delete-confirm>نعم، حذف الحساب</button><button type="button" data-delete-back>عودة</button></div><p role="alert"></p>';document.body.append(dialog);dialog.querySelector('[data-delete-back]').onclick=()=>dialog.close();}
-  const owner=current().id;dialog.querySelector('[data-delete-message]').textContent=`هل أنت متأكد أنك تريد حذف حساب «${child.name}» وتقدّمه من التطبيقات على هذا الجهاز؟`;dialog.querySelector('[role=alert]').textContent='';
+  const owner=current().id;dialog.querySelector('[data-delete-message]').textContent=`هل أنت متأكد أنك تريد حذف حساب «${child.name}» وتقدّمه من هذا التطبيق على هذا الجهاز؟`;dialog.querySelector('[role=alert]').textContent='';
   dialog.querySelector('[data-delete-confirm]').onclick=()=>{let ok=false;try{ok=remove(localStorage,owner,child.id);}catch{}if(ok){dialog.close();location.reload();}else dialog.querySelector('[role=alert]').textContent='تعذّر حذف الحساب. تأكد من الحساب النشط وحاول مجددًا.';};
   dialog.showModal();dialog.querySelector('[data-delete-back]').focus();
  }
@@ -212,16 +184,14 @@
   item.append(select);
   const tools=document.createElement('div');tools.className='suite-account-tools';tools.append(...actions);
   const remove=button(child);if(remove)tools.append(remove);
-  if(isAdmin(child)&&current()?.id===child.id&&['VocProgress','SenbProgress','TaffahaProgress'].some(name=>root[name])){
-   const reset=document.createElement('button');reset.type='button';reset.className='suite-account-reset';reset.dataset.resetHamada='';reset.setAttribute('aria-label','مسح بيانات حمادة');reset.title='مسح بيانات حمادة';reset.innerHTML=glyph('<path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"/>');reset.onclick=requestReset;tools.append(reset);
-  }
+
   if(tools.children.length)item.append(tools);return item;
  }
  function render(host,children,makeRow){
   openSort?.close();
   host.classList.remove('suite-account-list');host.classList.add('suite-account-browser');host.replaceChildren();
   host.removeAttribute('role');
-  // Sorting metadata comes from the shared store, including legacy creation dates.
+  // Sorting metadata comes from this app’s store, including legacy creation dates.
   let saved=[];try{saved=JSON.parse(localStorage.getItem(KEY))?.children||[];}catch{}
   const entries=children.map(child=>({...saved.find(entry=>entry.id===child.id),...child}));
   let storage;try{storage=localStorage;}catch{}
@@ -239,6 +209,6 @@
   const update=()=>{const list=orderedChildren(entries,search.value,sortValue);grid.replaceChildren(...list.map(makeRow));empty.textContent=list.length?'':search.value?'لا يوجد حساب بهذا الاسم.':'لا توجد حسابات أطفال بعد.';empty.hidden=!!list.length;};
   search.oninput=update;search.onkeydown=event=>{if(event.key==='Enter')event.preventDefault();};update();
  }
- root.addEventListener('storage',event=>{if(event.key!==KEY)return;try{const before=JSON.parse(event.oldValue||'null'),after=JSON.parse(event.newValue||'null');if(JSON.stringify(before?.deletedChildren)!==JSON.stringify(after?.deletedChildren)||['VocProgress','SenbProgress','TaffahaProgress'].some(name=>root[name])&&current()?.id&&(before?.accountResets?.[current().id]||null)!==(after?.accountResets?.[current().id]||null))location.reload();}catch{}});
- root.SuiteAccounts={button,request,row,render,requestReset};
+ root.addEventListener('storage',event=>{if(event.key!==KEY)return;try{const before=JSON.parse(event.oldValue||'null'),after=JSON.parse(event.newValue||'null');if(JSON.stringify(before?.deletedChildren)!==JSON.stringify(after?.deletedChildren))location.reload();}catch{}});
+ root.SuiteAccounts={button,request,row,render};
 })(globalThis);

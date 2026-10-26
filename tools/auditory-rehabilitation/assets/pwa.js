@@ -1,9 +1,22 @@
 import {MEDIA} from './release.js';
 import './updates.js';
 const $=id=>document.getElementById(id),dialog=$('install-dialog');
-let registration,preparing,downloading=false;
+let registration,preparing,downloading=false,installPrompt;
 const mediaURLs=MEDIA.map(entry=>new URL(entry.url,document.baseURI).href);
-window.addEventListener('beforeinstallprompt',event=>event.preventDefault());
+const installButton=$('install-app'),installHelp=$('install-help');
+const installed=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+function installUI(){
+ installButton.hidden=!installPrompt||installed();
+ installHelp.hidden=installed()||!!installPrompt;
+ installHelp.textContent=/iphone|ipad|ipod/i.test(navigator.userAgent)?'للتثبيت: افتح المشاركة ثم اختر إضافة إلى الشاشة الرئيسية.':'للتثبيت: اختر تثبيت التطبيق أو إضافة إلى الشاشة الرئيسية من قائمة المتصفح.';
+}
+window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;installUI();});
+window.addEventListener('appinstalled',()=>{installPrompt=null;installUI();});
+installButton.addEventListener('click',async()=>{
+ if(!installPrompt)return;const prompt=installPrompt;installPrompt=null;
+ try{await prompt.prompt();await prompt.userChoice;}catch(error){showError(error);}finally{installUI();}
+});
+installUI();
 function showError(error){$('offline-error').textContent=error?.message||'تعذر تجهيز التنزيل. اتصل بالإنترنت ثم حاول مجدداً.';$('offline-error').hidden=false;}
 async function ready(){
  if(!('serviceWorker'in navigator)||!isSecureContext)throw Error('افتح التطبيق عبر HTTPS أو localhost لتفعيل التنزيل.');

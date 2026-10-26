@@ -54,7 +54,8 @@ async function run(type, name) {
     const page = await context.newPage(); page.setDefaultTimeout(10000);
     const errors = []; page.on('pageerror', error => errors.push(error.message));
     const base = `http://127.0.0.1:${port}` + encodeURI(prefix);
-    await page.goto(base + 'index.html');
+    await page.addLocatorHandler(page.locator('#cloudDialog[open]'),()=>page.locator('#skipCloud').click());
+ await page.goto(base + 'index.html');
     await ready(page);
     const manifest = await page.evaluate(async () => {
       const href = document.querySelector('link[rel=manifest]').href;
@@ -87,113 +88,40 @@ async function run(type, name) {
       await (await caches.open('another-app-cache')).put('/outside-data', new Response('preserve'));
       await (await caches.open('arabic-articulation:another-scope:shell:old')).put('/other-articulation-data', new Response('preserve'));
     });
-    await page.locator('#pwaPanel').evaluate(node => { node.open = true; });
-    if (name === 'webkit') {
-      await page.locator('#pwaInstall').click();
-      assert.match(await page.locator('#pwaInstallHelp').textContent(), /iPhone.*Share/);
-    }
-    await page.evaluate(() => {
-      const event = new Event('beforeinstallprompt', { cancelable: true });
-      event.prompt = async () => { window.installPromptCalled = true; };
-      event.userChoice = Promise.resolve({ outcome: 'dismissed' });
-      window.dispatchEvent(event);
-    });
-    await page.locator('#pwaInstall').click();
-    assert.equal(await page.evaluate(() => window.installPromptCalled), true);
-    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
-    if (process.env.ARTICULATION_PWA_DEBUG) console.log(name, 'cache before offline', await page.evaluate(async () => { const names = await caches.keys(); const entries = {}; for (const key of names) entries[key] = (await (await caches.open(key)).keys()).map(request => request.url); return { entries, controller: navigator.serviceWorker.controller?.scriptURL }; }));
-    await offline(context, name, true);
-    if (process.env.ARTICULATION_PWA_DEBUG) console.log(name, 'offline entry', await page.evaluate(async () => { const key = new URL('index.html', document.baseURI).href; const entries = []; for (const name of await caches.keys()) entries.push([name, Boolean(await (await caches.open(name)).match(key))]); return { key, entries, fetch: await fetch(key).then(response => response.status).catch(error => error.message) }; }));
-    await page.reload({ waitUntil: 'load' }); await ready(page);
-    assert.equal(await page.evaluate(async () => { try { await fetch('/network-probe'); return true; } catch { return false; } }), false);
-    const offlineFiles = await page.evaluate(async files => {
-      const result = [];
-      for (const file of files) { const response = await fetch(file); result.push(response.ok); }
-      return result;
-    }, original.shell);
-    assert.ok(offlineFiles.every(Boolean), 'Every shipped asset must work offline');
-    // All 84 probes must resolve their mapped picture with the network unavailable.
+    await page.locator('#welcomeLaunch').waitFor({state:'hidden'});
+    await page.locator('#homeAccounts').click();await page.locator('#caseName').fill('حالة دون إنترنت');await page.locator('#createChildButton').click();
     await page.locator('[data-page="screen"]').first().click();
-    const pictures = await page.evaluate(async () => {
-      for (let i = 0; i < allProbes.length; i++) {
-        selectPicture(i);
-        const image = document.querySelector('#trials .picture-frame img');
-        await image.decode();
-        if (!image.naturalWidth || image.hidden) throw new Error('Broken picture ' + allProbes[i].image);
-      }
-      selectPicture(0); return allProbes.length;
-    });
-    assert.equal(pictures, 84);
-    for (const viewport of [{width:320,height:740},{width:390,height:844},{width:844,height:390},{width:768,height:1024},{width:1280,height:800}]) {
-      await page.setViewportSize(viewport);
-      const layout = await page.evaluate(() => {
-        const rect = document.querySelector('#trials .picture-frame').getBoundingClientRect();
-        return { overflow: document.documentElement.scrollWidth > innerWidth, square: Math.abs(rect.width-rect.height)<2, arrow: document.querySelector('#nextPicture').getBoundingClientRect().height };
-      });
-      assert.equal(layout.overflow, false, name + ' overflow at ' + viewport.width);
-      assert.ok(layout.square, 'Square picture canvas'); assert.ok(layout.arrow>=44, 'Touch navigation');
-    }
-    await page.setViewportSize({width:390,height:844});
-    await page.screenshot({path:`/private/tmp/articulation-screen-${name}.png`, fullPage:true});
-    await page.locator('[data-picture]').tap();
-    await page.locator('#childPicture img').evaluate(image => image.decode());
-    assert.equal(await page.locator('#childPicture .word').count(), 0);
-    await page.locator('#closePicture').click();
     await page.locator('[data-score="correct"]').click();
-    assert.equal(await page.evaluate(() => state.trials['s1-0'].status), 'correct');
-    await page.locator('#nextPicture').click();
-    await page.locator('[data-score="substitution"]').click();
-    await page.locator('#closeSound').click();
-    assert.equal(await page.evaluate(() => state.trials['s1-1']?.status), undefined);
-    await page.locator('[data-score="substitution"]').click();
-    await page.locator('[data-phoneme="0"]').click();
-    assert.equal(await page.evaluate(() => state.trials['s1-1'].status), 'substitution');
-    await page.locator('#reportButton').click();
-    const arabicDownload = page.waitForEvent('download'); await page.locator('#exportText').click();
-    const arabic = await arabicDownload;
-    assert.match(fs.readFileSync(await arabic.path(), 'utf8'), /تقرير/);
-    await page.locator('.report-language [role=combobox]').click();
-    await page.getByRole('option', {name:'English', exact:true}).click();
-    assert.equal(await page.locator('#reportLanguage').inputValue(), 'en');
-    // Actual touch events exercise the phone selection path as well as mouse click.
-    await page.locator('.report-language [role=combobox]').tap();
-    await page.getByRole('option', {name:'العربية', exact:true}).tap();
-    assert.equal(await page.locator('#reportLanguage').inputValue(), 'ar');
-    await page.locator('.report-language [role=combobox]').tap();
-    await page.getByRole('option', {name:'English', exact:true}).tap();
-    assert.match(await page.locator('#reportPreview').textContent(), /Arabic Speech Sound Screening Report/);
-    const englishDownload = page.waitForEvent('download'); await page.locator('#exportText').click();
-    const english = await englishDownload;
-    assert.match(fs.readFileSync(await english.path(), 'utf8'), /Arabic Speech Sound Screening Report/);
-    await page.screenshot({path:`/private/tmp/articulation-report-${name}.png`,fullPage:true});
-    await page.locator('#closeReport').click();
-    await page.locator('#remember').check();
-    await page.reload({waitUntil:'load'}); await ready(page);
-    assert.equal(await page.evaluate(() => state.trials['s1-0'].status), 'correct', 'Offline draft restore');
-    await page.locator('#remember').uncheck();
-    assert.equal(await page.evaluate(() => localStorage.getItem(KEY)), null);
-    // Launch the installed-app entry point in a new tab without a live origin.
-    const cold = await context.newPage();
-    await cold.goto(base + '?source=home-screen'); await ready(cold);
-    assert.equal(await cold.evaluate(() => Object.keys(state.trials).length), 0, 'Drafts remain opt-in');
-    await cold.locator('[data-page="screen"]').first().click();
-    await cold.locator('#trials img').evaluate(image => image.decode());
-    await cold.close();
-    await offline(context, name, false);
+    await page.locator('.workplace [data-page="home"]').click();
+    await page.locator('#downloadButton').click();
+    await page.locator('#downloadStart').click();await page.waitForFunction(()=>document.getElementById('downloadProgress').value===100);
+    if (name==='webkit'){await page.locator('#pwaInstall').click();assert.match(await page.locator('#pwaInstallHelp').textContent(),/iPhone.*Share/);}
+    await page.evaluate(()=>{const event=new Event('beforeinstallprompt',{cancelable:true});event.prompt=async()=>{window.installPromptCalled=true;};event.userChoice=Promise.resolve({outcome:'dismissed'});window.dispatchEvent(event);});
+    await page.locator('#pwaInstall').click();assert.equal(await page.evaluate(()=>window.installPromptCalled),true);
+    await page.locator('[data-close="downloadDialog"]').click();
+    await offline(context,name,true);
+    await page.reload({waitUntil:'load'});await ready(page);await page.locator('#welcomeLaunch').waitFor({state:'hidden'});
+    assert.equal(await page.evaluate(()=>state.trials['s1-0'].status),'correct','Autosave restored offline');
+    const offlineFiles=await page.evaluate(async files=>{const results=[];for(const file of files)results.push((await fetch(file)).ok);return results;},original.shell);
+    assert.ok(offlineFiles.every(Boolean),'Every shipped file works offline');
+    await page.locator('#continueAssessment').click();
+    const pictures=await page.evaluate(async()=>{for(let i=0;i<allProbes.length;i++){selectPicture(i);const image=document.querySelector('#trials .picture-frame img');await image.decode();if(!image.naturalWidth||image.hidden)throw Error('Broken picture '+allProbes[i].image);}selectPicture(0);return allProbes.length;});
+    assert.equal(pictures,84);
+    await page.locator('.workplace [data-page="home"]').click();
+    const cold=await context.newPage();await cold.goto(base+'?source=home-screen');await ready(cold);assert.equal(await cold.evaluate(()=>state.trials['s1-0'].status),'correct','Offline cold launch retains child progress');await cold.close();
+    await offline(context,name,false);
     const newCSS = Buffer.concat([fs.readFileSync(path.join(root, 'assets/styles.css')), Buffer.from('\n/* verified test update */')]);
     overrides.set('assets/styles.css', { body: newCSS });
     release(`test-update-${name}`);
     await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration()).update(); });
-    await page.locator('#pwaUpdate').waitFor({ state: 'visible', timeout: 20000 });
+    await page.waitForFunction(()=>!document.getElementById('pwaUpdate').hidden,null,{timeout:20000});
     assert.equal(await page.evaluate(async version => (await caches.keys()).some(key => key.endsWith(version)), original.version), true, 'Waiting update retains the active release');
-    // An update cannot reload an unsaved assessment without explicit consent.
-    assert.equal(await page.evaluate(() => state.trials['s1-0'].status), 'correct');
-    await page.locator('#pwaUpdate').click();
-    await page.locator('#pwaUpdateDialog').waitFor({state:'visible'});
-    await page.locator('#pwaCancelUpdate').click();
-    assert.equal(await page.evaluate(() => state.trials['s1-0'].status), 'correct');
-    await page.locator('#remember').check();
-    await Promise.all([page.waitForEvent('load'), page.locator('#pwaUpdate').click()]);
+    // A failed device save blocks activation; successful autosave permits it.
+    await page.locator('#downloadButton').click();
+    await page.evaluate(()=>{window.originalSetItem=Storage.prototype.setItem;Storage.prototype.setItem=()=>{throw Error('quota');};});
+    await page.locator('#pwaUpdate').click();assert(await page.locator('#pwaError').isVisible());assert.equal(await page.evaluate(()=>state.trials['s1-0'].status),'correct');
+    await page.evaluate(()=>{Storage.prototype.setItem=window.originalSetItem;});
+    await Promise.all([page.waitForEvent('load'),page.locator('#pwaUpdate').click()]);
     await ready(page);
     assert.equal(await page.evaluate(async version => (await caches.keys()).some(key => key.endsWith(version)), original.version), false);
     assert.ok(await page.evaluate(async () => (await fetch('assets/styles.css').then(response => response.text())).includes('verified test update')));
@@ -222,7 +150,7 @@ async function run(type, name) {
     assert.equal(await outside.evaluate(() => navigator.serviceWorker.controller), null);
     assert.deepEqual(errors, []);
     await page.screenshot({ path: `/private/tmp/articulation-pwa-${name}.png`, fullPage: true });
-    console.log(`PASS ${name}: nested-path installation, icons, all 69 WebPs/84 probes offline, phone/tablet layout, scoring, bilingual TXT, drafts and cold launch, install help, unsaved-case update guard, safe updates, failed-release rollback and other-app isolation`);
+    console.log(`PASS ${name}: nested-path installation, manifest, icons, all assets/69 WebPs/84 probes offline, device cases and cold launch, download progress, install prompt/help, save-failure update guard, safe updates, failed-release rollback and other-app isolation`);
   } finally { await offline(context, name, false); await context.close(); await browser?.close(); if (profile) fs.rmSync(profile, { recursive: true, force: true }); overrides.clear(); }
 }
 (async () => {

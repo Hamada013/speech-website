@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "فاحص النطق العربي — Ahmad Ghanem",
-  "short_name": "فاحص النطق",
-  "description": "فحص وصفي لأصوات الكلام مع 69 صورة وتسجيل النتائج وتقارير عربية وإنجليزية، يعمل دون إنترنت.",
+  "name": "اختبار النطق",
+  "short_name": "اختبار النطق",
+  "description": "فاحص أصوات الكلام العربي، بحسابات أطفال محلية وفحوصات محفوظة حسب التاريخ ومقارنة النتائج وتقارير PDF. يعمل دون إنترنت.",
   "lang": "ar",
   "dir": "rtl",
   "start_url": "./index.html",
@@ -12,8 +12,48 @@
   "theme_color": "#d9efff",
   "prefer_related_applications": false,
   "icons": [
-    { "src": "./assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "./assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "./assets/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "./assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "orientation": "any",
+  "categories": [
+    "education",
+    "medical"
+  ],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "screenshots": [
+    {
+      "src": "./assets/screenshots/home-narrow.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "الحسابات واختبار النطق على الهاتف"
+    },
+    {
+      "src": "./assets/screenshots/home-wide.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "اختبار النطق على الكمبيوتر"
+    }
   ]
 }

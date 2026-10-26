@@ -1,8 +1,9 @@
 const assert=require('node:assert/strict');
 const {create}=require('../shared/sound-progress.js');
-const {remove}=require('../shared/accounts.js');
+const vm=require('node:vm'),fs=require('node:fs');
+const ctx={document:{currentScript:{dataset:{app:'arabicsounds'}}},module:{exports:{}}};vm.createContext(ctx);vm.runInContext(fs.readFileSync(require.resolve('../shared/sound-accounts.js'),'utf8').replace(' if(!root.document)return;',' return;'),ctx);const {remove}=ctx.module.exports;
 const values=new Map(),storage={getItem:k=>values.get(k)||null,setItem:(k,v)=>values.set(k,v),removeItem:k=>values.delete(k)};
-values.set('voc-children-v1',JSON.stringify({schema:1,active:'ali',children:[{id:'hamada-admin',name:'Hamada',role:'admin',words:{},apps:{}},{id:'ali',name:'علي',words:{keep:{receptive:true}},workspace:{slots:['keep']},senb:{sessions:[{id:'existing'}]},taffaha:{attempts:[{id:'old'}]},apps:{voc:true}}]}));
+for(const app of ['arabicsounds','auditory-rehabilitation'])values.set(`${app}-children-v1`,JSON.stringify({schema:1,active:'ali',children:[{id:'hamada-admin',name:'Hamada',role:'admin',words:{},apps:{}},{id:'ali',name:'علي',words:{keep:{receptive:true}},workspace:{slots:['keep']},senb:{sessions:[{id:'existing'}]},taffaha:{attempts:[{id:'old'}]},apps:{voc:true}}]}));
 for(const app of ['arabicsounds','auditory-rehabilitation']){
  const p=create({app,storage});assert.equal(p.active().id,'ali');const before=JSON.stringify(p.active().words);
  p.record({sessionId:'run',id:'0',label:'صوت',skill:'detection',kind:'assessment',present:true,response:true,correct:true,owner:'ali'});

@@ -12,3 +12,8 @@ assert(arabic?!data.includes('SOUND_NAMES'):!data.includes('LETTER_MAP'));
 for(const file of release.shell.filter(entry=>entry.url.endsWith('.js')))cp.execFileSync(process.execPath,['--check',path.join(root,file.url)]);
 assert(release.shell.some(entry=>entry.url==='assets/updates.js'));assert(release.shell.some(entry=>entry.url==='images/logo.webp'));
 console.log(`PASS ${app}: independent app shell, ${release.media.length} local media hashes, scoped manifest, installation icons, isolated activity data, JavaScript syntax.`);
+
+assert.equal(manifest.prefer_related_applications,false);assert.equal(manifest.display,'standalone');
+for(const shot of manifest.screenshots){const body=fs.readFileSync(path.join(root,shot.src));assert.equal(`${body.readUInt32BE(16)}x${body.readUInt32BE(20)}`,shot.sizes);assert(['narrow','wide'].includes(shot.form_factor));}
+const navigation=fs.readFileSync(path.join(root,'assets/app-navigation.js'),'utf8');assert(!/urlFor|openApps|reportLinks|location.assign|localStorage/.test(navigation));
+assert(html.includes(`src="assets/accounts.js" data-app="${app}"`));

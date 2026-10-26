@@ -29,9 +29,18 @@ function inventory(app,root=ROOT){
  if(files.some(file=>file.startsWith('/')||file.split('/').includes('..')))throw Error('Invalid shell path');
  return {app,version:release.version,mediaCount:media.length,mediaBytes:media.reduce((sum,entry)=>sum+entry.bytes,0),files};
 }
+function articulationInventory(root=ROOT){
+ const prefix='forms/speech/articulation/',base=path.join(root,prefix),context={self:{}};
+ vm.runInNewContext(fs.readFileSync(path.join(base,'assets/pwa-release.js'),'utf8'),context);
+ const release=context.self.ARTICULATION_RELEASE;
+ for(const file of release.shell)if(release.integrity[file]!=='sha256-'+sha(fs.readFileSync(path.join(base,file)),'base64'))throw Error('Stale articulation shell: '+file);
+ return [...release.shell,'sw.js','assets/pwa-release.js'].map(file=>prefix+file);
+}
 function build(){
  cp.execFileSync(process.execPath,[path.join(__dirname,'sync-navigation.cjs')],{stdio:'inherit'});
  for(const app of APPS)cp.execFileSync(process.execPath,[path.join(ROOT,'tools',app,'scripts/build-pwa.cjs')],{stdio:'inherit'});
+ cp.execFileSync(process.execPath,[path.join(ROOT,'forms/speech/articulation/scripts/build-pwa.cjs')],{stdio:'inherit'});
+ articulationInventory();
  return APPS.map(app=>inventory(app));
 }
 function stageSite(releases){
@@ -40,12 +49,14 @@ function stageSite(releases){
  // Tracked site files preserve all existing pages. Runtime inventories also
  // include new local app assets when checking a release before its first commit.
  const tracked=cp.execFileSync('git',['ls-files','-z'],{cwd:ROOT}).toString().split('\0').filter(Boolean);
- const files=new Set([...tracked,...releases.flatMap(release=>release.files.map(file=>`tools/${release.app}/${file}`))]);
+ const files=new Set([...tracked,...articulationInventory(),...releases.flatMap(release=>release.files.map(file=>`tools/${release.app}/${file}`))]);
  const omitted=new Set(['node_modules','.git','.github','.aws','.agents','.codex','.vscode','output','tmp','tests','scripts','__pycache__']);
  let total=0;
  for(const file of [...files].sort()){
   const parts=file.split('/'),name=parts.at(-1);
   if(parts.some(part=>omitted.has(part))||name==='.DS_Store'||name==='AGENTS.md'||name.startsWith('.env')||name==='package-lock.json'||name==='package.json')continue;
+  if(file.startsWith('forms/speech/articulation/cloud/')&&file!=='forms/speech/articulation/cloud/config.json')continue;
+  if(file.startsWith('forms/speech/articulation/research/')&&file!=='forms/speech/articulation/research/google-link.json')continue;
   const source=path.join(ROOT,file);if(!fs.existsSync(source))continue;
   if(fs.lstatSync(source).isSymbolicLink())throw Error('Pages files must not be symlinks: '+file);
   if(!fs.statSync(source).isFile())continue;
@@ -54,6 +65,7 @@ function stageSite(releases){
  fs.writeFileSync(path.join(destination,'.nojekyll'),'');
  require('../VSS/scripts/legacy-redirects.cjs').writeRedirects(destination);
  for(const release of releases)inventory(release.app,destination);
+ articulationInventory(destination);
  console.log(`Pages artifact: ${total} files in output/pages; every app shell and media revision verified.`);
  return destination;
 }

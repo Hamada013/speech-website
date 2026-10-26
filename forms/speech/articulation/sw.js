@@ -28,6 +28,23 @@ self.addEventListener('activate', event => {
 });
 self.addEventListener('message', event => {
   if (event.data?.type === 'ACTIVATE_UPDATE') self.skipWaiting();
+  if (event.data?.type === 'DOWNLOAD_OFFLINE' && event.ports[0]) {
+    event.waitUntil((async () => {
+      const port=event.ports[0];
+      try {
+        const cache=await caches.open(CACHE),files=self.ARTICULATION_RELEASE.shell;
+        for(let i=0;i<files.length;i++){
+          const url=new URL(files[i],BASE).href;
+          if(!(await cache.match(url))){
+            const response=await fetch(new Request(url,{cache:'reload',integrity:self.ARTICULATION_RELEASE.integrity[files[i]]}));
+            if(!response.ok)throw Error('Download failed');
+            await cache.put(url,response);
+          }
+          port.postMessage({percent:Math.round((i+1)/files.length*100),done:i===files.length-1});
+        }
+      }catch{port.postMessage({error:'Download failed'});}
+    })());
+  }
 });
 self.addEventListener('fetch', event => {
   const request = event.request;

@@ -38,10 +38,10 @@
  }
  function openReport(id){
   const data=P.report(id);if(!data)return;reportId=data.child.id;
-  if(!report){report=dialog('sound-report','تقرير الطفل');report.insertAdjacentHTML('beforeend','<nav data-sound-report-apps></nav><div data-sound-report-body></div><button type="button" class="button" data-print-report>حفظ التقرير / طباعة</button>');report.querySelector('[data-print-report]').onclick=()=>window.print();}
+  if(!report){report=dialog('sound-report','تقرير الطفل');report.insertAdjacentHTML('beforeend','<div data-sound-report-body></div><button type="button" class="button" data-print-report>حفظ التقرير / طباعة</button>');report.querySelector('[data-print-report]').onclick=()=>window.print();}
   const groups=new Map();for(const session of data.sessions){const row=groups.get(session.skill)||{skill:session.skill,practice:0,correct:0,total:0,partial:0};if(session.kind==='practice')row.practice+=session.records.length;else for(const r of session.records){row.total++;row.correct+=Number(r.correct);}if(session.partial)row.partial++;groups.set(session.skill,row);}
   report.querySelector('[data-sound-report-body]').innerHTML=`<h3>${escape(data.child.name)} · ${labels[app]}</h3>${P.isAdmin()&&data.child.id===P.active().id?'<p>حساب Hamada للتجربة؛ بياناته منفصلة عن الأطفال.</p>':''}${data.sessions.length?`${reportGraphics(data,groups)}<details class="sound-report-table" ${app==='auditory-rehabilitation'?'':'open'}><summary>تفاصيل الأنشطة</summary><div class="table-wrap"><table><thead><tr><th>النشاط</th><th>الاستجابات الصحيحة</th><th>محاولات التدريب</th></tr></thead><tbody>${[...groups.values()].map(row=>`<tr><th>${skillNames[row.skill]||escape(row.skill)}</th><td dir="ltr">${row.total?`${row.correct} / ${row.total} (${Math.round(row.correct/row.total*100)}%)`:'—'}</td><td>${row.practice}</td></tr>`).join('')}</tbody></table></div></details><p class="subtle">التدريب منفصل عن الاختبار. تشمل الأرقام الاستجابات المسجلة في الجلسات غير المكتملة، ولا تعني اكتساب المهارة.</p><details><summary>الجلسات (${data.sessions.length})</summary>${[...data.sessions].reverse().map(session=>`<article class="sound-session"><b>${escape(session.activity)}</b><p>${new Date(session.date).toLocaleDateString('ar')} · ${session.kind==='practice'?'تدريب':'اختبار'} · ${session.partial?'غير مكتملة':'مكتملة'}</p>${recordMarks(session)}<p>${[...new Set(session.records.map(r=>r.label))].map(escape).join('، ')}</p></article>`).join('')}</details>`:'<p>لا توجد محاولات مسجلة لهذا الطفل في هذا التطبيق بعد.</p>'}`;
-  window.AppNavigation?.reportLinks(report.querySelector('nav'),data.child);show(report);
+  show(report);
  }
  function openLesson(){
   const child=P.active(),data=P.report();if(!child||!data)return;
@@ -83,7 +83,7 @@
  document.addEventListener('click',event=>{if(event.target.closest('[data-sound-download]'))document.getElementById('install').click();});
  window.SoundProfile={open:openProfile};window.SoundReports={open:openReport};
  window.SoundSuite={bind(value){api=value;if(!P.active())void openProfile();},rendered(){window.dispatchEvent(new Event('sound-view-change'));},pause,openLesson,skillNames};
- window.addEventListener('storage',event=>{if(event.key==='voc-children-v1'){pause();api?.render();if(!P.active())void openProfile();if(report?.open)openReport(reportId);}});
+ window.addEventListener('storage',event=>{if(event.key===`${app}-children-v1`){pause();api?.render();if(!P.active())void openProfile();if(report?.open)openReport(reportId);}});
  const storageStatus=document.createElement('p');storageStatus.className='sound-storage-error';storageStatus.setAttribute('role','alert');storageStatus.hidden=true;document.body.append(storageStatus);window.addEventListener('sound-progress-change',()=>{storageStatus.hidden=P.storageOK();storageStatus.textContent=P.storageOK()?'':'تعذّر حفظ التقدم على الجهاز. أبقوا النافذة مفتوحة وانسخوا النتائج قبل الإغلاق.';});
  window.addEventListener('suite-navigation-open',()=>api?.stop());
 })();

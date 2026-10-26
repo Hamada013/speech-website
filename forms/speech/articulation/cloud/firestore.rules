@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  match /users/{uid}/records/{recordId} {
+   function owner() { return request.auth != null && request.auth.uid == uid && request.auth.token.firebase.sign_in_provider == 'google.com'; }
+   allow read: if owner();
+   function valid() { return owner()
+     && request.resource.data.keys().hasOnly(['value','revision'])
+     && request.resource.data.value is string
+     && request.resource.data.value.size() < 900000
+     && request.resource.data.revision is int
+     ; }
+   allow create: if valid() && request.resource.data.revision == 1;
+   allow update: if valid() && request.resource.data.revision == resource.data.revision + 1;
+   allow delete: if false; // Tombstones prevent another device restoring a deleted case.
+  }
+  match /{document=**} { allow read, write: if false; }
+ }
+}

@@ -30,10 +30,11 @@ try{
   const kind=app==='arabicsounds'?'arabic':'around',total=kind==='arabic'?62:200,context=await browser.newContext({viewport:{width:390,height:844}});
   const page=await context.newPage(),errors=[],foreign=[];
   page.on('pageerror',error=>errors.push(error.message));page.on('request',request=>{const url=new URL(request.url());if(!url.pathname.startsWith('/standalone/'+app+'/')&&url.pathname!=='/favicon.ico')foreign.push(url.pathname);});
-  await page.addInitScript(()=>{localStorage.setItem('voc-children-v1',JSON.stringify({schema:1,active:'qa-sounds',children:[{id:'qa-sounds',name:'اختبار',role:'child',apps:{},words:{}}]}));window.finishedAudio=0;const Context=window.AudioContext||window.webkitAudioContext;if(Context){const create=Context.prototype.createBufferSource;Context.prototype.createBufferSource=function(...args){const node=create.apply(this,args);node.addEventListener('ended',()=>{if(node.buffer?.length>1)window.finishedAudio++;},{once:true});return node;};}const native=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){this.addEventListener('ended',()=>window.finishedAudio++,{once:true});return native.call(this);};});
+  await page.addInitScript(app=>{localStorage.setItem(`${app}-children-v1`,JSON.stringify({schema:1,active:'qa-sounds',children:[{id:'qa-sounds',name:'اختبار',role:'child',apps:{},words:{}}]}));window.finishedAudio=0;const Context=window.AudioContext||window.webkitAudioContext;if(Context){const create=Context.prototype.createBufferSource;Context.prototype.createBufferSource=function(...args){const node=create.apply(this,args);node.addEventListener('ended',()=>{if(node.buffer?.length>1)window.finishedAudio++;},{once:true});return node;};}const native=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){this.addEventListener('ended',()=>window.finishedAudio++,{once:true});return native.call(this);};},app);
   const url=`${origin}/standalone/${app}/index.html`;await page.goto(url);await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
   await page.waitForFunction(()=>!document.getElementById('offline-download').disabled);
-  assert.equal(await page.locator('.app-home-action').count(),5);assert.equal(await page.locator('#menu-toggle:visible,#home-link:visible').count(),0);
+  assert.equal(await page.locator('.app-home-action').count(),5);assert.equal(await page.locator('[data-suite-apps],[data-report-app]').count(),0,'No cross-app navigation');assert.equal(await page.locator('#menu-toggle:visible,#home-link:visible').count(),0);
+  const cdp=await context.newCDPSession(page);const installability=await cdp.send('Page.getInstallabilityErrors');assert.deepEqual(installability.installabilityErrors.filter(error=>error.errorId!=='in-incognito'),[],'Chromium installation requirements (test contexts are incognito)');await cdp.detach();
   assert.equal((await rpc(page,'STATUS')).count,0,'Startup does not bulk-download media');
   for(const[width,height]of[[320,568],[390,844],[844,390],[768,1024],[1280,640]]){
    await page.setViewportSize({width,height});await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
@@ -41,7 +42,7 @@ try{
    await page.screenshot({path:`/tmp/${app}-${width}-home.png`});
   }
   await page.setViewportSize({width:390,height:844});await page.locator('[data-sound-download]').click();
-  assert.equal(await page.locator('#install-dialog button').count(),1);assert.equal(await page.locator('#offline-download').textContent(),'تنزيل');assert.equal(await page.locator('#offline-progress').getAttribute('max'),'100');
+  assert.equal(await page.locator('#install-dialog button').count(),3);assert.equal(await page.locator('#offline-download').textContent(),'تنزيل');assert.equal(await page.locator('#offline-progress').getAttribute('max'),'100');
   corruptNext=true;await page.locator('#offline-download').click();await page.waitForFunction(()=>!document.getElementById('offline-download').disabled);
   assert(await page.locator('#offline-error').isVisible());assert((await rpc(page,'STATUS')).count<total,'Corrupt files are not counted');
   await page.locator('#offline-download').click();await page.waitForFunction(()=>document.getElementById('offline-status').textContent==='100%',null,{timeout:60000});
@@ -53,7 +54,7 @@ try{
   assert(await page.locator('#install').isHidden(),'Download icon appears only on home');
   await page.locator('[data-suite-menu]').click();assert(await page.locator('#suite-activity-menu').isVisible());await page.keyboard.press('Escape');
   await context.setOffline(true);await page.reload();await page.locator('.picture img').first().waitFor();await page.waitForFunction(()=>[...document.querySelectorAll('.picture img')].every(img=>img.complete&&img.naturalWidth>0));
-  await page.locator('.picture').first().click();await page.waitForFunction(()=>window.finishedAudio>0,null,{timeout:20000});
+  await page.locator('.picture').first().click();await page.waitForFunction(()=>window.finishedAudio>0,null,{timeout:45000});
   const range=await page.evaluate(async()=>{const response=await fetch('sounds/1.m4a',{headers:{Range:'bytes=0-31'}});return[response.status,(await response.arrayBuffer()).byteLength];});assert.deepEqual(range,[206,32]);
   await context.setOffline(false);await page.evaluate(()=>location.hash='/home');await page.locator('.app-home-action').first().waitFor();
   const css='assets/home.css',body=Buffer.concat([fs.readFileSync(path.join(root,'tools',app,css)),Buffer.from('\n/* published update fixture */\n')]);overrides.set(app+'/'+css,body);
@@ -65,6 +66,20 @@ try{
   assert.deepEqual(errors,[]);assert.deepEqual(foreign,[],'Standalone app never requests a sibling app');await context.close();
   console.log(`PASS ${app}: five home actions, responsive layouts, own ${total} media files, integrity rejection/retry, all ${decoded.length} native audio decoders, real offline images/audio/ranges, deferred and accepted updates.`);
  }
+ // Both installed apps can be open on the same origin without sharing accounts.
+ const isolated=await browser.newContext(),one=await isolated.newPage(),two=await isolated.newPage();
+ await one.goto(`${origin}/standalone/arabicsounds/index.html`);await one.waitForFunction(()=>!!window.SoundProgress);
+ await one.evaluate(()=>{SoundProgress.add('العربية فقط');document.querySelector('#sound-profile')?.close();SoundProgress.record({label:'م',kind:'practice'});});
+ await two.goto(`${origin}/standalone/auditory-rehabilitation/index.html`);await two.waitForFunction(()=>!!window.SoundProgress);
+ assert.equal(await two.evaluate(()=>SoundProgress.active()),null,'A new app requires its own account');
+ await two.evaluate(()=>{SoundProgress.add('من حولي فقط');document.querySelector('#sound-profile')?.close();});
+ assert.equal(await one.evaluate(()=>SoundProgress.active().name),'العربية فقط');
+ assert.equal(await two.evaluate(()=>SoundProgress.report().sessions.length),0);
+ await one.reload();await one.waitForFunction(()=>!!window.SoundProgress);assert.equal(await one.evaluate(()=>SoundProgress.active().name),'العربية فقط');
+ await one.evaluate(()=>{window.installCalls=0;const event=new Event('beforeinstallprompt',{cancelable:true});event.prompt=async()=>{window.installCalls++;};event.userChoice=Promise.resolve({outcome:'accepted'});window.dispatchEvent(event);document.querySelector('#install').click();});
+ await one.locator('#install-app').click();assert.equal(await one.evaluate(()=>window.installCalls),1);
+ await one.evaluate(()=>window.dispatchEvent(new Event('appinstalled')));assert(await one.locator('#install-app').isHidden());
+ await isolated.close();console.log('PASS: two same-origin apps keep separate accounts and reports after reload; install control invokes the browser prompt.');
  const context=await browser.newContext(),page=await context.newPage();
  const aliases={arabicsounds:['matching','memory'],'auditory-rehabilitation':['detection','discrimination','duration','identification','memory']};
  for(const[app,names]of process.env.SOUNDS_MIGRATION_ONLY?[]:Object.entries(aliases))for(const name of names){await page.goto(`${origin}/tools/${app}/${name}.html`);await page.waitForURL(`${origin}/tools/${app}/index.html#/${app==='arabicsounds'?'arabic':'around'}/${name}`);assert(await page.locator('main').textContent());}

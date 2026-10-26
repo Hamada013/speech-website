@@ -4,9 +4,10 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),asse
 const root=path.resolve(__dirname,'..');
 function fixture(saved=null){
  const elements=new Map(),storage=new Map();if(saved)storage.set('aghanem-arabic-articulation-v1',JSON.stringify(saved));
- function el(id){if(!elements.has(id))elements.set(id,{value:'',textContent:'',innerHTML:'',checked:false,hidden:false,dataset:{},style:{},addEventListener(){},setAttribute(k,v){this[k]=v;},removeAttribute(k){delete this[k];},querySelectorAll(){return[];},querySelector(){return el(id+'-query');},focus(){},showModal(){this.open=true;},close(){this.open=false;}});return elements.get(id);}
- const context={console,Blob,URL,setTimeout,document:{getElementById:el,querySelectorAll(){return[];},querySelector(){return null;},addEventListener(){},title:'Screener',body:{append(){}},createElement(){return{click(){},remove(){}}}},window:{addEventListener(){},removeEventListener(){},print(){}},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)}};
- vm.createContext(context);for(const file of ['stimuli','browser','phonology','reporting','dropdowns','app'])vm.runInContext(fs.readFileSync(path.join(root,'assets',file+'.js'),'utf8'),context);
+ function el(id){if(!elements.has(id))elements.set(id,{value:'',textContent:'',innerHTML:'',checked:false,hidden:false,dataset:{},style:{},classList:{contains(){return false;},add(){},remove(){}},addEventListener(){},setAttribute(k,v){this[k]=v;},removeAttribute(k){delete this[k];},querySelectorAll(){return[];},querySelector(){return el(id+'-query');},focus(){},showModal(){this.open=true;},close(){this.open=false;}});return elements.get(id);}
+ const context={console,Blob,URL,setTimeout,document:{getElementById:el,querySelectorAll(){return[];},querySelector(){return null;},addEventListener(){},title:'Screener',body:{append(){},classList:{contains(){return false;},add(){},remove(){}}},createElement(){return{click(){},remove(){}}}},startNewAssessment(){},resultCharts(){return '';},renderHistory(){},visibleReportHTML(){return vm.runInContext('assessmentReportHTML()',context);},comparisonSelection:null,window:{addEventListener(){},removeEventListener(){},print(){}},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)}};
+ vm.createContext(context);for(const file of ['stimuli','browser','phonology','diagnosis','reporting','dropdowns','icons','app','workspace'])vm.runInContext(fs.readFileSync(path.join(root,'assets',file+'.js'),'utf8'),context);
+ vm.runInContext('renderMeta();renderTrials();',context);
  return{run:code=>vm.runInContext(code,context),el};
 }
 const {run,el}=fixture();
@@ -30,9 +31,9 @@ assert.equal(run("allProbes.find(p=>p.id==='s28-0').spoken"),'إيد');
 assert.equal(run("allProbes.find(p=>p.id==='s28-0').targetIPA"),null);
 assert.equal(run("allProbes.find(p=>p.id==='s21-0').targetIPA"),'ʔ');
 assert.equal(run('aggregate().scored'),0);assert.equal(run('processAnalysis().results.length'),0);
-assert.equal((el('trials').innerHTML.match(/class="trial play-card"/g)||[]).length,1);
+assert.equal((el('trials').innerHTML.match(/class="trial play-card workplace"/g)||[]).length,1);
 run('selectPicture(83)');assert.equal(run('selectedProbe'),83);assert.equal(el('nextPicture').disabled,undefined); // disabled attribute is tested in markup
-assert.ok(el('trials').innerHTML.includes('id="nextPicture" class="arrow-button" aria-label="الصورة التالية" disabled'));
+assert.match(el('trials').innerHTML,/id="nextPicture"[^>]+disabled/);
 run('selectPicture(84)');assert.equal(run('selectedProbe'),83);run('selectPicture(-1)');assert.equal(run('selectedProbe'),0);
 run("recordScore('s1-0','substitution')");assert.equal(run("state.trials['s1-0']?.status"),undefined);
 run("$('closeSound').onclick()");assert.equal(run('soundPicker'),null);assert.equal(run("state.trials['s1-0']?.status"),undefined);
@@ -60,15 +61,12 @@ assert.equal(run("state.trials['s22-0'].targetIPA"),'k');
 run("state.meta.childName='<script>child</script>';state.meta.analysis='ملاحظة عربية';state.meta.analysisEn='English clinician note';state.trials['s22-0'].note='<img src=x>';state.trials['s22-0'].noteEn='English item note'");
 assert.ok(!run('reportHTML().includes("<script>child")'));assert.ok(run('reportHTML().includes("&lt;img")'));
 run("$('reportLanguage').value='en';refreshReport()");
-assert.ok(run('reportHTML().includes("Arabic Speech Sound Screening Report")'));
-assert.ok(run('reportHTML().includes("Automatic phonological analysis")'));
-assert.ok(run('reportHTML().includes("English clinician note")'));
+assert.ok(run('reportHTML().includes("Speech Sound Assessment Report")'));
+assert.ok(run('reportHTML().includes("Patterns observed in recorded productions")'));
+assert.ok(!run('reportHTML().includes("English clinician note")'));
 assert.ok(run('reportHTML().includes("English item note")'));
 assert.ok(run('reportHTML()').includes('dir="ltr" lang="en"'));
-assert.ok(run('reportText().includes("Velar / uvular fronting")'));
-assert.ok(run('reportText().endsWith(SIGNATURE)'));
-assert.ok(run('reportHTML().includes("No connected-speech sample")'));
-run("$('reportLanguage').value='ar'");assert.ok(run('reportHTML().includes("التحليل الفونولوجي التلقائي")'));
+run("$('reportLanguage').value='ar'");assert.ok(run('reportHTML().includes("الأنماط المستخلصة من التسجيلات")'));
 run("$('includeUntested').checked=true");assert.equal(run('reportModel().rows.length'),84);
 assert.equal(run("parseDate({day:'٢٩',month:'٢',year:'٢٠٢٤'}).iso"),'2024-02-29');
 assert.equal(run("parseDate({day:'29',month:'2',year:'2023'}).error"),true);

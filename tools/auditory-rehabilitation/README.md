@@ -12,7 +12,7 @@ Discrimination and identification use a square ear card for target playback, rep
 
 Automatic sessions use gesture-unlocked Web Audio for playback after countdowns and between trials. Leaving or hiding an activity cancels pending audio, timers, countdowns, and demonstrations; manual library and Memory playback also stops on leaving the page. Audio failures retain explicit error feedback and allow replay/restart.
 
-The supplied logo is `images/logo.webp`. Installation icons are in `icons/`. The home uses the project home-screen style. Its only header action is Download, opening one «تنزيل» button and a percentage bar. Downloading saves this app's own 200 media files, verifies hashes, and resumes missing files on retry. Offline audio supports byte ranges. Cache names include this app's name and hosting scope.
+The supplied logo is `images/logo.webp`. Installation icons are in `icons/`. The home uses the project home-screen style. Its download dialog offers installation when supported, offline download, and a percentage bar. Downloading saves this app's own 200 media files, verifies hashes, and resumes missing files on retry. Offline audio supports byte ranges. Cache names include this app's name and hosting scope.
 
 Complete new releases wait for «تحديث الآن» or «لاحقًا». Update checks run when opening the app and returning online. Rebuild release manifests before publishing changes.
 
@@ -31,3 +31,13 @@ npm run test:browser
 Browser checks require Chrome and Playwright. Set `SOUNDS_PLAYWRIGHT` to an absolute installed Playwright package path if needed; `SOUNDS_ENGINE=chromium` selects Chrome for activity checks. Shared standalone checks are in `tools/tests/split-sounds-browser.cjs` and verify responsive screens, download retries, native audio decoding, offline reopening, updates, and legacy URLs.
 
 Legacy HTML activity paths now redirect within this app to `index.html#/around/…`. Old `tools/aswati/index.html#/around/…` bookmarks redirect here.
+
+## Independent accounts and PWA validation
+
+This app has its own `APP_ID-children-v1` account store and `APP_ID-account-avatars-v1` avatar store (replace `APP_ID` with this directory name). Its active child, reports, deletion tombstones and parent messages are independent of the other sound app and VSS. There is no app picker or cross-app report navigation. On first upgrade, only accounts registered in this app and their own sound results are copied from the legacy shared store; the original store is preserved and later changes are not synchronized.
+
+Install from the logo/download dialog: supported browsers show «تثبيت التطبيق» when an install prompt is available; other browsers show their menu instructions. Downloading offline media is a separate action. Each directory can be hosted by itself, including at a domain root. Keep the manifest, worker, all assets and media together, and serve over HTTPS with valid MIME types. Serve `sw.js` and `assets/release-worker.js` without long-lived HTTP caching. Publish each rebuilt release atomically so integrity hashes match the files.
+
+The manifest includes local regular/maskable icons, scoped identity/shortcuts, standalone display, and actual narrow/wide screenshots. Submit each deployed app URL separately to PWABuilder. Local checks cannot certify the live server’s HTTPS certificate, response headers or store packaging. Run `node tools/tests/standalone-sound-accounts.cjs` and `SOUNDS_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node tools/tests/split-sounds-browser.cjs` from the repository root for migration/isolation and real offline/install/update checks.
+
+Standalone shared sources: `tools/shared/sound-accounts.js`, `sound-navigation.js`, `sound-progress.js`, and `sound-suite.js`. The sync script keeps these separate from VSS account/navigation sources. Rebuild this app after syncing.

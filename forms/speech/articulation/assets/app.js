@@ -11,7 +11,7 @@ const PATTERNS = ['حذف في آخر الكلمة','تغيير موضع الن�
 const RECOMMENDATIONS = ['تقييم شامل لأصوات الكلام','استكمال مراجعة السمع','فحص آلية النطق الفموية','عينة كلام متصل إضافية','فحص القابلية للاستثارة','مراجعة اللهجة واللغات','تعاون مع الأسرة / المدرسة','إعادة فحص ومتابعة'];
 const allProbes = SOUNDS.flatMap(sound => sound.probes.map(probe => ({...probe,sound})));
 const localToday = () => {const d=new Date();return {day:String(d.getDate()),month:String(d.getMonth()+1),year:String(d.getFullYear())};};
-const freshState = () => ({meta:{assessment:localToday(),examiner:'Ahmad Ghanem',dialect:'سورية شامية مدينية — مرجع مبدئي قابل للتعديل',languages:'العربية السورية'},trials:{},patterns:[],recommendations:[]});
+const freshState = () => ({meta:{assessment:localToday(),examiner:'Ahmad Ghanem',dialect:'',languages:''},trials:{},patterns:[],recommendations:[]});
 let state = freshState(), selectedSound = 0, selectedProbe = 0, saving = false, soundPicker = null;
 const notePanels = new Set();
 try {
@@ -26,9 +26,10 @@ try {
   }
 } catch {}
 function save() {
-  if (!saving) return;
-  try {localStorage.setItem(KEY,JSON.stringify({version:1,state}));$('saveStatus').textContent='تم حفظ المسودة على هذا الجهاز.';}
-  catch {$('saveStatus').textContent='تعذر الحفظ؛ أبقِ الصفحة مفتوحة أو صدّر التقرير.';}
+  if (typeof saveCase==='function') return saveCase();
+  if (!saving) return false;
+  try {localStorage.setItem(KEY,JSON.stringify({version:1,state}));return true;}
+  catch {$('message').textContent='تعذر الحفظ؛ أبقِ الصفحة مفتوحة أو صدّر التقرير.';return false;}
 }
 function normalizeDigits(s) {return String(s||'').replace(/[٠-٩]/g,c=>String(c.charCodeAt(0)-1632)).replace(/[۰-۹]/g,c=>String(c.charCodeAt(0)-1776));}
 function parseDate(v) {
@@ -57,16 +58,23 @@ function updateDates() {$('dateError').textContent=dateProblem();$('age').textCo
 function renderMeta() {
   document.querySelectorAll('[data-meta]').forEach(input=>{input.value=state.meta[input.dataset.meta]||'';});
   document.querySelectorAll('[data-date]').forEach(input=>{input.value=state.meta[input.dataset.date]?.[input.dataset.part]||'';});
-  const renderChecks=(id,options,key)=>{$(id).innerHTML=options.map((label,i)=>`<label class="choice"><input type="checkbox" data-list="${key}" value="${i}" ${state[key].includes(String(i))?'checked':''}>${escapeHTML(label)}</label>`).join('');};
-  renderChecks('patterns',PATTERNS,'patterns');renderChecks('recommendations',RECOMMENDATIONS,'recommendations');
+  if($('referenceReviewed'))$('referenceReviewed').checked=state.meta.referenceReviewed===true;
+  if($('diagnosisReviewed'))$('diagnosisReviewed').checked=state.meta.diagnosisReviewed===true;
   $('remember').checked=saving;updateDates();enhanceDropdowns();
 }
 function showPage(id) {
   closeDropdowns();
-  ['details','screen','summary'].forEach(page=>$(page).hidden=page!==id);
+  if(id!=='home'&&!activeChild()){openAccounts();return;}
+  ['home','details','screen','summary'].forEach(page=>$(page).hidden=page!==id);
+  document.body.dataset.page=id;
+  document.querySelector('.tabs').hidden=id==='home';
+  $('downloadButton').hidden=id!=='home';
   document.querySelectorAll('.tabs [data-page]').forEach(button=>{if(button.dataset.page===id)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
-  if(id==='summary')renderAutomaticSummary();
-  $(id+'Title').focus();
+  if(id==='summary')renderDiagnosisEditor();
+  if(id==='home')refreshHome();
+  if(id==='screen'){document.body.classList.add('workplace-focused');renderTrials();}
+  else document.body.classList.remove('workplace-focused');
+  const heading=$(id+'Title');if(id!=='home')heading?.focus({preventScroll:true});else if(document.activeElement?.matches?.('h1,h2,h3,[tabindex="-1"]'))document.activeElement.blur();
 }
 function trialFor(id) {return state.trials[id]||{};}
 function aggregate(probes=allProbes) {
@@ -105,13 +113,8 @@ function pictureMarkup(probe,child=false) {
 }
 function wireImages(root){root.querySelectorAll('img').forEach(img=>{const fail=()=>{img.hidden=true;img.nextElementSibling.hidden=false;};img.addEventListener('error',fail);if(img.complete&&img.naturalWidth===0)fail();});}
 function pillGroup(probe,prop,options,value){return `<div class="pill-group">${Object.entries(options).map(([key,label])=>`<button type="button" data-setting="${prop}" data-trial-id="${probe.id}" data-value="${key}" aria-pressed="${value===key}" class="${value===key?'chosen':''}">${escapeHTML(label)}</button>`).join('')}</div>`;}
-function renderTrials() {
- const probe=allProbes[selectedProbe],sound=probe.sound,r=trialFor(probe.id),target=expectedTarget(probe),hasError=ERRORS.includes(r.status),expanded=notePanels.has(probe.id)||!!r.note||!!r.noteEn;
- selectedSound=SOUNDS.findIndex(s=>s.id===sound.id);
- $('trials').innerHTML=`<section class="trial play-card" aria-labelledby="heading-${probe.id}"><div class="trial-heading"><span class="target-chip">${escapeHTML(sound.letter)} <b dir="ltr">${target?'/'+escapeHTML(target)+'/':'—'}</b></span><div><h3 id="heading-${probe.id}" tabindex="-1">${probe.position}</h3><p class="muted">الصورة ${selectedProbe+1} من ${allProbes.length}</p></div><button type="button" data-picture="${probe.id}" class="soft-button">عرض الصورة فقط</button></div><div class="picture-navigation" dir="ltr"><button id="nextPicture" class="arrow-button" aria-label="الصورة التالية" ${selectedProbe===allProbes.length-1?'disabled':''}>←</button><div class="stimulus">${pictureMarkup(probe)}<p class="word">${escapeHTML(spokenWord(probe))}</p></div><button id="previousPicture" class="arrow-button" aria-label="الصورة السابقة" ${selectedProbe===0?'disabled':''}>→</button></div><div class="trial-fields"><fieldset class="scoring"><legend>كيف نطق الطفل الصوت؟</legend><div class="score-buttons">${Object.entries(RESULTS).map(([value,label])=>`<button type="button" id="${probe.id}-${value}" data-score="${value}" data-trial-id="${probe.id}" aria-pressed="${r.status===value}" class="score-button score-${value} ${r.status===value?'chosen':''}" ${target===null&&SCORED.includes(value)?'disabled':''}>${label}</button>`).join('')}</div></fieldset>${target===null?`<p class="notice" data-absent-note>${escapeHTML(probe.referenceNote)} الحرف المكتوب ليس هدفاً صوتياً موجوداً في هذا المرجع.</p>`:''}<div class="recorded-sound" ${hasError?'':'hidden'}><span>الصوت المسجل: <strong dir="auto">${escapeHTML(r.status==='omission'?'∅ — حذف':r.actual||'لم يُحدد بعد')}</strong></span>${r.status!=='omission'?`<button type="button" data-pick-actual="${probe.id}">اختيار الصوت / IPA</button>`:''}</div><fieldset><legend>طريقة الاستثارة</legend>${pillGroup(probe,'mode',MODES,r.mode||'naming')}</fieldset>${hasError?`<fieldset data-error-details><legend>القابلية للاستثارة بعد المحاولة</legend>${pillGroup(probe,'stimulability',STIM,r.stimulability||'')}</fieldset>`:''}<details class="reference-panel"><summary>الكلمة المستخدمة والنطق المرجعي السوري</summary><div class="compact-grid"><label>الكلمة المستخدمة<input data-trial="${probe.id}" data-prop="word" value="${escapeHTML(spokenWord(probe))}"></label><label>النطق المرجعي (IPA)<input data-trial="${probe.id}" data-prop="expected" dir="ltr" value="${escapeHTML(expectedWord(probe))}"></label></div><div class="reference-target"><span>الصوت المستهدف فعلياً: <strong dir="ltr">${escapeHTML(target||'غير محدد / غير موجود')}</strong></span><button type="button" data-pick-target="${probe.id}">تعديل الصوت المستهدف</button></div><p class="muted">${escapeHTML(probe.referenceNote)} تغيير الكلمة أو النطق يمسح النتيجة السابقة؛ اختر بعدها الصوت المستهدف من جديد.</p></details><div class="actions"><button type="button" data-note="${probe.id}" aria-controls="note-${probe.id}" aria-expanded="${expanded}" class="soft-button">${expanded?'إخفاء الملاحظة':'إضافة ملاحظة'}</button><button type="button" data-clear="${probe.id}" class="quiet-button">مسح التسجيل</button></div><div id="note-${probe.id}" class="note-panel" ${expanded?'':'hidden'}><label>ملاحظة / تفسير لهجي / التلميح المستخدم<textarea data-trial="${probe.id}" data-prop="note">${escapeHTML(r.note||'')}</textarea></label><details class="english-note"><summary>إضافة نسخة إنجليزية للملاحظة</summary><label lang="en" dir="ltr">English note<textarea data-trial="${probe.id}" data-prop="noteEn" dir="ltr">${escapeHTML(r.noteEn||'')}</textarea></label></details></div></div></section>`;
- wireImages($('trials'));$('previousPicture').onclick=()=>selectPicture(selectedProbe-1);$('nextPicture').onclick=()=>selectPicture(selectedProbe+1);updateCoverage();
-}
-function selectPicture(index){selectedProbe=Math.max(0,Math.min(allProbes.length-1,index));renderTrials();$('heading-'+allProbes[selectedProbe].id)?.focus();}
+function renderTrials() { renderWorkplace(); }
+function selectPicture(index){selectedProbe=Math.max(0,Math.min(allProbes.length-1,index));renderTrials();save();$('heading-'+allProbes[selectedProbe].id)?.focus();}
 function selectSound(index){const sound=SOUNDS[index];if(sound)selectPicture(allProbes.findIndex(p=>p.sound.id===sound.id));}
 function snapshotReference(id){const p=allProbes.find(p=>p.id===id),r=state.trials[id]||{};r.word=r.word||p.spoken||p.word;r.expected=expectedWord(p);r.targetIPA=expectedTarget(p);state.trials[id]=r;return r;}
 function recordScore(id,status){
@@ -132,7 +135,7 @@ function useSound(value,source='picker'){
  if(!soundPicker)return;
  const {id,prop,status}=soundPicker,probe=allProbes.find(p=>p.id===id);let r=state.trials[id]||{};
  if(prop==='targetIPA'){
-  const current=expectedTarget(probe);if(current!==value){
+  const current=expectedTarget(probe);if(current!==value){state.meta.referenceReviewed=false;
    const fullWord=expectedWord(probe);
    // Replace exact known IPA tokens, rather than letters within emphatic/affricate tokens.
    const tokens=PHONEMES.map(p=>p.ipa).sort((a,b)=>b.length-a.length);
@@ -152,6 +155,7 @@ function changeTrial(input){
  const p=allProbes.find(p=>p.id===id),current=trialFor(id);
  if(prop==='word'||prop==='expected'){
   const previous=prop==='word'?spokenWord(p):expectedWord(p);if(input.value.trim()===previous.trim())return;
+  state.meta.referenceReviewed=false;
   state.trials[id]={word:current.word||p.spoken,expected:prop==='word'?'':expectedWord(p),targetIPA:'',[prop]:input.value.trim()};
   // Keep the editor and the tapped control in place while invalidating the old judgment.
   const root=$('trials'),stimulus=root.querySelector('.stimulus');
@@ -168,24 +172,26 @@ document.addEventListener('input',event=>{
  const input=event.target;
  if(input.dataset.meta){state.meta[input.dataset.meta]=input.value;save();}
  if(input.dataset.date){state.meta[input.dataset.date]={...state.meta[input.dataset.date],[input.dataset.part]:input.value};save();}
- if(input.dataset.trial&&['note','noteEn'].includes(input.dataset.prop))changeTrial(input);
+ if(input.dataset.trial&&['note','noteEn','productionIPA'].includes(input.dataset.prop))changeTrial(input);
 });
 document.addEventListener('focusout',event=>{if(event.target.dataset.date)updateDates();});
 document.addEventListener('change',event=>{
  const input=event.target;
- if(input.dataset.trial&&!['note','noteEn'].includes(input.dataset.prop))changeTrial(input);
+ if(input.dataset.trial&&!['note','noteEn','productionIPA'].includes(input.dataset.prop))changeTrial(input);
+ if(input.id==='referenceReviewed'){state.meta.referenceReviewed=input.checked;save();}
+ if(input.id==='diagnosisReviewed'){state.meta.diagnosisReviewed=input.checked;save();}
  if(input.dataset.list){const key=input.dataset.list;state[key]=state[key].filter(v=>v!==input.value);if(input.checked)state[key].push(input.value);save();}
 });
 document.addEventListener('click',event=>{
  const button=event.target.closest('button');if(!button)return;
  if(button.dataset.page)showPage(button.dataset.page);
- if(button.dataset.sound!==undefined)selectSound(Number(button.dataset.sound));
+ if(button.dataset.sound!==undefined){selectSound(Number(button.dataset.sound));closeDialog($('soundNavDialog'));}
  if(button.dataset.score)recordScore(button.dataset.trialId,button.dataset.score);
  if(button.dataset.setting){const r=snapshotReference(button.dataset.trialId);r[button.dataset.setting]=button.dataset.value;save();renderTrials();}
  if(button.dataset.pickActual)openSoundPicker(button.dataset.pickActual,'actual');
  if(button.dataset.pickTarget)openSoundPicker(button.dataset.pickTarget,'targetIPA');
  if(button.dataset.phoneme!==undefined)useSound(PHONEMES[Number(button.dataset.phoneme)].ipa);
- if(button.dataset.note){const id=button.dataset.note,panel=$('note-'+id);panel.hidden=!panel.hidden;button.setAttribute('aria-expanded',String(!panel.hidden));button.textContent=panel.hidden?'إضافة ملاحظة':'إخفاء الملاحظة';if(panel.hidden)notePanels.delete(id);else{notePanels.add(id);panel.querySelector('textarea').focus();}}
+ if(button.dataset.note)openTrialNote(button.dataset.note);
  if(button.dataset.clear){const id=button.dataset.clear,current=trialFor(id);state.trials[id]={word:current.word,expected:current.expected,targetIPA:expectedTarget(allProbes.find(p=>p.id===id))};notePanels.delete(id);save();renderTrials();}
  if(button.dataset.picture){const p=allProbes.find(p=>p.id===button.dataset.picture);$('childPicture').innerHTML=pictureMarkup(p,true);wireImages($('childPicture'));openDialog($('pictureDialog'));}
 });
@@ -204,21 +210,17 @@ $('detailsForm').addEventListener('submit',e=>e.preventDefault());
 $('unansweredOnly').onchange=updateCoverage;
 
 $('closePicture').onclick=()=>closeDialog($('pictureDialog'));
-$('remember').onchange=()=>{saving=$('remember').checked;if(saving)save();else{try{localStorage.removeItem(KEY);$('saveStatus').textContent='حُذفت المسودة المحفوظة. يبقى التسجيل الحالي مفتوحاً.';}catch{$('saveStatus').textContent='تعذر حذف المسودة؛ امسح بيانات الموقع في المتصفح.';}}};
 $('newCase').onclick=()=>openDialog($('resetDialog'));$('cancelReset').onclick=()=>closeDialog($('resetDialog'));
-$('confirmReset').onclick=()=>{try{localStorage.removeItem(KEY);}catch{$('message').textContent='تعذر حذف المسودة؛ امسح بيانات الموقع قبل تسجيل حالة جديدة.';closeDialog($('resetDialog'));return;}state=freshState();saving=false;selectedSound=0;selectedProbe=0;notePanels.clear();$('unansweredOnly').checked=false;$('includeUntested').checked=false;$('saveStatus').textContent='الحفظ معطل افتراضياً.';$('message').textContent='';renderMeta();renderTrials();closeDialog($('resetDialog'));showPage('details');};
+$('confirmReset').onclick=startNewAssessment;
 
 $('reportButton').onclick=showReport;$('summaryReport').onclick=showReport;$('closeReport').onclick=()=>closeDialog($('reportDialog'));
 $('includeUntested').onchange=refreshReport;
 $('reportLanguage').onchange=refreshReport;
-$('exportText').onclick=()=>{
- const filename=(state.meta.childName||'Arabic-articulation').replace(/[<>:"/\\|?*\u0000-\u001f]/g,'_').slice(0,70)+'-'+reportLang()+'-screening.txt';
- downloadTextReport(reportText(),filename);
-};
 $('exportPdf').onclick=()=>{
- $('printArea').innerHTML=reportHTML();$('printArea').dir=reportLang()==='en'?'ltr':'rtl';$('printArea').lang=reportLang();
+ $('printArea').innerHTML=visibleReportHTML();$('printArea').dir=reportLang()==='en'?'ltr':'rtl';$('printArea').lang=reportLang();
  closeDropdowns();closeDialog($('reportDialog'));
- const original=document.title;document.title=(state.meta.childName||'Arabic articulation')+' - Screening';
+ const original=document.title;
+ const dates=comparisonSelection?comparisonSelection.map(id=>activeChild().assessments.find(item=>item.id===id)).map(caseDate).sort().join(' vs '):caseDate(reportRecord());
+ document.title=(activeChild()?.name||'Arabic articulation')+' - '+dates;
  const restore=()=>{document.title=original;window.removeEventListener('afterprint',restore);};window.addEventListener('afterprint',restore);window.print();
 };
-renderMeta();renderTrials();
