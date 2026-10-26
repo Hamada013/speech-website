@@ -1,0 +1,7 @@
+importScripts('./release.js');
+const CACHE='aphasia-shell-'+APHASIA_RELEASE.id,ROOT=new URL('./',self.location).href;
+async function digest(buffer){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',buffer))].map(b=>b.toString(16).padStart(2,'0')).join('');}
+self.addEventListener('install',event=>event.waitUntil((async()=>{const cache=await caches.open(CACHE);try{await Promise.all(APHASIA_RELEASE.files.map(async f=>{const url=new URL(f.url,ROOT).href,response=await fetch(url,{cache:'reload'});if(!response.ok||await digest(await response.clone().arrayBuffer())!==f.hash)throw Error('Incomplete aphasia release: '+f.url);await cache.put(url,response);}));}catch(e){await caches.delete(CACHE);throw e;}})()));
+self.addEventListener('message',event=>{if(event.data?.type==='ACTIVATE')self.skipWaiting();});
+self.addEventListener('activate',event=>event.waitUntil((async()=>{for(const key of await caches.keys())if(key.startsWith('aphasia-shell-')&&key!==CACHE)await caches.delete(key);await self.clients.claim();})()));
+self.addEventListener('fetch',event=>{if(event.request.method!=='GET'||!event.request.url.startsWith(ROOT))return;const url=new URL(event.request.url);if(url.origin!==self.location.origin)return;const rel=url.href.slice(ROOT.length).split('?')[0];if(!APHASIA_RELEASE.files.some(f=>f.url===rel)&&rel!==''&&rel!=='index.html')return;event.respondWith((async()=>{const cache=await caches.open(CACHE);return await cache.match(new URL(rel||'index.html',ROOT).href)||fetch(event.request);})());});

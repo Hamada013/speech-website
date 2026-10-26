@@ -290,7 +290,7 @@ function setReportLanguage(language) {
   if (language !== 'ar' && language !== 'en') return;
   reportLanguage = language;
   $('reportStatus').textContent = '';
-  updateReport();
+  updateReport({viewOnly:true});
 }
 
 function updateReportLanguageUI() {
@@ -386,13 +386,14 @@ function buildReport() {
     'النسب وصفية للبنود المسجلة في هذا النموذج وليست درجات معيارية. تُفسّر مع سياق التطبيق وملاحظات الفاحص.',
     'Percentages describe the items recorded in this form and are not standardized scores. Interpret them with the administration context and examiner observations.'
   ));
+  if(window.AphasiaApp){const extra=window.AphasiaApp.reportSupplement(lang);html.push(extra.html);text.push(extra.text);}
   text.push('', 'SLP. AHMAD GHANEM');
   html.push('<footer class="report-signature">SLP. AHMAD GHANEM</footer>');
   return { text: text.join('\n'), html: html.join('') };
 }
 
 
-function updateReport() {
+function updateReport(event) {
   updateReportLanguageUI();
   for (let sec = 1; sec <= 13; sec++) {
     const span = $('percent' + sec);
@@ -404,6 +405,7 @@ function updateReport() {
   const report = buildReport();
   $('report').value = report.text;
   $('reportPreview').innerHTML = report.html;
+  window.dispatchEvent(new CustomEvent('aphasia-changed',{detail:{viewOnly:!!event?.viewOnly||event?.target?.id==='includeUnanswered'}}));
 }
 
 function downloadReport() {
@@ -420,7 +422,7 @@ function downloadReport() {
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
-function preparePrint() { updateReportLanguageUI(); $('printArea').innerHTML = buildReport().html; }
+function preparePrint() { updateReportLanguageUI(); $('printArea').innerHTML = window.AphasiaApp?.currentDocument()?.html || buildReport().html; }
 function printReport() { updateReport(); preparePrint(); window.print(); }
 async function copyReport() {
   updateReport();
@@ -436,9 +438,9 @@ async function copyReport() {
 
 function openBox(content) {
   const box = $('floatingBox');
-  if (box.hidden) previousFocus = document.activeElement;
+  if (!box.open) previousFocus = document.activeElement;
   box.innerHTML = '<button type="button" class="btn-close" aria-label="إغلاق" onclick="closeBox()">×</button>' + content;
-  box.hidden = false;
+  if(!box.open) box.showModal();
   box.classList.add('show');
   document.body.classList.add('modal-open');
   box.querySelector('button').focus();
@@ -452,13 +454,13 @@ function showImage(src) {
   });
 }
 function closeBox() {
-  $('floatingBox').classList.remove('show'); $('floatingBox').hidden = true;
+  $('floatingBox').classList.remove('show'); $('floatingBox').close();
   document.body.classList.remove('modal-open');
   if (previousFocus?.isConnected) previousFocus.focus();
 }
 
 function initialize() {
-  document.querySelectorAll('button').forEach(button => { button.type = 'button'; });
+  document.querySelectorAll('button:not([type])').forEach(button => { button.type = 'button'; });
   for (let section = 0; section <= 13; section++) {
     const node = $('section' + section);
     if (!node) continue;
@@ -502,11 +504,11 @@ function initialize() {
     const comment = $(id + '-comment'); comment.addEventListener('input', updateReport);
     items.push({ id, group, section, observation, label, card, comment });
   });
-  document.querySelectorAll('input[id], textarea[id]').forEach(input => {
+  document.querySelectorAll('#assessmentStage input[id], #assessmentStage textarea[id], #assessmentStage select[id], #includeUnanswered').forEach(input => {
     if (input.id === 'report' || input.id.startsWith('note-') || input.id.startsWith('item-')) return;
     const label = input.closest('.card')?.querySelector('label');
     if (label) label.htmlFor = input.id;
-    input.addEventListener(input.type === 'checkbox' ? 'change' : 'input', updateReport);
+    input.addEventListener(input.type === 'checkbox' || input.tagName==='SELECT' ? 'change' : 'input', updateReport);
   });
   document.querySelectorAll('.btn-info,.btn-note,.btn-show').forEach(button => {
     const title = button.classList.contains('btn-note') ? 'ملاحظات القسم' : button.classList.contains('btn-show') ? 'عرض المثير' : 'تعليمات ومعلومات';
@@ -515,7 +517,7 @@ function initialize() {
   const date = new Date();
   if (!$('currentDate').value) $('currentDate').value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   document.addEventListener('keydown', event => {
-    if ($('floatingBox').hidden) return;
+    if (!$('floatingBox').open) return;
     if (event.key === 'Escape') closeBox();
     if (event.key === 'Tab') {
       const focusables = [...$('floatingBox').querySelectorAll('button,a[href],input,textarea,select,[tabindex="0"]')];

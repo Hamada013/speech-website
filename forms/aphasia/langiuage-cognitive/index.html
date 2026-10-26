@@ -2,50 +2,16 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f8fafc"><meta name="description" content="تقييم معرفي ولغوي وصفي، حالات محلية وتقارير ومتابعة تقدم."><meta name="apple-mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 <title>التقييم المعرفي واللغوي · أحمد غانم</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="assets/experience.css">
 </head>
 <body>
-<div class="container">
+<a class="skip-link" href="#appHome">الانتقال إلى المحتوى</a><header class="app-bar"><a class="app-brand" href="./"><img src="assets/icons/logo.webp" width="44" height="44" alt=""><span>التقييم المعرفي واللغوي</span></a><nav aria-label="أدوات التطبيق"><button data-action="home" data-icon="home" aria-label="الرئيسية"></button><button data-action="accounts" data-icon="people" aria-label="الحالات المحلية"></button><button data-action="sections" data-icon="menu" aria-label="أقسام التقييم"></button><button data-action="history" data-icon="report" aria-label="التقارير والمتابعة"></button><button data-action="install" data-icon="download" aria-label="تنزيل وتثبيت التطبيق"></button><button data-action="info" data-icon="info" aria-label="معلومات وحدود التقييم"></button></nav></header><p id="saveStatus" class="save-status" role="status" aria-live="polite"></p><p id="appError" class="app-error" role="alert" hidden></p>
+<main id="appHome" class="app-home" tabindex="-1"><img class="home-logo" src="assets/icons/logo.webp" width="124" height="124" alt=""><p class="eyebrow">مرحباً</p><h1>التقييم المعرفي واللغوي</h1><p class="muted" id="caseIdentity">حالاتك وفحوصاتك على هذا الجهاز</p><div class="home-actions"><button data-action="accounts"><span data-icon="people"></span><span>الحالات</span></button><button data-action="continue" id="continueAssessment"><span data-icon="play"></span><span>متابعة التقييم</span></button><button data-action="new" id="newAssessment"><span data-icon="plus"></span><span>تقييم جديد</span></button><button data-action="history" id="homeReports"><span data-icon="chart"></span><span>التقارير والمتابعة</span></button></div><div class="home-progress"><progress id="homeProgress" max="100" value="0"></progress><p id="homeProgressText" class="muted"></p></div><footer>SPEECH AND LANGUAGE PATHOLOGY<br><strong>Ahmad Ghanem</strong><br>Latakia - Syria<br><a href="mailto:slp.ahmadghanem@gmail.com">slp.ahmadghanem@gmail.com</a></footer></main>
+<main id="workView" class="container workplace" hidden><div class="workspace-heading"><button data-action="sections" data-icon="menu" aria-label="اختيار القسم"></button><div><h1 id="stageTitle"></h1><p id="stageProgress" class="muted"></p></div><button data-action="stage-info" data-icon="info" aria-label="معلومات القسم"></button><button data-action="stage-note" data-icon="note" aria-label="ملاحظة القسم"></button></div><span id="stageAnnouncement" class="sr-only" role="status" aria-live="polite"></span><div id="assessmentStage" class="assessment-stage">
 
     <!-- Title and Subtitle -->
-    <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-        
-        <!-- Titles -->
-        <div style="flex: 1; text-align: center;">
-            <h1 style="margin: 0; font-size: 2em;">تقييم معرفي - لغوي</h1>
-            <h2 style="margin: 5px 0 0; font-size: 1.2em; font-weight: normal;">
-                أداة تقييم الأداء لمرضى الإصابات العصبية
-            </h2>
-        </div>
-
-<!-- Info button on far right, fixed size -->
-<button class="btn-info" 
-    style="flex-shrink: 0; width: 40px; height: 40px; font-size: 20px; margin-left: 10px; cursor: pointer;"
-    onclick="showInfo(`
-         أداة تقييم الأداء لمرضى الإصابات العصبية<p> وتشمل الجوانب التالية: </p>
-        <ol style='margin-top:10px; padding-left:25px; line-height:2;'>
-            <li>التوجه والوعي</li>
-            <li>الفهم السمعي</li>
-            <li>الأسئلة الفكرية المعقدة</li>
-            <li>حل المشكلات</li>
-            <li>التسمية</li>
-            <li>تكرار الجمل</li>
-            <li>المنطق والاستدلال والفهم</li>
-            <li>تنظيم الأفكار</li>
-            <li>القراءة والكتابة</li>
-            <li>الحساب</li>
-            <li>البراغماتية</li>
-            <li>الذاكرة</li>
-            <li>خصائص الكلام</li>
-        </ol>
-    `)">
-    ؟
-</button>
-
-    <nav class="form-nav" id="sectionButtons" aria-label="أقسام التقييم"></nav>
-    </header>
 
 <!-- القسم 0 – البيانات الشخصية والطبية -->
 <section id="section0">
@@ -2387,35 +2353,24 @@
 
 </section>
 
+<section id="aphasiaProfile"><h2>الملف اللغوي السريري</h2><p class="assessment-help">قدّر المجالات من عينة لغة وظيفية وفحص سريري. لا تُحوّل النسب في هذا النموذج إلى حدود تشخيصية.</p><div class="card-row"><div class="card"><label for="profileFluency">طلاقة الكلام العفوي</label><select id="profileFluency"><option value="">غير محدد</option><option value="fluent">طليق</option><option value="nonfluent">غير طليق</option><option value="mixed">مختلط / متباين</option></select></div><div class="card"><label for="profileComprehension">الفهم السمعي السريري</label><select id="profileComprehension"><option value="">غير محدد</option><option value="preserved">محفوظ نسبياً</option><option value="impaired">متأثر</option><option value="mixed">مختلط / متباين</option></select></div><div class="card"><label for="profileRepetition">التكرار السريري</label><select id="profileRepetition"><option value="">غير محدد</option><option value="preserved">محفوظ نسبياً</option><option value="impaired">متأثر</option><option value="mixed">مختلط / متباين</option></select></div><div class="card"><label for="profileNaming">التسمية السريرية</label><select id="profileNaming"><option value="">غير محدد</option><option value="preserved">محفوظة نسبياً</option><option value="impaired">متأثرة</option><option value="mixed">مختلطة / متباينة</option></select></div><div class="card"><label for="profileConfounds">اللغة والسمع والرؤية والكلام الحركي والإدراك</label><select id="profileConfounds"><option value="">غير محدد</option><option value="considered">نوقشت العوامل المؤثرة سريرياً</option><option value="unresolved">توجد عوامل غير محسومة</option></select></div></div><p id="profileSuggestion" role="status"></p><label class="review-check"><input id="profileReviewed" type="checkbox"> راجعت الملف والاقتراح؛ التشخيص النهائي مسؤولية الفاحص</label><p class="assessment-help">الأنماط احتمالات وصفية وليست تشخيصاً مؤكداً. قد تتداخل الأنماط وتتغير مع الوقت. الحبسة لا تعني تلقائياً ضعف الإدراك.</p></section>
 <section id="clinicalSummary" aria-labelledby="summaryTitle">
 <h2 id="summaryTitle">الخلاصة السريرية وخطة المتابعة</h2>
 <label for="clinicalImpression">انطباع الفاحص والقدرات والصعوبات الملحوظة</label><textarea id="clinicalImpression" rows="4"></textarea>
 <label for="recommendations">التوصيات والأهداف وخطة المتابعة</label><textarea id="recommendations" rows="4"></textarea>
 </section>
 <!-- التقرير النهائي -->
-<section id="reportSection" aria-labelledby="reportTitle">
-  <h2 id="reportTitle" data-report-ar="التقرير النهائي" data-report-en="Final report">التقرير النهائي</h2>
-  <div class="report-language" role="group" aria-label="لغة التقرير / Report language">
-    <button type="button" class="action secondary" data-report-language="ar" aria-pressed="true" onclick="setReportLanguage('ar')">العربية</button>
-    <button type="button" class="action secondary" data-report-language="en" aria-pressed="false" onclick="setReportLanguage('en')">English</button>
-  </div>
-  <p class="assessment-help" data-report-ar="لغة التقرير فقط. تبقى بيانات الحالة والملاحظات والاستجابات كما أدخلتها." data-report-en="Report language only. Patient details, notes and responses remain as entered.">لغة التقرير فقط. تبقى بيانات الحالة والملاحظات والاستجابات كما أدخلتها.</p>
-  <div class="report-options"><label><input id="includeUnanswered" type="checkbox"> <span data-report-ar="إظهار البنود التي لم تُقيّم في تفاصيل التقرير" data-report-en="Include unassessed items in report details">إظهار البنود التي لم تُقيّم في تفاصيل التقرير</span></label></div>
-  <div class="report-actions">
-    <button type="button" class="action" data-report-ar="تنزيل التقرير النصي" data-report-en="Download English text report" onclick="downloadReport()">تنزيل التقرير النصي</button>
-    <button type="button" class="action" data-report-ar="طباعة / حفظ PDF" data-report-en="Print / Save PDF" onclick="printReport()">طباعة / حفظ PDF</button>
-    <button type="button" class="action secondary" data-report-ar="نسخ التقرير" data-report-en="Copy report" onclick="copyReport()">نسخ التقرير</button>
-  </div>
-  <p id="reportStatus" role="status" aria-live="polite"></p>
-  <div id="reportPreview" class="report-document" aria-label="معاينة التقرير"></div>
-  <details><summary data-report-ar="عرض النسخة النصية" data-report-en="View text version">عرض النسخة النصية</summary><textarea id="report" readonly aria-label="التقرير النصي"></textarea></details>
-</section>
 
-</div>
-
-<div class="floating-box" id="floatingBox" role="dialog" aria-modal="true" aria-label="معلومات التقييم" hidden></div>
+</div><div class="workspace-navigation"><button data-action="previous" data-icon="back" aria-label="البند السابق"></button><span id="itemPosition" aria-live="polite"></span><button data-action="next" data-icon="arrow" aria-label="البند التالي"></button></div></main>
+<main id="reportView" class="report-view" hidden><div class="report-toolbar"><button data-action="history" data-icon="back" aria-label="عودة إلى تقارير الحالة"></button><h1 id="reportHeading">التقرير</h1><button id="reportLanguage" data-action="report-language" data-icon="language" aria-label="تقرير باللغة الإنجليزية" aria-pressed="false"></button><button data-action="print" data-icon="print" aria-label="طباعة وحفظ PDF"></button><button data-action="copy" data-icon="copy" aria-label="نسخ التقرير"></button><button data-action="share" data-icon="share" aria-label="إرسال إلى المصنف"></button></div><p id="reportStatus" role="status"></p><label class="report-options"><input id="includeUnanswered" type="checkbox" checked> إظهار البنود التي لم تُقيّم</label><div id="reportPreview" class="report-document"></div><details hidden><summary>النص</summary><textarea id="report" readonly></textarea></details></main>
+<dialog id="accountsDialog" aria-labelledby="accountsTitle"><div class="dialog-heading"><h2 id="accountsTitle">الحالات على الجهاز</h2><button data-close data-icon="close" aria-label="إغلاق"></button></div><form id="createCaseForm"><label for="caseName">اسم الحالة</label><div class="input-action"><input id="caseName" maxlength="200" required autocomplete="off"><button type="submit" data-icon="plus" aria-label="إنشاء حالة"></button></div></form><label for="caseSearch">بحث</label><input id="caseSearch" type="search"><div id="caseList" class="case-list"></div><div class="dialog-actions"><button data-action="backup" data-icon="download" aria-label="نسخة احتياطية لكل الحالات"></button><label class="icon-button" title="استعادة نسخة احتياطية"><span data-icon="upload"></span><span class="sr-only">استعادة نسخة احتياطية</span><input id="restoreBackup" type="file" accept="application/json" hidden></label></div></dialog>
+<dialog id="sectionsDialog" aria-labelledby="sectionsTitle"><div class="dialog-heading"><h2 id="sectionsTitle">أقسام التقييم</h2><button data-close data-icon="close" aria-label="إغلاق"></button></div><nav id="sectionButtons" class="section-list" aria-label="أقسام التقييم"></nav></dialog>
+<dialog id="historyDialog" aria-labelledby="historyTitle"><div class="dialog-heading"><h2 id="historyTitle">تقارير الحالة</h2><button data-close data-icon="close" aria-label="إغلاق"></button></div><div id="historyProgress"></div><p class="muted">اختر تقريرين للمقارنة؛ التقرير التاريخي لا يبدّل الفحص الجاري.</p><div id="historyList"></div><div class="dialog-actions"><button data-action="compare" data-icon="compare" aria-label="مقارنة التقريرين المحددين"></button><button data-action="new" data-icon="plus" aria-label="تقييم جديد"></button></div></dialog>
+<dialog id="confirmDialog" aria-labelledby="confirmTitle"><h2 id="confirmTitle"></h2><p id="confirmText"></p><div class="dialog-actions"><button id="confirmYes" class="text-button">تأكيد</button><button data-close class="text-button">إلغاء</button></div></dialog>
+<dialog id="shareDialog" aria-labelledby="shareTitle"><div class="dialog-heading"><h2 id="shareTitle">المصنف المرتبط</h2><button data-close data-icon="close" aria-label="إغلاق"></button></div><p>الإرسال اختياري. تُرسل الفحوصات المسجلة للحالة المحددة فقط.</p><label><input id="shareConsent" type="checkbox"> أوافق على إرسال بيانات هذه الحالة إلى مصنفي</label><label><input id="shareIdentifiers" type="checkbox"> تضمين الاسم والبيانات التعريفية</label><div class="dialog-actions"><a id="openWorkbook" class="icon-button" target="_blank" rel="noopener" aria-label="فتح Google Sheets"><span data-icon="sheet"></span></a><button data-action="send-sheet" data-icon="upload" aria-label="إرسال الحالة إلى Google Sheets"></button><button data-action="export-case" data-icon="download" aria-label="تصدير بيانات الحالة JSON"></button></div><p id="sheetStatus" role="status" aria-live="polite"></p></dialog>
+<dialog class="floating-box" id="floatingBox" aria-label="معلومات التقييم"></dialog>
 <div id="printArea" class="report-document" lang="ar" dir="rtl"></div>
 
-<script src="script.js"></script>
+<script src="assets/model.js"></script><script src="assets/icons.js"></script><script src="script.js"></script><script src="assets/app.js"></script><script src="assets/pwa.js"></script>
 </body>
 </html>
