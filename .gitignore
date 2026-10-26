@@ -6,3 +6,7 @@ node_modules/
 
 # macOS folder metadata.
 .DS_Store
+
+# Generated screenshots, test reports and local assistant settings.
+/tmp/
+/.kilo/

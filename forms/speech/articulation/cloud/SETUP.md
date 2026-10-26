@@ -1,10 +1,10 @@
 # Activate Google sign-in, private syncing and shared research uploads
 
-The app works offline without Google. After its welcome animation it offers an optional Google dialog with a skip arrow. The home cloud icon reopens it. `config.json` is deliberately empty: there is no Firebase project connected yet. A GitHub Pages push alone cannot create Google authentication credentials or authorize a server to edit your private spreadsheet.
+The app works offline without Google. After its welcome animation it offers an optional Google dialog with a skip arrow. The home cloud icon reopens it. `config.json` contains the public Web app configuration for project `speech-apps-5d3b0`; authentication settings, Firestore rules and real-device syncing still need verification. The research endpoint is empty pending collector deployment. A GitHub Pages push alone cannot enable Google authentication or authorize a server to edit your private spreadsheet.
 
-## 1. Create your Firebase project
+## 1. Complete Firebase project setup
 
-1. Open https://console.firebase.google.com/ and create a project you own. Register a **Web app**. Copy its public `apiKey`, `authDomain`, `projectId` and `appId` into `cloud/config.json` → `firebase`. These are public app configuration, not server credentials.
+1. Open https://console.firebase.google.com/ and select **speech-apps-5d3b0**. Its registered **Web app** configuration is already in `cloud/config.json` → `firebase`. These are public app configuration, not server credentials. The measurement ID does not enable Analytics; the app does not load the Analytics SDK.
 2. Under **Authentication → Sign-in method**, enable **Google** (choose your support email) and **Anonymous**. Anonymous authentication lets the research button work without asking guests to sign in. Guest cases stay local; only explicit research sharing uses the guest identity.
 3. Under **Authentication → Settings → Authorized domains**, add the published host (for example `hamada013.github.io`), plus `localhost` and `127.0.0.1` for previews if accepted by the console. Keep the project's Firebase auth domain. The Google provider creates the OAuth integration; no separate client ID is required in `research/google-link.json` for this route.
 4. Create a **Cloud Firestore** database in production mode. Choose an appropriate region, such as `europe-west1`. Deploy the supplied rules before using it. Each Google user can access only their own `/users/<uid>/records/` documents. Research collection and locks are server-only.
@@ -18,8 +18,7 @@ From this directory (`forms/speech/articulation/cloud`):
 ```sh
 npm install --prefix functions
 npx firebase-tools login
-npx firebase-tools use --add
-npx firebase-tools deploy --only firestore:rules,functions:submitResearch
+npx firebase-tools deploy --project speech-apps-5d3b0 --only firestore:rules,functions:submitResearch
 ```
 
 At deployment, set:

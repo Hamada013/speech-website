@@ -42,6 +42,16 @@ The existing Google workbook must be writable by the selected account. The app u
 
 ## Research definitions
 
+### Live Google Sheets dashboard
+
+The linked workbook opens with **Dashboard**, followed by **Age_groups** and **Children**. The age table uses six-month intervals: **1.5–2.0**, **2.0–2.5**, and so on through **11.5–12.0** years, with separate under-1.5, 12+ and unknown-age rows. Lower bounds are inclusive and upper bounds exclusive; 1.5–2.0 means 18–23 completed months.
+
+These views calculate directly from `Case_info` and update after supported imports/uploads, without copying formulas or rebuilding charts. They support the collector's existing capacity of 2,000 assessments. Each child is identified by source account plus participant code (child ID if the code is blank). The earliest dated shared assessment supplies that child's age and baseline results; creation time and assessment ID resolve ties. Unknown dates sort after dated assessments. Follow-up visits remain in the overall assessment count and the detailed `Results` phoneme tables, but do not duplicate children in age charts.
+
+`Age_groups` shows child counts, children with scored items, correct/error totals, pooled target accuracy and result bars. Accuracy includes all elicitation methods and is blank when there are no scored items. The phoneme chart separately shows independent naming with reviewed references across all shared visits. These are descriptive observations, not age norms. A name appears in `Children` only if identifiers were explicitly included in the export.
+
+Chart recalculation does not activate data delivery: Firebase personal syncing uses Firestore. The JSON import or an authorized Sheets upload route must deliver records to this workbook first. The one-time native dashboard request builder is `../scripts/research-dashboard.cjs`; it preserves raw-data columns and existing importers.
+
 - `Case_info`: one row per assessment; age in completed months, language/dialect, region, sampling source, consent and clinician review are explicit. Name/DOB are optional in the share dialog. Free-text clinical notes are retained as entered and can still contain identifying content.
 - `Findings`: every assessment's 84 probes, including unrecorded items, actual reference IPA, whole-word IPA when entered, target-level replacement, elicitation method, modified references and notes. Missing observations are not scored as zero accuracy.
 - `Results`: live counts, outcome pie, age distribution and phoneme results. Assisted productions remain distinguishable from independent naming. The phoneme accuracy table includes independent naming with a clinician-reviewed reference only.

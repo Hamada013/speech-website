@@ -1,4 +1,12 @@
 {
-  "firebase": {"apiKey":"","authDomain":"","projectId":"","appId":""},
+  "firebase": {
+    "apiKey": "AIzaSyAV_jjN7yRdVdLWkwNtDEpcFK3on5KkBPA",
+    "authDomain": "speech-apps-5d3b0.firebaseapp.com",
+    "projectId": "speech-apps-5d3b0",
+    "storageBucket": "speech-apps-5d3b0.firebasestorage.app",
+    "messagingSenderId": "1016342452142",
+    "appId": "1:1016342452142:web:3211b347d1ec2f2cd95a3f",
+    "measurementId": "G-2EG015ZH0D"
+  },
   "researchEndpoint":""
 }

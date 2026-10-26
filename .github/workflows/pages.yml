@@ -34,6 +34,8 @@ jobs:
           fi
       - name: Rebuild app catalogs and prepare the complete website
         run: node tools/shared/build-pwa-releases.cjs --site
+      - name: Verify main website directories
+        run: node tests/site.test.cjs
       - name: Verify accounts and app integrity
         run: |
           node tools/VSS/tests/static.cjs

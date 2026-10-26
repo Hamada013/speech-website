@@ -1,0 +1,20 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process');
+const root=path.resolve(__dirname,'..'),pages=require('../scripts/site-pages.cjs');
+cp.execFileSync(process.execPath,[path.join(root,'scripts/build-site.cjs'),'--check'],{stdio:'inherit'});
+const symbols=new Set([...fs.readFileSync(path.join(root,'assets/site/icons.svg'),'utf8').matchAll(/<symbol id="([^"]+)"/g)].map(m=>m[1]));
+for(const page of pages){
+ const html=fs.readFileSync(path.join(root,page.path),'utf8');
+ assert(!/\.gif|cdn\.tailwindcss|fonts\.googleapis|<audio|onerror=/.test(html),page.path+' must use local, static presentation');
+ assert.equal((html.match(/aria-current="page"/g)||[]).length,1,page.path+' active navigation');
+ for(const match of html.matchAll(/(?:href|src)="([^"]+)"/g)){
+  const value=match[1];if(/^(?:https?:|mailto:|tel:|#)/.test(value))continue;
+  const [file,fragment]=value.split('#'),resolved=path.resolve(root,path.dirname(page.path),decodeURIComponent(file.split('?')[0]));
+  assert(resolved.startsWith(root+path.sep),page.path+' escaped site root');
+  assert(fs.existsSync(resolved),page.path+' missing local target '+value);
+  if(file.endsWith('icons.svg'))assert(symbols.has(fragment),'Unknown icon '+fragment);
+ }
+ for(const section of page.sections)for(const card of section.cards){assert(symbols.has(card.icon),'Card icon '+card.icon);assert(card.ar&&card.arDescription,'Bilingual card required');}
+}
+assert.deepEqual(fs.readFileSync(path.join(root,'assets/site/brand/logo.webp')),fs.readFileSync(path.join(root,'tools/VSS/voc/images/logo.webp')),'Main site uses the VOC artwork');
+console.log('PASS: 12 consistent directories, nested local links, bilingual content, all SVG symbols, no GIF/CDN/audio effects, matching VOC logo.');
