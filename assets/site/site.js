@@ -28,9 +28,6 @@
  document.querySelectorAll('[data-open-dialog]').forEach(button=>button.addEventListener('click',()=>{closeMenu();$('#'+button.dataset.openDialog+'-dialog').showModal();}));
  document.querySelectorAll('[data-close-dialog]').forEach(button=>button.addEventListener('click',()=>button.closest('dialog').close()));
  document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();}}));
- document.querySelectorAll('[data-protected-forms]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();closeMenu();$('#forms-error').hidden=true;$('#forms-code').value='';$('#forms-dialog').showModal();}));
- const access=$('#forms-access');
- if(access)access.addEventListener('submit',event=>{event.preventDefault();const code=$('#forms-code');if(code.value==='13')location.href=access.action;else{$('#forms-error').hidden=false;code.value='';code.focus();}});
  if(search)search.addEventListener('input',filter);
  document.addEventListener('keydown',event=>{if(event.key==='Escape'){const wasOpen=menu.classList.contains('is-open');closeMenu();if(wasOpen)menuToggle.focus();}if(event.key==='/'&&search&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&!event.target.matches('input,textarea,[contenteditable]')){event.preventDefault();search.focus();}});
  renderLanguage();

@@ -17,7 +17,7 @@ node tests/site.test.cjs
 SITE_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node tests/site-browser.cjs
 ```
 
-The generator edits only the twelve paths declared in `site-pages.cjs`. It never traverses or builds apps. A directory entry whose destination has not been supplied is rendered as a non-link “Coming soon” card. AOS language selection continues into its assessment through the `lang` query parameter. The homepage's existing access-code prompt remains a navigation convenience; it is not server authentication.
+The generator edits only the twelve paths declared in `site-pages.cjs`. It never traverses or builds apps. A directory entry whose destination has not been supplied is rendered as a non-link “Coming soon” card. AOS language selection continues into its assessment through the `lang` query parameter. Forms links open the directory directly without an access-code prompt.
 
 Generated site artifacts and app-test screenshots belong in ignored `output/` and `tmp/` folders. Unreferenced GIFs, old homepage effects and obsolete root assets were removed; media inside apps is outside this cleanup's scope. Do not move app directories to reorganize the main website.
 
