@@ -317,81 +317,74 @@ function summaryText(s, observation = false, lang = 'ar') {
   return `الدقة: ${s.percent === null ? 'لم يُقيّم' : s.percent + '%'} (${s.correct}/${s.assessed})؛ مُقيّم: ${s.assessed} من ${s.total}؛ غير صحيح: ${s.incorrect}؛ لا يعرف / لم يستجب: ${s.dontknow}؛ مستبعد: ${s.skipped}؛ لم يُقيّم: ${s.unanswered}`;
 }
 
-function buildReport() {
-  const lang = reportLanguage;
-  const sections = lang === 'en' ? reportEnglishSections : sectionTitles;
-  const subsections = lang === 'en' ? reportEnglishSubsections : subsectionTitles;
-  const statuses = lang === 'en' ? reportEnglishStatuses : statusTitles;
-  const fields = lang === 'en' ? reportEnglishPatientFields : patientFields;
-  const title = rt('تقرير التقييم المعرفي واللغوي', 'Language and Cognitive Assessment Report');
-  const author = rt('أحمد غانم · اختصاص النطق واللغة', 'Ahmad Ghanem · Speech and Language Pathology');
-  const text = [title, author, ''];
-  const html = [`<header class="report-heading"><p>${author}</p><h1>${title}</h1></header>`];
-  const paragraph = (label, value) => {
-    const content = value || rt('غير مسجل', 'Not recorded');
-    text.push(`${label}: ${content}`);
-    html.push(`<p><strong>${escapeHTML(label)}:</strong> <bdi dir="auto">${escapeHTML(content)}</bdi></p>`);
-  };
-  const heading = value => { text.push('', value); html.push(`<h2>${escapeHTML(value)}</h2>`); };
-  heading(sections[0]);
-  Object.entries(fields).forEach(([id, label]) => paragraph(label, $(id).value.trim()));
-  if (notes[0]) paragraph(rt('ملاحظات البيانات الشخصية والطبية', 'Personal and medical information notes'), notes[0]);
-  heading(rt('سياق التقييم', 'Assessment context'));
-  paragraph(rt('اللغة / اللهجة والخلفية التعليمية', 'Language / dialect and educational background'), $('languageContext').value.trim());
-  paragraph(rt('ظروف التطبيق والدعم المستخدم', 'Administration conditions and support used'), $('assessmentConditions').value.trim());
-  paragraph(rt('طريقة عرض النتائج', 'Scoring method'), rt(
-    'الدقة = الإجابات الصحيحة ÷ البنود المُقيّمة. الإجابة غير الصحيحة وعدم معرفة الإجابة / عدم الاستجابة تُحسب ضمن البنود المُقيّمة. البنود المستبعدة والتي لم تُقيّم لا تدخل في المقام. الملاحظات السلوكية والصوتية وصفية.',
-    'Accuracy = correct responses divided by assessed items. Incorrect responses and does not know / no response are assessed items. Excluded and unassessed items are not included in the denominator. Behavioral and voice observations are descriptive.'
-  ));
-  if (lang === 'en') paragraph('Report language', 'Fixed headings and item descriptions are translated from the Arabic form. Patient details, clinician notes and recorded responses remain as entered; prompts were not changed by this report-language selection.');
-  const performance = items.filter(item => !item.observation);
-  heading(rt('ملخص الأداء', 'Performance summary'));
-  paragraph(rt('إجمالي البنود الأدائية', 'All performance items'), summaryText(summarize(performance), false, lang));
-  const columns = lang === 'en' ? ['Domain', 'Correct / assessed', 'Accuracy', 'Excluded', 'Not assessed'] : ['المجال', 'صحيح / مُقيّم', 'الدقة', 'مستبعد', 'لم يُقيّم'];
-  html.push('<table class="report-table"><thead><tr>' + columns.map(column => `<th scope="col">${column}</th>`).join('') + '</tr></thead><tbody>');
-  for (let sec = 1; sec <= 13; sec++) {
-    const list = performance.filter(item => item.section === sec);
-    if (!list.length) continue;
-    const s = summarize(list);
-    const domain = sec === 13 ? subsections['13sub2'] : sections[sec];
-    text.push(`${domain}: ${summaryText(s, false, lang)}`);
-    html.push(`<tr><th scope="row">${escapeHTML(domain)}</th><td>${s.correct} / ${s.assessed}</td><td>${s.percent === null ? rt('لم يُقيّم', 'Not assessed') : s.percent + '%'}</td><td>${s.skipped}</td><td>${s.unanswered}</td></tr>`);
-  }
-  html.push('</tbody></table>');
-  heading(rt('الخلاصة السريرية وخطة المتابعة', 'Clinical summary and follow-up plan'));
-  paragraph(rt('انطباع الفاحص', 'Examiner impression'), $('clinicalImpression').value.trim());
-  paragraph(rt('التوصيات والأهداف وخطة المتابعة', 'Recommendations, goals and follow-up plan'), $('recommendations').value.trim());
-  for (let sec = 1; sec <= 13; sec++) {
-    heading(`${sec}. ${sections[sec]}`);
-    if (notes[sec]) paragraph(rt('ملاحظات القسم', 'Section notes'), notes[sec]);
-    const groups = [...new Set(items.filter(item => item.section === sec).map(item => item.group))];
-    for (const group of groups) {
-      const list = items.filter(item => item.group === group);
-      paragraph(subsections[group] || sections[sec], summaryText(summarize(list), list[0].observation, lang));
-      const visible = list.filter(item => responses.has(item.id) || item.comment.value.trim() || $('includeUnanswered').checked);
-      if (!visible.length) continue;
-      html.push('<ul class="report-items">');
-      visible.forEach(item => {
-        const result = statuses[responses.get(item.id) || 'unanswered'];
-        const label = lang === 'en' ? reportEnglishItems[item.label] || item.label : item.label;
-        const comment = item.comment.value.trim();
-        text.push(`  • ${label}: ${result}${comment ? ' — ' + comment : ''}`);
-        html.push(`<li><span>${escapeHTML(label)}</span> — <strong>${result}</strong>${comment ? `<p class="item-comment">${rt('الاستجابة / الملاحظة', 'Response / note')}: <bdi dir="auto">${escapeHTML(comment)}</bdi></p>` : ''}</li>`);
-      });
-      html.push('</ul>');
-    }
-  }
-  heading(rt('توضيح', 'Interpretation note'));
-  paragraph(rt('نوع النتائج', 'Type of results'), rt(
-    'النسب وصفية للبنود المسجلة في هذا النموذج وليست درجات معيارية. تُفسّر مع سياق التطبيق وملاحظات الفاحص.',
-    'Percentages describe the items recorded in this form and are not standardized scores. Interpret them with the administration context and examiner observations.'
-  ));
-  if(window.AphasiaApp){const extra=window.AphasiaApp.reportSupplement(lang);html.push(extra.html);text.push(extra.text);}
-  text.push('', 'SLP. AHMAD GHANEM');
-  html.push('<footer class="report-signature">SLP. AHMAD GHANEM</footer>');
-  return { text: text.join('\n'), html: html.join('') };
+// The report summarizes each scoring subgroup; item records remain in the case workspace.
+function reportGroupTitle(group, section, lang) {
+  return (lang === 'en' ? reportEnglishSubsections : subsectionTitles)[group] ||
+    (lang === 'en' ? reportEnglishSections : sectionTitles)[section];
 }
-
+function reportResultBar(s, lang, variant = '') {
+  const en = lang === 'en', percent = s.percent === null ? null : Math.round(s.percent * 100);
+  const value = percent === null ? (en ? 'Not assessed' : 'لم يُقيّم') : percent + '%';
+  const count = en ? `${s.correct} correct / ${s.assessed} evaluated` : `${s.correct} صحيح / ${s.assessed} مُقيّم`;
+  return `<div class="subgroup-result ${variant}" data-correct="${s.correct}" data-assessed="${s.assessed}"><div class="result-caption"><strong>${value}</strong><span>${count}</span></div><div class="subgroup-track" role="img" aria-label="${escapeHTML(value + ' · ' + count)}"><span style="width:${percent === null ? 0 : s.percent * 100}%"></span></div></div>`;
+}
+function reportSubgroupCharts(state, lang) {
+  const groups = AphasiaModel.groupSummaries(items, state), en = lang === 'en';
+  let html = '<div class="subgroup-domains">'; const text = [];
+  for (let section = 1; section <= 13; section++) {
+    const list = groups.filter(g => g.section === section); if (!list.length) continue;
+    const title = (en ? reportEnglishSections : sectionTitles)[section];
+    html += `<section class="report-domain"><h2>${escapeHTML(title)}</h2><div class="subgroup-grid">`; text.push('', title);
+    for (const g of list) {
+      const name = reportGroupTitle(g.group, section, lang);
+      html += `<article class="subgroup-card" data-group="${g.group}"><h3>${escapeHTML(name)}</h3>`;
+      if (g.observation) {
+        const description = en ? `Present: ${g.present} · Not observed: ${g.absent} · Documented: ${g.assessed}/${g.total}` : `موجود: ${g.present} · غير ملاحظ: ${g.absent} · موثق: ${g.assessed}/${g.total}`;
+        html += `<p class="observation-result">${description}</p><small>${en ? 'Descriptive observations; no accuracy percentage.' : 'ملاحظات وصفية؛ لا تُحسب كنسبة إجابات صحيحة.'}</small>`;
+        text.push(name + ': ' + description);
+      } else {
+        html += reportResultBar(g, lang);
+        text.push(`${name}: ${g.percent === null ? (en ? 'Not assessed' : 'لم يُقيّم') : Math.round(g.percent * 100) + '%'} (${g.correct}/${g.assessed})`);
+      }
+      const coverage = en ? `Evaluated ${g.assessed}/${g.total} · Excluded ${g.skipped} · Unassessed ${g.unanswered}` : `مُقيّم ${g.assessed}/${g.total} · مستبعد ${g.skipped} · لم يُقيّم ${g.unanswered}`;
+      html += `<p class="subgroup-coverage">${coverage}</p></article>`; text.push(coverage);
+    }
+    html += '</div></section>';
+  }
+  return {html: html + '</div>', text: text.join('\n')};
+}
+function buildReport() {
+  const lang = reportLanguage, en = lang === 'en', t = (ar, eng) => en ? eng : ar;
+  const fields = en ? reportEnglishPatientFields : patientFields;
+  const state = {responses: Object.fromEntries(responses)}, total = AphasiaModel.summarize(items, state);
+  const percent = total.percent === null ? null : Math.round(total.percent * 100);
+  const title = t('تقرير التقييم المعرفي واللغوي', 'Language and Cognitive Assessment Report');
+  const author = t('أحمد غانم · اختصاص النطق واللغة', 'Ahmad Ghanem · Speech and Language Pathology');
+  const text = [title, author, ''], html = [`<header class="report-heading"><p>${author}</p><h1>${title}</h1></header>`];
+  function paragraph(label, value) {if (!value) return; text.push(`${label}: ${value}`); html.push(`<p><strong>${escapeHTML(label)}:</strong> <bdi dir="auto">${escapeHTML(value)}</bdi></p>`);}
+  html.push('<div class="report-identity">');
+  for (const key of ['name', 'age', 'currentDate', 'medicalDiagnosis', 'examinerName']) paragraph(fields[key], $(key).value.trim());
+  html.push('</div>');
+  html.push(`<div class="report-overview"><div class="accuracy-ring" role="img" aria-label="${percent === null ? t('لم يُقيّم', 'Not assessed') : percent + '%'}"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="ring-background" cx="60" cy="60" r="50"/><circle class="ring-value" cx="60" cy="60" r="50" pathLength="100" stroke-dasharray="${percent === null ? 0 : total.percent * 100} 100" transform="rotate(-90 60 60)"/></svg><strong>${percent === null ? '—' : percent + '%'}</strong></div><div><h2>${t('ملخص الأداء', 'Performance summary')}</h2><p>${total.correct} ${t('صحيح من', 'correct out of')} ${total.assessed} ${t('بنداً مُقيّماً', 'evaluated tasks')}</p><p class="muted">${t('مُقيّم', 'Evaluated')} ${total.assessed}/${total.total} · ${t('مستبعد', 'Excluded')} ${total.skipped} · ${t('لم يُقيّم', 'Unassessed')} ${total.unanswered}</p></div></div>`);
+  text.push(`${t('الدقة الإجمالية', 'Overall accuracy')}: ${percent === null ? t('لم يُقيّم', 'Not assessed') : percent + '%'} (${total.correct}/${total.assessed})`);
+  paragraph(t('طريقة الحساب', 'Calculation'), t('النسبة = عدد الإجابات الصحيحة ÷ عدد البنود المُقيّمة × ١٠٠. تشمل البنود المُقيّمة الإجابة غير الصحيحة وعدم المعرفة / عدم الاستجابة؛ يُستبعد غير المطبق وغير المُقيّم. النسب وصفية وليست درجات معيارية.', 'Percentage = correct tasks ÷ evaluated tasks × 100. Incorrect and does not know / no response count as evaluated. Excluded and unassessed tasks do not enter the denominator. Results are descriptive, not standardized scores.'));
+  const charts = reportSubgroupCharts(state, lang); html.push(charts.html); text.push(charts.text);
+  if ($('clinicalImpression').value.trim() || $('recommendations').value.trim() || Object.values(notes).some(Boolean)) html.push(`<h2>${t('الخلاصة السريرية والمتابعة', 'Clinical summary and follow-up')}</h2>`);
+  paragraph(t('انطباع الفاحص', 'Examiner impression'), $('clinicalImpression').value.trim());
+  paragraph(t('التوصيات والأهداف', 'Recommendations and goals'), $('recommendations').value.trim());
+  for (let sec = 0; sec <= 13; sec++) if (notes[sec]) paragraph((en ? reportEnglishSections : sectionTitles)[sec], notes[sec]);
+  const contextKeys = ['incidentDate', 'treatingDoctor', 'preIncidentCondition', 'medications', 'results'];
+  const hasContext = contextKeys.some(key => $(key).value.trim()) || $('languageContext').value.trim() || $('assessmentConditions').value.trim();
+  if (hasContext) {
+    html.push(`<h2>${t('سياق التقييم والمعلومات الطبية', 'Assessment context and medical information')}</h2>`);
+    paragraph(t('اللغة / اللهجة والخلفية التعليمية', 'Language / dialect and educational background'), $('languageContext').value.trim());
+    paragraph(t('ظروف التطبيق والدعم المستخدم', 'Administration conditions and support'), $('assessmentConditions').value.trim());
+    contextKeys.forEach(key => paragraph(fields[key], $(key).value.trim()));
+  }
+  if (window.AphasiaApp) {const extra = window.AphasiaApp.reportSupplement(lang); html.push(extra.html); text.push(extra.text);}
+  html.push('<footer class="report-signature">SLP. AHMAD GHANEM</footer>'); text.push('', 'SLP. AHMAD GHANEM');
+  return {html: html.join(''), text: text.join('\n')};
+}
 
 function updateReport(event) {
   updateReportLanguageUI();
@@ -405,7 +398,7 @@ function updateReport(event) {
   const report = buildReport();
   $('report').value = report.text;
   $('reportPreview').innerHTML = report.html;
-  window.dispatchEvent(new CustomEvent('aphasia-changed',{detail:{viewOnly:!!event?.viewOnly||event?.target?.id==='includeUnanswered'}}));
+  window.dispatchEvent(new CustomEvent('aphasia-changed',{detail:{viewOnly:!!event?.viewOnly}}));
 }
 
 function downloadReport() {
@@ -504,7 +497,7 @@ function initialize() {
     const comment = $(id + '-comment'); comment.addEventListener('input', updateReport);
     items.push({ id, group, section, observation, label, card, comment });
   });
-  document.querySelectorAll('#assessmentStage input[id], #assessmentStage textarea[id], #assessmentStage select[id], #includeUnanswered').forEach(input => {
+  document.querySelectorAll('#assessmentStage input[id], #assessmentStage textarea[id], #assessmentStage select[id]').forEach(input => {
     if (input.id === 'report' || input.id.startsWith('note-') || input.id.startsWith('item-')) return;
     const label = input.closest('.card')?.querySelector('label');
     if (label) label.htmlFor = input.id;

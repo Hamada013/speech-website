@@ -15,6 +15,14 @@
   for(const item of list){const r=state.responses[item.id];if(!r)s.unanswered++;else if(r==='skip')s.skipped++;else if(['correct','incorrect','dontknow'].includes(r)){s.assessed++;s[r]++;}}
   s.percent=s.assessed?s.correct/s.assessed:null;return s;
  }
+ function groupSummaries(catalog,state){
+  return [...new Set(catalog.map(i=>i.group))].map(group=>{
+   const list=catalog.filter(i=>i.group===group),observation=!!list[0].observation;
+   if(!observation)return {group,section:list[0].section,observation,...summarize(list,state)};
+   const s={group,section:list[0].section,observation,total:list.length,assessed:0,present:0,absent:0,skipped:0,unanswered:0,percent:null};
+   for(const i of list){const r=state.responses[i.id];if(r==='present'||r==='absent'){s.assessed++;s[r]++;}else if(r==='skip')s.skipped++;else s.unanswered++;}return s;
+  });
+ }
  function compare(catalog,earlier,later){
   const contexts=['languageContext','assessmentConditions'],contextComparable=contexts.every(k=>String(earlier.fields[k]||'').trim()&&earlier.fields[k]===later.fields[k]);
   const paired=catalog.filter(i=>!i.observation&&contextComparable&&['correct','incorrect','dontknow'].includes(earlier.responses[i.id])&&['correct','incorrect','dontknow'].includes(later.responses[i.id])&&earlier.supports[i.id]&&earlier.supports[i.id]===later.supports[i.id]&&earlier.supports[i.id]!=='modified');
@@ -38,5 +46,5 @@
   const candidates=patterns.filter(p=>(fluency==='mixed'||p[3]===fluency)&&(comprehension==='mixed'||p[4]===comprehension)&&(repetition==='mixed'||p[5]===repetition)&&(p[0]!=='anomic'||naming!=='preserved')).map(p=>({id:p[0],ar:p[1],en:p[2]}));
   return {status:candidates.length?'provisional':'unclassified',candidates};
  }
- return {VERSION,KEY,STATUSES,SUPPORTS,clone,empty,validate,summarize,compare,suggest,patterns};
+ return {VERSION,KEY,STATUSES,SUPPORTS,clone,empty,validate,summarize,groupSummaries,compare,suggest,patterns};
 });
