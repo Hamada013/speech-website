@@ -1,5 +1,5 @@
 'use strict';
-const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process');
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process'),vm=require('node:vm'),crypto=require('node:crypto');
 const root=path.resolve(__dirname,'..'),pages=require('../scripts/site-pages.cjs');
 cp.execFileSync(process.execPath,[path.join(root,'scripts/build-site.cjs'),'--check'],{stdio:'inherit'});
 const symbols=new Set([...fs.readFileSync(path.join(root,'assets/site/icons.svg'),'utf8').matchAll(/<symbol id="([^"]+)"/g)].map(m=>m[1]));
@@ -17,4 +17,7 @@ for(const page of pages){
  for(const section of page.sections)for(const card of section.cards){assert(symbols.has(card.icon),'Card icon '+card.icon);assert(card.ar&&card.arDescription,'Bilingual card required');}
 }
 assert.deepEqual(fs.readFileSync(path.join(root,'assets/site/brand/logo.webp')),fs.readFileSync(path.join(root,'tools/VSS/voc/images/logo.webp')),'Main site uses the VOC artwork');
-console.log('PASS: 12 consistent directories, nested local links, bilingual content, all SVG symbols, no GIF/CDN/audio effects, matching VOC logo.');
+const context={self:{}};vm.runInNewContext(fs.readFileSync(path.join(root,'assets/site/pwa-release.js'),'utf8'),context);const release=context.self.SPEECH_SITE_RELEASE;
+for(const file of release.shell){assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,file))).digest('hex'),release.integrity[file],'Offline file integrity: '+file);assert(!/^(tools|forms)\//.test(file)||pages.some(p=>p.path===file),'Only directory pages belong in the root cache');}
+const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.webmanifest'),'utf8'));assert.equal(manifest.scope,'./');assert.equal(manifest.display,'standalone');for(const icon of manifest.icons)assert(fs.existsSync(path.join(root,icon.src)));
+console.log('PASS: 12 consistent directories, nested local links, bilingual content, SVG symbols, VOC logo and complete main-site PWA integrity.');
