@@ -86,6 +86,7 @@
  try{localStorage.removeItem('aphasia-sheet-settings-v1');}catch{}
  const bridge=['localhost','127.0.0.1'].includes(location.hostname)?location.origin:'http://127.0.0.1:8876';
  $id('openWorkbook').href=bridge+'/api/aphasia/workbook';
+ WorkbookReset.attach({anchor:$id('openWorkbook'),app:'aphasia',label:'اللغة والمعرفة',bridge});
  function payload(){const c=M.clone(activeCase());if(!$id('shareIdentifiers').checked){c.name='Case '+c.id.slice(0,8);for(const a of c.assessments)for(const key of ['name','treatingDoctor','examinerName'])a.state.fields[key]='';}return {version:1,case:c,catalog,revision:db.revision};}
  let sending=false;
  async function sendSheet(){

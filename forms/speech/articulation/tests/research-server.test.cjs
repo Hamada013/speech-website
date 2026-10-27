@@ -26,5 +26,11 @@ let child;
  const secondCase=JSON.parse(JSON.stringify(aphasia));secondCase.case.id='case-b';secondCase.case.assessments.forEach(a=>a.id+='-b');result=await postA(secondCase);assert.equal((await result.json()).assessments,4);
  const localA=await fetch(base+'/api/aphasia/workbook');assert.equal(localA.status,200);assert.equal(Buffer.from(await localA.arrayBuffer()).subarray(0,2).toString(),'PK');assert.equal((await fetch(base+'/forms/aphasia/langiuage-cognitive/')).status,200);assert.equal((await fetch(base+'/forms/aphasia/langiuage-cognitive/research/dataset.json')).status,403);
  const savedA=JSON.parse(await fs.readFile(path.join(dataDir,'aphasia/dataset.json'),'utf8'));assert.equal(savedA.length,2);assert.equal(savedA[0].case.assessments.length,2);
+ const reset=async(app,confirm=app,origin=base)=>fetch(base+'/api/'+app+'/reset',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({confirm})});
+ assert.equal((await reset('research','aphasia')).status,400);assert.equal((await reset('research','research','https://unrelated.example')).status,403);
+ result=await reset('research');assert.equal(result.status,200);assert.deepEqual(await result.json(),{reset:'research'});assert.equal(JSON.parse(await fs.readFile(path.join(dataDir,'dataset.json'),'utf8')).caseRows.length,0);assert.deepEqual(JSON.parse(await fs.readFile(path.join(dataDir,'aphasia/dataset.json'),'utf8')),savedA);
+ result=await reset('aphasia');assert.equal(result.status,200);assert.deepEqual(JSON.parse(await fs.readFile(path.join(dataDir,'aphasia/dataset.json'),'utf8')),[]);assert.equal((await fetch(base+'/api/aphasia/workbook')).status,200);
+ // Export after reset starts a new collection and remains idempotent.
+ result=await post(fixture);assert.equal((await result.json()).assessments,2);assert.equal(JSON.parse(await fs.readFile(path.join(dataDir,'aphasia/dataset.json'),'utf8')).length,0);
  console.log('PASS: both local collectors write/download real XLSX files, upsert without duplication, retain other cases, reject unapproved origins and hide raw records.');
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(()=>child?.kill());

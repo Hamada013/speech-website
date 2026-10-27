@@ -34,6 +34,10 @@ When switching between VOC, SENB, and Taffaha (including report links), blur the
 
 ## Shared account controls
 
+### Dropdowns and option menus
+
+Use styled dropdowns for new or edited option controls across the website. Match the app's rounded white cards, pale borders, dark blue text, clear outline chevron, soft shadow, and green selected row with a check. Keep triggers and options at least 44px tall. Use custom option lists so Safari also receives the intended styling; keep the underlying select's value and input/change events when enhancing a form field. Support associated labels, combobox/listbox semantics, arrow keys, Home/End, Enter/Space, Escape, Tab, and outside dismissal. Fit lists inside the dialog and viewport on phones and short screens. The reusable source is `tools/shared/styled-dropdowns.js/css`; Ling includes local copies in its offline shell.
+
 VOC, SENB and Taffaha share the local `tools/shared/welcome.js/css` startup screen. A direct opening or manual reload animates the app's complete logo, types «مرحبا», then asks for the child's name only when no account is active. Returning children continue with their existing account. Respect reduced motion and keep the name form usable on short screens. Preserve the parent gate when saved child accounts already exist.
 
 Internal activity links, app-picker/report transitions, browser back/forward and automatic account/update reloads skip startup. App navigation writes a short-lived, one-use destination token only when navigation actually happens. Automatic reloads use both session storage and a history-state fallback. Never use a permanent “seen” flag. Profile adapters connect to the shared welcome controller instead of opening a second first-run name dialog. The update offer waits until welcome finishes; service-worker setup and downloads run independently.

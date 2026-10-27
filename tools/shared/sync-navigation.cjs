@@ -26,3 +26,15 @@ for(const file of ['updates.js','welcome.js','welcome.css']){
  if(process.argv.includes('--check')){if(!fs.existsSync(target)||!source.equals(fs.readFileSync(target)))throw Error('VSS copy is stale: '+target);}
  else{fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,source);}
 }
+
+// Research collectors and the download-only app share one reset confirmation.
+for(const app of ['forms/speech/articulation','forms/aphasia/langiuage-cognitive','tools/follow-direction']){
+ const source=fs.readFileSync(path.join(__dirname,'workbook-reset.js')),target=path.resolve(__dirname,'../..',app,'assets/workbook-reset.js');
+ if(process.argv.includes('--check')){if(!fs.existsSync(target)||!source.equals(fs.readFileSync(target)))throw Error('Workbook reset copy is stale: '+target);}
+ else fs.writeFileSync(target,source);
+}
+for(const file of ['styled-dropdowns.js','styled-dropdowns.css']){
+ const source=fs.readFileSync(path.join(__dirname,file)),target=path.resolve(__dirname,'../../forms/Hearing/ling_test/assets',file);
+ if(process.argv.includes('--check')){if(!fs.existsSync(target)||!source.equals(fs.readFileSync(target)))throw Error('Styled dropdown copy is stale: '+target);}
+ else fs.writeFileSync(target,source);
+}

@@ -14,6 +14,7 @@ Keep that process running. Open:
 
 - Articulation: http://127.0.0.1:8876/forms/speech/articulation/
 - Language/cognitive: http://127.0.0.1:8876/forms/aphasia/langiuage-cognitive/
+- Ling: http://127.0.0.1:8876/forms/Hearing/ling_test/
 
 In a child's report, press the share icon. It immediately updates the local workbook and shows success only after Excel and the cumulative dataset are saved. Press the workbook icon in that dialog to download/open the current file. To include names/identifiers, select that option and press update again. They are omitted by default; free-text notes remain as entered.
 
@@ -21,10 +22,13 @@ Files on this computer:
 
 - Articulation: `forms/speech/articulation/research/arabic-speech-research.xlsx` and `dataset.json`.
 - Language/cognitive: `forms/aphasia/langiuage-cognitive/research/language-cognitive-research.xlsx` and `dataset.json`.
+- Ling: `forms/Hearing/ling_test/research/ling-research.xlsx` and `dataset.json`.
 
 Re-sharing replaces the same assessment/case IDs rather than appending duplicates. Other submitted cases are retained. The JSON datasets drive rebuilding; keep them alongside the workbooks and back up both. Manual edits to generated Excel files are replaced at the next share. Deleting a case from the app does not remove a previously exported local record. Generated records and workbooks are ignored by Git and omitted from offline caches and publication.
 
-The collector binds to `127.0.0.1`, validates request origins/Host and JSON payloads, serializes writes, writes temporary files before renaming, and does not expose the raw datasets through HTTP. Workbook downloads use dedicated loopback routes with no caching. `RESEARCH_DATA_DIR` overrides the storage folder; language/cognitive records then live in its `aphasia` subfolder. The two usual loopback preview ports, 8765 and 8876, are allowed. Do not expose the collector as a public service or permit public website origins.
+Each app has a trash icon beside its workbook controls. Cross cancels; tick clears only that app’s cumulative research dataset and rebuilds a blank workbook. Child accounts and clinical reports remain unchanged and can be re-exported. Workbook reset and export are serialized. Downloaded copies elsewhere are not modified. Follow Direction’s download-only workbook uses a local exclusion boundary and downloads a blank replacement; later exports include only sessions created after reset.
+
+The collector binds to `127.0.0.1`, validates request origins/Host and JSON payloads, serializes writes, writes temporary files before renaming, and does not expose the raw datasets through HTTP. Workbook downloads use dedicated loopback routes with no caching. `RESEARCH_DATA_DIR` overrides the storage folder; language/cognitive records then live in its `aphasia` subfolder and Ling records in its `ling` subfolder. The two usual loopback preview ports, 8765 and 8876, are allowed. Do not expose the collector as a public service or permit public website origins.
 
 The builder uses Codex's bundled `@oai/artifact-tool` runtime. If running outside that environment, provide a supported installed runtime using `ARTIFACT_NODE_MODULES`. The local collector needs Node.js and that dependency; a hosted static website alone cannot write into a folder on the computer.
 

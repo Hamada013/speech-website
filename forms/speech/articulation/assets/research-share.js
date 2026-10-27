@@ -37,6 +37,7 @@
  $('saveResearchLocal').onclick=saveLocal;
  $('exportResearchJson').onclick=()=>{try{const blob=new Blob([JSON.stringify(payload(),null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='articulation-research-'+activeChild().id+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);status('تم تنزيل JSON على هذا الجهاز.');}catch(error){status(error.message,true);}};
  const openWorkbook=()=>window.open(bridge+'/api/research/workbook','_blank','noopener');
+ WorkbookReset.attach({anchor:$('openWorkbookButton'),app:'research',label:'النطق',bridge:()=>bridge,ready:bridgeReady});
  $('openResearchLocal').onclick=openWorkbook;
  $('openWorkbookButton').onclick=openWorkbook;
  $('importResearchJson').onchange=async event=>{

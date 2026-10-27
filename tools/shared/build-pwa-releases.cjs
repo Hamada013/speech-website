@@ -42,11 +42,29 @@ function aphasiaInventory(root=ROOT){
  for(const file of context.self.APHASIA_RELEASE.files)if(file.hash!==sha(fs.readFileSync(path.join(base,file.url))))throw Error('Stale aphasia shell: '+file.url);
  return [...context.self.APHASIA_RELEASE.files.map(file=>file.url),'release.js'].map(file=>prefix+file);
 }
+
+function followDirectionInventory(root=ROOT){
+ const prefix='tools/follow-direction/',base=path.join(root,prefix),context={self:{}};
+ vm.runInNewContext(fs.readFileSync(path.join(base,'release.js'),'utf8'),context);
+ const release=context.self.FD_RELEASE;
+ if(release.workerHash!==sha(fs.readFileSync(path.join(base,'sw.js'))))throw Error('Stale Follow Direction worker');
+ for(const file of release.files)if(file.hash!==sha(fs.readFileSync(path.join(base,file.url))))throw Error('Stale Follow Direction shell: '+file.url);
+ return [...release.files.map(file=>file.url),'sw.js','release.js'].map(file=>prefix+file);
+}
+function lingInventory(root=ROOT){
+ const prefix='forms/Hearing/ling_test/',base=path.join(root,prefix),release=JSON.parse(fs.readFileSync(path.join(base,'release.json'),'utf8'));
+ for(const file of release.files)if(sha(fs.readFileSync(path.join(base,file)))!==release.integrity[file])throw Error('Stale Ling shell: '+file);
+ return [...release.files,'sw.js','release.js','release.json'].map(file=>prefix+file);
+}
 function build(){
  cp.execFileSync(process.execPath,[path.join(__dirname,'sync-navigation.cjs')],{stdio:'inherit'});
  for(const app of APPS)cp.execFileSync(process.execPath,[path.join(ROOT,'tools',app,'scripts/build-pwa.cjs')],{stdio:'inherit'});
  cp.execFileSync(process.execPath,[path.join(ROOT,'forms/speech/articulation/scripts/build-pwa.cjs')],{stdio:'inherit'});
  cp.execFileSync(process.execPath,[path.join(ROOT,'forms/aphasia/langiuage-cognitive/scripts/build-release.cjs')],{stdio:'inherit'});
+ cp.execFileSync(process.execPath,[path.join(ROOT,'tools/follow-direction/scripts/build-pwa.cjs')],{stdio:'inherit'});
+ cp.execFileSync(process.execPath,[path.join(ROOT,'forms/Hearing/ling_test/scripts/build-pwa.cjs')],{stdio:'inherit'});
+ followDirectionInventory();
+ lingInventory();
  articulationInventory();
  return APPS.map(app=>inventory(app));
 }
@@ -56,13 +74,14 @@ function stageSite(releases){
  // Tracked site files preserve all existing pages. Runtime inventories also
  // include new local app assets when checking a release before its first commit.
  const tracked=cp.execFileSync('git',['ls-files','-z'],{cwd:ROOT}).toString().split('\0').filter(Boolean);
- const files=new Set([...tracked,...articulationInventory(),...aphasiaInventory(),...releases.flatMap(release=>release.files.map(file=>`tools/${release.app}/${file}`))]);
+ const files=new Set([...tracked,...articulationInventory(),...aphasiaInventory(),...followDirectionInventory(),...lingInventory(),...releases.flatMap(release=>release.files.map(file=>`tools/${release.app}/${file}`))]);
  const omitted=new Set(['node_modules','.git','.github','.aws','.agents','.codex','.vscode','output','tmp','tests','scripts','__pycache__']);
  let total=0;
  for(const file of [...files].sort()){
   const parts=file.split('/'),name=parts.at(-1);
   if(parts.some(part=>omitted.has(part))||name==='.DS_Store'||name==='AGENTS.md'||name.startsWith('.env')||name==='package-lock.json'||name==='package.json')continue;
   if(file.startsWith('forms/speech/articulation/cloud/')&&file!=='forms/speech/articulation/cloud/config.json')continue;
+  if(file.startsWith('forms/Hearing/ling_test/research/'))continue;
   if(file.startsWith('forms/speech/articulation/research/'))continue;
   if(file.startsWith('forms/aphasia/langiuage-cognitive/research/')&&file!=='forms/aphasia/langiuage-cognitive/research/SETUP.md')continue;
   const source=path.join(ROOT,file);if(!fs.existsSync(source))continue;
@@ -75,11 +94,14 @@ function stageSite(releases){
  for(const release of releases)inventory(release.app,destination);
  articulationInventory(destination);
  aphasiaInventory(destination);
+ followDirectionInventory(destination);
+ lingInventory(destination);
  console.log(`Pages artifact: ${total} files in output/pages; every app shell and media revision verified.`);
  return destination;
 }
 if(require.main===module){
  const releases=process.argv.includes('--check')?APPS.map(app=>inventory(app)):build();
+ if(process.argv.includes('--check')){articulationInventory();aphasiaInventory();followDirectionInventory();lingInventory();}
  if(process.argv.includes('--site'))stageSite(releases);
  console.log(JSON.stringify(releases.map(({files,...summary})=>summary),null,2));
 }
