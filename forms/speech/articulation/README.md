@@ -1,6 +1,6 @@
 # اختبار النطق
 
-A standalone Arabic speech sound screening PWA. Serve the complete folder over HTTPS, or localhost during development. The manifest supports installation under a nested path and includes regular/maskable icons and phone/desktop screenshots. No external fonts, account server or runtime CDN is required.
+A standalone Arabic speech sound screening PWA. Serve the complete folder over HTTPS, or localhost during development. The manifest supports installation under a nested path and includes regular/maskable icons and phone/desktop screenshots. The offline assessment needs no external fonts or runtime CDN. Optional Google account sync loads the Firebase SDK when needed. Local workbook updates use a loopback service.
 
 ## Child accounts and assessment history
 
@@ -8,7 +8,7 @@ The home screen opens the accounts dialog. Enter a child's name to create a loca
 
 The plus icon starts a new assessment for the selected child. It preserves the previous assessment and carries over identifying information, birth date, clinician and language/dialect, with a fresh date and no previous judgments or conclusions. Date/time buttons in reports open earlier assessments without replacing or editing the active assessment. The former opt-in draft migrates once; its old duplicate is removed only after the new child record saves successfully.
 
-Child deletion requires confirmation and removes that child's assessments. It never clears another app's storage or downloaded assets. Other open tabs follow the current case and cannot resurrect a deleted child by saving stale state. Records stay on this device and are not uploaded or synchronized. Clearing site data removes local accounts and results; saved PDF reports remain independent.
+Child deletion requires confirmation and removes that child's assessments. It never clears another app's storage or downloaded assets. Other open tabs follow the current case and cannot resurrect a deleted child by saving stale state. Guest records stay on this device. Optional Google sign-in syncs cases in that account’s private Firebase space. Clearing site data removes local accounts and results; saved PDF reports remain independent.
 
 ## Assessment workplace
 
@@ -64,7 +64,7 @@ The app is named **اختبار النطق**. The language/dialect fields start 
 
 The former connected-speech, participation, selected-pattern, analysis, conclusion and plan controls/sections have been removed. Historical metadata is retained in saved records rather than destroyed. The replacement summary offers provisional descriptive decision support and a typed clinician override, with a separate review checkbox. Scoring or relevant reference/diagnostic changes invalidate that review checkbox. The app does not apply English age cutoffs to Arabic speakers or generate numeric diagnosis codes.
 
-The report share icon exports all shareable assessments for the active child. The local research collector saves a cumulative Excel workbook inside `research/`; the verified Google workbook URL and optional OAuth client ID are in `research/google-link.json`. No tokens or client secrets are stored there. Direct Google upload requires a user-owned web client ID. Without one, the app offers JSON export and a bound-Sheets import workflow. [research/SETUP.md](research/SETUP.md) contains the exact local-server command and one-time Google setup steps. Research records, generated workbooks and temporary inspection files are ignored by Git and omitted from the offline release.
+The report share icon updates a cumulative local Excel workbook on the computer through the loopback research server. The dialog opens/downloads that workbook and exports/imports JSON for device transfer. Online Drive/Sheets sharing has been removed. See [local setup](research/SETUP.md). Clinical datasets and generated workbooks are ignored by Git and excluded from offline releases.
 
 Additional checks:
 
@@ -77,6 +77,6 @@ APP_ENGINE=webkit ARTICULATION_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playw
 
 ## Optional Google account and device syncing
 
-The launch dialog can be skipped; the home cloud icon opens it again. Firebase Google sign-in, independent local account spaces, private per-assessment cloud syncing, offline retry and concurrent-edit preservation are implemented in `assets/cloud.js` / `cloud-model.js`. The `cloud/` directory contains Firestore rules and a verified Google/guest research collector. Source identity columns and the `Accounts` research tab distinguish where submissions came from.
+The launch dialog can be skipped; the home cloud icon opens it again. Firebase Google sign-in, independent local account spaces, private per-assessment cloud syncing, offline retry and concurrent-edit preservation are implemented in `assets/cloud.js` / `cloud-model.js`. The `cloud/` directory contains the public Firebase configuration and private per-user Firestore rules. The online research collector has been removed. Source identity columns and the `Accounts` research tab distinguish where submissions came from.
 
-The public `cloud/config.json` now identifies Firebase project `speech-apps-5d3b0`. Live sign-in and syncing still require the project's authentication providers, authorized domains, Firestore database and deployed rules; see [cloud setup](cloud/SETUP.md). These console settings and real-device syncing have not been verified. The research endpoint remains empty until the collector is deployed. The Google research-send action falls back to the existing authorized importer; no fake sign-in or upload success is shown.
+The public `cloud/config.json` now identifies Firebase project `speech-apps-5d3b0`. Live sign-in and syncing still require the project's authentication providers, authorized domains, Firestore database and deployed rules; see [cloud setup](cloud/SETUP.md). These console settings and real-device syncing have not been verified. Report sharing uses local Excel only and is independent of personal Google account syncing.

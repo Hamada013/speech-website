@@ -1,8 +1,8 @@
-# ملف بحث أصوات الكلام
+# Local research workbooks
 
-The local workbook is `arabic-speech-research.xlsx` in this folder. Its verified Google Sheets link is recorded in `google-link.json`. Clinical records and the generated workbook are ignored by Git; they are not part of the PWA's downloaded assets.
+Report sharing writes only to this computer. No Google Drive, Google Sheets, Apps Script, OAuth spreadsheet client, or online research endpoint is used. Articulation's optional Google account sync uses Firebase/Firestore independently.
 
-## Save into this VS Code folder
+## Start the local app
 
 From the repository root:
 
@@ -10,59 +10,36 @@ From the repository root:
 node forms/speech/articulation/scripts/research-server.mjs
 ```
 
-Open `http://127.0.0.1:8876/forms/speech/articulation/`, or keep the existing preview at port 8765. In the child's report, select the share icon, then the local-workbook icon. It writes `dataset.json` and rebuilds `arabic-speech-research.xlsx` here, merging by immutable assessment/probe IDs. Re-sharing updates existing assessments. New assessments remain separate. Workbook creation requires `@oai/artifact-tool`; the script uses Codex's bundled runtime. Set `ARTIFACT_NODE_MODULES` to a different supported dependency folder if needed. The collector binds only to the local computer; a phone cannot write to the Mac's folder through its own `127.0.0.1` address.
+Keep that process running. Open:
 
-The port-8765 and port-8876 preview origins are explicitly allowed by default. Set `RESEARCH_ALLOWED_ORIGINS` to a comma-separated allowlist for another preview origin. Do not deploy this local collector as a public anonymous service.
+- Articulation: http://127.0.0.1:8876/forms/speech/articulation/
+- Language/cognitive: http://127.0.0.1:8876/forms/aphasia/langiuage-cognitive/
 
-## Google import without an OAuth client ID
+In a child's report, press the share icon. It immediately updates the local workbook and shows success only after Excel and the cumulative dataset are saved. Press the workbook icon in that dialog to download/open the current file. To include names/identifiers, select that option and press update again. They are omitted by default; free-text notes remain as entered.
 
-This route uses your existing signed-in Google Sheets account and needs no public endpoint:
+Files on this computer:
 
-1. Open the linked Google workbook. Choose **Extensions → Apps Script**.
-2. Paste `Code.gs` into the bound script's `Code.gs` file.
-3. Add a script named `ResearchSchema` and paste `../assets/research-schema.js` into it.
-4. Add an HTML file named `Sidebar` and paste `Sidebar.html` into it.
-5. Save the script, return to the spreadsheet and reload it. The **بحث أصوات الكلام** menu appears.
-6. In the assessment's share dialog, use the download icon to export the case JSON file. In the Google workbook's research menu, choose **استيراد حالة / تحديثها**, select that file and import. Google asks you to authorize your own bound script on first use.
+- Articulation: `forms/speech/articulation/research/arabic-speech-research.xlsx` and `dataset.json`.
+- Language/cognitive: `forms/aphasia/langiuage-cognitive/research/language-cognitive-research.xlsx` and `dataset.json`.
 
-The importer preserves other cases, updates matching IDs, retains all 84 item rows per assessment and refreshes the linked Results formulas/charts. There is no web-app deployment or anonymous Google write endpoint. The connected Drive tools cannot install a bound Apps Script project automatically, so these one-time steps must be completed in your Google account.
+Re-sharing replaces the same assessment/case IDs rather than appending duplicates. Other submitted cases are retained. The JSON datasets drive rebuilding; keep them alongside the workbooks and back up both. Manual edits to generated Excel files are replaced at the next share. Deleting a case from the app does not remove a previously exported local record. Generated records and workbooks are ignored by Git and omitted from offline caches and publication.
 
-## Optional direct Google upload
+The collector binds to `127.0.0.1`, validates request origins/Host and JSON payloads, serializes writes, writes temporary files before renaming, and does not expose the raw datasets through HTTP. Workbook downloads use dedicated loopback routes with no caching. `RESEARCH_DATA_DIR` overrides the storage folder; language/cognitive records then live in its `aphasia` subfolder. The two usual loopback preview ports, 8765 and 8876, are allowed. Do not expose the collector as a public service or permit public website origins.
 
-For the app's direct Google-send icon:
+The builder uses Codex's bundled `@oai/artifact-tool` runtime. If running outside that environment, provide a supported installed runtime using `ARTIFACT_NODE_MODULES`. The local collector needs Node.js and that dependency; a hosted static website alone cannot write into a folder on the computer.
 
-1. Create a Google Cloud project, enable the **Google Sheets API**, and configure the OAuth consent screen for your account/test users.
-2. Create an OAuth **Web application** client ID. Add the exact app origins, for example `http://127.0.0.1:8765`, `http://127.0.0.1:8876`, and the published HTTPS origin. Add `localhost` separately if used.
-3. Put the public client ID into `oauthClientId` in `google-link.json`. Never put a client secret, access token or refresh token in this file or the app.
-4. Rebuild the PWA release. In the report share dialog, choose the Google-send icon and select your Google account. Tokens are held in memory only.
+## Phones, tablets and account sync
 
-Use one uploader at a time for the optional direct API route. The bound-script import route serializes updates with a document lock.
+Signing into articulation with the same Google account selects that account's private Firebase case space. With working Firebase settings/rules and a successful sync, cases and dated assessments can be retrieved on another device. Google account sync does not upload a spreadsheet or share a Drive file. Live Firebase setup still needs verification; see [cloud setup](../cloud/SETUP.md).
 
-The existing Google workbook must be writable by the selected account. The app uses Google's Identity Services token flow and the Sheets API; a Codex connector connection is not a reusable browser authorization. When the client ID is absent, the app clearly reports that direct sending is not configured and offers the JSON import path instead of reporting a false upload success.
+A phone/tablet cannot write directly to the laptop's disk through its own loopback address. Sync its articulation case, then open the local laptop app, sign into the same Google account, wait for successful sync and press the report share icon there. Alternatively, download the report's research JSON on the phone, transfer it to the laptop, and use the local report dialog's import icon. This merges it into Excel without an online spreadsheet. Local-server errors retain app records and permit retry/export.
 
-## Research definitions
+## Articulation workbook definitions
 
-### Live Google Sheets dashboard
+`Case_info` has one row per assessment. `Findings` has all 84 probes for every assessment, including missing results. `Accounts` records source-account provenance, not workbook permissions. `Results` calculates descriptive counts, outcome and age charts and phoneme error totals. `Dictionary` records the protocol and exclusions. Research-declined assessments are excluded. Capacity is 2,000 assessments / 168,000 findings; over-capacity submissions fail visibly.
 
-The linked workbook opens with **Dashboard**, followed by **Age_groups** and **Children**. The age table uses six-month intervals: **1.5–2.0**, **2.0–2.5**, and so on through **11.5–12.0** years, with separate under-1.5, 12+ and unknown-age rows. Lower bounds are inclusive and upper bounds exclusive; 1.5–2.0 means 18–23 completed months.
+Accuracy includes scored responses only. Dialect-appropriate, unelicited, skipped and unrecorded responses do not enter the denominator. Independent naming with a reviewed reference stays separate from assisted responses. Repeated visits remain identifiable. Counts are descriptive observations, not population acquisition norms or diagnostic cutoffs. The workbook's original layout and research schema are retained.
 
-These views calculate directly from `Case_info` and update after supported imports/uploads, without copying formulas or rebuilding charts. They support the collector's existing capacity of 2,000 assessments. Each child is identified by source account plus participant code (child ID if the code is blank). The earliest dated shared assessment supplies that child's age and baseline results; creation time and assessment ID resolve ties. Unknown dates sort after dated assessments. Follow-up visits remain in the overall assessment count and the detailed `Results` phoneme tables, but do not duplicate children in age charts.
+## Retired online integration
 
-`Age_groups` shows child counts, children with scored items, correct/error totals, pooled target accuracy and result bars. Accuracy includes all elicitation methods and is blank when there are no scored items. The phoneme chart separately shows independent naming with reviewed references across all shared visits. These are descriptive observations, not age norms. A name appears in `Children` only if identifiers were explicitly included in the export.
-
-Chart recalculation does not activate data delivery: Firebase personal syncing uses Firestore. The JSON import or an authorized Sheets upload route must deliver records to this workbook first. The one-time native dashboard request builder is `../scripts/research-dashboard.cjs`; it preserves raw-data columns and existing importers.
-
-- `Case_info`: one row per assessment; age in completed months, language/dialect, region, sampling source, consent and clinician review are explicit. Name/DOB are optional in the share dialog. Free-text clinical notes are retained as entered and can still contain identifying content.
-- `Findings`: every assessment's 84 probes, including unrecorded items, actual reference IPA, whole-word IPA when entered, target-level replacement, elicitation method, modified references and notes. Missing observations are not scored as zero accuracy.
-- `Results`: live counts, outcome pie, age distribution and phoneme results. Assisted productions remain distinguishable from independent naming. The phoneme accuracy table includes independent naming with a clinician-reviewed reference only.
-- `Dictionary`: protocol version, variable names, exclusions, sources and interpretation.
-
-The age chart counts the first shared assessment per participant code, not every repeated visit. Use the same participant code across devices when observations belong to the same child. The remaining item totals are descriptive counts over shared assessments, including repeated observations; they are not population acquisition norms or independent-child prevalence estimates. A research design and reviewed eligibility/sampling criteria are still required before building norms. Capacity is 2,000 assessments / 168,000 findings; exceeding it is rejected rather than silently dropping records.
-
-Automatic impressions are provisional descriptions, not confirmed diagnoses. Typed clinician wording takes priority and review status is stored separately. Changing responses or diagnostic inputs resets the review checkbox. No numeric diagnostic code is generated.
-
-Sources: [ASHA speech sound assessment](https://www.asha.org/practice-portal/clinical-topics/articulation-and-phonology/), [Google token authorization](https://developers.google.com/identity/oauth2/web/guides/use-token-model), [Google bound dialogs/sidebars](https://developers.google.com/apps-script/guides/dialogs).
-
-## Google and guest collection from all devices
-
-The preferred shared collector is now in [cloud/SETUP.md](../cloud/SETUP.md). It uses a server-side Google identity to update this same workbook for Google users and guests. The `Accounts` tab and six source columns in each raw-data tab identify the source account, email when signed in, sign-in type, device, origin and whether the collector verified it. The schema is now v2; v1 JSON files migrate with `unattributed` sources rather than invented account labels. Manual/local routes remain available and their provenance is self-reported.
+The Ali-owned articulation workbook was permanently deleted at the user's request on 2026-10-27 and deletion was verified by Drive readback. Both apps' online spreadsheet links, upload transports, bound-script sources and deployment instructions have been removed. Language/cognitive also discards its old saved endpoint/token/automatic-upload settings on startup. This source change does not revoke independently deployed external services or remove unrelated files from Google accounts. Previously installed app versions need the rebuilt release before using the local-only behavior.

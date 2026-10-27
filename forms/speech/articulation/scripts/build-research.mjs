@@ -8,6 +8,7 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const dependencyRoot=process.env.ARTIFACT_NODE_MODULES||path.join(os.homedir(),'.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules');
 const artifactRequire=createRequire(path.join(path.dirname(dependencyRoot),'research-builder.cjs'));
 const {Workbook,SpreadsheetFile}=await import(pathToFileURL(artifactRequire.resolve('@oai/artifact-tool')).href);
+export {Workbook,SpreadsheetFile};
 const column=index=>{let out='';for(let n=index+1;n;n=Math.floor((n-1)/26))out=String.fromCharCode(65+(n-1)%26)+out;return out;};
 export const CAPACITY=2000,FINDINGS_END=CAPACITY*84+1;
 export function resultModel({findingsEnd=FINDINGS_END,caseEnd=CAPACITY+1}={}){
@@ -25,7 +26,7 @@ export function resultModel({findingsEnd=FINDINGS_END,caseEnd=CAPACITY+1}={}){
  while(rows.length<74)rows.push([]);rows.push(['Judgment group','Items'],['Correct','=B8'],['Error','=B7-B8'],['Not scored','=SUM(B12:B20)-B7']);
  return {rows,soundStart,sounds,bands};
 }
-function sourceSheet(wb,name,headers,rows){
+export function sourceSheet(wb,name,headers,rows){
  const s=wb.worksheets.add(name);s.showGridLines=false;
  s.getRange(`A1:${column(headers.length-1)}1`).values=[headers];
  if(rows.length)s.getRange(`A2:${column(headers.length-1)}${rows.length+1}`).values=rows.map(row=>row.map(value=>typeof value==='string'&&value.startsWith('=')?"'"+value:value));
@@ -66,8 +67,6 @@ export async function buildResearch(dataset=schema.empty(),output=path.join(root
  ];
  const dictionary=sourceSheet(wb,'Dictionary',['Field / method','Variable / value','Definition'],dictionaryRows);
  dictionary.getRange(`A1:A${dictionaryRows.length+1}`).format.columnWidth=29;dictionary.getRange(`B1:B${dictionaryRows.length+1}`).format.columnWidth=62;dictionary.getRange(`B2:B${dictionaryRows.length+1}`).format.wrapText=true;dictionary.getRange(`A2:C${dictionaryRows.length+1}`).format.rowHeight=34;dictionary.getRange(`C1:C${dictionaryRows.length+1}`).format.columnWidth=110;
- let googleLink={};try{googleLink=JSON.parse(await fs.readFile(path.join(root,'research/google-link.json'),'utf8'));}catch{}
- if(googleLink.spreadsheetUrl)dictionary.getRange(`A${dictionaryRows.length+2}:C${dictionaryRows.length+2}`).values=[['Linked Google workbook',googleLink.spreadsheetUrl,'Connection/authorization settings are in research/google-link.json.']];
  const model=resultModel({findingsEnd:Math.max(100,dataset.findingRows.length+85),caseEnd:Math.max(100,dataset.caseRows.length+10)});
  results.getRange(`A1:E${model.rows.length}`).values=model.rows.map(row=>Array.from({length:5},(_,i)=>typeof row[i]==='string'&&row[i].startsWith('=')?null:row[i]??null));
  for(const [i,row] of model.rows.entries())row.forEach((value,j)=>{if(typeof value==='string'&&value.startsWith('='))results.getCell(i,j).formulas=[[value]];});

@@ -1,5 +1,6 @@
 'use strict';
 const APP_ICONS = {
+ sheet:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12M3 15h18"/>',
  cloud:'<path d="M7 18H6a5 5 0 0 1-1-10 7 7 0 0 1 13-1 6 6 0 0 1 1 11h-2M12 12v10m-4-4 4 4 4-4"/>',
  google:'<path d="M21 12h-9m9 0a9 9 0 1 1-3-7m3 7c0 6-4 9-9 9"/>',
  logout:'<path d="M9 3H3v18h6m4-15 6 6-6 6m-6-6h14"/>',

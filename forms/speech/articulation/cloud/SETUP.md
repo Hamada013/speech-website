@@ -1,54 +1,32 @@
-# Activate Google sign-in, private syncing and shared research uploads
+# Private Google account sync for articulation
 
-The app works offline without Google. After its welcome animation it offers an optional Google dialog with a skip arrow. The home cloud icon reopens it. `config.json` contains the public Web app configuration for project `speech-apps-5d3b0`; authentication settings, Firestore rules and real-device syncing still need verification. The research endpoint is empty pending collector deployment. A GitHub Pages push alone cannot enable Google authentication or authorize a server to edit your private spreadsheet.
+Google sign-in remains optional. It syncs cases and dated assessments through Firebase Authentication and Firestore, separately from local Excel report sharing. There is no online research collector, Google Drive connection, spreadsheet OAuth flow or Sheets upload in this version.
 
-## 1. Complete Firebase project setup
+## Firebase setup
 
-1. Open https://console.firebase.google.com/ and select **speech-apps-5d3b0**. Its registered **Web app** configuration is already in `cloud/config.json` → `firebase`. These are public app configuration, not server credentials. The measurement ID does not enable Analytics; the app does not load the Analytics SDK.
-2. Under **Authentication → Sign-in method**, enable **Google** (choose your support email) and **Anonymous**. Anonymous authentication lets the research button work without asking guests to sign in. Guest cases stay local; only explicit research sharing uses the guest identity.
-3. Under **Authentication → Settings → Authorized domains**, add the published host (for example `hamada013.github.io`), plus `localhost` and `127.0.0.1` for previews if accepted by the console. Keep the project's Firebase auth domain. The Google provider creates the OAuth integration; no separate client ID is required in `research/google-link.json` for this route.
-4. Create a **Cloud Firestore** database in production mode. Choose an appropriate region, such as `europe-west1`. Deploy the supplied rules before using it. Each Google user can access only their own `/users/<uid>/records/` documents. Research collection and locks are server-only.
+The public Web app configuration in `config.json` identifies project `speech-apps-5d3b0`. Before relying on cross-device sync:
 
-## 2. Deploy the private data rules and research service
+1. In Firebase Console → Authentication, enable **Google** and select the correct support email. Anonymous auth is no longer needed by this app.
+2. Add the published host and required local preview hosts in Authentication → Settings → Authorized domains. This local app uses `127.0.0.1:8876`; add the host without its port if accepted by Firebase.
+3. Create Cloud Firestore in production mode and deploy `firestore.rules`. Each signed-in Google user may access only their own `/users/<uid>/records` documents; other paths are denied.
 
-Cloud Functions deployment requires Firebase's **Blaze billing plan**; set a budget alert in your project. The supplied service scales to one instance with one request at a time. It uses runtime Application Default Credentials, so no service-account JSON key belongs in this repository.
-
-From this directory (`forms/speech/articulation/cloud`):
+From this directory:
 
 ```sh
-npm install --prefix functions
 npx firebase-tools login
-npx firebase-tools deploy --project speech-apps-5d3b0 --only firestore:rules,functions:submitResearch
+npx firebase-tools deploy --project speech-apps-5d3b0 --only firestore:rules
 ```
 
-At deployment, set:
+No Cloud Functions or Blaze research collector deployment is required. If an older research function was independently deployed, remove it in Firebase Console; removing deployment source does not delete a live function. There is no configured research endpoint in this app.
 
-- `APP_ORIGINS`: exact comma-separated website origins, e.g. `https://hamada013.github.io,http://127.0.0.1:8765,http://127.0.0.1:8876`. Do not include paths or trailing slashes.
-- `RESEARCH_SPREADSHEET_ID`: `1-85y5YUMqpuQQkxpeVnzxtwqoTeUf-dr4DhBdTnpwRc`.
+## What sync does
 
-Find the function's **runtime service account** in Google Cloud Console → Cloud Run → the deployed function → Security. Share the linked Google research spreadsheet with that email as **Editor**, and enable the **Google Sheets API** in the same project. This service can edit the central workbook even when the examiner is a guest or uses another Google account; those examiners do not need edit access to the workbook.
+Signing into Google imports unlinked local cases into that Google account and syncs each child/assessment. Other Google accounts have separate local and remote spaces. Signing out returns to local guest cases. Offline edits stay local until a successful sync. Conflicting concurrent assessment edits preserve both versions; deletions use tombstones. App account sync never creates or updates a Drive workbook.
 
-Copy the exact HTTPS `submitResearch` URL printed by deployment into `cloud/config.json` → `researchEndpoint`. Rebuild:
+For the same email on phone, laptop and iPad, verify successful sync on each device before assuming the records match. On two real devices, sign into the same account, create/score an assessment, wait for success, and check it on the other device. Also test offline edits, reconnect, sign-out, another account's isolation and deletion. Repository browser tests verify this logic with a deterministic Firebase adapter; live project settings and real-device sync have not been certified from this workspace.
 
-```sh
-node forms/speech/articulation/scripts/build-pwa.cjs
-```
+## API key alert
 
-Run the command above from the repository root. Publish the updated public config and release to GitHub. Never commit `.env*`, credentials, refresh tokens, or service-account keys. Google Sheets remains private unless you deliberately change its sharing settings.
+Firebase web keys are public app identifiers, not database or spreadsheet passwords. Their live API restrictions still need verification. In Google Cloud Console → APIs & Services → Credentials, restrict the matching key to Firebase APIs actually used (Authentication needs Identity Toolkit API and Token Service API). Exclude Gemini and unrelated paid APIs, review usage/billing, and verify appropriate website restrictions. If the old key was unrestricted or used for other services, replace it with a Firebase-only restricted key, update/test/deploy the public config and then revoke the old key. Hiding it in frontend environment variables does not secure it. Supplied Firestore rules also must be deployed before cloud saving is enabled.
 
-## What is stored and when
-
-- **Skip:** child accounts and progress save to this device, as before. The prompt returns at the next launch; the cloud icon is always available on home.
-- **Google sign-in:** imports this device's unlinked guest cases into that Google account, then syncs child accounts and each assessment separately. After upload and a successful local save, its redundant guest copy is removed. Another Google account gets a separate local and remote space. Signing out returns to the separate guest space; it does not delete the cloud account's cached local backup.
-- **Offline:** the active account's saved cases keep working locally. Reconnect or press the sync icon to upload/download. A status confirms successful syncing; failed uploads retain local data. Initial sign-in needs the internet. The core PWA remains fully offline; the Firebase SDK is loaded only when cloud services are configured and needed.
-- **Concurrent changes:** separate assessment records merge; simultaneous edits to the same assessment preserve both complete versions. A remotely deleted child is not resurrected under its original ID; concurrent local work is recovered as a separate child copy. Deletions are synced using tombstones.
-- **Research sharing:** explicit and independent of personal cloud saving. Research-declined assessments are excluded. The deployed service verifies the Firebase token, overwrites claimed source identity/origin, namespaces record IDs by source account, serializes writes and checks Google readback before showing success. It accepts Google and anonymous users. `source_verified=1` means the collector checked the source; local/JSON/manual routes use `0`.
-- **Accounts tab:** groups the central results by verified Google account or guest identity. `Case_info` and `Findings` include source account ID, Google email when signed in, sign-in type, device ID, app origin and verification status. Guest identity belongs to a browser installation; clearing its browser storage creates a new guest. The same explicit participant code can support later research reconciliation, but different source accounts are deliberately not merged automatically.
-- A guest share followed by a Google share is a distinct source; review duplicate participants before research analysis. Identical client assessment IDs submitted by different accounts cannot overwrite each other.
-- The research collector accepts up to 50 assessments / 5 MiB per request and 2,000 assessments in the workbook. Quotas fail visibly, with no silent truncation. Firebase anonymous-auth abuse limits and the collector's origin/token/rate checks apply; monitor quotas and billing before a public research rollout.
-
-## Verify before calling cloud saving active
-
-Use two real browsers/devices with the same Google account. Create a child, score a response and wait for the successful sync message. Sign in on the second device, open the child and check the dated assessment. Try guest and Google research submissions, confirm the source fields and `Accounts` totals in Sheets, and verify another Google account cannot see the first account's cases. Also test offline edits, reconnect and deletion. The repository browser checks use a deterministic Firebase adapter; they do not certify a real Google project deployment.
-
-Official setup references: [Firebase web setup](https://firebase.google.com/docs/web/setup), [Google sign-in](https://firebase.google.com/docs/auth/web/google-signin), [anonymous auth](https://firebase.google.com/docs/auth/web/anonymous-auth), [HTTP functions](https://firebase.google.com/docs/functions/http-events).
+References: [Firebase API keys](https://firebase.google.com/docs/projects/api-keys), [Google sign-in](https://firebase.google.com/docs/auth/web/google-signin), [Firestore rules](https://firebase.google.com/docs/firestore/security/get-started).

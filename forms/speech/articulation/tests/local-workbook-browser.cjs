@@ -1,0 +1,22 @@
+// Real app UI -> real loopback collector -> real Excel files, using disposable clinical fixtures.
+const fs=require('node:fs/promises'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict'),{spawn}=require('node:child_process');
+const {chromium}=require(process.env.ARTICULATION_PLAYWRIGHT||'../../../../tools/VSS/voc/node_modules/playwright');
+let child,browser;
+(async()=>{
+ const dir=await fs.mkdtemp(path.join(os.tmpdir(),'local-workbook-ui-'));
+ child=spawn(process.execPath,[path.resolve(__dirname,'../scripts/research-server.mjs')],{env:{...process.env,RESEARCH_PORT:'0',RESEARCH_DATA_DIR:dir},stdio:['ignore','pipe','pipe']});
+ const origin=await new Promise((resolve,reject)=>{child.stdout.on('data',v=>{const m=String(v).match(/http:\/\/127\.0\.0\.1:\d+/);if(m)resolve(m[0]);});child.stderr.on('data',v=>process.stderr.write(v));child.once('error',reject);child.once('exit',code=>reject(Error('Collector exit '+code)));});
+ browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
+ const context=await browser.newContext({serviceWorkers:'block',reducedMotion:'reduce',viewport:{width:390,height:844},acceptDownloads:true}),page=await context.newPage();page.setDefaultTimeout(60000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(origin+'/forms/speech/articulation/');await page.locator('#welcomeLaunch').waitFor({state:'hidden'});await page.locator('#skipCloud').click();await page.evaluate(()=>{createChild('Synthetic local workbook');recordScore('s1-0','correct');showReport();});
+ await page.locator('#shareResearch').click();await page.waitForFunction(()=>document.getElementById('researchShareStatus').textContent.includes('تم تحديث ملف Excel المحلي'),null,{timeout:60000});
+ let dataset=JSON.parse(await fs.readFile(path.join(dir,'dataset.json'),'utf8'));assert.equal(dataset.caseRows.length,1);assert.equal(dataset.caseRows[0][3],'');assert.equal(dataset.findingRows.length,84);assert((await fs.stat(path.join(dir,'arabic-speech-research.xlsx'))).size>10000);
+ const download=page.waitForEvent('download');await page.locator('#openResearchLocal').click();assert.equal((await download).suggestedFilename(),'arabic-speech-research.xlsx');
+ await page.screenshot({path:'/private/tmp/articulation-local-workbook.png'});
+ await page.locator('[data-close="researchShareDialog"]').click();await page.locator('[id="closeReport"]').click();await page.locator('#homeButton').click();
+ const directDownload=page.waitForEvent('download');await page.getByRole('button',{name:'فتح ملف Excel المحلي',exact:true}).first().click();assert.equal((await directDownload).suggestedFilename(),'arabic-speech-research.xlsx');
+ for(const width of [320,390,1280]){await page.setViewportSize({width,height:844});assert.equal(await page.locator('.app-header').evaluate(n=>n.scrollWidth<=n.clientWidth),true,`Header fits ${width}px`);assert.equal(await page.locator('#openWorkbookButton').isVisible(),true);}await page.setViewportSize({width:390,height:844});await page.screenshot({path:'/private/tmp/articulation-workbook-button.png'});
+ await page.goto(origin+'/forms/aphasia/langiuage-cognitive/');await page.waitForFunction(()=>window.AphasiaApp);await page.locator('.home-actions [data-action=accounts]').click();await page.locator('#caseName').fill('Synthetic language workbook');await page.locator('#createCaseForm button').click();await page.locator('#homeReports').click();await page.locator('#historyList .history-row>button').first().click();await page.locator('[data-action=share]').click();await page.waitForFunction(()=>document.getElementById('sheetStatus').textContent.includes('تم تحديث ملف Excel المحلي'),null,{timeout:60000});
+ dataset=JSON.parse(await fs.readFile(path.join(dir,'aphasia/dataset.json'),'utf8'));assert.equal(dataset.length,1);assert.equal(dataset[0].catalog.length,197);assert.equal(dataset[0].case.assessments[0].state.fields.name,'');assert((await fs.stat(path.join(dir,'aphasia/language-cognitive-research.xlsx'))).size>10000);await page.screenshot({path:'/private/tmp/aphasia-local-workbook.png'});
+ assert.deepEqual(errors,[]);await context.close();console.log('PASS real browser: both share icons generate cumulative local XLSX files from actual app payloads; workbook opens from report; names excluded by default.');
+})().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();child?.kill();});

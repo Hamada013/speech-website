@@ -353,11 +353,37 @@ function reportSubgroupCharts(state, lang) {
   }
   return {html: html + '</div>', text: text.join('\n')};
 }
+function reportGroupedOverview(state, lang) {
+  const en = lang === 'en', t = (ar, english) => en ? english : ar;
+  const series = [
+    {key: 'correct', label: t('صحيح', 'Correct')},
+    {key: 'incorrect', label: t('غير صحيح', 'Incorrect')},
+    {key: 'dontknow', label: t('لا يعرف / لم يستجب', 'No response / does not know')}
+  ];
+  const domains = Array.from({length: 13}, (_,i) => i+1).map(section => ({section, ...AphasiaModel.summarize(items, state, section)})).filter(domain => domain.total);
+  const maximum = Math.max(5, Math.ceil(Math.max(...domains.flatMap(domain => series.map(series => domain[series.key]))) / 5) * 5);
+  const title = t('ملخص الأداء حسب المجال', 'Performance by domain');
+  const text = [title];
+  let html = `<figure class="grouped-bar-chart" aria-label="${title}"><figcaption><h2>${title}</h2><p>${t('عدد المهام حسب النتيجة؛ مقياس مشترك لجميع المجالات.', 'Number of tasks by result; the same scale applies to every domain.')} <span dir="ltr">0–${maximum}</span></p></figcaption><div class="grouped-chart-grid">`;
+  for (const domain of domains) {
+    const label = (en ? reportEnglishSections : sectionTitles)[domain.section];
+    const accessible = domain.assessed ? series.map(series => `${series.label}: ${domain[series.key]}`).join(' · ') : t('لم يُقيّم', 'Not assessed');
+    html += `<div class="grouped-chart-domain${domain.assessed ? '' : ' is-unassessed'}" data-section="${domain.section}"><h3>${escapeHTML(label)}</h3>`;
+    if (!domain.assessed) html += `<p class="grouped-chart-empty">${t('لم يُقيّم', 'Not assessed')}</p>`;
+    html += `<div class="grouped-chart-bars" role="img" aria-label="${escapeHTML(label + ': ' + accessible)}">`;
+    for (const seriesEntry of series) {
+      const count = domain[seriesEntry.key];
+      html += `<div class="grouped-chart-series series-${seriesEntry.key}" data-series="${seriesEntry.key}" data-count="${count}"><span class="series-label">${seriesEntry.label}</span><span class="series-track"><span style="width:${100 * count / maximum}%"></span></span><span class="series-count">${domain.assessed ? count : ''}</span></div>`;
+    }
+    html += '</div></div>'; text.push(`${label}: ${accessible}`);
+  }
+  html += `</div><p class="grouped-chart-note">${t('المستبعد وغير المُقيّم خارج الرسم؛ الملاحظات الوصفية مفصلة أدناه.', 'Excluded and unassessed tasks are outside the scores; descriptive observations appear below.')}</p></figure>`;
+  return {html, text: text.join('\n')};
+}
 function buildReport() {
   const lang = reportLanguage, en = lang === 'en', t = (ar, eng) => en ? eng : ar;
   const fields = en ? reportEnglishPatientFields : patientFields;
-  const state = {responses: Object.fromEntries(responses)}, total = AphasiaModel.summarize(items, state);
-  const percent = total.percent === null ? null : Math.round(total.percent * 100);
+  const state = {responses: Object.fromEntries(responses)};
   const title = t('تقرير التقييم المعرفي واللغوي', 'Language and Cognitive Assessment Report');
   const author = t('أحمد غانم · اختصاص النطق واللغة', 'Ahmad Ghanem · Speech and Language Pathology');
   const text = [title, author, ''], html = [`<header class="report-heading"><p>${author}</p><h1>${title}</h1></header>`];
@@ -365,8 +391,7 @@ function buildReport() {
   html.push('<div class="report-identity">');
   for (const key of ['name', 'age', 'currentDate', 'medicalDiagnosis', 'examinerName']) paragraph(fields[key], $(key).value.trim());
   html.push('</div>');
-  html.push(`<div class="report-overview"><div class="accuracy-ring" role="img" aria-label="${percent === null ? t('لم يُقيّم', 'Not assessed') : percent + '%'}"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="ring-background" cx="60" cy="60" r="50"/><circle class="ring-value" cx="60" cy="60" r="50" pathLength="100" stroke-dasharray="${percent === null ? 0 : total.percent * 100} 100" transform="rotate(-90 60 60)"/></svg><strong>${percent === null ? '—' : percent + '%'}</strong></div><div><h2>${t('ملخص الأداء', 'Performance summary')}</h2><p>${total.correct} ${t('صحيح من', 'correct out of')} ${total.assessed} ${t('بنداً مُقيّماً', 'evaluated tasks')}</p><p class="muted">${t('مُقيّم', 'Evaluated')} ${total.assessed}/${total.total} · ${t('مستبعد', 'Excluded')} ${total.skipped} · ${t('لم يُقيّم', 'Unassessed')} ${total.unanswered}</p></div></div>`);
-  text.push(`${t('الدقة الإجمالية', 'Overall accuracy')}: ${percent === null ? t('لم يُقيّم', 'Not assessed') : percent + '%'} (${total.correct}/${total.assessed})`);
+  const overview = reportGroupedOverview(state, lang); html.push(overview.html); text.push(overview.text);
   paragraph(t('طريقة الحساب', 'Calculation'), t('النسبة = عدد الإجابات الصحيحة ÷ عدد البنود المُقيّمة × ١٠٠. تشمل البنود المُقيّمة الإجابة غير الصحيحة وعدم المعرفة / عدم الاستجابة؛ يُستبعد غير المطبق وغير المُقيّم. النسب وصفية وليست درجات معيارية.', 'Percentage = correct tasks ÷ evaluated tasks × 100. Incorrect and does not know / no response count as evaluated. Excluded and unassessed tasks do not enter the denominator. Results are descriptive, not standardized scores.'));
   const charts = reportSubgroupCharts(state, lang); html.push(charts.html); text.push(charts.text);
   if ($('clinicalImpression').value.trim() || $('recommendations').value.trim() || Object.values(notes).some(Boolean)) html.push(`<h2>${t('الخلاصة السريرية والمتابعة', 'Clinical summary and follow-up')}</h2>`);

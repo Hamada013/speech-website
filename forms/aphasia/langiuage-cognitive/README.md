@@ -6,7 +6,7 @@ Each case supports multiple dated assessments, automatic local saving, JSON back
 
 The provisional aphasia profile uses **clinician-entered** fluency, comprehension, repetition, naming and confound review. It does not infer a diagnosis from screening percentages. Mixed ratings may produce multiple profiles; unknown ratings/confounds block suggestions. Clinical changes invalidate the review checkbox. Clinician impressions remain editable and authoritative. [ASHA](https://www.asha.org/practice-portal/clinical-topics/aphasia/) and [Merck](https://www.merckmanuals.com/professional/neurologic-disorders/function-and-dysfunction-of-the-cerebral-lobes/aphasia) inform the descriptive profiles; the [mixed transcortical pattern](https://pmc.ncbi.nlm.nih.gov/articles/PMC7880889/) is also supported in the literature. This custom assessment has no standardized diagnostic cutoffs.
 
-Workbook and optional automatic upload: see [research/SETUP.md](research/SETUP.md). The workbook link is public configuration; its records remain private. The collector is prepared, not deployed. Deployment and a real upload receipt must be checked by the workbook owner before relying on delivery. Device keys stay out of source and backups. Backup files and device storage contain clinical records; safeguard them. A second tab is blocked from overwriting another tab's changes. Do not edit the same restored case independently on two devices.
+Local workbook updates: see [research/SETUP.md](research/SETUP.md). The report share icon updates Excel through the computer's loopback collector. Online spreadsheet uploads and links have been removed. App cases remain in browser storage; keep backups.
 
 ## PWA release and checks
 
@@ -14,7 +14,7 @@ Run `node forms/aphasia/langiuage-cognitive/scripts/build-release.cjs` after cha
 
 ```
 node forms/aphasia/langiuage-cognitive/tests/model.cjs
-node forms/aphasia/langiuage-cognitive/tests/collector.cjs
+node forms/speech/articulation/tests/research-server.test.cjs
 SITE_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node forms/aphasia/langiuage-cognitive/tests/browser.cjs
 APP_ENGINE=webkit SITE_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node forms/aphasia/langiuage-cognitive/tests/browser.cjs
 node forms/aphasia/langiuage-cognitive/scripts/build-release.cjs --check

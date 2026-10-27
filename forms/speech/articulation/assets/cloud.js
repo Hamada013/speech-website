@@ -74,15 +74,7 @@
  async function openCloud(){await configReady;updateControls();openDialog($('cloudDialog'));if(!configured())message('ربط Google ينتظر إعداد المشروع. المتابعة والحفظ على الجهاز متاحان.');else initialize().catch(()=>message('تعذر الاتصال بـ Google. يمكنك المتابعة دون اتصال.',true));}
  function deviceId(){let id=localStorage.getItem(DEVICE_KEY);if(!id){id=caseId();localStorage.setItem(DEVICE_KEY,id);}return id;}
  function source(){return {accountId:user&&!user.isAnonymous?user.uid:'guest-'+deviceId(),email:user&&!user.isAnonymous?user.email||'':'',signIn:user&&!user.isAnonymous?'google':'guest',deviceId:deviceId(),origin:location.origin,verified:false};}
- async function sendResearch(payload){
-  await initialize();if(!config.researchEndpoint)throw Error('لم يُفعّل إرسال البحث إلى Google بعد.');
-  // Guest authentication is internal; it never asks the examiner to sign in.
-  if(!auth.currentUser)await sdk.signInAnonymously(auth);
-  user=auth.currentUser;const idToken=await user.getIdToken();
-  const response=await fetch(config.researchEndpoint,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+idToken},body:JSON.stringify(payload),signal:AbortSignal.timeout(120000)});
-  if(!response.ok)throw Error('تعذر تحديث جدول Google. حاول لاحقاً.');const result=await response.json();if(result.status!=='updated')throw Error('لم يؤكد Google حفظ النتائج.');return result;
- }
- window.ArticulationCloud={source,sendResearch,configured:()=>configured()&&!!config.researchEndpoint,open:openCloud};
+ window.ArticulationCloud={source,open:openCloud};
  window.addEventListener('articulation-cases-saved',()=>{if(applying)return;mutations++;schedule();});
  window.addEventListener('online',()=>{initialize().then(()=>sync()).catch(()=>{});});
  window.addEventListener('focus',()=>{if(user&&!user.isAnonymous)sync().catch(()=>{});});

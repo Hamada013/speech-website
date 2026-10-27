@@ -63,7 +63,8 @@ function stageSite(releases){
   const parts=file.split('/'),name=parts.at(-1);
   if(parts.some(part=>omitted.has(part))||name==='.DS_Store'||name==='AGENTS.md'||name.startsWith('.env')||name==='package-lock.json'||name==='package.json')continue;
   if(file.startsWith('forms/speech/articulation/cloud/')&&file!=='forms/speech/articulation/cloud/config.json')continue;
-  if(file.startsWith('forms/speech/articulation/research/')&&file!=='forms/speech/articulation/research/google-link.json')continue;
+  if(file.startsWith('forms/speech/articulation/research/'))continue;
+  if(file.startsWith('forms/aphasia/langiuage-cognitive/research/')&&file!=='forms/aphasia/langiuage-cognitive/research/SETUP.md')continue;
   const source=path.join(ROOT,file);if(!fs.existsSync(source))continue;
   if(fs.lstatSync(source).isSymbolicLink())throw Error('Pages files must not be symlinks: '+file);
   if(!fs.statSync(source).isFile())continue;
