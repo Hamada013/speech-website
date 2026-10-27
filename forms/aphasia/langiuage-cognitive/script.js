@@ -317,68 +317,46 @@ function summaryText(s, observation = false, lang = 'ar') {
   return `الدقة: ${s.percent === null ? 'لم يُقيّم' : s.percent + '%'} (${s.correct}/${s.assessed})؛ مُقيّم: ${s.assessed} من ${s.total}؛ غير صحيح: ${s.incorrect}؛ لا يعرف / لم يستجب: ${s.dontknow}؛ مستبعد: ${s.skipped}؛ لم يُقيّم: ${s.unanswered}`;
 }
 
-// The report summarizes each scoring subgroup; item records remain in the case workspace.
-function reportGroupTitle(group, section, lang) {
-  return (lang === 'en' ? reportEnglishSubsections : subsectionTitles)[group] ||
-    (lang === 'en' ? reportEnglishSections : sectionTitles)[section];
-}
-function reportResultBar(s, lang, variant = '') {
-  const en = lang === 'en', percent = s.percent === null ? null : Math.round(s.percent * 100);
-  const value = percent === null ? (en ? 'Not assessed' : 'لم يُقيّم') : percent + '%';
-  const count = en ? `${s.correct} correct / ${s.assessed} evaluated` : `${s.correct} صحيح / ${s.assessed} مُقيّم`;
-  return `<div class="subgroup-result ${variant}" data-correct="${s.correct}" data-assessed="${s.assessed}"><div class="result-caption"><strong>${value}</strong><span>${count}</span></div><div class="subgroup-track" role="img" aria-label="${escapeHTML(value + ' · ' + count)}"><span style="width:${percent === null ? 0 : s.percent * 100}%"></span></div></div>`;
-}
-function reportSubgroupCharts(state, lang) {
-  const groups = AphasiaModel.groupSummaries(items, state), en = lang === 'en';
-  let html = '<div class="subgroup-domains">'; const text = [];
-  for (let section = 1; section <= 13; section++) {
-    const list = groups.filter(g => g.section === section); if (!list.length) continue;
-    const title = (en ? reportEnglishSections : sectionTitles)[section];
-    html += `<section class="report-domain"><h2>${escapeHTML(title)}</h2><div class="subgroup-grid">`; text.push('', title);
-    for (const g of list) {
-      const name = reportGroupTitle(g.group, section, lang);
-      html += `<article class="subgroup-card" data-group="${g.group}"><h3>${escapeHTML(name)}</h3>`;
-      if (g.observation) {
-        const description = en ? `Present: ${g.present} · Not observed: ${g.absent} · Documented: ${g.assessed}/${g.total}` : `موجود: ${g.present} · غير ملاحظ: ${g.absent} · موثق: ${g.assessed}/${g.total}`;
-        html += `<p class="observation-result">${description}</p><small>${en ? 'Descriptive observations; no accuracy percentage.' : 'ملاحظات وصفية؛ لا تُحسب كنسبة إجابات صحيحة.'}</small>`;
-        text.push(name + ': ' + description);
-      } else {
-        html += reportResultBar(g, lang);
-        text.push(`${name}: ${g.percent === null ? (en ? 'Not assessed' : 'لم يُقيّم') : Math.round(g.percent * 100) + '%'} (${g.correct}/${g.assessed})`);
-      }
-      const coverage = en ? `Evaluated ${g.assessed}/${g.total} · Excluded ${g.skipped} · Unassessed ${g.unanswered}` : `مُقيّم ${g.assessed}/${g.total} · مستبعد ${g.skipped} · لم يُقيّم ${g.unanswered}`;
-      html += `<p class="subgroup-coverage">${coverage}</p></article>`; text.push(coverage);
+// One common-scale chart for the main domains; task detail stays in the workspace.
+function reportDomainChart(domains, series, maximum, lang, title, note) {
+  const ticks = Array.from({length:5}, (_,i) => maximum*i/4);
+  const legend = `<div class="grouped-chart-legend">${series.map(s=>`<span class="series-${s.key}"><i aria-hidden="true"></i>${escapeHTML(s.label)}</span>`).join('')}</div>`;
+  let html = `<figure class="grouped-bar-chart" aria-label="${escapeHTML(title)}"><figcaption><h2>${escapeHTML(title)}</h2>${legend}</figcaption><div class="grouped-chart-grid">`;
+  for (const d of domains) {
+    const label = (lang==='en'?reportEnglishSections:sectionTitles)[d.section];
+    const description = d.values.map((v,i)=>`${series[i].label}: ${v.text}`).join(' · ');
+    html += `<div class="grouped-chart-domain" data-section="${d.section}" data-correct="${d.correct??''}" data-assessed="${d.assessed??''}"><div class="grouped-domain-label"><h3>${escapeHTML(label)}</h3><small>${escapeHTML(d.caption||'')}</small></div><div class="grouped-chart-bars" dir="ltr" role="img" aria-label="${escapeHTML(label+': '+description)}">`;
+    for (const [i,v] of d.values.entries()) {
+      const width = Math.max(0,Math.min(100,100*(v.count||0)/maximum));
+      html += `<div class="grouped-chart-series series-${series[i].key}" data-series="${series[i].key}" data-count="${v.count??''}" style="--bar-width:${width}%"><span class="series-track"><span></span><b class="series-count">${escapeHTML(v.text)}</b></span></div>`;
     }
-    html += '</div></section>';
+    html += '</div></div>';
   }
-  return {html: html + '</div>', text: text.join('\n')};
+  html += `<div class="grouped-chart-axis" aria-hidden="true"><span></span><div dir="ltr">${ticks.map(n=>`<span>${Number(n.toFixed(1))}</span>`).join('')}</div></div></div><p class="grouped-chart-note">${escapeHTML(note)}</p></figure>`;
+  return html;
+}
+function reportObservations(state, lang) {
+  const en=lang==='en',t=(ar,english)=>en?english:ar,rows=[];
+  for(let section=1;section<=13;section++){
+    const list=items.filter(i=>i.section===section&&i.observation);if(!list.length)continue;
+    const counts={present:0,absent:0,skip:0,unanswered:0};for(const item of list)counts[state.responses[item.id]||'unanswered']++;
+    rows.push({section,...counts});
+  }
+  const title=t('الملاحظات الوصفية حسب المجال','Descriptive observations by domain');
+  const labels=[t('المجال','Domain'),t('موجود','Present'),t('غير ملاحظ','Not observed'),t('مستبعد','Excluded'),t('لم يُقيّم','Unassessed')];
+  const text=rows.map(r=>`${(en?reportEnglishSections:sectionTitles)[r.section]}: ${labels.slice(1).map((l,i)=>l+': '+r[['present','absent','skip','unanswered'][i]]).join(' · ')}`).join('\n');
+  return {html:`<div class="domain-observations"><h2>${title}</h2><p class="muted">${t('تُسجل كوجود أو غياب، ولا تدخل في دقة الإجابات.','Recorded as present or not observed; excluded from accuracy.')}</p><table><thead><tr>${labels.map(l=>`<th scope="col">${l}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr><th scope="row">${escapeHTML((en?reportEnglishSections:sectionTitles)[r.section])}</th>${['present','absent','skip','unanswered'].map(k=>`<td>${r[k]}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`,text};
 }
 function reportGroupedOverview(state, lang) {
-  const en = lang === 'en', t = (ar, english) => en ? english : ar;
-  const series = [
-    {key: 'correct', label: t('صحيح', 'Correct')},
-    {key: 'incorrect', label: t('غير صحيح', 'Incorrect')},
-    {key: 'dontknow', label: t('لا يعرف / لم يستجب', 'No response / does not know')}
-  ];
-  const domains = Array.from({length: 13}, (_,i) => i+1).map(section => ({section, ...AphasiaModel.summarize(items, state, section)})).filter(domain => domain.total);
-  const maximum = Math.max(5, Math.ceil(Math.max(...domains.flatMap(domain => series.map(series => domain[series.key]))) / 5) * 5);
-  const title = t('ملخص الأداء حسب المجال', 'Performance by domain');
-  const text = [title];
-  let html = `<figure class="grouped-bar-chart" aria-label="${title}"><figcaption><h2>${title}</h2><p>${t('عدد المهام حسب النتيجة؛ مقياس مشترك لجميع المجالات.', 'Number of tasks by result; the same scale applies to every domain.')} <span dir="ltr">0–${maximum}</span></p></figcaption><div class="grouped-chart-grid">`;
-  for (const domain of domains) {
-    const label = (en ? reportEnglishSections : sectionTitles)[domain.section];
-    const accessible = domain.assessed ? series.map(series => `${series.label}: ${domain[series.key]}`).join(' · ') : t('لم يُقيّم', 'Not assessed');
-    html += `<div class="grouped-chart-domain${domain.assessed ? '' : ' is-unassessed'}" data-section="${domain.section}"><h3>${escapeHTML(label)}</h3>`;
-    if (!domain.assessed) html += `<p class="grouped-chart-empty">${t('لم يُقيّم', 'Not assessed')}</p>`;
-    html += `<div class="grouped-chart-bars" role="img" aria-label="${escapeHTML(label + ': ' + accessible)}">`;
-    for (const seriesEntry of series) {
-      const count = domain[seriesEntry.key];
-      html += `<div class="grouped-chart-series series-${seriesEntry.key}" data-series="${seriesEntry.key}" data-count="${count}"><span class="series-label">${seriesEntry.label}</span><span class="series-track"><span style="width:${100 * count / maximum}%"></span></span><span class="series-count">${domain.assessed ? count : ''}</span></div>`;
-    }
-    html += '</div></div>'; text.push(`${label}: ${accessible}`);
-  }
-  html += `</div><p class="grouped-chart-note">${t('المستبعد وغير المُقيّم خارج الرسم؛ الملاحظات الوصفية مفصلة أدناه.', 'Excluded and unassessed tasks are outside the scores; descriptive observations appear below.')}</p></figure>`;
-  return {html, text: text.join('\n')};
+  const en=lang==='en',t=(ar,english)=>en?english:ar;
+  const series=[{key:'correct',label:t('صحيح','Correct')},{key:'incorrect',label:t('غير صحيح','Incorrect')},{key:'dontknow',label:t('لا يعرف / لم يستجب','No response / does not know')},{key:'skipped',label:t('مستبعد','Excluded')},{key:'unanswered',label:t('لم يُقيّم','Unassessed')}];
+  const domains=Array.from({length:13},(_,i)=>i+1).map(section=>({section,...AphasiaModel.summarize(items,state,section)})).filter(d=>d.total);
+  const maximum=Math.max(4,Math.ceil(Math.max(...domains.flatMap(d=>series.map(s=>d[s.key])))/4)*4);
+  for(const d of domains){d.values=series.map(s=>({count:d[s.key],text:String(d[s.key])}));d.caption=d.assessed?`${Math.round(d.percent*100)}% (${d.correct}/${d.assessed})`:t('لم يُقيّم','Not assessed');}
+  const title=t('ملخص الأداء حسب المجال','Performance by domain');
+  const note=t('عدد البنود على مقياس مشترك. الدقة = الصحيح ÷ المُقيّم؛ المستبعد وغير المُقيّم خارج المقام.','Task counts on a shared scale. Accuracy = correct / evaluated; excluded and unassessed tasks are outside the denominator.');
+  const text=[title,...domains.map(d=>`${(en?reportEnglishSections:sectionTitles)[d.section]}: ${d.caption} · ${series.map(s=>`${s.label}: ${d[s.key]}`).join(' · ')}`)].join('\n');
+  return {html:reportDomainChart(domains,series,maximum,lang,title,note),text};
 }
 function buildReport() {
   const lang = reportLanguage, en = lang === 'en', t = (ar, eng) => en ? eng : ar;
@@ -393,7 +371,7 @@ function buildReport() {
   html.push('</div>');
   const overview = reportGroupedOverview(state, lang); html.push(overview.html); text.push(overview.text);
   paragraph(t('طريقة الحساب', 'Calculation'), t('النسبة = عدد الإجابات الصحيحة ÷ عدد البنود المُقيّمة × ١٠٠. تشمل البنود المُقيّمة الإجابة غير الصحيحة وعدم المعرفة / عدم الاستجابة؛ يُستبعد غير المطبق وغير المُقيّم. النسب وصفية وليست درجات معيارية.', 'Percentage = correct tasks ÷ evaluated tasks × 100. Incorrect and does not know / no response count as evaluated. Excluded and unassessed tasks do not enter the denominator. Results are descriptive, not standardized scores.'));
-  const charts = reportSubgroupCharts(state, lang); html.push(charts.html); text.push(charts.text);
+  const observations = reportObservations(state, lang); html.push(observations.html); text.push(observations.text);
   if ($('clinicalImpression').value.trim() || $('recommendations').value.trim() || Object.values(notes).some(Boolean)) html.push(`<h2>${t('الخلاصة السريرية والمتابعة', 'Clinical summary and follow-up')}</h2>`);
   paragraph(t('انطباع الفاحص', 'Examiner impression'), $('clinicalImpression').value.trim());
   paragraph(t('التوصيات والأهداف', 'Recommendations and goals'), $('recommendations').value.trim());
