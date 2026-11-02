@@ -17,3 +17,11 @@ dialog{width:min(600px,calc(100% - 24px));max-height:calc(100svh - 32px);max-hei
 @media print{body{background:white;padding:0}.app-header,.contact-footer,.error,.skip-link,dialog,.results-view>.primary,#print-button,noscript{display:none!important}#main{max-width:none;padding:0;height:auto!important}.view{display:none!important}#results-view{display:block!important;padding:0}.report{box-shadow:none;border:0;padding:0}.result-heading h1{font-size:20pt}.metric-grid>div,.score-track>span,thead{print-color-adjust:exact;-webkit-print-color-adjust:exact}.table-scroll{overflow:visible}table{font-size:10pt}thead{display:table-header-group}tr{break-inside:avoid}.metric-grid,.report-note{break-inside:avoid}}
 
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* Six examiner ratings: the visible percentage and icon also identify every color. */
+.grade-controls{display:grid;grid-template-columns:repeat(6,minmax(44px,1fr));gap:10px;width:min(100%,600px);margin-inline:auto;direction:ltr}
+.grade{display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0;min-height:60px;padding:8px 4px;font-weight:700;font-size:.9rem;background:var(--grade-bg);color:var(--grade-ink);border-color:var(--grade-border)}
+.grade svg{width:24px;height:24px}.grade bdi{white-space:nowrap}.grade:hover:not(:disabled){background:var(--grade-bg);box-shadow:inset 0 0 0 2px var(--grade-ink)}
+.score-0{--grade-bg:#fce7e7;--grade-ink:#9c3039;--grade-border:#e6b9bd}.score-20{--grade-bg:#ffebdf;--grade-ink:#914517;--grade-border:#ebc5aa}.score-40{--grade-bg:#fff3d6;--grade-ink:#795713;--grade-border:#e6d29b}.score-60{--grade-bg:#eff5d9;--grade-ink:#53651c;--grade-border:#cbd9a1}.score-80{--grade-bg:#ddf4ed;--grade-ink:#236956;--grade-border:#a5d7c8}.score-100{--grade-bg:#d8efdf;--grade-ink:#216435;--grade-border:#a0cdae}
+@media(max-width:600px){.grade-controls{gap:6px}.grade{font-size:.8rem;min-height:58px}}
+@media(max-height:560px) and (min-aspect-ratio:1/1){.grade-controls{position:static;width:min(100%,490px);gap:6px}.grade{flex-direction:row;gap:4px;min-height:44px;font-size:.8rem}.grade svg{width:18px;height:18px}.production-card{min-height:0}.production-card .syllable-part img{height:clamp(25px,10vh,45px)}}

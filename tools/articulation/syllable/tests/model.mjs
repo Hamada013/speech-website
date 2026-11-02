@@ -31,3 +31,11 @@ const bad=structuredClone(listening);bad.plan[0].choices=[bad.plan[0].id];assert
 assert.equal(validSession({...production,cues:{anything:true}}),false);
 for(const file of ['syllable.html','matching.html']){const html=fs.readFileSync(new URL(file,root),'utf8');assert.ok(!/https?:\/\/(?:cdn|fonts|assets\.mixkit)/.test(html));assert.ok(!/user-scalable=no|maximum-scale=1/.test(html));}
 console.log(`PASS: ${count} real CV/VC/VCV audio targets; picture paths, three listening choices, finite tests, one response per trial, production grades/cues, resume validation and local/zoom-friendly pages.`);
+
+const percentages=newAssessment('production',[2,3],'cv');
+assert.equal(addResponse(percentages,{id:percentages.plan[0].id,outcome:'emerging',score:30}),false);
+for(const [i,score] of [0,20,40,60,80,100].entries())assert.ok(addResponse(percentages,{id:percentages.plan[i].id,outcome:score===0?'incorrect':score===100?'correct':'emerging',score}));
+assert.equal(summarize(percentages).accuracy,50);assert.ok(validSession(percentages));
+assert.deepEqual(JSON.parse(JSON.stringify(percentages)).records.map(r=>r.score),[0,20,40,60,80,100]);
+const invalidScore=structuredClone(percentages);invalidScore.records[0].score=60;assert.equal(validSession(invalidScore),false);
+console.log('PASS: six production percentages, averaged scores, persistent values, invalid-score rejection and legacy result compatibility.');

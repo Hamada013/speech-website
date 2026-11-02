@@ -211,14 +211,14 @@ async function renderTrial() {
     if(!state.imagesReady){stopAudio();$('#audio-status').textContent='تعذر تحميل صورة. أعد التشغيل لتحميلها أو تخطّ المقطع.';return;}
     if(playback)await playback;
 }
-async function respond(outcome,selected='') {
+async function respond(outcome,selected='',score) {
     if(state.screen!=='activity'||state.busy||state.cueUnsaved||!state.session||state.session.status!=='draft')return;
     if(outcome!=='skip'&&(!state.imagesReady||state.playing||state.kind==='listening'&&!state.heard))return;
     const item=currentItem();if(!item)return;
     const next=structuredClone(state.session);
-    if(!addResponse(next,{id:item.id,outcome,selected,modeled:!!next.cues[item.id]}))return;
+    if(!addResponse(next,{id:item.id,outcome,selected,score,modeled:!!next.cues[item.id]}))return;
     writeSession(next);state.session=next;state.busy=true;stopAudio();updateResponseControls();
-    showFeedback(outcome==='correct'?'check':outcome==='emerging'?'half':outcome==='skip'?'skip':'cross',outcome,({correct:'صحيح',incorrect:'غير صحيح',emerging:'محاولة غير مكتملة',skip:'لم يُقيّم'})[outcome]);
+    showFeedback(outcome==='correct'?'check':outcome==='emerging'?'half':outcome==='skip'?'skip':'cross',outcome,score !== undefined ? `${score}%` : ({correct:'صحيح',incorrect:'غير صحيح',emerging:'محاولة غير مكتملة',skip:'لم يُقيّم'})[outcome]);
     const generation=state.generation;
     roundTimer=setTimeout(()=>{if(generation!==state.generation||state.screen!=='activity')return;state.busy=false;if(next.status==='complete')showResults(next);else void safe(renderTrial)();},450);
 }
@@ -240,7 +240,7 @@ function showResults(session) {
     invalidate();state.result=session;const summary=summarize(session),index=new Map(bank(session.letters,session.mode).map(item=>[item.id,item]));
     $('#results-title').textContent=title(session.kind);
     const date=new Date(session.startedAt).toLocaleString('ar');
-    $('#result-content').innerHTML=`<article class="panel report"><p class="muted">${escape(date)} · ${session.mode.toUpperCase()} · ${session.status==='complete'?'مكتمل':'جزئي'}</p><div class="metric-grid"><div><strong>${summary.accuracy===null?'—':summary.accuracy+'%'}</strong><span>${session.kind==='listening'?'اختيارات صحيحة':'إنتاج صحيح'}</span></div><div><strong><bdi dir="ltr">${summary.correct} / ${summary.assessed}</bdi></strong><span>صحيح / مقيّم</span></div><div><strong><bdi dir="ltr">${summary.recorded} / ${summary.total}</bdi></strong><span>استجابات / مخطط</span></div></div><div class="score-track" role="img" aria-label="${summary.accuracy===null?'لا توجد كلمات مقيّمة':summary.accuracy+' بالمئة صحيحة'}"><span style="width:${summary.accuracy??0}%"></span></div><p class="report-note">لم يُقيّم: ${summary.skipped}${session.kind==='production'?` · محاولات غير مكتملة: ${summary.emerging} · بعد نموذج صوتي: ${summary.modeled}`:''}</p><div class="table-scroll"><table><caption>استجابات المقاطع</caption><thead><tr><th>المقطع</th><th>الاستجابة</th>${session.kind==='listening'?'<th>الاختيار</th>':'<th>نموذج صوتي</th>'}</tr></thead><tbody>${session.records.map(r=>`<tr><td>${index.get(r.id).label}</td><td>${({correct:'صحيح',incorrect:'غير صحيح',emerging:'محاولة غير مكتملة',skip:'لم يُقيّم'})[r.outcome]}</td><td>${session.kind==='listening'?index.get(r.selected)?.label||'—':r.modeled?'نعم':'لا'}</td></tr>`).join('')}</tbody></table></div>${session.kind==='production'?'<p class="muted report-note">تقدير الفاحص. تُعرض التسمية بعد النموذج منفصلة؛ لا يوجد تصحيح آلي للصوت.</p>':''}</article>`;
+    $('#result-content').innerHTML=`<article class="panel report"><p class="muted">${escape(date)} · ${session.mode.toUpperCase()} · ${session.status==='complete'?'مكتمل':'جزئي'}</p><div class="metric-grid"><div><strong>${summary.accuracy===null?'—':summary.accuracy+'%'}</strong><span>${session.kind==='listening'?'اختيارات صحيحة':session.records.some(r=>r.score!==undefined)?'متوسط تقدير الإنتاج':'إنتاج صحيح'}</span></div><div><strong><bdi dir="ltr">${summary.correct} / ${summary.assessed}</bdi></strong><span>صحيح / مقيّم</span></div><div><strong><bdi dir="ltr">${summary.recorded} / ${summary.total}</bdi></strong><span>استجابات / مخطط</span></div></div><div class="score-track" role="img" aria-label="${summary.accuracy===null?'لا توجد كلمات مقيّمة':summary.accuracy+(session.kind==='production'?' بالمئة متوسط تقدير الإنتاج':' بالمئة صحيحة')}"><span style="width:${summary.accuracy??0}%"></span></div><p class="report-note">لم يُقيّم: ${summary.skipped}${session.kind==='production'?` · محاولات غير مكتملة: ${summary.emerging} · بعد نموذج صوتي: ${summary.modeled}`:''}</p><div class="table-scroll"><table><caption>استجابات المقاطع</caption><thead><tr><th>المقطع</th><th>الاستجابة</th>${session.kind==='listening'?'<th>الاختيار</th>':'<th>نموذج صوتي</th>'}</tr></thead><tbody>${session.records.map(r=>`<tr><td>${index.get(r.id).label}</td><td>${r.score!==undefined?r.score+'%':({correct:'صحيح',incorrect:'غير صحيح',emerging:'محاولة غير مكتملة',skip:'لم يُقيّم'})[r.outcome]}</td><td>${session.kind==='listening'?index.get(r.selected)?.label||'—':r.modeled?'نعم':'لا'}</td></tr>`).join('')}</tbody></table></div>${session.kind==='production'?'<p class="muted report-note">متوسط النسب التي اختارها الفاحص؛ تُستثنى المقاطع غير المقيّمة. التقديرات السابقة بلا نسبة محفوظة بتسمياتها الأصلية. تُعرض التسمية بعد النموذج منفصلة؛ لا يوجد تصحيح آلي للصوت.</p>':''}</article>`;
     showScreen('results');updateResume();
 }
 function openHistory() {
@@ -330,7 +330,7 @@ $('#continue-button').addEventListener('click',safe(()=>resume(state.session)));
 $('#finish-button').addEventListener('click',safe(finishPartial));
 $('#replay-button').addEventListener('click',safe(()=>!state.imagesReady?renderTrial():playItem(currentItem(),null,true)));
 $('#skip-button').addEventListener('click',safe(()=>respond('skip')));
-$$('[data-grade]').forEach(button=>button.addEventListener('click',safe(()=>respond(button.dataset.grade))));
+$$('[data-grade]').forEach(button=>button.addEventListener('click',safe(()=>{const score=Number(button.dataset.grade);return respond(score===100?'correct':score===0?'incorrect':'emerging','',score);})));
 $('#previous-page').addEventListener('click',()=>{state.page--;renderPractice();});$('#next-page').addEventListener('click',()=>{state.page++;renderPractice();});
 $('#restart-button').addEventListener('click',newMatching);$('#history-button').addEventListener('click',safe(openHistory));
 $('#repeat-button').addEventListener('click',()=>{state.letters=[...state.result.letters];state.mode=state.result.mode;openSetup(state.result.kind);});

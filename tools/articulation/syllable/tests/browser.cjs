@@ -59,15 +59,22 @@ async function run(engine,name,origin){
   await page.locator(`#choice-grid [data-item="${draft.plan[1].id}"]`).click();await page.waitForTimeout(520);await listeningReady(page);await page.locator('#skip-button').click();await visible(page,'#results-view');
   assert.match(await page.locator('#result-content').textContent(),/50%/);draft=(await stored(page)).find(s=>s.kind==='listening');assert.equal(draft.records.length,3);assert.equal(draft.status,'complete');
   // Production starts silently; cues survive pause/reload and never score automatically.
-  await setup(page,'production','cv');await page.waitForFunction(()=>!document.querySelector('[data-grade=correct]').disabled);
+  await setup(page,'production','cv');await page.waitForFunction(()=>!document.querySelector('[data-grade="100"]').disabled);
   assert.equal(await page.locator('#syllable-audio').evaluate(audio=>audio.paused),true);assert.deepEqual((await stored(page)).find(s=>s.kind==='production').cues,{});
   for(const [width,height]of viewports){await page.setViewportSize({width,height});await fit(page,`${name} production ${width}x${height}`);}
-  await page.setViewportSize({width:390,height:844});await page.locator('[data-grade=incorrect]').click();await page.waitForTimeout(520);await page.waitForFunction(()=>!document.querySelector('[data-grade=correct]').disabled);
+  await page.setViewportSize({width:390,height:844});await page.locator('[data-grade="0"]').click();await page.waitForTimeout(520);await page.waitForFunction(()=>!document.querySelector('[data-grade="100"]').disabled);
   await page.locator('#replay-button').click();await page.waitForFunction(()=>document.querySelector('#syllable-audio').currentTime>0);
-  await page.locator('#pause-button').click();await visible(page,'#paused-view');await page.reload();await visible(page,'#resume-button');await page.locator('#resume-button').click();await page.waitForFunction(()=>!document.querySelector('[data-grade=emerging]').disabled);
-  assert.match(await page.locator('#audio-status').textContent(),/سبق تشغيل/);await page.locator('[data-grade=emerging]').click();await page.waitForTimeout(520);await page.waitForFunction(()=>!document.querySelector('[data-grade=correct]').disabled);await page.locator('[data-grade=correct]').click();await visible(page,'#results-view');
-  let production=(await stored(page)).find(s=>s.kind==='production');assert.deepEqual(production.records.map(r=>r.outcome),['incorrect','emerging','correct']);assert.deepEqual(production.records.map(r=>r.modeled),[false,true,false]);assert.match(await page.locator('#result-content').textContent(),/33%/);
+  await page.locator('#pause-button').click();await visible(page,'#paused-view');await page.reload();await visible(page,'#resume-button');await page.locator('#resume-button').click();await page.waitForFunction(()=>!document.querySelector('[data-grade="40"]').disabled);
+  assert.match(await page.locator('#audio-status').textContent(),/سبق تشغيل/);await page.locator('[data-grade="40"]').click();await page.waitForTimeout(520);await page.waitForFunction(()=>!document.querySelector('[data-grade="100"]').disabled);await page.locator('[data-grade="100"]').click();await visible(page,'#results-view');
+  let production=(await stored(page)).find(s=>s.kind==='production');assert.deepEqual(production.records.map(r=>r.outcome),['incorrect','emerging','correct']);assert.deepEqual(production.records.map(r=>r.score),[0,40,100]);assert.deepEqual(production.records.map(r=>r.modeled),[false,true,false]);assert.match(await page.locator('#result-content').textContent(),/47%/);
   await page.screenshot({path:`/private/tmp/artic-syllable-${name}-report.png`,fullPage:true});
+  await setup(page,'production','vcv');
+  assert.deepEqual(await page.locator('#production-grades button').allTextContents(),['0%','20%','40%','60%','80%','100%']);
+  for(const score of [0,20,40,60,80,100]){await page.waitForFunction(()=>!document.querySelector('[data-grade="100"]').disabled);await page.locator(`[data-grade="${score}"]`).click();await page.waitForTimeout(520);}
+  for(let i=0;i<3;i++){await page.locator('#skip-button').click();await page.waitForTimeout(520);}
+  await visible(page,'#results-view');
+  const percentages=(await stored(page)).filter(s=>s.kind==='production').find(s=>s.mode==='vcv');
+  assert.deepEqual(percentages.records.slice(0,6).map(r=>r.score),[0,20,40,60,80,100]);assert.match(await page.locator('#result-content').textContent(),/50%/);
   // Tap/keyboard matching and pointer dragging; matched targets cannot score twice.
   await setup(page,'matching','vcv');
   for(const [width,height]of viewports){await page.setViewportSize({width,height});await fit(page,`${name} matching ${width}x${height}`);}
@@ -88,12 +95,12 @@ async function run(engine,name,origin){
   assert.match(await page.locator('#matching-count').textContent(),/1 \/ 3/,'Touch matching');
   await page.screenshot({path:`/private/tmp/artic-syllable-${name}-matching.png`,fullPage:true});
   // A storage failure leaves the trial unrecorded and available for retry.
-  await setup(page,'production','cv');await page.waitForFunction(()=>!document.querySelector('[data-grade=correct]').disabled);
+  await setup(page,'production','cv');await page.waitForFunction(()=>!document.querySelector('[data-grade="100"]').disabled);
   await page.evaluate(()=>{window.originalSetItem=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw new DOMException('QA quota','QuotaExceededError');};});
-  await page.locator('[data-grade=correct]').click();await visible(page,'#error');
+  await page.locator('[data-grade="100"]').click();await visible(page,'#error');
   assert.equal((await stored(page)).at(-1).records.length,0);
   await page.evaluate(()=>{Storage.prototype.setItem=window.originalSetItem;});
-  await page.locator('[data-grade=correct]').click();await page.waitForTimeout(520);
+  await page.locator('[data-grade="100"]').click();await page.waitForTimeout(520);
   assert.equal((await stored(page)).at(-1).records.length,1);assert.equal(await page.locator('#error').isVisible(),false);
   await page.locator('#pause-button').click();await visible(page,'#paused-view');await page.locator('#finish-button').click();await visible(page,'#results-view');assert.match(await page.locator('#result-content').textContent(),/جزئي/);
   // No listening score is possible when sound fails; replay recovers the same item.
