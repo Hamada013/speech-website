@@ -106,6 +106,9 @@ p {
   gap:24px;
   padding:0 20px 30px
 }
+.layout > aside, .layout > main {
+  min-width:0
+}
 aside {
   align-self:start;
   position:sticky;

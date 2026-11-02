@@ -1,0 +1,17 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const root=path.resolve(__dirname,'..'),ctx={console};ctx.window=ctx;vm.createContext(ctx);
+for(const f of ['data','stimuli','review','manual-data','manual','barriers-data','transitions-data','task-analysis-data','model','iep-curriculum','iep','goal-bank-data','goal-bank','report','pdf-data'])vm.runInContext(fs.readFileSync(path.join(root,`assets/${f}.js`),'utf8'),ctx);
+const {VBModel:M,VB_DATA:D,VBGoalBank:B,VB_GOAL_EXAMPLES:E,VBReport:R,VBPDFData:P}=ctx,all=M.allMilestones(D);
+assert.equal(E.items.length,178);assert.deepEqual([1,2,3].map(l=>E.items.filter(e=>e.level===l).length),[48,66,64]);assert.equal(B.entries(D).length,1088);assert.equal(new Set(B.entries(D).map(e=>e.id)).size,1088);
+for(const e of B.entries(D)){assert.ok(e.text.en&&e.text.ar);assert.ok(D.categories.includes(e.category));assert.ok([1,2,3].includes(e.level));}
+assert.equal(E.items.filter(e=>e.category==='Vocal').length,3);assert.ok(E.items.every(e=>e.sourcePage>=1&&e.sourcePage<=14));
+assert.match(E.items.find(e=>e.id==='pdf-2-social-01').text.en,/50 times/);assert.match(E.items.find(e=>e.id==='pdf-3-writing-04').text.en,/1-30/);
+assert.ok(B.filter(D,{query:'تنغيم',kind:'annual'}).some(e=>e.category==='Vocal'));assert.ok(B.filter(D,{level:3,category:'Math',kind:'annual'}).length===5);
+let s=M.blank();s.child.name='Child';s.lang='en';s.reportLang='en';assert.equal(B.childGoals(s,D).length,0);const mand=all.find(i=>i.id==='m1-1');M.setScore(s,'milestones',mand,0);const original=JSON.stringify(s),goals=B.childGoals(s,D);assert.equal(goals.length,1);assert.equal(JSON.stringify(s),original);assert.match(goals[0].plan.goal,/Within 12 months, Child will produce/);assert.match(R.make(s,D).text,/Within 12 months, Child will produce/);assert.ok(P.pack(s,D).assessment.goals['m1-1']);
+s.iepExcluded=['m1-1'];assert.equal(B.childGoals(s,D).length,0);assert.equal(M.normalize(s).iepExcluded[0],'m1-1');
+const e=E.items[0],plan=B.fromEntry(s,D,e,'en');s.goals['bank-'+e.id]=plan;s.goals['bank-'+e.id].goal='Preserved custom PDF goal';const n=M.normalize(s);assert.equal(n.goals['bank-'+e.id].bankId,e.id);assert.equal(n.goals['bank-'+e.id].itemId,'m1-1');assert.equal(B.childGoals(n,D).length,1);assert.match(R.make(n,D).text,/Preserved custom PDF goal/);assert.equal(P.pack(n,D).assessment.goals['bank-'+e.id].bankId,e.id);
+n.reportScope.milestones=false;assert.equal(Object.keys(P.pack(n,D).assessment.goals).length,1);assert.match(R.make(n,D).text,/Preserved custom PDF goal/);n.reportScope.goals=false;assert.equal(Object.keys(P.pack(n,D).assessment.goals).length,0);assert.doesNotMatch(R.make(n,D).text,/Preserved custom PDF goal/);
+const follow=M.startFollowup(s);assert.equal(B.childGoals(follow,D).length,0);assert.equal(follow.history[0].goals['bank-'+e.id].goal,'Preserved custom PDF goal');assert.equal(follow.iepExcluded.length,0);
+// Template choice never changes or fabricates test scores, including unassessed child records.
+const blank=M.blank(),snapshot=JSON.stringify(blank);assert.ok(B.fromEntry(blank,D,E.items.find(e=>e.category==='Math'),'ar'));assert.equal(JSON.stringify(blank),snapshot);
+console.log('PASS: 178 PDF examples, all 1088 templates, source counts/variants, current-child suggestions, exclusions, non-mutating selection, edited goals, report/PDF persistence and follow-up isolation.');

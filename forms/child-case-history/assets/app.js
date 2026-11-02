@@ -4,7 +4,7 @@ const pair=(en,ar)=>[en,ar];
 const yes=()=>[pair('Yes','نعم'),pair('No','لا'),pair('Unknown','غير معروف')];
 const f=(id,en,ar,type='text',options=null,hint=null)=>({id,label:pair(en,ar),type,options,hint});
 const sections=[
-{title:pair('Child & interview details','بيانات الطفل والمقابلة'),description:pair('Record the source of the history. Leave unknown information blank or select Unknown.','حدد مصدر المعلومات. اترك المعلومة غير المعروفة فارغة أو اختر غير معروف.'),fields:[f('childName','Child’s full name','اسم الطفل الكامل'),f('recordId','Record / file number','رقم الملف'),f('dob','Date of birth','تاريخ الميلاد','date'),f('assessmentDate','Assessment date','تاريخ التقييم','date'),f('sex','Sex (if relevant)','الجنس (إذا كان ذا صلة)','radio',[pair('Female','أنثى'),pair('Male','ذكر'),pair('Prefer not to say','أفضل عدم الإجابة')]),f('informant','Caregiver / informant and relationship','مقدم المعلومات وصلته بالطفل'),f('contact','Contact phone / email','رقم التواصل / البريد الإلكتروني'),f('address','City / address','المدينة / العنوان'),f('examiner','Clinician','الفاحص'),f('interpreter','Interview language / interpreter','لغة المقابلة / المترجم'),f('consent','Consent for assessment documented','توثيق الموافقة على التقييم','radio',yes()),f('source','Information sources / records reviewed','مصادر المعلومات / الوثائق التي تمت مراجعتها','textarea')]},
+{title:pair('Child & interview details','بيانات الطفل والمقابلة'),description:pair('Record the source of the history. Leave unknown information blank or add a note.','حدد مصدر المعلومات. اترك المعلومة غير المعروفة فارغة أو أضف ملاحظة.'),fields:[f('childName','Child’s full name','اسم الطفل الكامل'),f('recordId','Record / file number','رقم الملف'),f('dob','Date of birth','تاريخ الميلاد','date'),f('assessmentDate','Assessment date','تاريخ التقييم','date'),f('sex','Sex (if relevant)','الجنس (إذا كان ذا صلة)','radio',[pair('Female','أنثى'),pair('Male','ذكر'),pair('Prefer not to say','أفضل عدم الإجابة')]),f('informant','Caregiver / informant and relationship','مقدم المعلومات وصلته بالطفل'),f('contact','Contact phone / email','رقم التواصل / البريد الإلكتروني'),f('address','City / address','المدينة / العنوان'),f('examiner','Clinician','الفاحص'),f('interpreter','Interview language / interpreter','لغة المقابلة / المترجم'),f('consent','Consent for assessment documented','توثيق الموافقة على التقييم','radio',yes()),f('source','Information sources / records reviewed','مصادر المعلومات / الوثائق التي تمت مراجعتها','textarea')]},
 {title:pair('Referral & family priorities','الإحالة وأولويات الأسرة'),fields:[f('referral','Referred by / reason for referral','جهة الإحالة / سبب الإحالة'),f('concerns','Main concerns in the caregiver’s words','الشكاوى الأساسية بكلمات مقدم الرعاية','textarea'),f('onset','When noticed / changes over time','متى لوحظت المشكلة / تطورها','textarea'),f('strengths','Child’s strengths, interests and motivators','نقاط القوة والاهتمامات والمحفزات','textarea'),f('impact','Impact on home, school and participation','الأثر على المنزل والمدرسة والمشاركة','textarea'),f('goals','Child / caregiver priorities and goals','أولويات وأهداف الطفل والأسرة','textarea')]},
 {title:pair('Pregnancy & birth','الحمل والولادة'),fields:[f('pregnancy','Pregnancy history, complications / relevant exposures','الحمل والمضاعفات / التعرضات ذات الصلة','textarea'),f('birthType','Type of birth','نوع الولادة','radio',[pair('Vaginal (unassisted)','مهبلية دون مساعدة'),pair('Vaginal (assisted)','مهبلية بمساعدة'),pair('Caesarean','قيصرية'),pair('Other','أخرى'),pair('Unknown','غير معروف')]),f('birthDetails','Birth details / reason for assistance or caesarean','تفاصيل الولادة / سبب المساعدة أو القيصرية','textarea'),f('gestation','Gestational age at birth (weeks)','عمر الحمل عند الولادة (بالأسابيع)'),f('birthWeight','Birth weight (include unit)','وزن الولادة (مع الوحدة)'),f('neonatal','Neonatal complications, NICU stay, jaundice, breathing or feeding support','مضاعفات حديثي الولادة، الحضانة، اليرقان، دعم التنفس أو التغذية','textarea')]},
 {title:pair('Medical, hearing & vision','الصحة والسمع والبصر'),fields:[f('medical','Diagnoses, illnesses, hospitalizations, surgery / injuries','التشخيصات والأمراض والاستشفاء والجراحة / الإصابات','textarea'),f('medications','Current medications / allergies','الأدوية الحالية / الحساسية','textarea'),f('hearingScreen','Newborn hearing screening result','نتيجة فحص سمع حديثي الولادة','radio',[pair('Pass','اجتاز'),pair('Refer / did not pass','إحالة / لم يجتز'),pair('Not done','لم يتم'),pair('Unknown','غير معروف')]),f('hearingDate','Most recent hearing assessment date','تاريخ آخر تقييم للسمع','date'),f('hearing','Hearing results, concerns, ear infections / devices','نتائج السمع والشكاوى والتهابات الأذن / الأجهزة','textarea'),f('vision','Vision assessment / concerns / glasses','تقييم البصر / الشكاوى / النظارات','textarea'),f('sleep','Sleep, snoring / mouth breathing','النوم والشخير / التنفس الفموي','textarea'),f('familyHistory','Family history of speech, language, hearing or learning difficulties','التاريخ العائلي لصعوبات النطق أو اللغة أو السمع أو التعلم','textarea')]},
@@ -16,7 +16,7 @@ const sections=[
 ];
 
 // Choice values are saved as option indices; labels follow the report language.
-const choiceSets = {
+const legacyChoiceSets = {
   source: [['Caregiver interview','مقابلة مقدم الرعاية'],['Teacher report','تقرير المعلم'],['Medical records','السجلات الطبية'],['Previous assessment','تقييم سابق'],['Direct observation','ملاحظة مباشرة']],
   referral: [['Family / self-referral','الأسرة / إحالة ذاتية'],['Pediatrician','طبيب الأطفال'],['ENT / audiologist','طبيب الأذن / اختصاصي السمع'],['School / nursery','المدرسة / الحضانة'],['Other therapist','معالج آخر']],
   concerns: [['Late talking','تأخر الكلام'],['Speech clarity','وضوح الكلام'],['Understanding language','فهم اللغة'],['Sentence use','استخدام الجمل'],['Social communication','التواصل الاجتماعي'],['Fluency / stuttering','الطلاقة / التأتأة'],['Voice','الصوت'],['Feeding / swallowing','التغذية / البلع'],['Learning / literacy','التعلم / القراءة والكتابة']],
@@ -65,28 +65,100 @@ const choiceSets = {
   referrals: [['Audiology','السمعيات'],['ENT','الأنف والأذن والحنجرة'],['Pediatrician','طبيب الأطفال'],['Developmental specialist','اختصاصي نمو'],['Occupational therapy','العلاج الوظيفي'],['Psychology','علم النفس'],['Feeding / swallowing specialist','اختصاصي تغذية / بلع'],['Dental review','مراجعة الأسنان']],
   recommendations: [['Further assessment','تقييم إضافي'],['Caregiver coaching','تدريب مقدم الرعاية'],['Home communication activities','أنشطة تواصل منزلية'],['School collaboration','تعاون مع المدرسة'],['Communication supports / AAC','دعم التواصل / التواصل المعزز والبديل'],['Follow-up review','مراجعة متابعة']]
 };
+// Four responses per question: a typical response where relevant, two specific alternatives, and Other.
+const choiceSets = {
+  source: [["Caregiver interview", "مقابلة مقدم الرعاية"], ["Teacher report", "تقرير المعلم"], ["Medical / assessment records", "سجلات طبية / تقييمات سابقة"]],
+  referral: [["Family / self-referral", "الأسرة / إحالة ذاتية"], ["Pediatrician", "طبيب الأطفال"], ["School / nursery", "المدرسة / الحضانة"]],
+  concerns: [["No current concerns", "لا توجد شكاوى حالية"], ["Late talking / limited language", "تأخر الكلام / محدودية اللغة"], ["Unclear speech", "كلام غير واضح"]],
+  onset: [["No developmental concerns noticed", "لم تُلاحظ شكاوى نمائية"], ["Since early development", "منذ النمو المبكر"], ["Noticed recently", "لوحظت مؤخراً"]],
+  strengths: [["Social interaction", "التفاعل الاجتماعي"], ["Play / movement", "اللعب / الحركة"], ["Books / songs", "الكتب / الأغاني"]],
+  impact: [["No impact reported", "لا يوجد أثر حسب الإفادة"], ["Difficulty communicating at home", "صعوبة التواصل في المنزل"], ["Difficulty participating at school / with peers", "صعوبة المشاركة في المدرسة / مع الأقران"]],
+  goals: [["Express needs / build language", "التعبير عن الاحتياجات / تنمية اللغة"], ["Clearer speech", "كلام أوضح"], ["Better understanding / interaction", "تحسين الفهم / التفاعل"]],
+  pregnancy: [["No pregnancy complications reported", "لا توجد مضاعفات حمل حسب الإفادة"], ["Maternal illness", "مرض لدى الأم"], ["Medication exposure reported", "تعرض لأدوية مذكور"]],
+  birthDetails: [["No birth complications reported", "لا توجد مضاعفات ولادة حسب الإفادة"], ["Planned caesarean", "قيصرية مخططة"], ["Emergency / assisted delivery", "ولادة إسعافية / بمساعدة"]],
+  neonatal: [["No neonatal complications reported", "لا توجد مضاعفات لحديث الولادة حسب الإفادة"], ["Jaundice", "يرقان"], ["NICU / breathing or feeding support", "حضانة / دعم التنفس أو التغذية"]],
+  medical: [["No significant medical history reported", "لا يوجد تاريخ طبي مهم حسب الإفادة"], ["Recurrent illness / hospitalization", "مرض متكرر / استشفاء"], ["Previous surgery", "جراحة سابقة"]],
+  medications: [["No current medication or known allergies", "لا أدوية حالية أو حساسية معروفة"], ["Current medication", "دواء حالي"], ["Known allergy", "حساسية معروفة"]],
+  hearing: [["No hearing concerns reported", "لا توجد شكاوى سمعية حسب الإفادة"], ["Ear infections", "التهابات أذن"], ["Hearing concerns / reported hearing loss", "شكاوى سمعية / فقدان سمع مذكور"]],
+  vision: [["No vision concerns reported", "لا توجد شكاوى بصرية حسب الإفادة"], ["Glasses", "نظارات"], ["Vision concerns", "شكاوى بصرية"]],
+  sleep: [["No sleep concerns reported", "لا توجد شكاوى نوم حسب الإفادة"], ["Snoring / mouth breathing", "شخير / تنفس فموي"], ["Restless sleep / frequent waking", "نوم مضطرب / استيقاظ متكرر"]],
+  familyHistory: [["No relevant family history reported", "لا يوجد تاريخ عائلي ذو صلة حسب الإفادة"], ["Speech / language difficulties", "صعوبات نطق / لغة"], ["Hearing / learning difficulties", "صعوبات سمع / تعلم"]],
+  motor: [["Milestones on time per caregiver", "المهارات في موعدها حسب مقدم الرعاية"], ["Delayed sitting / walking", "تأخر الجلوس / المشي"], ["Coordination concerns", "شكاوى تناسق حركي"]],
+  babble: [["Babbling on time per caregiver", "مناغاة في موعدها حسب مقدم الرعاية"], ["Babbling appeared late", "ظهرت المناغاة متأخرة"], ["Not yet reported", "لم تظهر حسب الإفادة"]],
+  firstWords: [["First words on time per caregiver", "الكلمات الأولى في موعدها حسب مقدم الرعاية"], ["First words appeared late", "ظهرت الكلمات الأولى متأخرة"], ["Not yet reported", "لم تظهر حسب الإفادة"]],
+  phrases: [["Word combinations on time per caregiver", "تراكيب الكلمات في موعدها حسب مقدم الرعاية"], ["Word combinations appeared late", "ظهرت تراكيب الكلمات متأخرة"], ["Not yet reported", "لم تظهر حسب الإفادة"]],
+  regressionDetails: [["No skills lost", "لا يوجد فقدان مهارات"], ["Language / speech skills lost", "فقدان مهارات اللغة / الكلام"], ["Social / motor skills lost", "فقدان مهارات اجتماعية / حركية"]],
+  selfCare: [["Age-appropriate independence per caregiver", "استقلالية مناسبة للعمر حسب مقدم الرعاية"], ["Needs reminders", "يحتاج تذكيراً"], ["Needs hands-on help", "يحتاج مساعدة مباشرة"]],
+  play: [["Age-appropriate play / interaction per caregiver", "لعب / تفاعل مناسب للعمر حسب مقدم الرعاية"], ["Prefers solitary play", "يفضل اللعب الفردي"], ["Attention / regulation concerns", "شكاوى انتباه / تنظيم"]],
+  sensory: [["No sensory concerns reported", "لا توجد شكاوى حسية حسب الإفادة"], ["Sound sensitivity", "حساسية للأصوات"], ["Touch / texture sensitivity", "حساسية للمس / القوام"]],
+  languages: [["Arabic", "العربية"], ["English", "الإنجليزية"], ["French", "الفرنسية"]],
+  preferred: [["Arabic", "العربية"], ["English", "الإنجليزية"], ["French", "الفرنسية"]],
+  understanding: [["Understands age-appropriate language per caregiver", "يفهم اللغة المناسبة لعمره حسب مقدم الرعاية"], ["Difficulty following directions", "صعوبة اتباع التعليمات"], ["Difficulty understanding questions", "صعوبة فهم الأسئلة"]],
+  expression: [["Age-appropriate words / sentences per caregiver", "كلمات / جمل مناسبة للعمر حسب مقدم الرعاية"], ["Few words / short phrases", "كلمات قليلة / عبارات قصيرة"], ["Mainly gestures / limited speech", "إيماءات بشكل أساسي / كلام محدود"]],
+  speech: [["Usually understood by familiar and unfamiliar listeners", "يفهمه المألوفون وغير المألوفين غالباً"], ["Sound substitutions / omissions", "إبدال / حذف أصوات"], ["Often needs repetition to be understood", "يحتاج تكراراً كثيراً ليُفهم"]],
+  fluency: [["No fluency concerns reported", "لا توجد شكاوى طلاقة حسب الإفادة"], ["Sound / word repetitions", "تكرار أصوات / كلمات"], ["Prolongations / blocks", "إطالات / توقفات"]],
+  voice: [["No voice / resonance concerns reported", "لا توجد شكاوى صوت / رنين حسب الإفادة"], ["Hoarse / strained voice", "صوت أجش / مجهد"], ["Nasal resonance concern", "شكوى رنين أنفي"]],
+  social: [["Age-appropriate interaction per caregiver", "تفاعل مناسب للعمر حسب مقدم الرعاية"], ["Limited initiation / response", "مبادرة / استجابة محدودة"], ["Difficulty taking turns / sharing interests", "صعوبة تبادل الأدوار / مشاركة الاهتمامات"]],
+  literacy: [["No literacy concerns reported", "لا توجد شكاوى قرائية حسب الإفادة"], ["Reading / sound-awareness concerns", "شكاوى قراءة / وعي صوتي"], ["Writing concerns", "شكاوى كتابة"]],
+  earlyFeeding: [["No early feeding difficulties reported", "لا توجد صعوبات تغذية مبكرة حسب الإفادة"], ["Breast / bottle feeding difficulty", "صعوبة الرضاعة الطبيعية / الصناعية"], ["Difficulty transitioning to solids", "صعوبة الانتقال للطعام الصلب"]],
+  feeding: [["No current feeding concerns reported", "لا توجد شكاوى تغذية حالية حسب الإفادة"], ["Restricted foods / texture refusal", "أطعمة محدودة / رفض قوام الطعام"], ["Chewing / drinking difficulty", "صعوبة مضغ / شرب"]],
+  swallowDetails: [["No swallowing concerns reported", "لا توجد شكاوى بلع حسب الإفادة"], ["Coughing / choking with meals", "سعال / اختناق مع الوجبات"], ["Wet voice / breathing changes with meals", "صوت رطب / تغير التنفس مع الوجبات"]],
+  oral: [["No oral concerns reported", "لا توجد شكاوى فموية حسب الإفادة"], ["Drooling", "سيلان لعاب"], ["Thumb sucking / prolonged pacifier use", "مص الإبهام / استخدام مطول للهاية"]],
+  household: [["Parent caregivers", "رعاية الوالدين"], ["Grandparent caregivers", "رعاية الأجداد"], ["Multiple homes / care settings", "منازل / بيئات رعاية متعددة"]],
+  school: [["Not attending nursery / school", "لا يرتاد حضانة / مدرسة"], ["Nursery / kindergarten", "حضانة / روضة"], ["School student", "طالب مدرسة"]],
+  learning: [["No learning concerns reported", "لا توجد شكاوى تعلم حسب الإفادة"], ["Learning concerns", "شكاوى تعلم"], ["Classroom communication concerns", "شكاوى تواصل صفي"]],
+  routines: [["No routine concerns reported", "لا توجد شكاوى روتين حسب الإفادة"], ["Limited shared play / conversation", "محدودية اللعب المشترك / المحادثة"], ["Screen use concerns", "شكاوى استخدام الشاشات"]],
+  services: [["No previous / current services", "لا خدمات سابقة / حالية"], ["Speech / language therapy", "علاج نطق / لغة"], ["Developmental assessment / support", "تقييم / دعم نمائي"]],
+  barriers: [["No access barriers reported", "لا توجد عوائق وصول حسب الإفادة"], ["Cost", "التكلفة"], ["Transport / scheduling", "النقل / المواعيد"]],
+  observations: [["Engaged throughout the interview", "متفاعل طوال المقابلة"], ["Needed breaks / attention support", "احتاج فترات راحة / دعم الانتباه"], ["Needed caregiver / visual support", "احتاج دعم مقدم الرعاية / دعماً بصرياً"]],
+  assessmentPlan: [["Speech sounds / intelligibility", "أصوات الكلام / الوضوح"], ["Receptive / expressive language", "اللغة الاستقبالية / التعبيرية"], ["Social communication / play", "التواصل الاجتماعي / اللعب"]],
+  referrals: [["No referral currently planned", "لا إحالة مخططة حالياً"], ["Audiology / ENT", "السمعيات / الأنف والأذن والحنجرة"], ["Pediatric / developmental review", "مراجعة طب الأطفال / النمو"]],
+  recommendations: [["Follow-up review", "مراجعة متابعة"], ["Home communication activities", "أنشطة تواصل منزلية"], ["Further assessment / therapy", "تقييم / علاج إضافي"]]
+};
 const unknownChoice = pair('Unknown','غير معروف');
 const otherChoice = pair('Other — add a note','أخرى — أضف ملاحظة');
 const noneChoice = pair('None reported','لا شيء مذكور');
 const noNone = new Set(['source','referral','onset','strengths','goals','motor','babble','firstWords','phrases','selfCare','languages','preferred','understanding','expression','speech','earlyFeeding','household','school','routines','observations','assessmentPlan','recommendations']);
+const normalResponseFields = new Set(["babble", "barriers", "birthDetails", "concerns", "earlyFeeding", "expression", "familyHistory", "feeding", "firstWords", "fluency", "hearing", "impact", "learning", "literacy", "medical", "medications", "motor", "neonatal", "observations", "onset", "oral", "phrases", "play", "pregnancy", "referrals", "regressionDetails", "routines", "selfCare", "sensory", "services", "sleep", "social", "speech", "swallowDetails", "understanding", "vision", "voice"]);
 const singleChoice = new Set(['babble','firstWords','phrases','preferred']);
 for (const section of sections) {
   for (const field of section.fields) {
+    if(['birthType','hearingScreen'].includes(field.id)){
+      field.legacyOptions=[...field.options];
+      field.options=[...field.options.slice(0,3),otherChoice];
+    }
+    if(['regression','swallowConcerns'].includes(field.id)){
+      field.legacyOptions=[...field.options];
+      field.options=[field.options[1],field.options[0],otherChoice];
+    }
     if (choiceSets[field.id]) {
       field.type = singleChoice.has(field.id) ? 'radio' : 'checklist';
-      field.options = [...choiceSets[field.id], otherChoice, ...(!noNone.has(field.id) ? [noneChoice] : []), unknownChoice];
-      field.exclusive = field.options.map((option,index)=>option===noneChoice || option===unknownChoice ? String(index) : null).filter(index=>index!==null);
+      field.legacyOptions = [...legacyChoiceSets[field.id], otherChoice, ...(!noNone.has(field.id) ? [noneChoice] : []), unknownChoice];
+      field.options = [...choiceSets[field.id], otherChoice];
+      field.exclusive = normalResponseFields.has(field.id) ? ['0'] : [];
       field.converted = true;
     }
   }
 }
 const allFields = sections.flatMap(section=>section.fields);
 const openNotes = new Set();
-function migrateChoiceDraft(data) {
-  for (const field of allFields.filter(field=>field.converted)) {
-    if (typeof data[field.id] === 'string') {
-      const legacy = data[field.id].trim();
-      if (legacy) data[field.id+'Note'] = [data[field.id+'Note'],legacy].filter(Boolean).join('\n');
+function migrateChoiceDraft(data, schema=1) {
+  if(schema===2)return data;
+  for (const field of allFields.filter(field=>field.legacyOptions)) {
+    const value=data[field.id];
+    const selected=Array.isArray(value)?value:field.type==='radio'&&/^\d+$/.test(String(value))?[value]:null;
+    if(selected) {
+      // Preserve the exact old meaning in both report languages, never reinterpret an old index.
+      const labels=selected.map(index=>field.legacyOptions[Number(index)]).filter(Boolean);
+      const notes=labels.map(label=>label.join(' / '));
+      const mapped=labels.map(label=>field.options.findIndex(option=>option[0]===label[0]));
+      const indices=[...new Set(mapped.filter(index=>index>=0).map(String))];
+      const otherIndex=String(field.options.indexOf(otherChoice));
+      if(mapped.some(index=>index<0))indices.push(otherIndex);
+      data[field.id]=field.type==='radio'?(indices.includes(otherIndex)?otherIndex:indices[0]):indices;
+      if(notes.length)data[field.id+'Note']=[data[field.id+'Note'],...notes].filter(Boolean).join('\n');
+    } else if(typeof value==='string') {
+      if(value.trim())data[field.id+'Note']=[data[field.id+'Note'],value.trim()].filter(Boolean).join('\n');
       delete data[field.id];
     }
   }
@@ -98,7 +170,7 @@ let lang=0,step=0,answers={},storageEnabled=false;
 const t=x=>x[lang], esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const today=()=>{const d=new Date();return {day:String(d.getDate()).padStart(2,'0'),month:String(d.getMonth()+1).padStart(2,'0'),year:String(d.getFullYear())}};
 answers.assessmentDate=today(); answers.examiner='Ahmad Ghanem';
-try{const raw=localStorage.getItem(KEY);if(raw){const saved=JSON.parse(raw);if(saved.version===1&&saved.answers&&typeof saved.answers==='object'){answers={...answers,...migrateChoiceDraft(saved.answers)};storageEnabled=true;$('remember').checked=true;}}}catch{};
+try{const raw=localStorage.getItem(KEY);if(raw){const saved=JSON.parse(raw);if(saved.version===1&&saved.answers&&typeof saved.answers==='object'){answers={...answers,...migrateChoiceDraft(saved.answers,saved.choiceSchema)};storageEnabled=true;$('remember').checked=true;}}}catch{};
 function fieldHTML(field){const {id,type,label,options}=field,v=answers[id];let control='';
 if(type==='date'){control=`<fieldset id="group-${id}" class="datefield"><legend>${esc(t(label))}</legend><div class="dateparts">${['day','month','year'].map((part,i)=>`<label for="${id}-${part}">${t([['Day','اليوم'],['Month','الشهر'],['Year','السنة']][i])}<input id="${id}-${part}" data-field="${id}" data-part="${part}" type="text" inputmode="numeric" maxlength="${part==='year'?4:2}" placeholder="${part==='year'?'YYYY':part==='day'?'DD':'MM'}" value="${esc(v?.[part]||'')}" aria-describedby="${id}-hint ${id}-error" autocomplete="off"></label>`).join('')}</div><div class="hint" id="${id}-hint">${t(pair('Enter a four-digit year; complete all three parts.','أدخل السنة بأربعة أرقام وأكمل الأجزاء الثلاثة.'))}</div><div id="${id}-error" class="error" aria-live="polite"></div></fieldset>`;}
 else if(type==='radio'||type==='checklist'){
@@ -120,7 +192,7 @@ if(field.id==='dob'&&(result.date>now||assessment.date&&result.date>assessment.d
 function validateDates(){let first=null;sections.forEach((s,i)=>s.fields.filter(f=>f.type==='date').forEach(f=>{const error=dateError(f),group=$('group-'+f.id);$(f.id+'-error').textContent=error;group.classList.toggle('invalid',!!error);group.querySelectorAll('input').forEach(input=>input.setAttribute('aria-invalid',String(!!error)));if(error&&!first)first={i,id:f.id};}));return first;}
 function ageText(){const birth=parsedDate(answers.dob),assessment=parsedDate(answers.assessmentDate);if(!birth.date||!assessment.date||birth.date>assessment.date||dateError({id:'dob'}))return '';let years=assessment.date.getFullYear()-birth.date.getFullYear(),months=assessment.date.getMonth()-birth.date.getMonth();if(assessment.date.getDate()<birth.date.getDate())months--;if(months<0){years--;months+=12;}return t(pair(`${years} years, ${months} months at assessment`,`${years} سنة و${months} شهر عند التقييم`));}
 function updateAge(){if($('age'))$('age').textContent=ageText()?t(pair('Age: ','العمر: '))+ageText():t(pair('Age is calculated from birth and assessment dates.','يُحسب العمر من تاريخ الميلاد وتاريخ التقييم.'));}
-function save(){if(!storageEnabled)return;try{localStorage.setItem(KEY,JSON.stringify({version:1,answers}));$('saveStatus').textContent=t(pair('Draft saved on this device.','حُفظت المسودة على هذا الجهاز.'));}catch{$('saveStatus').textContent=t(pair('Draft could not be saved. Keep this tab open or export your report.','تعذر حفظ المسودة. أبقِ النافذة مفتوحة أو صدّر التقرير.'));}}
+function save(){if(!storageEnabled)return;try{localStorage.setItem(KEY,JSON.stringify({version:1,choiceSchema:2,answers}));$('saveStatus').textContent=t(pair('Draft saved on this device.','حُفظت المسودة على هذا الجهاز.'));}catch{$('saveStatus').textContent=t(pair('Draft could not be saved. Keep this tab open or export your report.','تعذر حفظ المسودة. أبقِ النافذة مفتوحة أو صدّر التقرير.'));}}
 function updateAnswer(el) {
   const id=el.dataset.field;
   if(!id)return;

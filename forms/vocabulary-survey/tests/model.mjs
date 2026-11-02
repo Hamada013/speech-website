@@ -102,3 +102,58 @@ const expectedVersion = crypto.createHash('sha256').update(JSON.stringify({ inte
 assert.equal(release.version, expectedVersion, 'Rebuild the PWA release after editing worker/app files');
 assert.ok(!release.shell.some(file => file.includes('tools/VSS/voc/images/1/')));
 console.log(`PASS: ${data.items.length} source items, ${tested} complete receptive matrices, age overrides, scoring, safe imports, JSON/CSV round trips, matched-item deltas and PWA integrity.`);
+
+// Fixed banks: exact counts, distinct words, stable membership and nested 50/100.
+for (const mode of ['receptive','expressive']) {
+    const full = await buildChecklist(index, mode, 'full', 'all');
+    const short = await buildChecklist(index, mode, 'full', '50');
+    const repeat = await buildChecklist(index, mode, 'full', '50');
+    for (const cohort of COHORTS) {
+        const ids = list => list.plan.filter(p=>p.cohort===cohort.id).map(p=>p.id).sort();
+        assert.equal(ids(full).length, mode==='receptive'?50:100);
+        assert.equal(ids(short).length, 50);
+        assert.deepEqual(ids(short),ids(repeat));
+        assert.ok(ids(short).every(id=>ids(full).includes(id)));
+        assert.equal(new Set(ids(full).map(id=>normalizeWord(index.byId.get(id).label))).size,ids(full).length);
+    }
+}
+const { progressSeries, peerComparison, ageMonths } = await import('../reporting.js');
+const baseline = structuredClone(current); baseline.id='baseline'; baseline.metadata.assessmentDate='2026-09-01';
+const newer = structuredClone(current); newer.records = newer.records.filter(r=>r.outcome!=='skip'); newer.plan=newer.plan.filter(p=>newer.records.some(r=>r.targetId===p.id));
+const older = structuredClone(newer); older.id='older'; older.metadata.assessmentDate='2026-09-01'; older.records[1].outcome='target';
+const series=progressSeries(newer,[older,newer]);
+assert.equal(series.points.length,2); assert.equal(series.count,4); assert.equal(series.delta,-25);
+const peer=structuredClone(newer); peer.id='peer';peer.metadata.childId='OTHER';peer.metadata.birthDate='2021-11-01';peer.records[1].outcome='target';
+assert.equal(peerComparison(newer,[peer]).count,1);
+assert.equal(peerComparison(newer,[peer]).median,50);
+const duplicate=structuredClone(peer);duplicate.id='peer-repeat';
+assert.equal(peerComparison(newer,[peer,duplicate]).count,1);
+peer.metadata.birthDate='2015-01-01';assert.equal(peerComparison(newer,[peer]).available,false);
+peer.metadata.birthDate='2021-11-01';peer.metadata.languages='Other language';assert.equal(peerComparison(newer,[peer]).available,false);
+peer.metadata.languages=newer.metadata.languages;peer.records[0].audioPlayed=false;assert.equal(peerComparison(newer,[peer]).available,false);
+assert.equal(ageMonths({birthDate:'2022-11-03',assessmentDate:'2026-11-02'}),47);
+assert.equal(progressSeries(newer,[]).points.length,0);
+assert.equal(peerComparison({...newer,status:'partial'},[peer]).available,false);
+for (const sampling of ['50','100']) {
+    const sample={...current,sampling}; assert.equal(validateSession(sample).sampling,sampling);
+}
+console.log('PASS: fixed 50/100 banks, nested retests, decline series, age matching, language/prompt exclusions and one result per peer.');
+
+// Choice identities remain stable when retest positions shuffle.
+for (const entry of receptive.plan) {
+    const signature = options => options.map(o=>`${o.id}:${o.role}`).sort();
+    assert.deepEqual(signature(index.matrix(entry.id)), signature(index.matrix(entry.id)));
+}
+const changedChoices = structuredClone(older);
+changedChoices.records[0].options[1].id = '40-30';
+assert.equal(compare(newer, changedChoices).count, 3);
+changedChoices.metadata.childId='OTHER';
+assert.equal(peerComparison(newer, [changedChoices]).available, false);
+const manifest = JSON.parse(fs.readFileSync(path.join(root,'manifest.json')));
+assert.equal(manifest.scope,'./'); assert.equal(manifest.display,'standalone');
+for (const asset of [...manifest.icons,...manifest.screenshots]) {
+    assert.ok(release.shell.includes(asset.src));
+    const body=fs.readFileSync(path.join(root,asset.src));
+    assert.equal(`${body.readUInt32BE(16)}x${body.readUInt32BE(20)}`,asset.sizes);
+}
+console.log('PASS: stable distractors, changed-choice exclusions and manifest screenshot/icon dimensions.');

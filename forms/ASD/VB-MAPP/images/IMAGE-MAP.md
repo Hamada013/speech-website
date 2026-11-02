@@ -2,7 +2,7 @@
 
 Place the mapped images in this folder. Change `assets/stimuli.js` to add further boards or replace paths; source-review overrides live in `assets/review.js`.
 
-These are reserved filenames, not completed stimulus sets. Use the guide’s item-specific arrays, distractors, trials, and exemplars. Do not replace manipulation, social observation, or auditory-only tasks with static pictures.
+These numbered filenames are historical registry references. The app now presents the prepared multi-page sets in `assets/stimulus-data.js` through `assets/stimulus-viewer.js`, using local `images/cards/` and `scene-*.webp` files instead of requesting these numbered PNGs. See `library.json` for current page counts. Use the guide’s item-specific arrays, distractors, trials, and exemplars. Do not replace manipulation, social observation, or auditory-only tasks with static pictures.
 
 All 62 numbers are preserved. Rows flagged as reviewed need newly prepared boards for the corrected task. Files 30–31 are retained for assessor preparation/history only. File 29 remains available for child naming stimuli; the judging listener must not see the item or picture.
 

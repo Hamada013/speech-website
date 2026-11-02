@@ -29,3 +29,14 @@ export const saveSession = session => transaction('sessions', 'readwrite', store
 export const getSessions = () => transaction('sessions', 'readonly', store => store.getAll());
 export const saveSetting = (key, value) => transaction('settings', 'readwrite', store => store.put(value, key));
 export const getSetting = key => transaction('settings', 'readonly', store => store.get(key));
+
+export const profileKey = id => String(id).trim().toLocaleLowerCase('en-US');
+export function saveProfile(profile) {
+    const childId = String(profile.childId || '').trim();
+    if (!childId || childId.length > 100) throw new Error('أدخل رمزاً صالحاً للطفل.');
+    return saveSetting(`child:${profileKey(childId)}`, { kind: 'child-profile', ...profile, childId, updatedAt: new Date().toISOString() });
+}
+export async function getProfiles() {
+    const settings = await transaction('settings', 'readonly', store => store.getAll());
+    return settings.filter(value => value?.kind === 'child-profile').sort((a,b) => (a.childName || a.childId).localeCompare(b.childName || b.childId, 'ar'));
+}

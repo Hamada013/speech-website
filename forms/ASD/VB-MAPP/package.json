@@ -1,5 +1,24 @@
 {
-  "name":"vb-mapp-assessment", "version":"2.1.0", "private":true,
-  "scripts":{"build":"node scripts/build-pwa.cjs","build:icons":"node scripts/build-icons.cjs","test":"node tests/model.cjs","test:browser":"node tests/browser.cjs"},
-  "devDependencies":{"playwright":"1.56.1"}
+  "name": "vb-mapp-assessment",
+  "version": "2.1.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build-pwa.cjs",
+    "build:icons": "node scripts/build-icons.cjs",
+    "test": "node tests/model.cjs && node tests/accounts.cjs && node tests/task-analysis.cjs && node tests/iep.cjs && node tests/goal-bank.cjs",
+    "test:browser": "node tests/accounts-browser.cjs",
+    "test:barriers": "node tests/barriers-browser.cjs",
+    "test:transitions": "node tests/transitions-browser.cjs",
+    "test:forms": "node tests/form-style-browser.cjs",
+    "test:task-analysis": "node tests/task-analysis-browser.cjs",
+    "test:iep": "node tests/iep-browser.cjs",
+    "test:report": "node tests/report-browser.cjs",
+    "test:lifecycle": "node tests/lifecycle-browser.cjs",
+    "build:stimuli": "node scripts/build-stimuli.cjs",
+    "test:stimuli": "node tests/stimuli.cjs",
+    "test:stimuli:browser": "node tests/stimuli-browser.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
 }

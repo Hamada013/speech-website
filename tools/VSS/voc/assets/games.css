@@ -199,10 +199,6 @@ body.compact-playing{height:100dvh;min-height:0;overflow:hidden;display:flex;fle
 /* Hover on a replaced target must never resemble a retained answer. */
 .compact-game .picture-button:not(.matched):not(.wrong):not(.guide-glow):hover{border-color:#cddfe9;background:#fff}
 html[data-suite-input=pointer] .game-page :is(.icon-button,.production-rating,.picture-button):focus{outline:0;box-shadow:none}
-@media(orientation:landscape){
- .compact-playing[data-game=matching] .game-workspace:has(.match-source){grid-template-columns:minmax(0,1fr) minmax(100px,22%);grid-template-rows:minmax(0,1fr);align-items:stretch}
- .compact-playing .match-source{max-width:100%}
-}
 @media(max-height:500px){
  .compact-playing .game-header{min-height:48px;padding-block:2px}
  .compact-playing .game-shell{padding-block:2px}
@@ -225,3 +221,19 @@ html[data-suite-input=pointer] .game-page :is(.icon-button,.production-rating,.p
 .compact-game #setup-view :is(.game-intro p,#settings-help,#session-preview){display:none}
 .compact-game #results-view .game-back{font-size:0;min-width:44px}.compact-game #results-view .game-back>i{font-size:23px}
 @media(max-height:500px){.production-rhythm{padding:4px}.production-rhythm .production-beat{height:38px;min-height:38px}}
+
+/* Matching always places a square source below square destination cards. */
+.compact-playing[data-game=matching] #game-board{grid-template-columns:repeat(var(--board-columns,2),var(--match-size,100px));grid-template-rows:repeat(var(--board-rows,1),var(--match-size,100px));justify-content:center;align-content:center}
+.compact-playing[data-game=matching] #game-board>.picture-button{width:var(--match-size,100px);height:var(--match-size,100px);aspect-ratio:1}
+.compact-playing[data-game=matching] #active-match{align-items:center}
+.compact-playing[data-game=matching] .match-source{width:var(--source-size,100px);height:var(--source-size,100px);max-width:none;aspect-ratio:1;flex:none}
+
+.production-score-guide{position:fixed;inset:0;width:min(480px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;margin:auto;padding:20px;border:1px solid #dceaf4;border-radius:24px;background:#fff;color:#22445a;box-shadow:0 14px 60px #22445a30}
+.production-score-guide::backdrop{background:#f8fafc99;backdrop-filter:blur(6px)}
+.production-score-guide header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.production-score-guide h2{font-size:20px;margin:0}
+.production-score-guide p{font-size:14px;color:#5c7285;margin:12px 0}
+.production-score-legend{display:grid;gap:8px}
+.production-score-row{display:flex;align-items:center;gap:12px;padding:8px;border:1px solid #dceaf4;border-radius:16px;font-size:14px}
+.production-score-row img{width:48px;height:48px;object-fit:contain;flex:none}
+.automatic-toolbar:has(#production-score-help) .automatic-stars{max-width:calc(100% - 156px)}

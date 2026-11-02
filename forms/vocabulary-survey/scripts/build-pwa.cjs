@@ -15,9 +15,10 @@ const media = Array.from({ length: 40 }, (_, i) => {
             return { url: `../../tools/VSS/voc/${kind}/${folder}/${name}`, bytes: body.length, revision: hash(body) };
         }));
 });
-const shell = ['../../tools/VSS/voc/images/logo.webp', 'index.html', 'styles.css', 'app.js', 'validation.js', 'reporting.js', 'storage.js', 'offline.js',
+const shell = ['index.html', 'styles.css', 'app.js', 'validation.js', 'reporting.js', 'storage.js', 'offline.js',
     'manifest.json', 'data/vocabulary.json', ...fs.readdirSync(path.join(root, 'assets')).filter(name => !name.startsWith('pwa-release')).map(name => `assets/${name}`),
-    ...fs.readdirSync(path.join(root, 'icons')).map(name => `icons/${name}`)].sort();
+    ...fs.readdirSync(path.join(root, 'icons')).map(name => `icons/${name}`),
+    ...fs.readdirSync(path.join(root, 'screenshots')).filter(name => name.endsWith('.png')).map(name => `screenshots/${name}`)].sort();
 const integrity = Object.fromEntries(shell.map(file => [file,
     `sha256-${crypto.createHash('sha256').update(fs.readFileSync(path.join(root, file))).digest('base64')}`]));
 const version = hash(JSON.stringify({ integrity, media, worker: hash(fs.readFileSync(path.join(root, 'sw.js'))) })).slice(0, 20);

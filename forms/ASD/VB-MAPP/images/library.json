@@ -1,0 +1,460 @@
+{
+  "cards": 629,
+  "tasks": 60,
+  "pages": 2438,
+  "sets": {
+    "m1-1": {
+      "pages": 2,
+      "types": [
+        "array"
+      ],
+      "note": {
+        "en": "Choose genuinely motivating items; offer the actual reinforcer when appropriate.",
+        "ar": "اختر أشياء معززة فعلاً للطفل وقدّم المعزز الحقيقي عند ملاءمته."
+      }
+    },
+    "t1-1": {
+      "pages": 2,
+      "types": [
+        "single"
+      ],
+      "note": null
+    },
+    "t1-2": {
+      "pages": 4,
+      "types": [
+        "single"
+      ],
+      "note": null
+    },
+    "t1-3": {
+      "pages": 6,
+      "types": [
+        "single"
+      ],
+      "note": null
+    },
+    "t1-4": {
+      "pages": 10,
+      "types": [
+        "single"
+      ],
+      "note": null
+    },
+    "t1-5": {
+      "pages": 10,
+      "types": [
+        "single"
+      ],
+      "note": null
+    },
+    "t2-6": {
+      "pages": 25,
+      "types": [
+        "single"
+      ],
+      "note": null
+    },
+    "t2-10": {
+      "pages": 200,
+      "types": [
+        "single"
+      ],
+      "note": null
+    },
+    "t3-15": {
+      "pages": 510,
+      "types": [
+        "single"
+      ],
+      "note": null
+    },
+    "l1-3": {
+      "pages": 5,
+      "types": [
+        "array"
+      ],
+      "note": {
+        "en": "Use these only if they are known reinforcers. Actual familiar people or pets need personal photos or live presentation.",
+        "ar": "استخدم هذه الصور فقط إذا كانت معززات معروفة للطفل. يتطلب عرض أشخاص أو حيوانات مألوفة صورهم الشخصية أو وجودهم الحقيقي."
+      }
+    },
+    "l1-5": {
+      "pages": 20,
+      "types": [
+        "array"
+      ],
+      "note": null
+    },
+    "vp1-3": {
+      "pages": 2,
+      "types": [
+        "single"
+      ],
+      "note": null
+    },
+    "vp1-5": {
+      "pages": 10,
+      "types": [
+        "matching"
+      ],
+      "note": null
+    },
+    "t2-8": {
+      "pages": 10,
+      "types": [
+        "single"
+      ],
+      "note": null
+    },
+    "t2-9": {
+      "pages": 40,
+      "types": [
+        "single"
+      ],
+      "note": null
+    },
+    "l2-6": {
+      "pages": 40,
+      "types": [
+        "array"
+      ],
+      "note": null
+    },
+    "l2-10": {
+      "pages": 250,
+      "types": [
+        "array"
+      ],
+      "note": null
+    },
+    "l3-15": {
+      "pages": 510,
+      "types": [
+        "array"
+      ],
+      "note": null
+    },
+    "vp2-6": {
+      "pages": 25,
+      "types": [
+        "matching"
+      ],
+      "note": null
+    },
+    "vp2-8": {
+      "pages": 25,
+      "types": [
+        "matching"
+      ],
+      "note": null
+    },
+    "t2-7": {
+      "pages": 108,
+      "types": [
+        "single"
+      ],
+      "note": null
+    },
+    "l2-7": {
+      "pages": 108,
+      "types": [
+        "array"
+      ],
+      "note": null
+    },
+    "vp2-9": {
+      "pages": 25,
+      "types": [
+        "matching"
+      ],
+      "note": null
+    },
+    "vp3-12": {
+      "pages": 25,
+      "types": [
+        "matching"
+      ],
+      "note": null
+    },
+    "vp2-10": {
+      "pages": 25,
+      "types": [
+        "array"
+      ],
+      "note": {
+        "en": "Use the pictured item as one side only. Prepare the corresponding real object and similar physical distractors for both 3D/2D directions.",
+        "ar": "استخدم الصورة كطرف واحد فقط. جهّز الشيء الحقيقي المقابل ومشتتات حقيقية متشابهة لفحص الاتجاهين بين المجسم والصورة."
+      }
+    },
+    "lr2-6": {
+      "pages": 10,
+      "types": [
+        "array"
+      ],
+      "note": null
+    },
+    "lr2-7": {
+      "pages": 25,
+      "types": [
+        "array"
+      ],
+      "note": null
+    },
+    "lr2-8": {
+      "pages": 25,
+      "types": [
+        "array"
+      ],
+      "note": null
+    },
+    "lr2-9": {
+      "pages": 25,
+      "types": [
+        "array"
+      ],
+      "note": null
+    },
+    "lr2-10": {
+      "pages": 25,
+      "types": [
+        "array"
+      ],
+      "note": null
+    },
+    "lr3-11": {
+      "pages": 25,
+      "types": [
+        "array"
+      ],
+      "note": null
+    },
+    "lr3-14": {
+      "pages": 25,
+      "types": [
+        "array"
+      ],
+      "note": null
+    },
+    "lr3-15": {
+      "pages": 25,
+      "types": [
+        "array"
+      ],
+      "note": null
+    },
+    "li2-6": {
+      "pages": 10,
+      "types": [
+        "single"
+      ],
+      "note": {
+        "en": "The judging listener must not see the stimulus. These ten pictures are for the child only.",
+        "ar": "يجب ألا يرى المستمع الذي يحكم على وضوح الكلام المثير. هذه الصور العشر للطفل فقط."
+      }
+    },
+    "t3-11": {
+      "pages": 5,
+      "types": [
+        "single"
+      ],
+      "note": null
+    },
+    "t3-12": {
+      "pages": 11,
+      "types": [
+        "single"
+      ],
+      "note": {
+        "en": "Pictures support spatial vocabulary only. Assess the four pronouns through live interaction with the child and familiar objects.",
+        "ar": "تساند الصور مفردات المكان فقط. قيّم الضمائر الأربعة بتفاعل حي مع الطفل وأشياء مألوفة."
+      }
+    },
+    "t3-13": {
+      "pages": 8,
+      "types": [
+        "single"
+      ],
+      "note": null
+    },
+    "l3-13": {
+      "pages": 4,
+      "types": [
+        "array"
+      ],
+      "note": {
+        "en": "Use these for visual comparison only. Relative adverbs require live actions, movement or sound as specified in the task.",
+        "ar": "استخدم الصور للمقارنات البصرية فقط. تتطلب الظروف النسبية أفعالاً حية أو حركة أو صوتاً وفق البند."
+      }
+    },
+    "vp2-7": {
+      "pages": 15,
+      "types": [
+        "matching"
+      ],
+      "note": null
+    },
+    "l3-11": {
+      "pages": 16,
+      "types": [
+        "array"
+      ],
+      "note": null
+    },
+    "vp3-11": {
+      "pages": 2,
+      "types": [
+        "blocks"
+      ],
+      "note": {
+        "en": "Model cards for a real arts/crafts activity. Provide matching physical pieces and observe spontaneous matching.",
+        "ar": "نماذج لنشاط فنون حقيقي. قدّم القطع المادية المقابلة ولاحظ المطابقة التلقائية."
+      }
+    },
+    "vp3-13": {
+      "pages": 20,
+      "types": [
+        "blocks"
+      ],
+      "note": {
+        "en": "Provide eight or more real blocks or puzzle pieces; these are models, not a screen-based completion test.",
+        "ar": "قدّم ثمانية مكعبات أو قطع أحجية حقيقية أو أكثر؛ هذه نماذج وليست اختبار إكمال على الشاشة."
+      }
+    },
+    "vp3-14": {
+      "pages": 25,
+      "types": [
+        "single"
+      ],
+      "note": {
+        "en": "Print or use real objects for independent sorting into five categories, with no visible category model.",
+        "ar": "اطبع الصور أو استخدم الأشياء الحقيقية للتصنيف المستقل إلى خمس فئات، دون نموذج فئة ظاهر."
+      }
+    },
+    "vp3-15": {
+      "pages": 20,
+      "types": [
+        "sequence"
+      ],
+      "note": null
+    },
+    "r3-12": {
+      "pages": 10,
+      "types": [
+        "array"
+      ],
+      "note": null
+    },
+    "r3-13": {
+      "pages": 10,
+      "types": [
+        "single"
+      ],
+      "note": null
+    },
+    "r3-14": {
+      "pages": 1,
+      "types": [
+        "name"
+      ],
+      "note": {
+        "en": "Uses the active child’s name. Check spelling and the intended reading language before presenting.",
+        "ar": "يعرض اسم الطفل النشط. راجع التهجئة ولغة القراءة المستهدفة قبل العرض."
+      }
+    },
+    "r3-15": {
+      "pages": 10,
+      "types": [
+        "matching"
+      ],
+      "note": null
+    },
+    "w3-12": {
+      "pages": 5,
+      "types": [
+        "tracing"
+      ],
+      "note": null
+    },
+    "w3-13": {
+      "pages": 10,
+      "types": [
+        "copy"
+      ],
+      "note": null
+    },
+    "w3-15": {
+      "pages": 26,
+      "types": [
+        "copy"
+      ],
+      "note": null
+    },
+    "ma3-11": {
+      "pages": 5,
+      "types": [
+        "array"
+      ],
+      "note": null
+    },
+    "ma3-12": {
+      "pages": 5,
+      "types": [
+        "single"
+      ],
+      "note": null
+    },
+    "ma3-14": {
+      "pages": 8,
+      "types": [
+        "comparison"
+      ],
+      "note": {
+        "en": "Eight visual comparison prompts. Auditory comparisons such as loud/quiet still require actual sound.",
+        "ar": "ثمانية مثيرات مقارنة بصرية. تتطلب المقارنات السمعية مثل عالٍ/هادئ صوتاً حقيقياً."
+      }
+    },
+    "ma3-15": {
+      "pages": 10,
+      "types": [
+        "matching"
+      ],
+      "note": null
+    },
+    "t3-14": {
+      "pages": 4,
+      "types": [
+        "scene"
+      ],
+      "note": null
+    },
+    "lr3-12": {
+      "pages": 4,
+      "types": [
+        "scene"
+      ],
+      "note": null
+    },
+    "lr3-13": {
+      "pages": 4,
+      "types": [
+        "scene"
+      ],
+      "note": null
+    },
+    "li3-13": {
+      "pages": 4,
+      "types": [
+        "scene"
+      ],
+      "note": null
+    },
+    "r3-11": {
+      "pages": 4,
+      "types": [
+        "scene"
+      ],
+      "note": null
+    }
+  }
+}

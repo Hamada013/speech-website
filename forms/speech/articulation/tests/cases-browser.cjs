@@ -40,9 +40,13 @@ let browser;
  // A changed elicitation mode must be excluded from the paired change score.
  await page.locator('[data-setting="mode"][data-value="imitation"]').click();
  await page.locator('.workplace [data-page="home"]').click();await page.locator('#homeReports').click();
- assert.equal(await page.locator('#reportHistory button').count(),2);assert.equal(await page.locator('#reportPreview .assessment-table tbody tr').count(),84);
+ assert.equal(await page.locator('#reportHistory button').count(),2);assert.equal(await page.locator('#reportPreview .assessment-table').count(),0);
+ assert.deepEqual(await page.locator('#reportPreview .process-table th').allTextContents(),['العملية الفونولوجية','الكلمة المستهدفة','التغير الصوتي']);
+ assert.equal(await page.locator('#reportPreview .process-table tbody tr').count(),1);
+ assert.equal(await page.locator('#reportPreview .process-table tbody td').nth(1).textContent(),'أسد');
+ assert.equal(await page.locator('#reportPreview .process-table bdi').textContent(),'ʔ → ∅');
  const currentId=await page.evaluate(()=>cases.activeAssessment);
- await page.locator('#reportHistory button').last().click();assert.match(await page.locator('#reportPreview').textContent(),/ملاحظة محفوظة/);assert.equal(await page.evaluate(()=>cases.activeAssessment),currentId);assert.equal(await page.evaluate(()=>state.trials['s1-0'].status),'omission');
+ await page.locator('#reportHistory button').last().click();assert.doesNotMatch(await page.locator('#reportPreview').textContent(),/ملاحظة محفوظة/);assert.equal(await page.evaluate(()=>cases.activeAssessment),currentId);assert.equal(await page.evaluate(()=>state.trials['s1-0'].status),'omission');
  await page.locator('#compareButton').click();await page.locator('[data-compare-choice]').first().click();await page.locator('[data-compare-choice]').last().click();await page.locator('#confirmCompare').click();
  assert.equal(await page.locator('.comparison-table tbody tr').count(),84);assert.equal(await page.locator('.comparison-document .stat strong').first().textContent(),'1');
  assert.match(await page.locator('.comparison-key').textContent(),/2026-09-01/);assert(await page.locator('.bar.old').count()>0);assert(await page.locator('.bar.new').count()>0);
@@ -51,7 +55,8 @@ let browser;
  if(engine==='chromium'){await page.pdf({path:'/tmp/articulation-comparison.pdf',format:'A4',printBackground:true,preferCSSPageSize:true});}
  await page.locator('#homeReports').click();
  await page.locator('.report-language [role="combobox"]').click();await page.getByRole('option',{name:'English',exact:true}).click();
- assert.match(await page.locator('#reportPreview').textContent(),/Speech Sound Assessment Report/);assert.equal(await page.locator('#reportPreview .assessment-table tbody tr').count(),84);
+ assert.deepEqual(await page.locator('#reportPreview .process-table th').allTextContents(),['Phonological process','Target word','Sound change']);
+ assert.match(await page.locator('#reportPreview').textContent(),/Speech Sound Assessment Report/);assert.equal(await page.locator('#reportPreview .assessment-table').count(),0);
  await page.locator('#exportPdf').click();
  if(engine==='chromium'){await page.pdf({path:'/tmp/articulation-individual.pdf',format:'A4',printBackground:true,preferCSSPageSize:true});}
 

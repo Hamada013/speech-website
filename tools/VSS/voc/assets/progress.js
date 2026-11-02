@@ -124,7 +124,7 @@
             for (const child of read()?.children || []) if (!data.children.some(saved => saved.id === child.id)) data.children.push(clone(child));
             let child = data.children.find(c => c.name.toLocaleLowerCase() === name.toLocaleLowerCase());
             if (!child) { child = { id: root.crypto?.randomUUID?.() || `child-${Date.now()}-${Math.random().toString(36).slice(2)}`, name, role: 'child', apps: { voc: true }, created: new Date().toISOString(), words: {}, workspace: null, plan: null, sessions: [] }; data.children.push(child); }
-            child.apps = { ...(child.apps || { voc: !!child.words, senb: !!child.senb, taffaha: !!child.taffaha }), voc: true };
+            child.apps = { ...child.apps, voc: true, senb: true, taffaha: true };
             data.active = child.id; persist(true); return active();
         }
         function record(domain, records, difficulty = null) {

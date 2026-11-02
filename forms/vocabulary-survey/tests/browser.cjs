@@ -22,7 +22,7 @@ const server = http.createServer(async (request, response) => {
     }
     const filename = path.resolve(repo, `.${pathname.endsWith('/') ? pathname + 'index.html' : pathname}`);
     if (!filename.startsWith(repo + path.sep)) { response.writeHead(403).end(); return; }
-    const isMedia = /\/tools\/voc\/(images|sounds)\/\d+\//.test(pathname);
+    const isMedia = /\/tools\/VSS\/voc\/(images|sounds)\/\d+\//.test(pathname);
     requests.push(pathname);
     if (isMedia) {
         mediaActive++; mediaMax = Math.max(mediaMax, mediaActive);
@@ -64,12 +64,15 @@ async function readyForResponse(page, mode) {
 }
 async function setup(page, mode, condition = 'modeled') {
     await page.locator(`[data-start="${mode}"]`).click();
-    await page.locator('[name=childId]').fill('QA-SYNTHETIC');
-    await page.locator('[name=childName]').fill('Synthetic example');
-    await page.locator('[name=birthDate]').fill('2022-01-10');
-    await page.locator('[name=scope]').selectOption('A');
-    await page.locator('[name=sampling]').selectOption('5');
-    if (mode === 'expressive') await page.locator('[name=audioMode]').selectOption(condition);
+    await page.locator("#setup-view").waitFor({state:"visible"});
+    if (await page.locator('#setup-form [name=childId]').isEditable()) await page.locator('#setup-form [name=childId]').fill('QA-SYNTHETIC');
+    await page.locator('#setup-form [name=childName]').fill('Synthetic example');
+    await page.locator('#setup-form [name=birthDate]').fill('2022-01-10');
+    await page.locator('[name=scope]').selectOption('A', {force:true});
+    // Five synthetic trials keep media and scoring regression checks quick.
+    await page.evaluate(() => document.querySelector('[name=sampling]').append(new Option('QA 5','5')));
+    await page.locator('[name=sampling]').selectOption('5', {force:true});
+    if (mode === 'expressive') await page.locator('[name=audioMode]').selectOption(condition, {force:true});
     await page.waitForFunction(() => document.getElementById('plan-summary').textContent.startsWith('5 كلمة'));
     await page.locator('#begin-test').click();
     await readyForResponse(page, mode);
@@ -97,9 +100,9 @@ async function run(name, engine, origin) {
         assert.equal(requests.filter(p => /\/voc\/(images|sounds)\/\d+\//.test(p)).length, 0, 'No automatic media preload');
         assert.equal(await page.locator('html').getAttribute('lang'), 'ar');
         assert.equal(await page.locator('html').getAttribute('dir'), 'rtl');
-        assert.equal(await page.locator('#dashboard-view button').count(), 3);
-        assert.equal(await page.locator('#dashboard-view p').count(), 0);
-        assert.equal(await page.locator('.brand img').getAttribute('src'), '../../tools/VSS/voc/images/logo.webp');
+        assert.equal(await page.locator('#dashboard-view .module-card').count(), 4);
+        assert.equal(await page.locator('#dashboard-view .home-intro').count(), 1);
+        assert.equal(await page.locator('.brand img').getAttribute('src'), 'icons/logo.png');
         // Manual shortcut help leads to the separate, opt-in offline prompt.
         await page.locator('[data-offline-install]').click();
         await page.locator('[data-install-help]').waitFor({ state: 'visible' });
@@ -140,6 +143,7 @@ async function run(name, engine, origin) {
         assert.ok(fs.readFileSync(`/private/tmp/survey-${name}-session.csv`, 'utf8').includes('semantic'));
         const previous = structuredClone(current); previous.id = 'qa-previous'; previous.metadata.assessmentDate = '2026-09-01';
         previous.records[1].outcome = 'target'; previous.records[1].selectedId = previous.records[1].targetId; previous.records[1].selectedLabel = previous.records[1].label;
+        await page.locator('[data-report-tab=progress]').click();
         await page.locator('#baseline-import').setInputFiles({ name: 'baseline.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ session: previous })) });
         await page.waitForFunction(() => document.querySelector('#report-content').textContent.includes('-20.0 نقطة مئوية'));
         assert.equal(await page.locator('.bar-previous').count(), 1, 'Only the assessed cohort has a historical baseline');
@@ -179,7 +183,7 @@ async function run(name, engine, origin) {
         for (const outcome of ['learning', 'mastered', 'mastered', 'notMastered']) await respond(page, 'expressive', outcome);
         const expressive = (await sessions(page)).find(s => s.mode === 'expressive' && s.status === 'complete');
         assert.equal(expressive.records.filter(r => r.audioPlayed).length, 1, 'The manually modeled trial retains its prompt condition across reload');
-        assert.match(await page.locator('.metric-grid').textContent(), /50\.0%/);
+        assert.match(await page.locator('#panel-summary').textContent(), /50\.0%/);
         // CSV import round-trip, malformed history and clinician item overrides.
         await page.locator('nav [data-route=history]').click();
         await page.locator('#history-import').setInputFiles(`/private/tmp/survey-${name}-session.csv`);

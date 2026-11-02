@@ -1,11 +1,12 @@
+import { WORD_LISTS } from './assets/word-lists.js';
 import { COHORTS, CONFIG_VERSION, createIndex, buildChecklist } from './validation.js';
-import { saveSession, getSessions, getSetting, saveSetting } from './storage.js';
-import { analyze, renderReport, parseHistory, downloadSession, printReport, formatPercent } from './reporting.js';
+import { saveSession, getSessions, getSetting, saveSetting, getProfiles, saveProfile, profileKey } from './storage.js';
+import { analyze, compare, renderReport, parseHistory, downloadSession, printReport, formatPercent } from './reporting.js';
 
 const $ = selector => document.querySelector(selector);
 const all = selector => [...document.querySelectorAll(selector)];
 const state = { data: null, index: null, overrides: {}, sessions: [], mode: 'receptive', session: null,
-    phase: 'idle', prepared: null, report: null, baseline: null, trial: null, generation: 0, planning: 0 };
+    profiles: [], activeChild: '', reportTab: 'summary', phase: 'idle', prepared: null, report: null, baseline: null, trial: null, generation: 0, planning: 0 };
 const audio = $('#word-audio');
 const form = $('#setup-form');
 const modeLabel = mode => mode === 'receptive' ? 'اللغة الاستقبالية' : 'اللغة التعبيرية';
@@ -27,7 +28,7 @@ function guard(action) {
 }
 function currentItem() { return state.index.byId.get(state.session?.plan[state.session.records.length]?.id); }
 function updateDraftCard() {
-    const draft = state.sessions.find(session => session.status === 'draft' && session.plan.length > session.records.length);
+    const draft = childSessions().find(session => session.status === 'draft' && session.plan.length > session.records.length);
     $('#draft-card').hidden = !draft;
     if (draft) $('#draft-summary').textContent = `${draft.metadata.childId} · ${modeLabel(draft.mode)} · ${draft.records.length} من ${draft.plan.length} استجابة`;
 }
@@ -44,6 +45,7 @@ function stopAudio() { audio.pause(); audio.currentTime = 0; }
 async function route(name) {
     if (state.phase === 'trial' || state.phase === 'loading') await pause();
     $('#message').hidden = true;
+    if (name === 'profiles') { await renderProfiles(); }
     if (name === 'history') { await refreshSessions(); renderHistory(); }
     if (name === 'validation') await renderWordTables();
     if (name === 'dashboard') { await refreshSessions(); }
@@ -54,6 +56,11 @@ async function setup(mode) {
     if (!state.data) throw new Error('يرجى انتظار تحميل بنك الكلمات.');
     if (state.phase === 'trial' || state.phase === 'loading') await pause();
     state.mode = mode;
+    await fillProfilePicker();
+    applyProfile(state.activeChild);
+    form.elements.sampling.replaceChildren(new Option('٥٠ كلمة', '50'), ...(mode === 'expressive' ? [new Option('١٠٠ كلمة', '100')] : []));
+    form.elements.sampling.value = '50';
+    window.StyledDropdowns?.enhance();
     $('#setup-title').textContent = mode === 'receptive' ? 'اللغة الاستقبالية' : 'اللغة التعبيرية';
     $('#audio-mode-field').hidden = mode !== 'expressive';
     $('#module-instructions').textContent = mode === 'receptive'
@@ -70,13 +77,14 @@ async function preparePlan() {
     const result = await buildChecklist(state.index, state.mode, form.elements.scope.value, form.elements.sampling.value, state.overrides);
     if (ticket !== state.planning) return;
     state.prepared = result;
-    $('#plan-summary').textContent = `${result.plan.length} كلمة للاختبار · ${COHORTS.map(c => `${c.label}: ${result.eligible[c.id]}`).join(' · ')}`;
+    $('#plan-summary').textContent = `${result.plan.length} كلمة للاختبار · ${COHORTS.filter(c => result.plan.some(p => p.cohort === c.id)).map(c => `${c.label}: ${result.plan.filter(p => p.cohort === c.id).length}`).join(' · ')}`;
     $('#begin-test').disabled = !result.plan.length;
 }
 async function begin(event) {
     event.preventDefault();
     if (!form.reportValidity() || !state.prepared?.plan.length) return;
     const metadata = Object.fromEntries(['childId', 'childName', 'birthDate', 'assessmentDate', 'examiner', 'languages', 'notes'].map(key => [key, form.elements[key].value.trim()]));
+    if (state.profiles.some(p => profileKey(p.childId) === profileKey(metadata.childId)) && !form.elements.childId.readOnly) throw new Error('اختر حساب الطفل المحفوظ من القائمة لتحديث بياناته.');
     if (!metadata.childId) throw new Error('أدخل رمز الطفل.');
     if (metadata.assessmentDate > today()) throw new Error('لا يمكن أن يكون تاريخ التقييم في المستقبل.');
     if (metadata.birthDate && metadata.birthDate > metadata.assessmentDate) throw new Error('يجب أن يسبق تاريخ الميلاد تاريخ التقييم أو يوافقه.');
@@ -92,7 +100,11 @@ async function begin(event) {
         missingMediaCount: state.data.excluded.length, records: [], current: null };
     try {
         await persist();
-        // Only non-child clinician preferences are reused on the next setup.
+        // The child identity is shared by both modules; session metadata stays a snapshot.
+        await saveProfile(Object.fromEntries(['childId','childName','birthDate','languages'].map(key => [key, metadata[key]])));
+        state.activeChild = profileKey(metadata.childId);
+        await saveSetting('active-child', state.activeChild);
+        await fillProfilePicker();
         await saveSetting('clinician', { examiner: metadata.examiner, languages: metadata.languages });
         await showTrial();
     } finally { $('#begin-test').disabled = false; }
@@ -219,11 +231,11 @@ async function finish(status) {
 
 function renderHistory() {
     $('#session-list').replaceChildren();
-    if (!state.sessions.length) { const p = document.createElement('p'); p.className = 'panel'; p.textContent = 'لا توجد تقييمات محفوظة بعد.'; $('#session-list').append(p); }
-    for (const session of state.sessions) {
+    if (!childSessions().length) { const p = document.createElement('p'); p.className = 'panel'; p.textContent = 'لا توجد تقييمات محفوظة بعد.'; $('#session-list').append(p); }
+    for (const session of childSessions()) {
         const row = document.createElement('article'); row.className = 'session-row';
         const content = document.createElement('div'), title = document.createElement('h2'), detail = document.createElement('p');
-        title.textContent = `${session.metadata.childId} · ${session.mode === 'receptive' ? 'اللغة الاستقبالية' : 'اللغة التعبيرية'}`;
+        title.textContent = `${session.metadata.childName || session.metadata.childId} · ${session.mode === 'receptive' ? 'اللغة الاستقبالية' : 'اللغة التعبيرية'}`;
         detail.textContent = `${session.metadata.assessmentDate} · ${statusLabel(session.status)} · ${session.records.length} استجابة · ${formatPercent(analyze(session).overall.accuracy)}`; detail.className = 'small';
         content.append(title, detail); row.append(content);
         const actions = document.createElement('div'); actions.className = 'button-row';
@@ -235,18 +247,22 @@ function renderHistory() {
     }
 }
 async function openReport(session) {
-    state.report = session; state.baseline = null;
+    state.report = session; state.reportTab = 'summary'; state.baseline = null;
     await refreshSessions();
     const select = $('#baseline-select'); select.replaceChildren(new Option('دون مقارنة', ''));
-    for (const previous of state.sessions.filter(s => s.id !== session.id && s.status !== 'draft')) {
+    for (const previous of state.sessions.filter(s => s.id !== session.id && s.status !== 'draft' && profileKey(s.metadata.childId) === profileKey(session.metadata.childId) && s.mode === session.mode && s.audioMode === session.audioMode && s.metadata.assessmentDate <= session.metadata.assessmentDate)) {
         select.append(new Option(`${previous.metadata.assessmentDate} · ${previous.metadata.childId} · ${modeLabel(previous.mode)}`, previous.id));
     }
+    state.baseline = state.sessions.find(s => s.id !== session.id && s.status !== 'draft' && compare(session, s).compatible && (s.metadata.assessmentDate !== session.metadata.assessmentDate || s.startedAt < session.startedAt)) || null;
+    select.value = state.baseline?.id || '';
+    window.StyledDropdowns?.enhance();
     drawReport(); view('report');
 }
 function drawReport() {
-    const companion = state.sessions.find(s => s.id !== state.report.id && s.metadata.childId === state.report.metadata.childId &&
+    const companion = state.sessions.find(s => s.id !== state.report.id && profileKey(s.metadata.childId) === profileKey(state.report.metadata.childId) &&
         s.metadata.assessmentDate === state.report.metadata.assessmentDate && s.mode !== state.report.mode && s.status === 'complete');
-    renderReport($('#report-content'), state.report, state.baseline, companion);
+    renderReport($('#report-content'), state.report, state.baseline, companion, state.sessions);
+    selectReportTab(state.reportTab);
 }
 async function importFile(input, baseline = false) {
     const file = input.files[0]; if (!file) return;
@@ -259,10 +275,11 @@ async function importFile(input, baseline = false) {
         if (existing && JSON.stringify(existing.records) !== JSON.stringify(session.records)) throw new Error('يوجد تقييم مختلف يحمل المعرف نفسه. استورد الملف بمعرفه الأصلي.');
         if (!existing) await saveSession(session);
         await refreshSessions();
+        await migrateProfiles();
         if (baseline && state.report) {
             if (session.id === state.report.id) throw new Error('اختر تقييماً آخر للمقارنة.');
             const current = state.report; await openReport(current); state.baseline = session;
-            $('#baseline-select').value = session.id; drawReport();
+            $('#baseline-select').value = session.id; state.reportTab = 'progress'; drawReport();
         } else renderHistory();
         message('تم استيراد التقييم. تعتمد المقارنة على الكلمات وشروط الاختبار المتطابقة.');
     } finally { input.value = ''; }
@@ -271,6 +288,7 @@ async function importFile(input, baseline = false) {
 async function renderWordTables() {
     const container = $('#word-tables');
     container.replaceChildren();
+    const note = document.createElement('p'); note.className = 'panel small'; note.textContent = 'قوائم عربية مختارة من الكلمات اليومية المتاحة، وليست ترتيباً موثقاً للشيوع أو معايير عمرية. الكلمات المرقمة ١–٥٠ هي اختبار التعبير المختصر؛ الاختبار الكامل يشمل ١٠٠. يُغيّر ترتيب العرض فقط بين التقييمات.'; container.append(note);
     if (!state.index) return;
     for (const mode of ['receptive', 'expressive']) {
         // Use the same full checklist as assessment setup, including saved
@@ -279,7 +297,7 @@ async function renderWordTables() {
         const cohorts = new Map(checklist.plan.map(entry => [entry.id, entry.cohort]));
         const panel = document.createElement('section'); panel.className = 'panel table-scroll';
         const table = document.createElement('table'); table.className = 'word-bank-table'; table.dataset.mode = mode;
-        const caption = table.createCaption(); caption.textContent = mode === 'receptive' ? 'اللغة الاستقبالية' : 'اللغة التعبيرية';
+        const caption = table.createCaption(); caption.textContent = mode === 'receptive' ? 'اللغة الاستقبالية · ٥٠ كلمة لكل مجموعة' : 'اللغة التعبيرية · ١٠٠ كلمة لكل مجموعة';
         const header = table.createTHead().insertRow();
         for (const title of ['المجموعة الفرعية', 'العمر', 'الكلمات المختبرة']) {
             const th = document.createElement('th'); th.scope = 'col'; th.textContent = title; header.append(th);
@@ -299,7 +317,7 @@ async function renderWordTables() {
                 const words = row.insertCell(); words.className = 'bank-words';
                 items.forEach((item, i) => {
                     if (i) words.append(document.createTextNode('، '));
-                    const word = document.createElement('span'); word.textContent = item.label; word.dataset.item = item.id; words.append(word);
+                    const word = document.createElement('span'); word.textContent = item.label; word.dataset.item = item.id; const rank = Object.values(WORD_LISTS[mode]).find(ids => ids.includes(item.id)).indexOf(item.id) + 1; word.textContent = `${rank}. ${item.label}`; word.classList.toggle('core-word', mode === 'expressive' && rank <= 50); words.append(word);
                 });
             }
             if (!groups.size) {
@@ -312,6 +330,92 @@ async function renderWordTables() {
     }
 }
 
+function childSessions() {
+    return state.activeChild ? state.sessions.filter(s => profileKey(s.metadata.childId) === state.activeChild) : state.sessions;
+}
+async function migrateProfiles() {
+    const profiles = await getProfiles(), known = new Set(profiles.map(p => profileKey(p.childId)));
+    for (const session of state.sessions) {
+        const key = profileKey(session.metadata.childId);
+        if (known.has(key)) continue;
+        await saveProfile(Object.fromEntries(['childId','childName','birthDate','languages'].map(name => [name, session.metadata[name] || ''])));
+        known.add(key);
+    }
+    state.profiles = await getProfiles();
+}
+async function fillProfilePicker() {
+    state.profiles = await getProfiles();
+    const select = $('#setup-profile'); select.replaceChildren(new Option('طفل جديد', ''));
+    for (const profile of state.profiles) select.append(new Option(profile.childName || profile.childId, profileKey(profile.childId)));
+    select.value = state.activeChild;
+    const active = state.profiles.find(p => profileKey(p.childId) === state.activeChild);
+    $('#active-profile').textContent = active ? `${active.childName || active.childId} · تغيير الحساب` : 'اختيار حساب الطفل';
+    updateDraftCard();
+    window.StyledDropdowns?.enhance();
+}
+function applyProfile(key) {
+    const profile = state.profiles.find(p => profileKey(p.childId) === key);
+    for (const name of ['childId','childName','birthDate','languages']) form.elements[name].value = profile?.[name] || (name === 'languages' ? 'العربية / اللهجة السورية' : '');
+    form.elements.childId.readOnly = !!profile;
+    form.elements.notes.value = '';
+}
+async function chooseProfile(key) {
+    state.activeChild = key; await saveSetting('active-child', key);
+    await fillProfilePicker(); applyProfile(key);
+}
+async function renderProfiles() {
+    await fillProfilePicker();
+    const container = $('#profile-list'); container.replaceChildren();
+    for (const profile of state.profiles) {
+        const card = document.createElement('article'); card.className = 'profile-card';
+        const name = document.createElement('h2'); name.textContent = profile.childName || profile.childId;
+        const detail = document.createElement('p'); detail.textContent = `${profile.childId} · ${state.sessions.filter(s => profileKey(s.metadata.childId) === profileKey(profile.childId)).length} تقييم`;
+        const choose = document.createElement('button'); choose.type = 'button'; choose.className = 'primary';
+        choose.textContent = state.activeChild === profileKey(profile.childId) ? 'الحساب الحالي ✓' : 'اختيار';
+        choose.addEventListener('click', guard(async () => { await chooseProfile(profileKey(profile.childId)); await route('dashboard'); }));
+        const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'secondary'; edit.textContent = 'تعديل';
+        edit.setAttribute('aria-label', `تعديل حساب ${profile.childName || profile.childId}`);
+        edit.addEventListener('click', () => {
+            const target = $('#profile-form');
+            for (const key of ['childId','childName','birthDate','languages']) target.elements[key].value = profile[key] || '';
+            target.elements.childId.readOnly = true; $('#profile-title').textContent = 'تعديل بيانات الطفل'; target.elements.childName.focus();
+        });
+        const actions = document.createElement('div'); actions.className = 'button-row'; actions.append(choose, edit);
+        card.append(name, detail, actions); container.append(card);
+    }
+}
+$('#setup-profile').addEventListener('change', guard(event => chooseProfile(event.target.value)));
+$('#new-profile').addEventListener('click', () => { $('#profile-form').reset(); $('#profile-form').elements.childId.readOnly = false; $('#profile-title').textContent = 'إضافة طفل'; $('#profile-form').elements.childId.focus(); });
+$('#profile-form').addEventListener('submit', event => {
+    event.preventDefault(); void guard(async () => {
+        const target = event.target; if (!target.reportValidity()) return;
+        const profile = Object.fromEntries(['childId','childName','birthDate','languages'].map(key => [key, target.elements[key].value.trim()]));
+        if (profile.birthDate > today()) throw new Error('تاريخ الميلاد في المستقبل.');
+        if (!target.elements.childId.readOnly && state.profiles.some(p => profileKey(p.childId) === profileKey(profile.childId))) throw new Error('رمز الطفل موجود. اختر تعديل حسابه.');
+        await saveProfile(profile); await chooseProfile(profileKey(profile.childId));
+        target.reset(); target.elements.childId.readOnly = false; await route('dashboard');
+        message('تم حفظ حساب الطفل على هذا الجهاز.');
+    })();
+});
+function selectReportTab(tab) {
+    state.reportTab = tab;
+    all('[data-report-tab]').forEach(button => { const selected = button.dataset.reportTab === tab; button.setAttribute('aria-selected', String(selected)); button.tabIndex = selected ? 0 : -1; });
+    all('[data-report-panel]').forEach(panel => { panel.hidden = panel.dataset.reportPanel !== tab; });
+    $('.report-controls').classList.toggle('show-baseline', tab === 'progress');
+}
+all('[data-report-tab]').forEach(button => {
+    button.addEventListener('click', () => selectReportTab(button.dataset.reportTab));
+    button.addEventListener('keydown', event => {
+        const tabs = all('[data-report-tab]'), i = tabs.indexOf(button);
+        let n;
+        if (event.key === 'Home') n = 0;
+        else if (event.key === 'End') n = tabs.length - 1;
+        else if (event.key === 'ArrowLeft') n = (i + 1) % tabs.length;
+        else if (event.key === 'ArrowRight') n = (i - 1 + tabs.length) % tabs.length;
+        if (n !== undefined) { event.preventDefault(); selectReportTab(tabs[n].dataset.reportTab); tabs[n].focus(); }
+    });
+});
+
 all('[data-route]').forEach(button => button.addEventListener('click', guard(() => route(button.dataset.route))));
 all('[data-start]').forEach(button => { button.disabled = true; button.addEventListener('click', guard(() => setup(button.dataset.start))); });
 form.addEventListener('submit', event => { event.preventDefault(); void guard(begin)(event); });
@@ -323,7 +427,7 @@ $('#skip-item').addEventListener('click', guard(() => answer('skip')));
 $('#pause-test').addEventListener('click', guard(pause));
 $('#continue-test').addEventListener('click', guard(() => resume(state.session)));
 $('#finish-partial').addEventListener('click', guard(() => finish('partial')));
-$('#resume-draft').addEventListener('click', guard(() => resume(state.sessions.find(s => s.status === 'draft'))));
+$('#resume-draft').addEventListener('click', guard(() => resume(childSessions().find(s => s.status === 'draft'))));
 $('#history-import').addEventListener('change', guard(event => importFile(event.target)));
 $('#baseline-import').addEventListener('change', guard(event => importFile(event.target, true)));
 $('#baseline-select').addEventListener('change', () => { state.baseline = state.sessions.find(s => s.id === $('#baseline-select').value) || null; drawReport(); });
@@ -344,6 +448,11 @@ async function initialize() {
     if (clinician) for (const key of ['examiner', 'languages']) form.elements[key].value = clinician[key] || '';
     form.elements.assessmentDate.value = today();
     await refreshSessions();
+    await migrateProfiles();
+    state.activeChild = await getSetting('active-child') || '';
+    if (!state.profiles.some(p => profileKey(p.childId) === state.activeChild)) state.activeChild = '';
+    await fillProfilePicker();
+    window.StyledDropdowns?.enhance();
     all('[data-start]').forEach(button => { button.disabled = false; });
 }
 void guard(initialize)();

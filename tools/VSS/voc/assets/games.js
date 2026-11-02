@@ -47,6 +47,22 @@
     for(const [id,icon,label]of [['continue-game','play','متابعة اللعب'],['change-cards','th-large','تغيير البطاقات'],['finish-paused','flag','إنهاء الجلسة'],['review-missed','redo','مراجعة الكلمات'],['play-again','redo','جلسة جديدة'],['return-setup','th-large','اختيار بطاقات أخرى'],['next-round','play','الجولة التالية']]){
         const control=$('#'+id);control.classList.add('icon-button');control.setAttribute('aria-label',label);control.title=label;control.innerHTML=`<i class="fas fa-${icon}" aria-hidden="true"></i>`;
     }
+    let scoreHelpDialog;
+    if(mode==='rapid'){
+        const help=document.createElement('button');help.id='production-score-help';help.type='button';help.className='game-button icon-button';help.title='شرح تقييم الاستجابة';help.setAttribute('aria-label',help.title);help.setAttribute('aria-haspopup','dialog');help.setAttribute('aria-controls','production-score-guide');
+        help.innerHTML='<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 3H5v18h14V8zM14 3v5h5M8 12h8M8 16h6"/></svg>';
+        actions.append(help);
+        scoreHelpDialog=document.createElement('dialog');scoreHelpDialog.id='production-score-guide';scoreHelpDialog.className='production-score-guide';scoreHelpDialog.dir='rtl';scoreHelpDialog.setAttribute('aria-labelledby','production-score-title');
+        scoreHelpDialog.innerHTML='<header><h2 id="production-score-title" tabindex="-1">تقييم الاستجابة</h2><button type="button" class="game-button icon-button" aria-label="إغلاق الشرح"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header><p>كل اختيار يسجّل الاستجابة وينتقل للكلمة التالية.</p><div class="production-score-legend"></div>';
+        for(const control of all('#rapid-grading [data-rating]')){
+            const row=document.createElement('div'),label=document.createElement('span');row.className='production-score-row';label.textContent=control.getAttribute('aria-label');row.append(control.querySelector('img').cloneNode(true),label);scoreHelpDialog.querySelector('.production-score-legend').append(row);
+        }
+        document.body.append(scoreHelpDialog);
+        help.onclick=()=>{stopBeats();scoreHelpDialog.showModal();scoreHelpDialog.querySelector('h2').focus();};
+        scoreHelpDialog.querySelector('button').onclick=()=>scoreHelpDialog.close();
+        scoreHelpDialog.addEventListener('close',()=>help.focus());
+        scoreHelpDialog.addEventListener('click',event=>{if(event.target!==scoreHelpDialog)return;const r=scoreHelpDialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)scoreHelpDialog.close();});
+    }
     const gamesLink=$('#results-view .game-back');gamesLink.setAttribute('aria-label','قائمة الألعاب');gamesLink.title='قائمة الألعاب';gamesLink.innerHTML='<i class="fas fa-gamepad" aria-hidden="true"></i>';
     function stopBeats(){
         beatRun?.abort();beatRun=null;
@@ -90,8 +106,13 @@
             if(size>best.size)best={size,columns,rows};
         }
         board.style.setProperty('--board-columns',best.columns);board.style.setProperty('--board-rows',best.rows);
+        if(mode==='matching'){
+            board.style.setProperty('--match-size',`${Math.max(0,Math.floor(best.size))}px`);
+            const source=$('#active-match'),height=source.getBoundingClientRect().height;
+            source.style.setProperty('--source-size',`${Math.max(0,Math.floor(Math.min(best.size,source.clientWidth,height)))}px`);
+        }
     }
-    new ResizeObserver(fitBoard).observe($('#game-board'));
+    const boardObserver=new ResizeObserver(fitBoard);boardObserver.observe($('#game-board'));boardObserver.observe($('#active-match'));
     function productionBeats(item){
         const row=$('#production-beats');row.replaceChildren();
         if(mode!=='rapid')return;
@@ -145,7 +166,7 @@
         for (const timer of timers) clearTimeout(timer);
         timers.clear(); stopAudio(); ready = false; deadline = null;
         $('#play-view').classList.remove('listening-replay', 'production-preview');
-        preview.close(); preview.hidden = true; guideBusy = false;
+        preview.close(); preview.hidden = true; scoreHelpDialog?.close(); guideBusy = false;
         if(document.documentElement.dataset.suiteInput!=='keyboard')document.activeElement?.blur();
         if(beatContext?.state==='running')void beatContext.suspend();
     }
@@ -294,6 +315,7 @@
         $('#mistake-counter').textContent = `تحتاج تدريباً: ${session.missed.length}`;
     }
     function enableControls() {
+        if($('#production-score-help'))$('#production-score-help').disabled=phase!=='active'||!ready;
         const active = phase === 'active' && ready;
         for (const button of all('#game-board > button, #active-match > button')) {
             button.disabled = !active || button.classList.contains('matched') || (mode === 'test' && heardKey !== session.order[session.position]);
@@ -566,8 +588,14 @@
             if (first.key === second.key) {
                 session.matched.push(first.key); session.position++; session.records.push({ key: first.key, result: 'matched' }); session.open = [];
                 feedback(`وجدت الزوج! ${byKey.get(first.key).name}`);
-                if (session.settings.sound) void playWord(first.key);
-                if (session.position === session.order.length) { phase = 'feedback'; later(() => finish(false), 650); }
+                if (session.position === session.order.length) {
+                    phase = 'feedback';
+                    const started = performance.now();
+                    const playback = session.settings.sound ? playWord(first.key, false, true) : Promise.resolve();
+                    void playback.then(() => {
+                        if (ticket === generation && phase === 'feedback') later(() => finish(false), Math.max(0, 650 - (performance.now() - started)));
+                    });
+                } else if (session.settings.sound) void playWord(first.key);
             } else {
                 for(const card of [first,second])window.SessionHomework?.record({activity:'لعبة الذاكرة',key:card.key,label:byKey.get(card.key).name,needsHelp:true});
                 session.mistakes++; missed(first.key); missed(second.key); session.pendingMismatch = true; phase = 'feedback';
@@ -612,13 +640,8 @@
         session.ratingHistory ||= {};
         (session.ratingHistory[session.order[session.position]] ||= []).push(rating);
         const key = session.order[session.position];
-        if (activePlan && result !== 'mastered') {
-            session.trialMistakes++; missed(key); feedback('حاول مرة أخرى.', true);
-            window.SessionHomework?.record({activity:meta.title,key,label:byKey.get(key).name,needsHelp:true});
-            save(); void playWord(key); return;
-        }
         phase = 'feedback';
-        // A corrected response advances, but does not become first-attempt success.
+        // Preserve prior attempts from a saved legacy trial without inflating mastery.
         if (activePlan && session.trialMistakes) result = 'learning';
         session.trialMistakes = 0;
         if(result==='syllables')result='learning';
@@ -739,6 +762,7 @@
     document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
     window.addEventListener('pagehide', () => { pause(); stopAudio(); });
     document.addEventListener('keydown', event => {
+        if(scoreHelpDialog?.open)return;
         if (event.key === 'Escape' && !$('#category-panel').hidden) { event.preventDefault(); toggleCategories(false); $('#toggle-categories').focus(); return; }
         if (['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)) return;
         if (event.key === 'Escape') { event.preventDefault(); pause(); }

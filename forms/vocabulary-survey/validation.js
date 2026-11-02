@@ -1,7 +1,8 @@
+import { WORD_LISTS } from './assets/word-lists.js';
 /** Editable clinical configuration. These are provisional checklists, NOT
  * standardized Arabic word-acquisition norms. General milestones cannot validate
  * a particular word, image, recording, dialect, or language-age equivalent. */
-export const CONFIG_VERSION = 'cohorts-1';
+export const CONFIG_VERSION = 'cohorts-2-fixed-lists';
 // The requested matrix requires semantic alternatives in another source folder.
 // Keep this strict: a missing cross-folder match excludes the target.
 export const REQUIRE_CROSS_FOLDER_SEMANTIC = true;
@@ -52,6 +53,10 @@ export function assignCohort(item, mode, overrides = {}) {
     const manual = overrides[item.id]?.[mode];
     if (COHORTS.some(c => c.id === manual)) return { cohort: manual, basis: 'Clinician assignment', reviewed: true, validated: false };
     const word = normalizeWord(item.label);
+    // Later descriptive concepts expand the 4–5 checklist beyond place names.
+    const laterDescriptors = new Set(['14-20','14-22','14-23','14-25','14-26','14-31','14-33','14-34','14-35','14-36','14-39','14-40']);
+    if (mode === 'receptive' && laterDescriptors.has(item.id)) return { cohort: 'C', basis: 'Local descriptive-concept checklist', reviewed: false, validated: false };
+    if (mode === 'expressive' && item.folder === 37) return { cohort: 'D', basis: 'Local extended community vocabulary', reviewed: false, validated: false };
     let cohort = Object.entries(FOLDER_COHORTS[mode]).find(([, folders]) => folders.includes(item.folder))?.[0];
     let basis = 'Provisional folder mapping';
     if (BASIC.has(word)) { cohort = 'A'; basis = 'Provisional familiar-word rule'; }
@@ -119,17 +124,23 @@ export function createIndex(items, overrides = {}) {
         const target = byId.get(targetId);
         if (!target) return null;
         const pools = candidates(target);
-        const phonological = shuffle(pools.phonological, random)[0];
+        // Retests keep the same distractor identities; only card positions vary.
+        const pick = (pool, role) => {
+            let hash = 2166136261;
+            for (const char of `${target.id}:${role}`) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619) >>> 0;
+            return pool.length ? pool[hash % pool.length] : undefined;
+        };
+        const phonological = pick(pools.phonological, 'phonological');
         if (!phonological) return null;
         const used = new Set([target.word, phonological.word]);
         const images = new Set([target.imageRevision, phonological.imageRevision]);
         const available = pool => pool.filter(item => !used.has(item.word) && !images.has(item.imageRevision));
         const semanticPool = available(pools.semantic);
         const crossFolder = semanticPool.filter(item => item.folder !== target.folder);
-        const semantic = shuffle(crossFolder.length ? crossFolder : semanticPool, random)[0];
+        const semantic = pick(crossFolder.length ? crossFolder : semanticPool, 'semantic');
         if (!semantic) return null;
         used.add(semantic.word); images.add(semantic.imageRevision);
-        const unrelated = shuffle(available(pools.unrelated), random)[0];
+        const unrelated = pick(available(pools.unrelated), 'unrelated');
         if (!unrelated) return null;
         return shuffle([
             { id: target.id, role: 'target' }, { id: phonological.id, role: 'phonological' },
@@ -142,19 +153,21 @@ export function createIndex(items, overrides = {}) {
 export async function buildChecklist(index, mode, scope, sampling, overrides = {}) {
     const byCohort = Object.fromEntries(COHORTS.map(c => [c.id, []]));
     const omitted = [];
-    for (let n = 0; n < index.items.length; n++) {
-        const item = index.items[n];
-        const assignment = assignCohort(item, mode, overrides);
-        if (scope !== 'full' && scope !== assignment.cohort) continue;
-        if (mode === 'receptive' && !index.matrix(item.id)) omitted.push(item.id);
-        else byCohort[assignment.cohort].push({ id: item.id, ...assignment });
-        // Yield while building a large checklist; no blocking mass image decoding.
-        if (n % 30 === 0) await new Promise(resolve => setTimeout(resolve, 0));
+    for (const cohort of COHORTS) {
+        const ids = WORD_LISTS[mode][cohort.id];
+        for (const id of ids) {
+            const item = index.byId.get(id);
+            if (!item) { omitted.push(id); continue; }
+            const assignment = assignCohort(item, mode, overrides);
+            if (scope !== 'full' && scope !== assignment.cohort) continue;
+            if (mode === 'receptive' && !index.matrix(id)) omitted.push(id);
+            else byCohort[assignment.cohort].push({ id, ...assignment });
+        }
+        await new Promise(resolve => setTimeout(resolve, 0));
     }
+    const limit = sampling === 'all' ? (mode === 'receptive' ? 50 : 100) : Number(sampling);
+    // Choose a stable prefix first; randomize presentation, never membership.
+    const selected = Object.fromEntries(COHORTS.map(c => [c.id, byCohort[c.id].slice(0, limit)]));
     const eligible = Object.fromEntries(COHORTS.map(c => [c.id, byCohort[c.id].length]));
-    const plan = COHORTS.flatMap(c => {
-        const randomized = shuffle(byCohort[c.id]);
-        return sampling === 'all' ? randomized : randomized.slice(0, Number(sampling));
-    });
-    return { plan, eligible, omitted };
+    return { plan: COHORTS.flatMap(c => shuffle(selected[c.id])), eligible, omitted };
 }

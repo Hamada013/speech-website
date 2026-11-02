@@ -13,9 +13,10 @@
       if (scope[type]) M.records(data, type).forEach(item => ids.add(item.id));
       else copy.scores[type] = {};
     }
-    for (const key of ['comments', 'customCriteria', 'scoreReviews', 'goals'])
+    for (const key of ['comments', 'customCriteria', 'scoreReviews', 'echoicModes'])
       copy[key] = Object.fromEntries(Object.entries(copy[key]).filter(([id]) => ids.has(id)));
-    if (!scope.milestones) copy.goals = {};
+    copy.goals=scope.goals!==false?Object.fromEntries((root.VBGoalBank?root.VBGoalBank.childGoals(state,data).filter(g=>g.generated||g.plan.selected).map(g=>[g.key,{...g.plan,itemId:g.item.id,selected:true}]):Object.entries(copy.goals).filter(([,plan])=>plan.selected))):{};
+    copy.iepExcluded=scope.milestones?copy.iepExcluded.filter(id=>ids.has(id)):[];
     return copy;
   }
   function pack(state, data) {

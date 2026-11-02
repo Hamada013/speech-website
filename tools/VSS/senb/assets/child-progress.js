@@ -91,7 +91,7 @@
                 child = { id: root.crypto?.randomUUID?.() || `child-${Date.now()}-${Math.random().toString(36).slice(2)}`, name, apps: { senb: true }, role: name.toLocaleLowerCase() === 'hamada' ? 'admin' : 'child', created: new Date().toISOString(), words: {}, workspace: null, plan: null, sessions: [] };
                 data.children.push(child);
             }
-            child.apps = { ...(child.apps || { voc: !!child.words, senb: !!child.senb, taffaha: !!child.taffaha }), senb: true };
+            child.apps = { ...child.apps, voc: true, senb: true, taffaha: true };
             state(child);
             data.active = child.id;
             persist(true);

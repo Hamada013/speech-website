@@ -28,7 +28,7 @@
  const children=()=>read()?.children||[];
  const legacyApps=child=>({voc:!!child.words,senb:!!child.senb,taffaha:!!child.taffaha});
  const registered=(child,id)=>!!child&&(child.apps||legacyApps(child))[id]===true;
- function register(){const child=active(),data=read();if(!child||!data)return;const saved=data.children.find(entry=>entry.id===child.id);if(!saved||saved.apps?.[appId])return;saved.apps={...(saved.apps||legacyApps(saved)),[appId]:true};try{localStorage.setItem(storageKey,JSON.stringify(data));}catch{window.dispatchEvent(new Event(`${appId}-storage-error`));}}
+ function register(){const child=active(),data=read();if(!child||!data)return;const saved=data.children.find(entry=>entry.id===child.id);if(!saved||['voc','senb','taffaha'].every(id=>saved.apps?.[id]))return;saved.apps={...saved.apps,voc:true,senb:true,taffaha:true};try{localStorage.setItem(storageKey,JSON.stringify(data));}catch{window.dispatchEvent(new Event(`${appId}-storage-error`));}}
  function button(label,icon){const b=document.createElement('button');b.type='button';b.className='suite-icon';b.innerHTML=icons[icon];b.title=label;b.setAttribute('aria-label',label);return b;}
  // Physical left-to-right order also defines keyboard order in every app.
  const controlOrder={settings:0,activities:10,apps:20,download:30,end:35,info:40,family:45,report:50,profile:60,back:70,suiteHome:80};

@@ -23,7 +23,7 @@ export function createProgress(storage, onError = () => {}) {
   write(latest=>{
    let child=latest.children.find(child=>normalize(child.name).toLocaleLowerCase()===name.toLocaleLowerCase());
    if(!child){child={id:globalThis.crypto?.randomUUID?.()||`child-${Date.now()}-${Math.random().toString(36).slice(2)}`,name,role:name.toLocaleLowerCase()==='hamada'?'admin':'child',created:new Date().toISOString()};latest.children.push(child);}
-   owner=child.id;child.taffaha||={attempts:[],workspace:null};child.apps={...(child.apps||{voc:!!child.words,senb:!!child.senb}),taffaha:true};
+   owner=child.id;child.taffaha||={attempts:[],workspace:null};child.apps = { ...child.apps, voc: true, senb: true, taffaha: true };
   },true);return active();
  }
  function record({id,word,mode,level,correct,firstTry,completed,sessionId}) {

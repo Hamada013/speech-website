@@ -12,31 +12,37 @@
     }
     newPage();
     let forceNextPage = false;
-    for (let index = 0; index < report.blocks.length; index++) {
-      if (forceNextPage && body.children.length) newPage();
-      forceNextPage = Boolean(report.blocks[index].pageBreakAfter);
-      const wrapper = document.createElement('div'); wrapper.innerHTML = report.blocks[index].html; const block = wrapper.firstElementChild;
-      // PDF pages already repeat the complete contact footer below their content.
+    const overflowing=()=>body.scrollHeight>body.clientHeight+1;
+    const checkFit=block=>{
+      if(overflowing()) {
+        const detail=`height ${block.offsetHeight}, page content ${body.scrollHeight}/${body.clientHeight}, ${block.textContent.slice(0,80)}`;
+        stage.remove();throw Error('A report row exceeds a PDF page: '+detail);
+      }
+    };
+    for(const entry of report.blocks) {
+      if(forceNextPage&&body.children.length)newPage();
+      forceNextPage=Boolean(entry.pageBreakAfter);
+      const wrapper=document.createElement('div');wrapper.innerHTML=entry.html;
+      let block=wrapper.firstElementChild;
       if(block.firstElementChild?.classList.contains('report-footer'))continue;
+      const rows=block.querySelector('[data-page-rows]');
+      if(!rows) { body.append(block);checkFit(block);continue; }
+      const entries=[...rows.children];rows.replaceChildren();
+      const template=block.cloneNode(true);
       body.append(block);
-      const overflow = body.scrollHeight > body.clientHeight + 1;
-      if (overflow && body.children.length > 1) {
-        body.removeChild(block);
-        // Keep a heading with the following block when it is the last block on a page.
-        const carried = [];
-        while (body.lastElementChild) {
-          const last = body.lastElementChild;
-          const keepWithNext = (last.firstElementChild?.matches('h2,h3') && last.children.length === 1) || last.querySelector('.grid-legend');
-          if (!keepWithNext) break;
-          carried.unshift(last); body.removeChild(last);
+      let target=rows;
+      for(const row of entries) {
+        target.append(row);
+        if(overflowing()&&target.children.length>1) {
+          row.remove();newPage();block=template.cloneNode(true);
+          block.dataset.reportContinuation='true';
+          const title=block.querySelector('.sheet-header h1');
+          if(title){const marker=document.createElement('small');marker.className='sheet-continuation';marker.textContent=state.reportLang==='ar'?'تابع':'Continued';title.append(marker);}
+          body.append(block);target=block.querySelector('[data-page-rows]');target.append(row);
         }
-        const gridLegend = block.querySelector('.milestone-grid') && !carried.some(node=>node.querySelector('.grid-legend')) ? stage.querySelector('.grid-legend')?.closest('.report-block')?.cloneNode(true) : null;
-        newPage(); carried.forEach(node => body.append(node)); if(gridLegend)body.append(gridLegend); body.append(block);
+        checkFit(block);
       }
-      if (body.scrollHeight > body.clientHeight + 1) {
-        const detail = `block ${index}, height ${block.offsetHeight}, page content ${body.scrollHeight}/${body.clientHeight}, ${block.textContent.slice(0,80)}`;
-        stage.remove(); throw Error('A report block exceeds a PDF page: ' + detail);
-      }
+      checkFit(block);
     }
     pages.forEach((node, index) => {
       const footer = document.createElement('div'); footer.className = 'pdf-footer';
@@ -68,5 +74,9 @@
       pdf.save(filename);
     } finally { layout?.stage.remove(); busy = false; }
   }
-  window.VBPDF = { export: exportPDF, paginate };
+  function preview(report,state,container) {
+    const layout=paginate(report,state);
+    container.replaceChildren(...layout.pages);layout.stage.remove();
+  }
+  window.VBPDF = { export: exportPDF, paginate, preview };
 })();

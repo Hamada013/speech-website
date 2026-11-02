@@ -1,7 +1,7 @@
 /* Explicit, per-child session boundaries shared by the three offline apps. */
 ((root)=>{
  'use strict';
- const names={voc:'الكلمات والمفاهيم',senb:'بناء الجمل',taffaha:'الكلمات والمقاطع'};
+ const WINDOW_MS=6*60*60*1000;
  const domains={receptive:'فهم الكلمات',expressive:'التعبير والتسمية',count:'تمييز عدد المقاطع',picture:'ربط المقاطع بالصورة'};
  const clone=value=>JSON.parse(JSON.stringify(value));
  // Short, goal-specific home activities. Each new note draws a different sample.
@@ -51,13 +51,13 @@
    ]
   };
   const example=focus.find(item=>item.syllables?.length);
-  return [`نستخدم من شغل اليوم: ${target}.`,(samples[app==='senb'&&!sentenceItems.length?'voc':app]||samples.voc)[variant],app==='taffaha'&&example?`«${example.label}»: ${example.syllables.join(' ـ ')} (${example.count===1?'مقطع واحد':example.count===2?'مقطعان':`${example.count} مقاطع`}).`:null,'نستخدم صورًا أو أغراض البيت، ونلعب ٣–٥ دقائق. إذا احتجت مساعدة، ورّوني النموذج؛ الإشارة مقبولة، ومنوقف إذا تعبت.'].filter(Boolean).join('\n');
+  return [`نستخدم من شغل اليوم: ${target}.`,(samples[app==='senb'&&!sentenceItems.length?'voc':app]||samples.voc)[variant],app==='taffaha'&&example?`«${example.label}»: ${example.syllables.join(' ـ ')} (${example.count===1?'مقطع واحد':example.count===2?'مقطعان':`${example.count} مقاطع`}).`:null,'نلعب ٣–٥ دقائق؛ الإشارة مقبولة ومنوقف إذا تعبت.'].filter(Boolean).join('\n');
  }
  function message(app,name,session){
   const items=Object.values(session.items),help=items.filter(item=>item.help),focus=(help.length?help:items).slice(0,3);
-  const lines=['مرحبًا ماما وبابا 🌷',`أنا ${name}، اليوم اشتغلت على ${names[app]}.`,`لعبت وتدرّبت على: ${Object.keys(session.activities).join('، ')}.`, ''];
-  for(const [entity,title]of [['word','الكلمات اللي اشتغلت عليها'],['sentence','الجمل اللي اشتغلت عليها']]){
-   const list=items.filter(item=>item.entity===entity);if(list.length)lines.push(`${title}: ${list.map(item=>item.label).join('، ')}.`);
+  const lines=['مرحبًا ماما وبابا 🌷',`أنا ${name}، تدرّبت اليوم على:`];
+  for(const [entity,title]of [['word','كلمات'],['sentence','جمل']]){
+   const list=items.filter(item=>item.entity===entity);if(list.length)lines.push(`${title}: ${list.slice(0,6).map(item=>item.label).join('، ')+(list.length>6?' وغيرها':'')}.`);
   }
   const scores={};
   for(const item of items)for(const [domain,value]of Object.entries(item.scores)){
@@ -66,11 +66,10 @@
    scores[key]||={label,correct:0,total:0};scores[key].correct+=value.correct;scores[key].total+=value.total;
   }
   if(Object.keys(scores).length){
-   lines.push('');for(const value of Object.values(scores))lines.push(`في ${value.label}، سجّلنا ${value.correct} استجابة صحيحة من أصل ${value.total} فرصة.`);
-   lines.push('هالأرقام بتحكي عن محاولاتي بهالجلسة، ولسه منكمّل التعلّم خطوة خطوة.');
-  }else lines.push('','كان شغلنا تعرّف وتدريب، وما سجّلنا إجابات مقيّمة بهالجلسة.');
-  if(help.length)lines.push(`بحتاج نرجع بهدوء لهالكلمات أو الجمل: ${help.map(item=>item.label).join('، ')}.`);
-  lines.push('','خلّونا نلعب شوي بالبيت 💛',homeActivity(app,focus),'اعطوني وقت أشير أو أحاول؛ مو ضروري أحكي.');
+   for(const value of Object.values(scores))lines.push(`${value.label}: ${value.correct}/${value.total} محاولات صحيحة.`);
+  }else lines.push('تدريب فقط؛ بلا تقييم.');
+  if(help.length)lines.push(`نراجع سوا: ${help.slice(0,3).map(item=>item.label).join('، ')}.`);
+  lines.push('','خلّونا نلعب شوي بالبيت 💛',homeActivity(app,focus));
   return lines.join('\n');
  }
  function create({app,storage,owner,onError=()=>{}}){
@@ -78,7 +77,20 @@
   const initialOwner=owner();if(initialOwner?.id)try{resetEpochs.set(initialOwner.id,JSON.parse(storage.getItem('voc-children-v1'))?.accountResets?.[initialOwner.id]||null);}catch{}
   const activeOwner=()=>{const child=owner();if(!child?.id)return null;try{const data=JSON.parse(storage.getItem('voc-children-v1'));if(data?.deletedChildren?.[child.id])return null;const epoch=data?.accountResets?.[child.id]||null;if(!resetEpochs.has(child.id))resetEpochs.set(child.id,epoch);if(resetEpochs.get(child.id)!==epoch)return null;}catch{}return child;};
   const storageKey=id=>`speech-homework-v1:${app}:${encodeURIComponent(id)}${resetEpochs.get(id)?':reset-'+resetEpochs.get(id):''}`;
-  function read(id){const key=storageKey(id);if(!ok&&memory.has(key))return clone(memory.get(key));try{const value=JSON.parse(storage.getItem(key));return value?.version===1?value:{version:1,current:null,last:null,cursors:{}};}catch{return memory.get(key)||{version:1,current:null,last:null,cursors:{}};}}
+  function read(id){
+   const key=storageKey(id);let state;
+   if(!ok&&memory.has(key))state=clone(memory.get(key));
+   else try{const value=JSON.parse(storage.getItem(key));state=value?.version===1?value:null;}catch{}
+   state||=clone(memory.get(key)||{version:1,current:null,last:null,cursors:{}});
+   const origin=state.windowStarted||state.current?.started||state.last?.started;
+   const started=Date.parse(origin);
+   if(!Number.isFinite(started)||Date.now()-started>=WINDOW_MS){
+    // Keep ingestion cursors: old rows from a resumed game must not refill the cleared message.
+    state={version:1,windowStarted:new Date(Date.now()).toISOString(),current:null,last:null,lessonDraft:null,cursors:state.cursors||{}};
+    write(id,state);
+   }else if(!state.windowStarted){state.windowStarted=origin;write(id,state);}
+   return state;
+  }
   function write(id,value){const key=storageKey(id);memory.set(key,clone(value));try{storage.setItem(key,JSON.stringify(value));ok=true;}catch{ok=false;onError();}}
   function add(state,entry){
    const label=String(entry.label||'').trim();if(!label)return;
@@ -106,7 +118,7 @@
    if(state.current){state.last={...state.current,ended:new Date().toISOString(),name:child.name};state.last.text=message(app,child.name,state.last);state.current=null;write(child.id,state);}
    return clone(state.last);
   }
-  return {record,capture,finish,current:()=>{const child=activeOwner();return child?.id?clone(read(child.id).current):null;},
+  return {record,capture,finish,expiresAt:()=>{const child=activeOwner();return child?.id?Date.parse(read(child.id).windowStarted)+WINDOW_MS:null;},current:()=>{const child=activeOwner();return child?.id?clone(read(child.id).current):null;},
    lessonDraft:id=>{const child=activeOwner();if(!child)return null;const draft=read(child.id).lessonDraft;return draft?.id===id?draft.text:null;},
    editLesson:(id,text)=>{const child=activeOwner();if(!child)return;const state=read(child.id);state.lessonDraft={id,text:String(text)};write(child.id,state);},
    edit:text=>{const child=activeOwner();if(!child?.id)return;const state=read(child.id);if(state.last){state.last.text=String(text);write(child.id,state);}},storageOK:()=>ok};
@@ -115,7 +127,7 @@
  if(!root.document)return;
  const app=document.currentScript.dataset.app,progress=()=>({voc:root.VocProgress,senb:root.SenbProgress,taffaha:root.TaffahaProgress})[app];
  let storage;try{storage=root.localStorage;}catch{storage={getItem(){},setItem(){throw Error('unavailable');}};}
- const model=create({app,storage,owner:()=>progress()?.active()});let dialog,input,status,trigger;
+ const model=create({app,storage,owner:()=>progress()?.active()});let dialog,input,status,trigger,expiryTimer;
  function open(lessonOnly=false){
   if(!progress()?.active()||dialog?.open)return;
   root.dispatchEvent(new Event('suite-navigation-open'));root.AppNavigation?.closeSettings(false,true);
@@ -123,7 +135,7 @@
   const note=lessonOnly?(current?{...current,name:progress().active().name,text:message(app,progress().active().name,current)}:model.finish()):model.finish();
   const draftId=note?.id||progress().active()?.homeLesson?.planId;
   let lessonText=note?.text;
-  if(lessonOnly&&app==='voc'&&!current&&progress().active()?.homeLesson){const lesson=progress().active().homeLesson;const items=typeof CATEGORIES!=='undefined'?CATEGORIES.flatMap(category=>category.items.map(item=>({key:progress().key(item),name:item.name}))):root.VOC_GAME_DATA?.categories.flatMap(category=>category.items)||[];lessonText=root.VocHomeLesson?.text(progress().active().name,lesson,items)||lessonText;}
+  if(lessonOnly&&app==='voc'&&!current&&!lessonText&&Date.now()-Date.parse(progress().active()?.homeLesson?.date)<WINDOW_MS){const lesson=progress().active().homeLesson;const items=typeof CATEGORIES!=='undefined'?CATEGORIES.flatMap(category=>category.items.map(item=>({key:progress().key(item),name:item.name}))):root.VOC_GAME_DATA?.categories.flatMap(category=>category.items)||[];lessonText=root.VocHomeLesson?.text(progress().active().name,lesson,items)||lessonText;}
 
   if(!dialog){
    dialog=document.createElement('dialog');dialog.id='session-homework-dialog';dialog.className='suite-dialog session-homework-dialog';dialog.dir='rtl';dialog.setAttribute('aria-labelledby','session-homework-title');
@@ -142,6 +154,8 @@
   dialog.querySelector('[data-homework-meta]').textContent=note?`${note.name} · ${new Date(note.ended||note.started).toLocaleDateString('ar')}`:progress().active().name;
   status.textContent=model.storageOK()?'':'تعذّر حفظ الرسالة على الجهاز. انسخوا الرسالة قبل إغلاق الصفحة.';
   dialog.showModal();dialog.querySelector('h2').focus();input.scrollTop=0;
+  clearTimeout(expiryTimer);
+  expiryTimer=setTimeout(()=>{model.current();input.value='';dialog.close();},Math.max(0,model.expiresAt()-Date.now()));
  }
  function init(){
   const host=document.querySelector(app==='taffaha'?'.topbar nav':app==='senb'?'#homeHeaderTools':'.app-home-tools'),home=document.querySelector(app==='taffaha'?'#home-screen':app==='senb'?'#homeView':'#home-view');

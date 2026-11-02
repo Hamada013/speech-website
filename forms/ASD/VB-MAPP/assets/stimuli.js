@@ -1,7 +1,9 @@
 /* IMAGE REGISTRY - edit paths here to map child-facing stimuli.
  * Example: "t1-1": { paths: ["images/2.png", "images/cup-set-b.png"], ... }
  * Each numbered PNG is reserved for the task listed in images/IMAGE-MAP.md.
- * No stimulus images are supplied or invented. Scoring never depends on a file loading.
+ * Historical numbered paths are retained for compatibility. stimulus-data.js and
+ * stimulus-viewer.js attach prepared local cartoon sets after the manual overlay.
+ * Scoring never depends on a file loading.
  * Intraverbal and echoic tasks intentionally have no picture cue.
  */
 window.VB_STIMULI = {
