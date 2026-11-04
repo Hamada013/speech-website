@@ -88,6 +88,73 @@ async function run(type, name) {
     await home(page); await slower(page);
     assert.match(await page.locator('.ff-speed').textContent(), /86/);
     assert.match(await page.locator('.ff-pagination').textContent(), /1 \/ 97/);
+    // Finished practice is saved with its rating and shown in My Practice. Unfinished practice is not.
+    await context.close();
+    context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce', permissions: name === 'chromium' ? ['clipboard-read', 'clipboard-write'] : [] });
+    page = await context.newPage(); page.setDefaultTimeout(8000);
+    page.on('pageerror', error => errors.push(error.message));
+    await page.goto(`http://127.0.0.1:${server.address().port}/index.html`);
+    await click(page, 'Switch to English');
+    // Names and history sit behind a fresh sum. Wrong answers and closing never open them.
+    await click(page, 'My Practice');
+    const gateAnswer = () => page.locator('.ff-gate-sum').textContent().then(text => { const [left, operation, right] = text.split(' '); return operation === '+' ? +left + +right : +left - +right; });
+    const answer = await gateAnswer();
+    const wrong = (await page.locator('.ff-gate-choices button').evaluateAll(buttons => buttons.map(button => +button.dataset.answer))).find(value => value !== answer);
+    await page.locator(`.ff-gate-choices button[data-answer="${wrong}"]`).click();
+    await page.getByText('Try again.').waitFor();
+    assert.equal(await page.locator('[data-screen]').getAttribute('data-screen'), 'home');
+    await page.keyboard.press('Escape');
+    assert.equal(await page.locator('.ff-gate').count(), 0);
+    assert.equal(await page.locator('[data-screen]').getAttribute('data-screen'), 'home');
+    assert.equal(await page.getByRole('button', { name: 'My Practice', exact: true }).evaluate(el => el === document.activeElement), true);
+    const passGate = async () => { await page.locator(`.ff-gate-choices button[data-answer="${await gateAnswer()}"]`).click(); };
+    await click(page, 'My Practice'); await passGate();
+    assert.match(await page.locator('.ff-progress').textContent(), /Finished practice will appear here/);
+    await click(page, 'Back');
+    await slower(page); await click(page, 'Numbers');
+    for (let i = 0; i < 5; i++) await click(page, 'Faster');
+    await click(page, 'Play'); await click(page, 'Pause'); await click(page, 'Reset');
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('fluency-flow-progress-v1') || '{"people":[]}').people.length), 0, 'A stopped practice is not recorded');
+    await click(page, 'Play');
+    await page.locator('.ff-rating').waitFor();
+    await page.locator('.ff-rating button[data-rating="1"]').click();
+    assert.equal(await page.locator('.ff-rating').count(), 0);
+    await home(page);
+    await click(page, 'My Practice'); await passGate();
+    const progressText = await page.locator('.ff-progress').textContent();
+    assert.match(progressText, /Me/); assert.match(progressText, /Slower Rate · Words/); assert.match(progressText, /1 time\b/); assert.match(progressText, /Easy 1/);
+    if (name === 'chromium') {
+      await click(page, 'Copy summary for your therapist');
+      await page.getByText('Copied').waitFor();
+      const copied = await page.evaluate(() => navigator.clipboard.readText());
+      assert.match(copied, /Slower Rate · Words/); assert.match(copied, /not an assessment/);
+    }
+    // History survives a reload and belongs to one person.
+    await page.reload();
+    await click(page, 'My Practice'); await passGate();
+    assert.match(await page.locator('.ff-progress').textContent(), /Easy 1/);
+    await click(page, 'Change');
+    await page.getByLabel('Add a person').fill('Sara');
+    await click(page, 'Add');
+    await page.keyboard.press('Escape');
+    assert.match(await page.locator('.ff-progress').textContent(), /Finished practice will appear here/);
+    await click(page, 'Profile');
+    assert.equal(await page.getByRole('button', { name: 'Delete: Sara' }).count(), 0, 'People stay hidden until the sum is solved');
+    await passGate();
+    await click(page, 'Delete: Sara');
+    await page.getByRole('alert').waitFor();
+    await click(page, 'Cancel');
+    await click(page, 'Delete: Sara');
+    await click(page, 'Delete');
+    assert.equal(await page.getByRole('button', { name: 'Sara' }).count(), 0);
+    await page.keyboard.press('Escape');
+    assert.match(await page.locator('.ff-progress').textContent(), /Easy 1/);
+    // A path step opens that exercise at that step, here a timed speaking prompt.
+    await page.locator('.ff-path-step[data-step="conversation"]').click();
+    assert.equal(await page.locator('[data-screen]').getAttribute('data-screen'), 'slower-rate-practice');
+    assert.equal(await page.locator('.ff-categories button[aria-pressed="true"]').textContent(), 'Conversation');
+    assert.ok(await page.locator('.ff-prompt').count());
+    assert.equal(await page.locator('.ff-speed').count(), 0);
     // Use a fresh context for native dialog animations and media events.
     await context.close();
     context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });

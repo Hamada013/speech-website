@@ -20,12 +20,14 @@ export function Dialog({ children, onClose, label, className }) {
       const items = focusables();
       const first = items[0], last = items.at(-1);
       if (!first) { event.preventDefault(); node.focus(); return; }
+      // A control that removed itself leaves focus outside; bring it back in.
+      if (!node.contains(document.activeElement)) { event.preventDefault(); first.focus(); return; }
       if (event.shiftKey && (document.activeElement === first || document.activeElement === node)) { event.preventDefault(); last.focus(); }
       else if (!event.shiftKey && (document.activeElement === last || document.activeElement === node)) { event.preventDefault(); first.focus(); }
     }
-    node.addEventListener('keydown', onKey);
+    document.addEventListener('keydown', onKey);
     return () => {
-      node.removeEventListener('keydown', onKey);
+      document.removeEventListener('keydown', onKey);
       surfaces.forEach((surface, i) => { surface.inert = priorInert[i]; });
       document.body.style.overflow = previousOverflow;
       if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });

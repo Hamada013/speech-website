@@ -171,6 +171,63 @@ input[type="range"]:focus::-webkit-slider-thumb { box-shadow: 0 0 0 3px rgba(40,
 .ff-letters button { min-height: 56px; border: 1px solid var(--line); border-radius: 16px; background: #fff; font-size: 1.4rem; font-weight: 700; }
 .ff-letters button:hover { background: var(--green-soft); border-color: var(--green-line); }
 
+.ff-gate { max-width: 360px; }
+.ff-gate-sum { margin: .75rem 0 !important; color: var(--ink); font-size: 2rem; font-weight: 800; text-align: center; }
+.ff-gate-choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+.ff-gate-choices button { min-height: 56px; border: 1px solid var(--line); border-radius: 16px; background: #fff; color: var(--ink); font-size: 1.4rem; font-weight: 700; }
+.ff-gate-choices button:hover { background: var(--green-soft); border-color: var(--green-line); }
+.ff-gate-choices button[aria-invalid="true"] { border-color: #da8b67; color: var(--red); }
+.ff-gate .ff-alert { min-height: 1.5em; margin-top: .5rem; text-align: center; }
+.ff-prompt { display: flex; flex-direction: column; align-items: center; gap: .75rem; max-width: 34rem; text-align: center; }
+.ff-prompt p { margin: 0; font-size: clamp(1.25rem, 3.6vw, 1.6rem); font-weight: 700; line-height: 1.6; transition: color .2s; }
+.ff-prompt p.is-active { color: var(--green); }
+.ff-prompt .ff-breath-bar { width: min(240px, 70vw); height: 6px; }
+.ff-rating { display: flex; flex-direction: column; align-items: center; gap: .35rem; margin-top: .35rem; color: var(--muted); font-size: .875rem; font-weight: 600; }
+.ff-rating > div { display: flex; flex-wrap: wrap; justify-content: center; gap: .35rem; }
+.ff-rating button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .15rem; min-width: 72px; min-height: 64px; padding: .35rem .5rem; border: 1px solid var(--line); border-radius: 16px; background: #fff; color: var(--ink); font-size: .8125rem; font-weight: 600; }
+.ff-rating button:hover { background: var(--green-soft); border-color: var(--green-line); }
+.ff-rating svg { width: 28px; height: 28px; }
+.ff-text-button { min-height: 44px; min-width: 44px; padding: .35rem .9rem; border: 1px solid var(--line); border-radius: 14px; background: #fff; font-size: .875rem; font-weight: 700; white-space: nowrap; }
+.ff-text-button:hover:not(:disabled) { background: var(--page); }
+.ff-text-button:disabled { opacity: .45; }
+.ff-primary { background: var(--green); border-color: var(--green); color: #fff; }
+.ff-primary:hover:not(:disabled) { background: #205c4a; }
+.ff-danger { color: #b42318; border-color: #eccbbf; }
+.ff-alert { margin: 0; color: #b42318; font-size: .875rem; font-weight: 600; }
+.ff-note { margin: .25rem 0; color: var(--muted); font-size: .875rem; line-height: 1.7; }
+.ff-people { display: flex; flex-direction: column; gap: .35rem; margin: 0 0 .75rem; padding: 0 !important; list-style: none !important; }
+.ff-people li { display: flex; align-items: center; gap: .25rem; }
+.ff-person { flex: 1; min-width: 0; display: flex; align-items: center; gap: .6rem; min-height: 52px; padding: .3rem .6rem; border: 1px solid var(--line); border-radius: 16px; color: var(--ink); font-weight: 700; text-align: start; overflow-wrap: anywhere; }
+.ff-person[aria-pressed="true"] { background: var(--green-soft); border-color: var(--green-line); }
+.ff-avatar { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: var(--blue-soft); color: var(--blue); font-weight: 800; }
+.ff-confirm { flex: 1; padding: .6rem .75rem; border: 1px solid #eccbbf; border-radius: 16px; color: var(--ink); }
+.ff-confirm > div { display: flex; justify-content: flex-end; gap: .35rem; margin-top: .4rem; }
+.ff-add-person label { display: block; margin-bottom: .2rem; color: var(--ink); font-size: .875rem; font-weight: 700; }
+.ff-add-person > div { display: flex; gap: .35rem; }
+.ff-add-person input { flex: 1; min-width: 0; min-height: 44px; padding-inline: .75rem; border: 1px solid var(--line); border-radius: 14px; background: #fff; color: var(--ink); }
+.ff-progress { display: flex; flex-direction: column; gap: .75rem; }
+.ff-panel { padding: .9rem 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow); }
+.ff-panel h2 { margin: 0 0 .15rem; font-size: 1.05rem; font-weight: 800; }
+.ff-panel .ff-categories { margin-block: .5rem; }
+.ff-person-row { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.ff-person-row strong { overflow-wrap: anywhere; }
+.ff-person-row p { margin: .1rem 0 0; color: var(--muted); font-size: .875rem; }
+.ff-path { display: flex; flex-direction: column; gap: .35rem; margin: .5rem 0; padding: 0; list-style: none; }
+.ff-path-step { display: flex; align-items: center; gap: .6rem; width: 100%; min-height: 56px; padding: .4rem .6rem; border: 1px solid var(--line); border-radius: 16px; text-align: start; }
+.ff-path-step:hover { border-color: var(--green-line); }
+.ff-path-step.is-next { background: var(--green-soft); border-color: var(--green-line); }
+.ff-path-number { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 28px; height: 28px; border: 1px solid var(--line); border-radius: 50%; background: #fff; font-size: .8125rem; font-weight: 800; }
+.ff-path-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.ff-path-text span { color: var(--muted); font-size: .8125rem; }
+.ff-path-badge { flex-shrink: 0; color: var(--green); font-size: .75rem; font-weight: 700; }
+.ff-path-badge.is-ready { color: var(--blue); }
+.ff-day { margin-top: .75rem; }
+.ff-day h3 { margin: 0 0 .25rem; color: var(--muted); font-size: .875rem; font-weight: 700; }
+.ff-day ul { display: flex; flex-direction: column; gap: .35rem; margin: 0; padding: 0; list-style: none; }
+.ff-day li { display: flex; flex-direction: column; padding: .4rem .6rem; background: var(--page); border-radius: 12px; font-size: .875rem; overflow-wrap: anywhere; }
+.ff-day li span { color: var(--muted); font-size: .8125rem; }
+.ff-copy { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin-top: .9rem; color: var(--green); font-size: .875rem; font-weight: 600; }
+
 .ff-pwa { width: calc(100% - 2rem); max-width: 728px; margin: 0 auto 1rem; padding: .75rem 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; color: var(--muted); font-size: .875rem; line-height: 1.6; }
 .ff-pwa h2 { margin: 0; color: var(--ink); font-size: .9375rem; font-weight: 700; }
 .ff-pwa h3 { margin: 0; color: var(--ink); font-weight: 700; }

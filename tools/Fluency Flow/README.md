@@ -37,6 +37,8 @@ App icons are generated from `assets/icons/logo.webp`. If you change it, run `no
 - `assets/pwa.js`: bilingual install guidance, offline readiness and controlled update UI.
 - `assets/icons/`: WebP logo, Android icons, maskable icon and Apple touch icon.
 - `assets/app.js`: translations and exercise content.
+- `assets/progress.js`: people and practice history in browser storage, with the summaries and path suggestion.
+- `assets/progress-ui.js`: My Practice, the self-rating faces and the People dialog.
 - `assets/ui.js`: the interface: one shared practice screen for all six speech exercises, the breathing guide, dialogs and session control.
 - `assets/pictures.js`: concrete bilingual word mappings, local Lucide icons and supplementary SVG drawings for Easy Onset.
 - `assets/practice.js`: the clinical timing rules, plus category, phrase, sound-grouping and navigation helpers. Change pacing, pauses, presets and limits here.
@@ -60,6 +62,17 @@ These defaults are in `assets/practice.js` and are suggestions for clinician rev
 - **Cancellations, Pull-outs, Preparatory Sets:** single words are all targets; sentences and stories use one marked target in each phrase, chosen automatically as the longest word. Cancellation's pause defaults to 3 seconds and can be set from 1 to 5.
 - **Breathing:** presets are 4/0/6, 3/0/4 and 3/0/6 seconds (in/hold/out). Holding is optional, the fastest cycle is 4 seconds, and practice ends after a chosen 1–10 breaths (default 5).
 
+## People, history and the speaking path
+
+- A fresh sum, worded for parents and therapists, guards **My Practice** and the profile icon, so names, history and deletion are out of a young child's reach. It is a child lock, not a password: it does not secure the data from another adult. Practice and rating are not gated.
+- Practice needs no setup. The first finished practice creates a person named «أنا» / Me; the profile icon adds, switches and deletes people.
+- Only finished practice is recorded. A stopped or reset run is not, and neither is the content of a recording.
+- After a finished practice, three faces ask how much effort it took. Rating is optional, and auto-advance skips the question so it does not interrupt the flow.
+- **My Practice** shows the last 7 days, the speaking path for each speech exercise and up to 30 days of history. **Copy summary** copies up to 14 days as text; nothing is sent automatically.
+- The path runs from words to sentences, reading stories, conversation and real situations. A step reads as mostly easy after at least 5 ratings with 70% rated easy (`READY_RATED`, `READY_EASY_SHARE`), and the first other step is suggested next. These are suggestions for clinician review and never lock a step.
+- Conversation and Real situations are prompts for 60 seconds of free speech (`FREE_SPEECH_MS`), without word-by-word cues.
+- Data is stored only in this browser under `fluency-flow-progress-v1`, separately from the other apps' accounts. Clearing browser data removes it, and storage failures are shown to the user.
+
 ## Behavior
 
 - Pause preserves the current exercise position. Reset returns to the beginning.
@@ -75,6 +88,7 @@ The tests start their own local server. Install Playwright in a development envi
 
 ```sh
 node tests/helpers.cjs
+node tests/progress.cjs
 node tests/pictures.cjs
 node tests/browser.cjs
 node tests/behavior.cjs

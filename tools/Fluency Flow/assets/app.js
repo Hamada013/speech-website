@@ -1561,7 +1561,7 @@ Object.assign(translations.ar, {
 });
 Object.assign(translations.en, {
   subtitle: 'Choose a strategy to practice.', paused: 'Paused', finished: 'Done',
-  pausePhase: 'Pause', repeat: 'Repeat', slower: 'Slower', syllablesPerMinute: 'syllables a minute',
+  pausePhase: 'Pause', repeat: 'Repeat', slower: 'Slower',
   longerPause: 'Longer pause', shorterPause: 'Shorter pause', pauseLength: 'Pause length',
   moreCycles: 'More breaths', fewerCycles: 'Fewer breaths', cycles: 'Breaths',
   lightContactIntro: 'Touch your lips or tongue together very lightly as each sound begins.',
@@ -1569,7 +1569,7 @@ Object.assign(translations.en, {
 });
 Object.assign(translations.ar, {
   subtitle: 'اختر استراتيجية للتدريب.', paused: 'متوقف مؤقتاً', finished: 'اكتمل التدريب',
-  pausePhase: 'وقفة', repeat: 'كرّر', slower: 'أبطأ', syllablesPerMinute: 'مقطعاً في الدقيقة',
+  pausePhase: 'وقفة', repeat: 'كرّر', slower: 'أبطأ',
   longerPause: 'وقفة أطول', shorterPause: 'وقفة أقصر', pauseLength: 'طول الوقفة',
   moreCycles: 'أنفاس أكثر', fewerCycles: 'أنفاس أقل', cycles: 'الأنفاس',
   lightContactIntro: 'المس شفتيك أو لسانك بخفة شديدة عند بدء كل صوت.',
@@ -1579,5 +1579,72 @@ translations.en.breathingInfo.tips.push('If you feel dizzy, stop and breathe nor
 translations.ar.breathingInfo.tips.push('إذا شعرت بدوار، توقف وتنفس بشكل طبيعي.');
 translations.en.appInfo.tips.push('Recordings stay on this device and are cleared when you leave the exercise.');
 translations.ar.appInfo.tips.push('تبقى التسجيلات على هذا الجهاز وتُمسح عند مغادرة التمرين.');
+
+Object.assign(translations.en, {
+  conversation: 'Conversation', situations: 'Real situations', talk: 'Talk and use your technique',
+  gateTitle: 'For parents and therapists', gateHelp: 'Solve this sum to open names and practice history.', gateRetry: 'Try again.',
+  myPractice: 'My Practice', people: 'People', me: 'Me', add: 'Add', cancel: 'Cancel', addPersonLabel: 'Add a person',
+  deletePerson: 'Delete', deletePersonConfirm: 'Delete {name} and all of their practice history? This cannot be undone.',
+  deviceOnly: 'Names and practice history stay in this browser and are not sent anywhere. Clearing browser data removes them.',
+  saveFailed: 'Practice could not be saved in this browser. It will be lost when the app closes.',
+  ratingQuestion: 'How much effort did that take?', ratingEasy: 'Easy', ratingSome: 'Some effort', ratingHard: 'Hard',
+  changePerson: 'Change', noPersonYet: 'No name yet', thisWeek: 'Last 7 days',
+  units: { times: { one: '1 time', other: '{n} times' }, days: { one: '1 day', other: '{n} days' }, practices: { one: '1 practice', other: '{n} practices' }, breaths: { one: '1 breath', other: '{n} breaths' }, syllables: { one: '1 syllable a minute', other: '{n} syllables a minute' } },
+  noPracticeThisWeek: 'No practice in the last 7 days.', notStarted: 'Not started',
+  pathTitle: 'Speaking path', pathIntro: 'Move from short words toward everyday speech, at your own pace.',
+  pathNote: 'Suggestions come from your own ratings: at least 5 ratings, with 70% easy. Your speech therapist can guide you differently.',
+  suggestedNext: 'Suggested next', mostlyEasy: 'Mostly easy', historyTitle: 'Practice history', noHistory: 'Finished practice will appear here.',
+  copySummary: 'Copy summary for your therapist', copied: 'Copied', copyFailed: 'Could not copy. Your browser blocked it.',
+  summaryNote: 'Ratings are the speaker\'s own view of effort. This is a practice record, not an assessment.',
+  step_words: 'Words', step_sentences: 'Sentences', step_stories: 'Reading stories', step_conversation: 'Conversation', step_situations: 'Real situations'
+});
+Object.assign(translations.ar, {
+  conversation: 'محادثة', situations: 'مواقف حقيقية', talk: 'تحدّث واستخدم التقنية',
+  gateTitle: 'للأهل والمختصين', gateHelp: 'احسب الناتج لفتح الأسماء وسجل التدريب.', gateRetry: 'حاول مرة أخرى.',
+  myPractice: 'تدريبي', people: 'الأشخاص', me: 'أنا', add: 'إضافة', cancel: 'إلغاء', addPersonLabel: 'إضافة شخص',
+  deletePerson: 'حذف', deletePersonConfirm: 'هل تريد حذف {name} وكل سجل تدريبه؟ لا يمكن التراجع عن ذلك.',
+  deviceOnly: 'تبقى الأسماء وسجل التدريب في هذا المتصفح ولا تُرسل إلى أي جهة. مسح بيانات المتصفح يحذفها.',
+  saveFailed: 'تعذر حفظ التدريب في هذا المتصفح، وسيضيع عند إغلاق التطبيق.',
+  ratingQuestion: 'كم احتاج هذا من جهد؟', ratingEasy: 'سهل', ratingSome: 'بعض الجهد', ratingHard: 'صعب',
+  changePerson: 'تغيير', noPersonYet: 'لا يوجد اسم بعد', thisWeek: 'آخر 7 أيام',
+  units: {
+    times: { one: 'مرة واحدة', two: 'مرتان', few: '{n} مرات', many: '{n} مرة', other: '{n} مرة' },
+    days: { one: 'يوم واحد', two: 'يومان', few: '{n} أيام', many: '{n} يوماً', other: '{n} يوم' },
+    practices: { one: 'تدريب واحد', two: 'تدريبان', few: '{n} تدريبات', many: '{n} تدريباً', other: '{n} تدريب' },
+    breaths: { one: 'نفس واحد', two: 'نفسان', few: '{n} أنفاس', many: '{n} نفساً', other: '{n} نفس' },
+    syllables: { few: '{n} مقاطع في الدقيقة', many: '{n} مقطعاً في الدقيقة', other: '{n} مقطع في الدقيقة' }
+  },
+  noPracticeThisWeek: 'لا يوجد تدريب في آخر 7 أيام.', notStarted: 'لم يبدأ',
+  pathTitle: 'مسار الكلام', pathIntro: 'انتقل من الكلمات القصيرة إلى الكلام اليومي، بالسرعة التي تناسبك.',
+  pathNote: 'تعتمد الاقتراحات على تقييماتك: 5 تقييمات على الأقل، 70% منها سهل. يمكن لأخصائي النطق توجيهك بشكل مختلف.',
+  suggestedNext: 'الخطوة المقترحة', mostlyEasy: 'سهل غالباً', historyTitle: 'سجل التدريب', noHistory: 'سيظهر هنا التدريب المكتمل.',
+  copySummary: 'نسخ ملخص لأخصائي النطق', copied: 'تم النسخ', copyFailed: 'تعذر النسخ. منع المتصفح ذلك.',
+  summaryNote: 'التقييمات هي رأي المتحدث في الجهد المبذول. هذا سجل تدريب وليس تقييماً.',
+  step_words: 'كلمات', step_sentences: 'جمل', step_stories: 'قراءة قصص', step_conversation: 'محادثة', step_situations: 'مواقف حقيقية'
+});
+translations.en.practiceData.conversation = [
+  'Tell someone what you did today.', 'Describe your favorite food and why you like it.', 'Talk about a place you would like to visit.',
+  'Describe your home to someone who has never seen it.', 'Talk about a friend and what you enjoy doing together.', 'Explain how to make a simple drink or snack.',
+  'Tell a story about a funny thing that happened to you.', 'Talk about your plans for this weekend.', 'Describe a film, show or game you like.',
+  'Talk about something you are learning at the moment.', 'Describe your usual morning, from waking up onward.', 'Talk about an animal you like and what makes it special.'
+];
+translations.ar.practiceData.conversation = [
+  'احكِ لشخص ما فعلته اليوم.', 'صف طعامك المفضل ولماذا تحبه.', 'تحدث عن مكان تود زيارته.',
+  'صف بيتك لشخص لم يره من قبل.', 'تحدث عن صديق وعمّا تحبان فعله معاً.', 'اشرح طريقة تحضير مشروب أو وجبة خفيفة بسيطة.',
+  'احكِ قصة عن موقف طريف حدث معك.', 'تحدث عن خططك لنهاية هذا الأسبوع.', 'صف فيلماً أو برنامجاً أو لعبة تحبها.',
+  'تحدث عن شيء تتعلمه هذه الأيام.', 'صف صباحك المعتاد منذ أن تستيقظ.', 'تحدث عن حيوان تحبه وما يميزه.'
+];
+translations.en.practiceData.situations = [
+  'Rehearse aloud, then try it for real: ask a shopkeeper how much something costs.', 'Rehearse aloud, then try it for real: say your name and greet someone new.',
+  'Rehearse aloud, then try it for real: order food or a drink yourself.', 'Rehearse aloud, then try it for real: make a short phone call to a relative.',
+  'Rehearse aloud, then try it for real: ask someone for directions or for help finding something.', 'Rehearse aloud, then try it for real: answer a question in class or at work.',
+  'Rehearse aloud, then try it for real: tell a family member about your day at dinner.', 'Rehearse aloud, then try it for real: tell someone who knows you about your stuttering, in your own words.'
+];
+translations.ar.practiceData.situations = [
+  'تدرّب بصوت عالٍ، ثم جرّب ذلك في الواقع: اسأل البائع عن سعر شيء ما.', 'تدرّب بصوت عالٍ، ثم جرّب ذلك في الواقع: عرّف عن اسمك وسلّم على شخص جديد.',
+  'تدرّب بصوت عالٍ، ثم جرّب ذلك في الواقع: اطلب طعاماً أو مشروباً بنفسك.', 'تدرّب بصوت عالٍ، ثم جرّب ذلك في الواقع: أجرِ مكالمة قصيرة مع أحد أقاربك.',
+  'تدرّب بصوت عالٍ، ثم جرّب ذلك في الواقع: اسأل شخصاً عن الطريق أو عن مكان شيء ما.', 'تدرّب بصوت عالٍ، ثم جرّب ذلك في الواقع: أجب عن سؤال في الصف أو في العمل.',
+  'تدرّب بصوت عالٍ، ثم جرّب ذلك في الواقع: أخبر أحد أفراد عائلتك عن يومك على مائدة الطعام.', 'تدرّب بصوت عالٍ، ثم جرّب ذلك في الواقع: أخبر شخصاً يعرفك عن تأتأتك بكلماتك الخاصة.'
+];
 
 yb.createRoot(document.getElementById('root')).render(u.jsx(Y.StrictMode, { children: u.jsx(App, { translations }) }));

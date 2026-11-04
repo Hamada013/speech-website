@@ -1,13 +1,35 @@
 // Pure practice helpers shared by the visual guide and navigation.
 export const singleItemCategories = new Set(['numbers', 'letters', 'colors', 'animals', 'food', 'words', 'plosives', 'practice']);
 export const categoriesByScreen = {
-  'slower-rate-practice': ['numbers', 'letters', 'colors', 'animals', 'food', 'words', 'sentences', 'stories'],
-  'easy-onset-practice': ['numbers', 'letters', 'words', 'practice', 'sentences', 'stories'],
-  'light-contact-practice': ['plosives', 'words', 'practice', 'sentences'],
-  'cancellation-practice': ['words', 'sentences', 'stories'],
-  'pull-out-practice': ['words', 'sentences', 'stories'],
-  'prep-set-practice': ['words', 'sentences', 'stories']
+  'slower-rate-practice': ['numbers', 'letters', 'colors', 'animals', 'food', 'words', 'sentences', 'stories', 'conversation', 'situations'],
+  'easy-onset-practice': ['numbers', 'letters', 'words', 'practice', 'sentences', 'stories', 'conversation', 'situations'],
+  'light-contact-practice': ['plosives', 'words', 'practice', 'sentences', 'conversation', 'situations'],
+  'cancellation-practice': ['words', 'sentences', 'stories', 'conversation', 'situations'],
+  'pull-out-practice': ['words', 'sentences', 'stories', 'conversation', 'situations'],
+  'prep-set-practice': ['words', 'sentences', 'stories', 'conversation', 'situations']
 };
+// Speaking prompts have no word-by-word guide: the person talks freely for a set time.
+export const freeCategories = new Set(['conversation', 'situations']);
+export const FREE_SPEECH_MS = 60000;
+const WORD_STEP = ['numbers', 'letters', 'colors', 'animals', 'food', 'words', 'plosives', 'practice'];
+const PATH = [
+  { key: 'words', categories: WORD_STEP },
+  { key: 'sentences', categories: ['sentences'] },
+  { key: 'stories', categories: ['stories'] },
+  { key: 'conversation', categories: ['conversation'] },
+  { key: 'situations', categories: ['situations'] }
+];
+// The speaking path for one exercise, from single words to real situations.
+export function pathSteps(screen) {
+  const available = categoriesByScreen[screen] || [];
+  return PATH.filter(step => step.categories.some(category => available.includes(category))).map(step => ({
+    ...step,
+    category: step.key === 'words' ? screenDefaults[screen].category : step.key
+  }));
+}
+export function stepOf(category) {
+  return PATH.find(step => step.categories.includes(category))?.key || 'words';
+}
 // Each exercise opens the same way, so nothing carries over from the previous one.
 export const screenDefaults = {
   'slower-rate-practice': { category: 'words', itemCount: 1, speed: 5 },
@@ -71,6 +93,9 @@ export function syllableMs(speed) { return Math.round(1500 - (speed - 1) * (1200
 export function syllablesPerMinute(speed) { return Math.round(60000 / syllableMs(speed)); }
 
 export function practiceTokens(items, category, pageIndex, itemCount) {
+  if (freeCategories.has(category)) {
+    return items[pageIndex] ? [{ text: items[pageIndex], breath: false, phraseEnd: true, target: false, syllables: 1, free: true }] : [];
+  }
   if (singleItemCategories.has(category)) {
     return items.slice(pageIndex, pageIndex + itemCount).map(item => ({
       text: item.text, breath: true, phraseEnd: true, target: true, syllables: countSyllables(item.text)
@@ -93,6 +118,7 @@ export function buildCues(screen, tokens, { speed = 5, pauseSeconds = cancellati
   tokens.forEach((token, index) => {
     const push = (phase, duration) => cues.push({ index, phase, duration });
     const say = token.syllables * perSyllable;
+    if (token.free) { push('talk', FREE_SPEECH_MS); return; }
     if (easyOnset) {
       if (token.breath) push('breath', 1000);
       push('vocalize', say);

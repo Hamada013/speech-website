@@ -2,15 +2,18 @@
 import { Y, Gn, Uf, q6, xa, Fs, Ui, cf, Vo, Ps, Hi, $s, Oo, nS, pd, Of, Vf, gT, sT, af, al, va, fr, Bf } from './vendor.js';
 import {
   categoriesByScreen, screenDefaults, breathingPresets, breathingLimits, breathingCycles, cancellationPause,
-  singleItemCategories, practiceItems, practiceTokens, buildCues, syllablesPerMinute, lettersForScreen,
+  singleItemCategories, freeCategories, practiceItems, practiceTokens, buildCues, syllablesPerMinute, lettersForScreen,
   parentScreen, readLanguage
 } from './practice.js';
 import { useRecording } from './recording.js';
 import { Dialog } from './dialog.js';
 import { pictureItems } from './pictures.js';
 import { PwaPanel } from './pwa.js';
+import { countLabel, createStore } from './progress.js';
+import { AdultGate, PathIcon, PeopleDialog, PersonIcon, ProgressScreen, RatingPrompt } from './progress-ui.js';
 
 const h = Y.createElement;
+const store = createStore(() => localStorage);
 const LOGO = './assets/icons/logo.webp';
 const FLUENCY = ['slower-rate-practice', 'easy-onset-practice', 'light-contact-practice'];
 const MOD_STEPS = {
@@ -97,6 +100,11 @@ function WordGuide({ screen, category, items, tokens, pageIndex, itemCount, useP
         item.icon && h('div', { className: usePictures ? 'ff-word-picture' : 'ff-item-icon' }, Y.cloneElement(item.icon, { 'aria-hidden': true })),
         !usePictures && h('span', { className: 'ff-word' }, item.text)))));
   }
+  if (freeCategories.has(category)) {
+    return h('div', { className: 'ff-prompt' },
+      h('p', { className: phase === 'talk' ? 'is-active' : '' }, tokens[0]?.text),
+      phase === 'talk' && h('span', { className: 'ff-breath-bar', 'aria-hidden': true }, h('i', { style: { width: `${breathProgress}%` } })));
+  }
   const showTargets = Boolean(MOD_STEPS[screen]);
   return h('div', { className: `ff-flow ff-flow-${category}` }, tokens.map((token, index) => h(Y.Fragment, { key: index },
     easy && token.breath && h(BreathMark, { active: breathing(index), progress: breathProgress }),
@@ -155,6 +163,11 @@ export function App({ translations }) {
   const [letter, setLetter] = Y.useState(null);
   const [showLetters, setShowLetters] = Y.useState(false);
   const [autoNext, setAutoNext] = Y.useState(false);
+  const [pendingRating, setPendingRating] = Y.useState(null);
+  const [showPeople, setShowPeople] = Y.useState(false);
+  const [gate, setGate] = Y.useState(null);
+  const progress = Y.useSyncExternalStore(store.subscribe, store.getSnapshot);
+  const finishedRef = Y.useRef(false);
   const elapsedRef = Y.useRef(0);
   const t = translations[lang];
   const isArabic = lang === 'ar';
@@ -176,7 +189,8 @@ export function App({ translations }) {
     'slower-rate-practice': t.slowerRate, 'easy-onset-practice': t.easyOnsets,
     'light-contact-practice': t.lightContacts, 'cancellation-practice': t.cancellations,
     'pull-out-practice': t.pullOuts, 'prep-set-practice': t.prepSets,
-    'breathing-practice': t.breathingInfo.techniques[breathingPreset]?.name || t.breathingTech
+    'breathing-practice': t.breathingInfo.techniques[breathingPreset]?.name || t.breathingTech,
+    progress: t.myPractice
   }[screen] || t.title;
   const intro = {
     'slower-rate-practice': t.slowerRateIntro, 'easy-onset-practice': t.easyOnsetIntro, 'light-contact-practice': t.lightContactIntro,
@@ -199,6 +213,7 @@ export function App({ translations }) {
     setBreathProgress(0);
     setBreathScale(.72);
     setBreathCycle(0);
+    setPendingRating(null);
     stopRecording();
   }
   function setScreen(next) {
@@ -243,6 +258,8 @@ export function App({ translations }) {
     if (playing) { setPlaying(false); setCompleted(false); return; }
     if (completed) elapsedRef.current = 0;
     setCompleted(false);
+    setPendingRating(null);
+    finishedRef.current = false;
     setPlaying(true);
   }
   function nextPage() {
@@ -251,7 +268,8 @@ export function App({ translations }) {
   function previousPage() {
     if (pageIndex > 0) { resetPractice(); setPageIndex(Math.max(0, pageIndex - pageStep)); }
   }
-  Y.useEffect(() => {
+  // Before the first paint, so a saved language never flashes the wrong direction.
+  Y.useLayoutEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = isArabic ? 'rtl' : 'ltr';
     try { localStorage.setItem('fluency-flow-language', lang); } catch { /* Private browsing can block storage. */ }
@@ -262,8 +280,13 @@ export function App({ translations }) {
     document.querySelector('h1')?.focus({ preventScroll: true });
   }, [screen, lang]);
   Y.useEffect(() => {
-    if (showInfo || showAbout || showLetters) { setPlaying(false); setCompleted(false); }
-  }, [showInfo, showAbout, showLetters]);
+    if (showInfo || showAbout || showLetters || showPeople || gate) { setPlaying(false); setCompleted(false); }
+  }, [showInfo, showAbout, showLetters, showPeople, gate]);
+  Y.useEffect(() => {
+    const refresh = event => { if (event.key === null || event.key?.startsWith('fluency-flow-progress')) store.refresh(); };
+    window.addEventListener('storage', refresh);
+    return () => window.removeEventListener('storage', refresh);
+  }, []);
   const backgroundStopRef = Y.useRef(stopRecording);
   backgroundStopRef.current = stopRecording;
   Y.useEffect(() => {
@@ -291,6 +314,7 @@ export function App({ translations }) {
       elapsedRef.current = 0;
       setCompleted(false);
       setActiveIndex(-1);
+      finishedRef.current = false;
       setPageIndex(index => index + pageStep);
       setPlaying(true);
     }, 1500);
@@ -303,6 +327,15 @@ export function App({ translations }) {
     if (!isBreathing && !tokens.length) { setPlaying(false); return; }
     const cues = isBreathing ? [] : buildCues(screen, tokens, { speed, pauseSeconds });
     function finish() {
+      // Only finished practice counts. The interval can tick again before React re-renders.
+      if (!finishedRef.current) {
+        finishedRef.current = true;
+        const id = store.record(isBreathing
+          ? { screen, preset: breathingPreset, breaths: cycles }
+          : { screen, category, ...(letter && category === 'practice' ? { letter } : {}), ...(freeCategories.has(category) ? {} : { spm: syllablesPerMinute(speed) }) }, t.me);
+        // Auto-advance keeps going, so asking would interrupt the requested flow.
+        if (isBreathing || !autoNext) setPendingRating(id);
+      }
       elapsedRef.current = 0;
       setPlaying(false);
       setCompleted(true);
@@ -348,7 +381,7 @@ export function App({ translations }) {
   const phaseLabel = {
     inhale: t.inhale, hold: t.hold, exhale: isBreathing ? exhaleLabel : t.exhale, breath: t.inhale, vocalize: t.speak,
     word: screen === 'light-contact-practice' ? t.light : t.speak, rest: t.pausePhase, pause: t.pausePhase,
-    stutter: t.stutter, repeat: t.repeat, transition: t.transition, prepare: t.prepare, smooth: t.smooth
+    talk: t.talk, stutter: t.stutter, repeat: t.repeat, transition: t.transition, prepare: t.prepare, smooth: t.smooth
   }[phase] || '';
   const statusText = playing ? phaseLabel : completed ? t.finished : elapsedRef.current > 0 ? t.paused : '';
   // The circle and step icons already show the phase, so screen readers alone get this copy.
@@ -364,7 +397,8 @@ export function App({ translations }) {
           : h('img', { src: LOGO, width: 40, height: 40, alt: '' }),
         h('h1', { tabIndex: -1 }, screenTitle)),
       h('div', { className: 'ff-header-actions' },
-        isPractice && h(IconButton, { label: t.info, icon: xa, onClick: event => { event.currentTarget.focus(); setShowInfo(true); } }),
+        h(IconButton, { label: t.profile, icon: PersonIcon, onClick: event => { event.currentTarget.focus(); setGate('people'); } }),
+        (isPractice || screen === 'home') && h(IconButton, { label: t.info, icon: xa, onClick: event => { event.currentTarget.focus(); isPractice ? setShowInfo(true) : setShowAbout(true); } }),
         h('button', {
           type: 'button', className: 'ff-language', onClick: toggleLanguage, lang: isArabic ? 'en' : 'ar',
           'aria-label': isArabic ? 'Switch to English' : 'التبديل إلى العربية'
@@ -378,7 +412,16 @@ export function App({ translations }) {
           h(ActionCard, { title: t.fluencyShaping, icon: Uf, onClick: () => setScreen('fluency-shaping') }),
           h(ActionCard, { title: t.stutteringMod, icon: q6, onClick: () => setScreen('stuttering-modification') }),
           h(ActionCard, { title: t.breathingTech, icon: Gn, onClick: () => setScreen('breathing-techniques') }),
-          h(ActionCard, { title: t.info, icon: xa, onClick: event => { event.currentTarget.focus(); setShowAbout(true); } }))),
+          h(ActionCard, { title: t.myPractice, icon: PathIcon, onClick: event => { event.currentTarget.focus(); setGate('progress'); } }))),
+      screen === 'progress' && h(ProgressScreen, {
+        t, lang, snapshot: progress,
+        names: {
+          'slower-rate-practice': t.slowerRate, 'easy-onset-practice': t.easyOnsets, 'light-contact-practice': t.lightContacts,
+          'cancellation-practice': t.cancellations, 'pull-out-practice': t.pullOuts, 'prep-set-practice': t.prepSets
+        },
+        onOpenPeople: () => setShowPeople(true),
+        onOpenStep: (next, step) => { setScreen(next); setCategory(step.category); }
+      }),
       ['fluency-shaping', 'stuttering-modification', 'breathing-techniques'].includes(screen) && h('section', { className: 'ff-menu' },
         h('p', { className: 'ff-intro' }, intro),
         h('div', { className: 'ff-actions' },
@@ -410,18 +453,19 @@ export function App({ translations }) {
               setBreath: (key, value) => setBreath(previous => ({ ...previous, [key]: clamp(value, breathingLimits[key]) }))
             })
             : h('div', { className: 'ff-guide' },
-              MOD_STEPS[screen] && h(ModSteps, { steps: MOD_STEPS[screen], phase, t }),
+              MOD_STEPS[screen] && !freeCategories.has(category) && h(ModSteps, { steps: MOD_STEPS[screen], phase, t }),
               h(WordGuide, { screen, category, items, tokens, pageIndex, itemCount, usePictures, activeIndex, phase, breathProgress: phaseProgress })),
           h('section', { className: 'ff-status', 'aria-label': t.sessionStatus },
             h('p', { role: 'status', className: phaseShownElsewhere ? 'ff-sr-only' : undefined }, statusText),
+            pendingRating && completed && h(RatingPrompt, { t, onRate: rating => { store.rate(pendingRating, rating); setPendingRating(null); } }),
             recordingUrl && h('audio', { controls: true, src: recordingUrl, preload: 'metadata', 'aria-label': t.playRecording }))),
-        !isBreathing && h('div', { className: 'ff-speed' },
+        !isBreathing && !freeCategories.has(category) && h('div', { className: 'ff-speed' },
           h(IconButton, { label: t.slower, icon: Hi, onClick: () => setSpeed(speed - 1), disabled: speed <= 1 }),
           h('label', null,
-            h('span', null, `${t.speed}: ${syllablesPerMinute(speed)} ${t.syllablesPerMinute}`),
+            h('span', null, `${t.speed}: ${countLabel(lang, syllablesPerMinute(speed), t.units.syllables)}`),
             h('input', { type: 'range', min: 1, max: 10, value: speed, 'aria-label': t.speed, onChange: event => setSpeed(parseInt(event.target.value, 10)) })),
           h(IconButton, { label: t.faster, icon: Ps, onClick: () => setSpeed(speed + 1), disabled: speed >= 10 })),
-        screen === 'cancellation-practice' && h('div', { className: 'ff-setting' },
+        screen === 'cancellation-practice' && !freeCategories.has(category) && h('div', { className: 'ff-setting' },
           h('span', null, t.pauseLength),
           h(Stepper, {
             value: `${pauseSeconds} ${t.seconds}`, label: t.pauseLength, moreLabel: t.longerPause, lessLabel: t.shorterPause,
@@ -457,6 +501,11 @@ export function App({ translations }) {
       letters: lettersForScreen(screen, t.practiceData.letterWords), title: t.chooseLetter, closeLabel: t.close,
       onChoose: chooseLetter, onClose: () => setShowLetters(false)
     }),
+    gate && h(AdultGate, {
+      t, onClose: () => setGate(null),
+      onPass: () => { const target = gate; setGate(null); target === 'people' ? setShowPeople(true) : setScreen('progress'); }
+    }),
+    showPeople && h(PeopleDialog, { t, snapshot: progress, store, onClose: () => setShowPeople(false) }),
     h(PwaPanel, { lang, home: screen === 'home', busy: playing || recording || recordingPending }),
     !isPractice && h('footer', { className: 'ff-footer' },
       h('p', { lang: 'en', dir: 'ltr' }, 'SPEECH AND LANGUAGE PATHOLOGY'),
