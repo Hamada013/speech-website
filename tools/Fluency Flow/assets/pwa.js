@@ -14,7 +14,7 @@ const copy = {
     installError: 'The install prompt could not open. Use your browser’s install or home-screen menu.'
   },
   ar: {
-    title: 'استخدم Fluency Flow كتطبيق', install: 'تثبيت التطبيق', installed: 'التطبيق مثبت',
+    title: 'استخدم «كلام وطلاقة» كتطبيق', install: 'تثبيت التطبيق', installed: 'التطبيق مثبت',
     preparing: 'جارٍ تجهيز التدريب دون إنترنت…', ready: 'جاهز للتدريب دون إنترنت',
     failed: 'التدريب دون إنترنت غير جاهز. اتصل بالإنترنت وأعد فتح التطبيق للمحاولة مجدداً.',
     unavailable: 'افتح الموقع عبر HTTPS لتفعيل التثبيت والتدريب دون إنترنت.',
@@ -93,7 +93,6 @@ export function PwaPanel({ lang, home, busy }) {
     id: 'pwa-panel', className: 'ff-pwa', 'aria-labelledby': 'pwa-title',
     children: [home && u.jsxs(React.Fragment, { children: [
       u.jsx('h2', { id: 'pwa-title', children: t.title }),
-      u.jsx('p', { children: t.detail }),
       u.jsx('p', { id: 'pwa-status', role: 'status', children: t[snapshot.status] }),
       snapshot.installed ? u.jsx('p', { children: t.installed }) : u.jsx('button', {
         id: 'pwa-install', type: 'button', onClick: install, 'aria-expanded': showHelp,

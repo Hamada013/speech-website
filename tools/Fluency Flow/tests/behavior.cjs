@@ -64,6 +64,30 @@ async function run(type, name) {
     // Resuming after 600 ms must reach vocalization within another 600 ms.
     await page.clock.runFor(150);
     assert.match(await page.locator('.ff-status > p').first().textContent(), /Speak/);
+    // Breathing stops by itself after the chosen breaths and never holds by default.
+    await click(page, 'Reset'); await home(page);
+    await click(page, 'Breathing Techniques'); await click(page, 'Controlled Exhalation');
+    await click(page, 'Fewer breaths'); await click(page, 'Fewer breaths'); await click(page, 'Fewer breaths');
+    await click(page, 'Play');
+    await page.clock.runFor(1000);
+    assert.match(await page.locator('.ff-status > p').textContent(), /Inhale/);
+    await page.clock.runFor(4000);
+    assert.match(await page.locator('.ff-status > p').textContent(), /Exhale with/);
+    assert.equal(await page.locator('[data-playing]').getAttribute('data-playing'), 'true');
+    await page.clock.runFor(14000);
+    assert.equal(await page.locator('[data-playing]').getAttribute('data-playing'), 'false');
+    assert.match(await page.locator('.ff-status > p').textContent(), /Done/);
+    await home(page);
+    // A speed set in one exercise must not change another, and is kept when returning.
+    // Slower Rate is at speed 10 from the auto-advance check above, so three steps down is speed 7.
+    await slower(page);
+    for (let i = 0; i < 3; i++) await click(page, 'Slower');
+    assert.match(await page.locator('.ff-speed').textContent(), /86/);
+    await home(page); await click(page, 'Fluency Shaping'); await click(page, 'Light Contacts');
+    assert.match(await page.locator('.ff-speed').textContent(), /62/);
+    await home(page); await slower(page);
+    assert.match(await page.locator('.ff-speed').textContent(), /86/);
+    assert.match(await page.locator('.ff-pagination').textContent(), /1 \/ 97/);
     // Use a fresh context for native dialog animations and media events.
     await context.close();
     context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });

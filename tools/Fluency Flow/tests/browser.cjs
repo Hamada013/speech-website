@@ -75,6 +75,7 @@ async function run(type, name) {
         await go(page, route);
         await layout(page, `${name} ${width} ${route[2]}`);
         assert.match(await page.locator('h1').textContent(), route[2] === 'breathing-practice' ? /Diaphragmatic/ : new RegExp(route[1]));
+        assert.equal(await page.getByRole('button', { name: 'Record', exact: true }).count(), 1, `${route[2]} needs recording`);
         await click(page, 'Play');
         await page.waitForTimeout(180);
         assert.equal(await page.locator('[data-playing]').getAttribute('data-playing'), 'true');
@@ -92,8 +93,9 @@ async function run(type, name) {
             if (category === 'Practice') {
               await page.getByRole('dialog').waitFor();
               await layout(page, `${name} ${width} letters`);
-              await click(page, 'A');
-              assert.ok(await page.locator('.ff-practice-card').textContent().then(text => text.includes('apple')));
+              const [letter, word] = route[2] === 'light-contact-practice' ? ['B', 'ball'] : ['A', 'apple'];
+              await click(page, letter);
+              assert.ok(await page.locator('.ff-practice-card').textContent().then(text => text.includes(word)));
             }
             await layout(page, `${name} ${width} ${route[2]} ${category}`);
             await click(page, 'Next'); await click(page, 'Previous');

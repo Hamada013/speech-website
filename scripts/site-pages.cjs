@@ -16,7 +16,7 @@ const aos=card('Motor speech','الكلام الحركي','Acquired apraxia and 
 const forms=card('Forms','النماذج','Case histories and clinical assessments.','تاريخ الحالة والتقييمات السريرية.','forms.html','clipboard');
 const tools=card('Tools','الأدوات','Interactive activities for your sessions.','أنشطة تفاعلية لجلساتك.','tools/tools.html','shapes');
 const resources=card('Resources','الموارد','Reference tools and practice materials.','أدوات مرجعية ومواد للتدريب.','resources.html','book');
-const flow=card('Fluency Flow','تدفق الكلام','Fluency strategies, practice and breathing.','استراتيجيات الطلاقة والتدريب والتنفس.','resources/Fluency Flow/index.html','flow');
+const flow=card('Fluency Flow','كلام وطلاقة','Fluency strategies, practice and breathing.','استراتيجيات الطلاقة والتدريب والتنفس.','tools/Fluency Flow/index.html','flow');
 module.exports=[
  {path:'index.html',nav:'home',title:'Ahmad Ghanem',ar:'أحمد غانم',description:'Speech-Language Pathologist',arDescription:'أخصائي أمراض النطق واللغة',icon:'home',home:true,sections:[{cards:[forms,tools,resources,{...card('About me','عنّي','My practice and approach to communication.','ممارستي ونهجي في دعم التواصل.','#about','person'),dialog:'about'}]}]},
  {path:'forms.html',nav:'forms',title:'Clinical forms',ar:'النماذج السريرية',description:'A clear starting point for every assessment.',arDescription:'بداية واضحة لكل تقييم.',icon:'clipboard',search:true,sections:[{title:'Case histories',ar:'تاريخ الحالة',cards:[child,adult]},{title:'Assessments',ar:'التقييمات',cards:[language,speech,asd,hearing,voice,aphasia,fluency,aos]}]},

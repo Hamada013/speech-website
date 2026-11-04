@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const os = require('node:os');
 const { chromium, webkit } = require(process.env.FLUENCY_PLAYWRIGHT || 'playwright');
 const root = path.resolve(__dirname, '..');
-const prefix = '/speech-website/resources/Fluency Flow/';
+const prefix = '/speech-website/tools/Fluency Flow/';
 const overrides = new Map();
 const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json' };
 const server = http.createServer((req, res) => {
@@ -116,6 +116,9 @@ async function run(type, name) {
     await click(page, 'Play'); await page.waitForTimeout(200); await click(page, 'Pause');
     await click(page, 'Practice'); await click(page, 'A');
     assert.match(await page.locator('.ff-practice-card').textContent(), /apple/);
+    await click(page, 'Show word pictures');
+    assert.ok(await page.locator('[data-picture-word] svg').count(), 'Local word pictures must render offline');
+    assert.equal(await page.locator('[data-picture-word]').first().getAttribute('aria-label'), 'apple');
     await page.getByRole('dialog').waitFor({ state: 'hidden' });
     await click(page, 'Back'); await click(page, 'Back');
     // Launch the installed-app entry point in a new tab with no live origin.
