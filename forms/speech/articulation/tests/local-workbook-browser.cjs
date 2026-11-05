@@ -1,6 +1,6 @@
 // Real app UI -> real loopback collector -> real Excel files, using disposable clinical fixtures.
 const fs=require('node:fs/promises'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict'),{spawn}=require('node:child_process');
-const {chromium}=require(process.env.ARTICULATION_PLAYWRIGHT||'../../../../tools/VSS/voc/node_modules/playwright');
+const {chromium}=require(process.env.ARTICULATION_PLAYWRIGHT||'playwright');
 let child,browser;
 (async()=>{
  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'local-workbook-ui-'));

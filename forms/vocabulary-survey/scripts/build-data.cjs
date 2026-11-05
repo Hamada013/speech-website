@@ -5,7 +5,8 @@ const path = require('node:path');
 const vm = require('node:vm');
 const crypto = require('node:crypto');
 const root = path.resolve(__dirname, '..');
-const repository = path.resolve(root, '../..');
+// Labels come from the tools repository, needed only when rebuilding this data.
+const repository = process.env.TOOLS_REPO || path.resolve(root, '../../../tools');
 const source = fs.readFileSync(path.join(repository, 'tools/VSS/voc/index.html'), 'utf8');
 const start = source.indexOf('const RAW_CATEGORIES =');
 const end = source.indexOf('const app =', start);
@@ -14,14 +15,14 @@ const categories = vm.runInNewContext(`${source.slice(start, end)}; JSON.parse(J
 const hash = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 const items = [], excluded = [];
 for (const category of categories) for (const item of category.items) {
-    const imageFile = `tools/VSS/voc/images/${category.id}/${item.id}.webp`;
-    const audioFile = `tools/VSS/voc/sounds/${category.id}/${item.id}.m4a`;
-    const missing = [imageFile, audioFile].filter(file => !fs.existsSync(path.join(repository, file)));
+    const imageFile = `media/images/${category.id}/${item.id}.webp`;
+    const audioFile = `media/sounds/${category.id}/${item.id}.m4a`;
+    const missing = [imageFile, audioFile].filter(file => !fs.existsSync(path.join(root, file)));
     if (missing.length) { excluded.push({ id: `${category.id}-${item.id}`, label: item.name, missing }); continue; }
-    const imageRevision = hash(fs.readFileSync(path.join(repository, imageFile)));
-    const audioRevision = hash(fs.readFileSync(path.join(repository, audioFile)));
+    const imageRevision = hash(fs.readFileSync(path.join(root, imageFile)));
+    const audioRevision = hash(fs.readFileSync(path.join(root, audioFile)));
     items.push({ id: `${category.id}-${item.id}`, folder: category.id, number: item.id, category: category.name,
-        label: item.name, image: `../../${imageFile}`, audio: `../../${audioFile}`, imageRevision,
+        label: item.name, image: imageFile, audio: audioFile, imageRevision,
         revision: hash(imageRevision + audioRevision + item.name) });
 }
 const data = { schemaVersion: 1, locale: 'ar-SY', source: 'tools/VSS/voc/index.html',

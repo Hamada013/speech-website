@@ -1,5 +1,7 @@
 # Default app home style
 
+Paths under `tools/` in this guide refer to the `Hamada013/tools` repository.
+
 The user selected the `tools/VSS/taffaha` home-screen style as the project default for future apps. Existing examples are `tools/VSS/taffaha/index.html`, `tools/VSS/voc/index.html`, and `tools/VSS/senb/index.html`.
 
 - Use a light background (`#f8fafc`) with soft green and blue radial washes. Use dark blue text (`#22445a`), muted secondary text (`#5c7285`), and pale borders (`#dceaf4`).

@@ -1,6 +1,6 @@
 // Synthetic responses exercise UI timing; a separate offline check reads all real media.
 const fs=require('node:fs/promises'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict'),{spawn}=require('node:child_process');
-const {chromium}=require('../../../../tools/VSS/voc/node_modules/playwright');
+const {chromium}=require('playwright');
 const M=require('../assets/model.js');let server,browser;
 (async()=>{
  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'ling-ui-'));

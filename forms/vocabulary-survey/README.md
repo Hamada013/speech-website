@@ -31,11 +31,11 @@ Installing saves the local shell. The download icon offers installation plus an 
 ## Checks
 
 - `npm test --prefix forms/vocabulary-survey`: strict matrices, bank counts, nested 50/100 membership, scoring, imports, exports, matched-word progress/decline, peer exclusions and PWA integrity.
-- `SURVEY_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" SURVEY_SMOKE=1 node forms/vocabulary-survey/tests/browser.cjs`: Chromium + WebKit smoke checks; omit `SURVEY_SMOKE` for complete media-download/offline validation.
-- `SURVEY_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node forms/vocabulary-survey/tests/profiles-browser.cjs`: profile edits/linking/reload/isolation, report tabs, repeat/peer graphs, responsive layout, screenshots and offline profile reopening.
+- `SURVEY_PLAYWRIGHT="<path to>/node_modules/playwright" SURVEY_SMOKE=1 node forms/vocabulary-survey/tests/browser.cjs`: Chromium + WebKit smoke checks; omit `SURVEY_SMOKE` for complete media-download/offline validation.
+- `SURVEY_PLAYWRIGHT="<path to>/node_modules/playwright" node forms/vocabulary-survey/tests/profiles-browser.cjs`: profile edits/linking/reload/isolation, report tabs, repeat/peer graphs, responsive layout, screenshots and offline profile reopening.
 
 The browser regressions use synthetic records only. `SURVEY_ENGINE=chromium` or `webkit` selects one engine. The original five-trial smoke fixtures inject a test-only sample option; production setup exposes only 50 (receptive) or 50/100 (expressive).
 
 ## App artwork
 
-`assets/logo-source.jpg` is the supplied Language Test artwork. The header, home, browser favicons, Apple touch icon, manifest and shortcut use local exports in `icons/`. Maskable exports fit the complete artwork within the central safe circle. Regenerate with `SURVEY_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" npm run build:icons --prefix forms/vocabulary-survey`, refresh install screenshots with `SURVEY_SCREENSHOTS=1 SURVEY_ENGINE=chromium` on the profile browser check, then rebuild the PWA release.
+`assets/logo-source.jpg` is the supplied Language Test artwork. The header, home, browser favicons, Apple touch icon, manifest and shortcut use local exports in `icons/`. Maskable exports fit the complete artwork within the central safe circle. Regenerate with `SURVEY_PLAYWRIGHT="<path to>/node_modules/playwright" npm run build:icons --prefix forms/vocabulary-survey`, refresh install screenshots with `SURVEY_SCREENSHOTS=1 SURVEY_ENGINE=chromium` on the profile browser check, then rebuild the PWA release.

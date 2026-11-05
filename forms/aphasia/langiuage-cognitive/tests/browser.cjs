@@ -1,4 +1,4 @@
-const {chromium,webkit}=require(process.env.SITE_PLAYWRIGHT||'../../../../tools/VSS/voc/node_modules/playwright'),http=require('node:http'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const {chromium,webkit}=require(process.env.SITE_PLAYWRIGHT||'playwright'),http=require('node:http'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'../../../..'),app='/forms/aphasia/langiuage-cognitive/';
 const types={'.html':'text/html','.js':'application/javascript','.json':'application/json','.webmanifest':'application/manifest+json','.css':'text/css','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.svg':'image/svg+xml','.webp':'image/webp'};
 let corruptRelease=false;
