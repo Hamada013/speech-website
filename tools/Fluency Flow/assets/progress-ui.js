@@ -2,6 +2,7 @@
 import { Y, pd, sT } from './vendor.js';
 import { Dialog } from './dialog.js';
 import { pathSteps, categoriesByScreen, stepOf } from './practice.js';
+import { PROGRAM, daysDone } from './program.js';
 import { countLabel, historyByDay, latestScreen, stepStats, weekSummary } from './progress.js';
 
 const h = Y.createElement;
@@ -14,6 +15,8 @@ function Outline({ children, ...props }) {
 }
 export const PersonIcon = props => h(Outline, props, h('circle', { cx: 12, cy: 8, r: 4 }), h('path', { d: 'M4 21c0-5 4-7 8-7s8 2 8 7' }));
 export const PathIcon = props => h(Outline, props, h('path', { d: 'M4 20h4v-4h4v-4h4V8h4' }), h('path', { d: 'M16 4h4v4' }));
+export const ShareIcon = props => h(Outline, props, h('circle', { cx: 18, cy: 5, r: 3 }), h('circle', { cx: 6, cy: 12, r: 3 }), h('circle', { cx: 18, cy: 19, r: 3 }), h('path', { d: 'm8.6 10.5 6.8-4M8.6 13.5l6.8 4' }));
+export const TickIcon = props => h(Outline, props, h('path', { d: 'm5 13 4 4L19 7' }));
 const Face = ({ mouth }) => h(Outline, null, h('circle', { cx: 12, cy: 12, r: 9 }), h('path', { d: 'M9 10h.01M15 10h.01' }), h('path', { d: mouth }));
 const FACES = { 1: 'M8 14.5c2 2.5 6 2.5 8 0', 2: 'M8.5 15.5h7', 3: 'M8 16.5c2-2.5 6-2.5 8 0' };
 
@@ -38,7 +41,7 @@ function newSum() {
   return { text: `${left} ${subtract ? '−' : '+'} ${right}`, answer, choices: [...choices].sort(() => Math.random() - .5) };
 }
 // A fresh sum each time, like the other apps' parent gate: it keeps young children out of names and history.
-export function AdultGate({ t, onPass, onClose }) {
+export function AdultGate({ t, help, onPass, onClose }) {
   const [sum] = Y.useState(newSum);
   const [wrong, setWrong] = Y.useState([]);
   return h(Dialog, { onClose, label: t.gateTitle },
@@ -47,7 +50,7 @@ export function AdultGate({ t, onPass, onClose }) {
         h('h2', null, t.gateTitle),
         h('button', { type: 'button', className: 'ff-icon-button', 'aria-label': t.close, title: t.close, onClick: onClose }, h(pd, { 'aria-hidden': true }))),
       h('div', { className: 'ff-dialog-body' },
-        h('p', null, t.gateHelp),
+        h('p', null, help || t.gateHelp),
         h('p', { className: 'ff-gate-sum', dir: 'ltr' }, `${sum.text} = ?`),
         h('div', { className: 'ff-gate-choices', dir: 'ltr' }, sum.choices.map(choice => h('button', {
           key: choice, type: 'button', 'data-answer': choice, 'aria-invalid': wrong.includes(choice) || undefined,
@@ -108,9 +111,13 @@ function historyLine(t, lang, group, names) {
 function weekLine(t, lang, week) {
   return `${t.thisWeek}: ${countLabel(lang, week.days, t.units.days)} · ${countLabel(lang, week.practices, t.units.practices)}`;
 }
-function summaryText(t, lang, person, entries, names, now) {
+function summaryText(t, lang, person, entries, names, now, extra = {}) {
   const week = weekSummary(entries, now);
-  const lines = [`${t.title} — ${person?.name || ''}`, weekLine(t, lang, week), ''];
+  const lines = [`${t.title} — ${person?.name || ''}`, weekLine(t, lang, week), `${t.dailyTraining}: ${daysDone(extra.program)} / ${PROGRAM.length}`, ''];
+  const recentRatings = (extra.selfRatings || []).slice(-7).map(item => `${formatDay(item.at, lang)}: ${t[`self_${item.value}`]}`);
+  if (recentRatings.length) lines.push(`${t.selfRecent}:`, ...recentRatings, '');
+  const hardest = Object.entries(extra.situations || {}).sort((a, b) => a[1] - b[1]);
+  if (hardest.length) lines.push(`${t.program_board}: ${hardest.length}`, '');
   for (const day of historyByDay(entries, stepOf).slice(0, 14)) {
     lines.push(formatDay(day.at, lang));
     for (const group of day.groups) {
@@ -123,21 +130,37 @@ function summaryText(t, lang, person, entries, names, now) {
   return lines.join('\n').trim();
 }
 
+// The device's share sheet where it exists, otherwise the clipboard. Nothing is sent without the person choosing to.
+export async function shareOrCopy(title, text) {
+  if (navigator.share) {
+    try { await navigator.share({ title, text }); return 'shared'; }
+    catch (error) { if (error.name === 'AbortError') return 'cancelled'; }
+  }
+  await navigator.clipboard.writeText(text);
+  return 'copied';
+}
+
 export function ProgressScreen({ t, lang, snapshot, names, onOpenStep, onOpenPeople }) {
   const person = snapshot.people.find(p => p.id === snapshot.active);
   const entries = snapshot.entries[snapshot.active] || [];
   const now = Date.now();
   const [technique, setTechnique] = Y.useState(() => latestScreen(entries, SPEECH_SCREENS, SPEECH_SCREENS[0]));
-  const [copyState, setCopyState] = Y.useState('');
+  const [shareState, setShareState] = Y.useState('');
+  const shareTimer = Y.useRef(null);
+  Y.useEffect(() => () => clearTimeout(shareTimer.current), []);
   const week = weekSummary(entries, now);
   const steps = pathSteps(technique).map(step => ({ ...step, stats: stepStats(entries, technique, step.categories) }));
   const nextIndex = steps.findIndex(step => !step.stats.ready);
   const days = historyByDay(entries, stepOf).slice(0, 30);
-  async function copy() {
+  async function share() {
+    const text = summaryText(t, lang, person, entries, names, now, snapshot.extra?.[snapshot.active]);
+    setShareState('');
     try {
-      await navigator.clipboard.writeText(summaryText(t, lang, person, entries, names, now));
-      setCopyState('copied');
-    } catch { setCopyState('failed'); }
+      if (await shareOrCopy(t.title, text) !== 'copied') return;
+      setShareState('done');
+      clearTimeout(shareTimer.current);
+      shareTimer.current = setTimeout(() => setShareState(''), 2000);
+    } catch { setShareState('failed'); }
   }
   return h('section', { className: 'ff-progress' },
     h('div', { className: 'ff-panel ff-person-row' },
@@ -164,16 +187,17 @@ export function ProgressScreen({ t, lang, snapshot, names, onOpenStep, onOpenPeo
           step.stats.ready && h('span', { className: 'ff-path-badge is-ready' }, t.mostlyEasy))))),
       h('p', { className: 'ff-note' }, t.pathNote)),
     h('div', { className: 'ff-panel' },
-      h('h2', null, t.historyTitle),
+      h('div', { className: 'ff-panel-head' },
+        h('h2', null, t.historyTitle),
+        days.length > 0 && h('button', { type: 'button', className: 'ff-icon-button', 'aria-label': t.shareSummary, title: t.shareSummary, onClick: share },
+          shareState === 'done' ? h(TickIcon, null) : h(ShareIcon, null))),
+      h('span', { className: 'ff-sr-only', role: 'status' }, shareState === 'done' ? t.shared : ''),
+      shareState === 'failed' && h('p', { className: 'ff-alert', role: 'alert' }, t.shareFailed),
       days.length === 0 && h('p', { className: 'ff-note' }, t.noHistory),
       days.map(day => h('div', { key: day.day, className: 'ff-day' },
         h('h3', null, formatDay(day.at, lang)),
         h('ul', null, day.groups.map((group, index) => {
           const line = historyLine(t, lang, group, names);
           return h('li', { key: index }, h('strong', null, line.title), h('span', null, line.detail), line.rated && h('span', null, line.rated));
-        })))),
-      days.length > 0 && h('div', { className: 'ff-copy' },
-        h('button', { type: 'button', className: 'ff-text-button ff-primary', onClick: copy }, t.copySummary),
-        copyState === 'copied' && h('span', { role: 'status' }, t.copied),
-        copyState === 'failed' && h('span', { role: 'alert', className: 'ff-alert' }, t.copyFailed))));
+        }))))));
 }

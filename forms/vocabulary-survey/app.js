@@ -84,8 +84,8 @@ async function begin(event) {
     event.preventDefault();
     if (!form.reportValidity() || !state.prepared?.plan.length) return;
     const metadata = Object.fromEntries(['childId', 'childName', 'birthDate', 'assessmentDate', 'examiner', 'languages', 'notes'].map(key => [key, form.elements[key].value.trim()]));
-    if (state.profiles.some(p => profileKey(p.childId) === profileKey(metadata.childId)) && !form.elements.childId.readOnly) throw new Error('اختر حساب الطفل المحفوظ من القائمة لتحديث بياناته.');
-    if (!metadata.childId) throw new Error('أدخل رمز الطفل.');
+    if (state.profiles.some(p => profileKey(p.childId) === profileKey(metadata.childId)) && $('#setup-profile').value !== profileKey(metadata.childId)) throw new Error('اختر حساب الطفل المحفوظ من القائمة لتحديث بياناته.');
+    if (!metadata.childId) { metadata.childId = createChildCode(); form.elements.childId.value = metadata.childId; }
     if (metadata.assessmentDate > today()) throw new Error('لا يمكن أن يكون تاريخ التقييم في المستقبل.');
     if (metadata.birthDate && metadata.birthDate > metadata.assessmentDate) throw new Error('يجب أن يسبق تاريخ الميلاد تاريخ التقييم أو يوافقه.');
     $('#begin-test').disabled = true;
@@ -353,10 +353,22 @@ async function fillProfilePicker() {
     updateDraftCard();
     window.StyledDropdowns?.enhance();
 }
+function createChildCode() {
+    const used = new Set([...state.profiles.map(p => profileKey(p.childId)), ...state.sessions.map(s => profileKey(s.metadata.childId))]);
+    let code;
+    do { code = `CH-${crypto.randomUUID().replaceAll('-', '').slice(0, 12).toUpperCase()}`; } while (used.has(profileKey(code)));
+    return code;
+}
+function resetProfileForm() {
+    const target = $('#profile-form');
+    target.reset(); target.dataset.editingId = '';
+    target.elements.childId.value = createChildCode();
+    $('#profile-title').textContent = 'إضافة طفل';
+}
 function applyProfile(key) {
     const profile = state.profiles.find(p => profileKey(p.childId) === key);
     for (const name of ['childId','childName','birthDate','languages']) form.elements[name].value = profile?.[name] || (name === 'languages' ? 'العربية / اللهجة السورية' : '');
-    form.elements.childId.readOnly = !!profile;
+    if (!profile) form.elements.childId.value = createChildCode();
     form.elements.notes.value = '';
 }
 async function chooseProfile(key) {
@@ -365,6 +377,7 @@ async function chooseProfile(key) {
 }
 async function renderProfiles() {
     await fillProfilePicker();
+    if (!$('#profile-form').elements.childId.value) resetProfileForm();
     const container = $('#profile-list'); container.replaceChildren();
     for (const profile of state.profiles) {
         const card = document.createElement('article'); card.className = 'profile-card';
@@ -378,22 +391,22 @@ async function renderProfiles() {
         edit.addEventListener('click', () => {
             const target = $('#profile-form');
             for (const key of ['childId','childName','birthDate','languages']) target.elements[key].value = profile[key] || '';
-            target.elements.childId.readOnly = true; $('#profile-title').textContent = 'تعديل بيانات الطفل'; target.elements.childName.focus();
+            target.dataset.editingId = profileKey(profile.childId); $('#profile-title').textContent = 'تعديل بيانات الطفل'; target.elements.childName.focus();
         });
         const actions = document.createElement('div'); actions.className = 'button-row'; actions.append(choose, edit);
         card.append(name, detail, actions); container.append(card);
     }
 }
 $('#setup-profile').addEventListener('change', guard(event => chooseProfile(event.target.value)));
-$('#new-profile').addEventListener('click', () => { $('#profile-form').reset(); $('#profile-form').elements.childId.readOnly = false; $('#profile-title').textContent = 'إضافة طفل'; $('#profile-form').elements.childId.focus(); });
+$('#new-profile').addEventListener('click', () => { resetProfileForm(); $('#profile-form').elements.childName.focus(); });
 $('#profile-form').addEventListener('submit', event => {
     event.preventDefault(); void guard(async () => {
         const target = event.target; if (!target.reportValidity()) return;
         const profile = Object.fromEntries(['childId','childName','birthDate','languages'].map(key => [key, target.elements[key].value.trim()]));
         if (profile.birthDate > today()) throw new Error('تاريخ الميلاد في المستقبل.');
-        if (!target.elements.childId.readOnly && state.profiles.some(p => profileKey(p.childId) === profileKey(profile.childId))) throw new Error('رمز الطفل موجود. اختر تعديل حسابه.');
+        if (!target.dataset.editingId && state.profiles.some(p => profileKey(p.childId) === profileKey(profile.childId))) throw new Error('رمز الطفل موجود. اختر تعديل حسابه.');
         await saveProfile(profile); await chooseProfile(profileKey(profile.childId));
-        target.reset(); target.elements.childId.readOnly = false; await route('dashboard');
+        resetProfileForm(); await route('dashboard');
         message('تم حفظ حساب الطفل على هذا الجهاز.');
     })();
 });

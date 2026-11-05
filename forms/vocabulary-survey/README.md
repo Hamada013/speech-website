@@ -1,6 +1,6 @@
 # تقييم المفردات / Vocabulary survey
 
-Arabic receptive and expressive checklists, child profiles, and reports saved in IndexedDB on the current device. No backend or child-data upload. Existing sessions migrate into reusable profiles; switching between tests fills the same child's details. Edits affect future tests; historical metadata remains a snapshot. Child codes are stable, case-insensitive identifiers. Device/browser storage deletion removes records; JSON/CSV exports provide portable copies, and importing a session restores its child profile.
+Arabic receptive and expressive checklists, child profiles, and reports saved in IndexedDB on the current device. No backend or child-data upload. Existing sessions migrate into reusable profiles; switching between tests fills the same child's details. Edits affect future tests; historical metadata remains a snapshot. Child codes are generated randomly by default and kept read-only; users enter the child’s name. Existing codes remain unchanged. Codes are stable, case-insensitive identifiers. Device/browser storage deletion removes records; JSON/CSV exports provide portable copies, and importing a session restores its child profile.
 
 Serve the repository root: `python3 -m http.server 8000`, then open `/forms/vocabulary-survey/`. Deploy the repository with its existing `tools/VSS/voc` images and audio at the same relative paths. Other apps and their caches are independent.
 

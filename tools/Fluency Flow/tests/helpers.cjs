@@ -3,7 +3,7 @@ const path = require('node:path');
 const assert = require('node:assert/strict');
 (async () => {
   const source = fs.readFileSync(path.resolve(__dirname, '../assets/practice.js'), 'utf8');
-  const { splitPhrases, practiceItems, practiceTokens, parentScreen, categoriesByScreen, buildCues, countSyllables, syllablesPerMinute, breathingPresets, breathingLimits, lettersForScreen } = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
+  const { splitPhrases, practiceItems, practiceTokens, parentScreen, categoriesByScreen, buildCues, countSyllables, syllablesPerMinute, breathingPresets, breathingLimits, lettersForScreen, touchSteps, touchTargets, dragResult, slideProgress, inSlideZone, slideMs, sayMs, syllableMs } = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
   assert.deepEqual(splitPhrases('Hello, world! Last phrase'), ['Hello,', 'world!', 'Last phrase']);
   assert.deepEqual(splitPhrases('مرحباً، كيف حالك؟ بخير؛ شكراً'), ['مرحباً،', 'كيف حالك؟', 'بخير؛', 'شكراً']);
   const data = { words: [{ text: 'one' }, { text: 'two' }], stories: ['Hello, world! Last phrase'], letterWords: { A: ['apple'] } };
@@ -14,8 +14,27 @@ const assert = require('node:assert/strict');
     { text: 'Hello,', breath: true, phraseEnd: true }, { text: 'world!', breath: true, phraseEnd: true },
     { text: 'Last', breath: true, phraseEnd: false }, { text: 'phrase', breath: false, phraseEnd: true }
   ]);
+  // Touch practice follows each technique, only on the words that technique works on.
+  assert.deepEqual(touchSteps('cancellation-practice', { pauseSeconds: 4 }).map(step => [step.kind, step.ms]), [['tap', undefined], ['hold', 4000], ['tap', undefined]]);
+  const phrase = practiceTokens(['Ball and sun, big cat.'], 'sentences', 0, 1);
+  assert.deepEqual(touchTargets('easy-onset-practice', 'sentences', phrase).map(i => phrase[i].text), ['Ball', 'big']);
+  assert.deepEqual(touchTargets('light-contact-practice', 'sentences', phrase).map(i => phrase[i].text), ['Ball', 'big', 'cat.']);
+  assert.equal(touchTargets('cancellation-practice', 'sentences', phrase).length, 2);
+  assert.equal(touchTargets('slower-rate-practice', 'sentences', phrase).length, 0, 'Slower Rate follows the turtle');
+  assert.deepEqual(touchSteps('easy-onset-practice').map(step => step.kind), ['slide', 'say']);
+  assert.equal(touchTargets('pull-out-practice', 'conversation', phrase).length, 0);
+  assert.equal(touchTargets('breathing-practice', 'words', phrase).length, 0);
+  // The ball rolls on its own, repeats, and only the middle counts.
+  assert.equal(slideProgress(0, 1000), 0); assert.equal(slideProgress(500, 1000), .5); assert.equal(slideProgress(1200, 1000), 1, 'It rests at the bottom');
+  assert.equal(slideProgress(1400, 1000), 0, 'Then starts again');
+  assert.deepEqual([.1, .34, .35, .5, .65, .66, .95].map(inSlideZone), [false, false, true, true, true, false, false]);
+  assert.ok(slideMs(0) > slideMs(5) && slideMs(5) > slideMs(10), 'A slower setting rolls more slowly');
+  assert.equal(sayMs(1, 10), 1200, 'There is always time to say the word'); assert.equal(sayMs(3, 0), 4500);
+  const drag = (value, previous, took) => dragResult({ value, previous, startedAt: 0, now: took, minMs: 1000 });
+  assert.equal(drag(20, 0, 100), 'moving'); assert.equal(drag(60, 0, 100), 'fast', 'A jump is not a slide');
+  assert.equal(drag(100, 90, 300), 'fast', 'Reaching the end too quickly'); assert.equal(drag(100, 90, 1200), 'done');
   // Rate runs from 40 to 200 syllables a minute.
-  assert.equal(syllablesPerMinute(1), 40); assert.equal(syllablesPerMinute(10), 200);
+  assert.equal(syllablesPerMinute(0), 40); assert.equal(syllablesPerMinute(10), 200); assert.equal(syllableMs(5), 900);
   assert.equal(countSyllables('banana'), 3); assert.equal(countSyllables('cake'), 1); assert.equal(countSyllables('تفاحة'), 3);
   assert.equal(countSyllables('P - Pen'), 1); assert.equal(countSyllables('7'), 1);
   const phases = (screen, tokens, options) => buildCues(screen, tokens, options).map(cue => `${cue.index}:${cue.phase}`);

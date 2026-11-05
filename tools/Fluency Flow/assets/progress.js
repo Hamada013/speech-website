@@ -59,6 +59,7 @@ export function createStore(getStorage, now = () => Date.now()) {
     data.people = data.people.filter(p => p.id !== id);
     const { [id]: _removed, ...entries } = data.entries;
     data.entries = entries;
+    if (data.extra) { const { [id]: _extra, ...extra } = data.extra; data.extra = extra; }
     if (data.active === id) data.active = data.people[0]?.id ?? null;
     save();
   }
@@ -74,6 +75,20 @@ export function createStore(getStorage, now = () => Date.now()) {
     save();
     return saved.id;
   }
+  function ensurePerson(defaultName) {
+    if (!data.people.some(p => p.id === data.active)) {
+      if (data.people[0]) data.active = data.people[0].id;
+      else addPerson(defaultName);
+    }
+  }
+  // Program progress, situation levels, feared words, own affirmation and self-ratings, per person.
+  function updateExtra(change, defaultName) {
+    reload();
+    ensurePerson(defaultName);
+    const current = data.extra?.[data.active] || {};
+    data.extra = { ...data.extra, [data.active]: change(current) };
+    save();
+  }
   function rate(id, rating) {
     reload();
     const list = data.entries[data.active] || [];
@@ -87,7 +102,7 @@ export function createStore(getStorage, now = () => Date.now()) {
       return () => listeners.delete(listener);
     },
     refresh() { reload(); publish(); },
-    addPerson, activate, removePerson, record, rate
+    addPerson, activate, removePerson, record, rate, updateExtra
   };
 }
 

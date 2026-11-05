@@ -14,6 +14,7 @@
     "test:iep": "node tests/iep-browser.cjs",
     "test:report": "node tests/report-browser.cjs",
     "test:lifecycle": "node tests/lifecycle-browser.cjs",
+    "test:navigation": "node tests/navigation-browser.cjs",
     "build:stimuli": "node scripts/build-stimuli.cjs",
     "test:stimuli": "node tests/stimuli.cjs",
     "test:stimuli:browser": "node tests/stimuli-browser.cjs"

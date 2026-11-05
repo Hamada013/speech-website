@@ -5,7 +5,7 @@ server.listen(0,'127.0.0.1',async()=>{let browser;try{
  const engine=process.env.VBMAPP_ENGINE==='webkit'?webkit:chromium;browser=await engine.launch({headless:true,...(engine===chromium?{channel:'chrome'}:{})});const page=await browser.newPage({viewport:{width:1440,height:1100}}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);
  await page.goto(`http://127.0.0.1:${server.address().port}/forms/ASD/VB-MAPP/`);await page.locator('#accountDialog').waitFor();await page.locator('#accountName').fill('Form Style QA');await page.locator('#accountForm button').click();await page.waitForFunction(()=>VBApp?.snapshot().child.name==='Form Style QA');
  await page.evaluate(()=>{
-  let s=VBModel.blank();s.child.name='Form Style QA';s.child.dob='2023-04-12';s.child.tester='QA Assessor';s.lang='en';
+  let s=VBModel.normalize(VBApp.snapshot());s.child.name='Form Style QA';s.child.dob='2023-04-12';s.child.tester='QA Assessor';s.lang='en';
   for(let visit=0;visit<4;visit++){
    s.date=`2026-10-${26+visit}`;
    for(const [i,item]of VBModel.allMilestones(VB_DATA).entries()) VBModel.setScore(s,'milestones',item,(i+visit)%7===0?0:(i+visit)%3===0&&VBModel.halfAllowed(item)?.5:1);

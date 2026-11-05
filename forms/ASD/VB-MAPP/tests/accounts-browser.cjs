@@ -7,6 +7,9 @@ async function add(page,name){await page.locator('#accountName').fill(name);awai
 async function scoreEesa(page,id,value){await page.locator(`.eesa-four [data-eesa-edit="${id}"]`).click();await page.locator(`#itemBody [data-score="${value}"]`).click();await page.locator('[data-close=itemDialog]').click();}
 async function run(){
  const engine=process.env.VBMAPP_ENGINE==='webkit'?webkit:chromium,browser=await engine.launch({headless:true,...(engine===chromium?{channel:'chrome'}:{})}),context=await browser.newContext({viewport:{width:390,height:844}}),page=await context.newPage(),errors=[];
+ // Playwright WebKit crashes on a second reload after pushState, even on a blank page. navigation-browser.cjs covers Back/Forward.
+ if(engine===webkit)await page.addInitScript(()=>{history.pushState=history.replaceState;});
+
  page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(15000);
  page.on('pageerror',e=>errors.push(e.message));const url=`http://127.0.0.1:${server.address().port}/forms/ASD/VB-MAPP/`;
  try{
@@ -70,7 +73,7 @@ async function run(){
  console.log('Second account');await gate(page);await add(page,'طفل ثان');assert.equal(Object.keys(await page.evaluate(()=>VBApp.snapshot().scores.milestones)).length,0);
  await gate(page);assert.equal(await page.locator('.suite-delete').count(),0);await page.locator('.suite-account-select',{hasText:'طفل أول'}).click();await page.waitForFunction(()=>window.VBApp?.snapshot().child.name==='طفل أول');
  assert.equal(await page.evaluate(()=>VBApp.snapshot().scores.milestones['m1-1']),1);assert.equal(await page.evaluate(()=>VBApp.snapshot().child.tester),'Saved assessor');
- await page.locator('[data-followup-current]').click();assert.equal(await page.evaluate(()=>VBApp.snapshot().history.length),1);await page.reload();await page.waitForFunction(()=>window.VBApp);assert.equal(await page.evaluate(()=>VBApp.snapshot().history.length),1);
+ await page.locator('nav [data-page=report]').click();await page.locator('[data-assessment-action=finish]').click();await page.locator('[data-confirm-assessment]').click();await page.locator('[data-assessment-action=new]').click();await page.locator('[data-confirm-assessment]').click();assert.equal(await page.evaluate(()=>VBApp.snapshot().history.length),1);await page.reload();await page.waitForFunction(()=>window.VBApp);assert.equal(await page.evaluate(()=>VBApp.snapshot().history.length),1);
  await page.locator('nav [data-page=report]').click();assert.equal(await page.locator('#reportPreview .milestone-sheet').count(),1);
  console.log('Admin');await gate(page);await add(page,'Hamada');await gate(page);assert.equal(await page.locator('.suite-delete').count(),2);assert.equal(await page.locator('[data-account-id=hamada] .suite-delete').count(),0);
  await page.locator('.suite-account-sort').click();await page.getByRole('option',{name:'حسب الأبجدية'}).click();assert.equal(await page.locator('.suite-account-sort').getAttribute('aria-expanded'),'false');

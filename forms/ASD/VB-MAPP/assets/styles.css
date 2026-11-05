@@ -577,3 +577,108 @@ dialog.fallback[open] { position:fixed; z-index:1001; top:50%; left:50%; transfo
 .stimulus-compare-empty .comparison-object{background:#fff}
 .stimulus-tracing .stimulus-picture svg{width:85%;height:85%}
 @media(max-height:450px){.image-dialog[open]{gap:2px;padding:6px}.stimulus-board{gap:4px}.stimulus-sample{min-height:44px}#imageControls{min-height:44px}.stimulus-array{padding:6px}.stimulus-comparison{padding:8px}}
+
+/* App shell, navigation and touch layer. Identity comes from VB-MAPP itself:
+   the three level colours, the teal brand and the protocol forms. Report and PDF styles stay separate. */
+:root { --level-1:#e85773; --level-2:#268b74; --level-3:#3186bf; --shadow:0 1px 3px rgba(33,59,74,.07); font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif; }
+html { scroll-padding-top:64px; }
+.report-document,#reportPreview { font-family:Tahoma,"Segoe UI",Arial,sans-serif; }
+button { border-radius:12px; }
+[hidden] { display:none!important; }
+
+.app-header { position:relative; display:flex; align-items:center; gap:10px; padding:11px max(16px,calc((100% - 1168px)/2)) 8px; border-bottom:0; }
+.app-header::before { content:''; position:absolute; inset:0 0 auto; height:3px; background:linear-gradient(90deg,var(--level-1) 0 33.33%,var(--level-2) 33.33% 66.66%,var(--level-3) 66.66%); }
+.brand { display:flex; align-items:center; gap:10px; flex:1 1 auto; min-width:0; }
+.brand img { flex:none; width:40px; height:40px; border-radius:10px; }
+.brand > div { min-width:0; }
+.brand h1 { margin:0; font-size:19px; line-height:1.25; white-space:nowrap; }
+.brand p { margin:0; font-size:13px; line-height:1.35; color:var(--muted); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.brand-credit { flex:none; margin:0; font-size:11px; }
+.back-link { flex:none; display:grid; place-items:center; width:44px; height:44px; border-radius:12px; color:var(--ink); }
+.back-link:hover { background:#eef6f8; }
+.back-link svg,.header-actions svg { width:22px; height:22px; }
+[dir=rtl] .back-link svg { transform:scaleX(-1); }
+.header-actions { flex:none; flex-wrap:nowrap; gap:4px; width:auto; }
+.header-actions button,.header-actions .install-icon { flex:none!important; display:grid; place-items:center; width:44px; min-width:44px; height:44px; min-height:44px; padding:0; border-color:transparent; background:transparent; }
+.header-actions button:hover { background:#eef6f8; border-color:transparent; }
+.header-actions #language { width:auto; padding:0 10px; font-size:14px; color:var(--brand); font-weight:600; }
+
+#navigation { position:sticky; top:0; z-index:20; display:flex; flex-wrap:nowrap; gap:2px; margin:0; padding:0 max(10px,calc((100% - 1168px)/2)); overflow-x:auto; scrollbar-width:none; background:#fff; border-bottom:1px solid var(--line); box-shadow:0 2px 6px rgba(33,59,74,.05); }
+#navigation::-webkit-scrollbar { display:none; }
+#navigation button { flex:0 0 auto; min-height:48px; padding:8px 13px; border:0; border-bottom:3px solid transparent; border-radius:0; background:none; color:var(--muted); font-size:15px; white-space:nowrap; }
+#navigation button:hover { color:var(--ink); background:#f3f8fa; }
+#navigation button[aria-current="page"] { color:var(--brand); border-bottom-color:var(--brand); background:none; font-weight:700; }
+#navigation button:focus-visible { outline-offset:-3px; }
+
+#main { padding:18px 16px 40px; }
+.page-intro { margin-bottom:14px; } .page-intro h2 { margin-bottom:4px; font-size:22px; }
+.panel,.assessment-card,.stat,.barrier-chart { box-shadow:var(--shadow); }
+.toolbar { margin-bottom:12px; }
+summary { min-height:44px; } .eesa-form-guide > summary { padding:10px 4px; }
+.section-tabs { margin:8px 0 14px; } .section-tabs button { min-height:44px; padding:8px 14px; border-radius:999px; }
+.followup-banner { padding:12px 14px; } .followup-banner > p { margin-bottom:4px; } .followup-help { margin-top:0; } .followup-help > summary { font-size:14px; font-weight:normal; color:var(--muted); } .followup-banner .section-tabs { margin-bottom:2px; }
+
+/* Grid / Tasks switches read as one control. */
+:is([data-view="grid"],[data-barrier-view="grid"],[data-transition-view="grid"],[data-analysis-view="grid"]) { border-start-end-radius:0; border-end-end-radius:0; }
+:is([data-view="cards"],[data-barrier-view="cards"],[data-transition-view="cards"],[data-analysis-view]:not([data-analysis-view="grid"])) { margin-inline-start:-11px; border-start-start-radius:0; border-end-start-radius:0; }
+
+#taskSearch,#analysisSearch { margin-bottom:14px; }
+.panel.screen-grid { padding:0; border:0; background:none; box-shadow:none; }
+.protocol-sheet { border-radius:14px; overflow:clip; box-shadow:var(--shadow); }
+.protocol-heading h2,.protocol-band { padding:11px 16px; margin-bottom:18px; font-size:20px; }
+.protocol-meta-toggle { margin:-6px 0 14px; } .protocol-meta-toggle > summary { font-size:14px; color:var(--muted); } .protocol-meta-toggle .protocol-meta { padding-top:6px; }
+
+/* What can be tapped is marked; historical visits stay plain. */
+.protocol-master button.master-mark.current.blank { background:var(--form-tint); }
+.protocol-master button.master-mark.current:focus-visible,.barrier-column.current:focus-visible { outline-offset:-3px; }
+.four-scores td.visit-current:not(.score-filled):has(> button) { background:var(--form-tint,#fff1f4); }
+.four-scores td.visit-current > button { font-weight:700; color:var(--form-accent,#d94766); }
+.eesa-four .four-scores td > button { min-height:44px; }
+.protocol-task-text { position:relative; padding-inline-end:30px; }
+.protocol-task-text::after { content:''; position:absolute; inset-inline-end:6px; top:50%; width:18px; height:18px; margin-top:-9px; opacity:.55; background:no-repeat center/18px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23246b86' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m15 4 5 5M4 20l5-1L21 7l-5-5L4 14z'/%3E%3C/svg%3E"); }
+.protocol-task-text:hover { background:rgba(36,107,134,.06); } .protocol-task-text:hover::after { opacity:1; }
+.barrier-column.current { background:#f5fafb; border-color:var(--brand); }
+
+/* On touch and narrow screens the whole cell or chart is the target for the current visit. */
+@media (pointer:coarse),(max-width:1100px) {
+ .master-visits { position:relative; }
+ .protocol-master button.master-mark.current { position:static; }
+ .protocol-master button.master-mark.current::after { content:''; position:absolute; inset:0; z-index:2; }
+ .master-mark.current > span { z-index:auto; }
+ .four-scores[data-four-item] { position:relative; }
+ .four-scores[data-four-item] td.visit-current > button::after { content:''; position:absolute; inset:0; }
+ .barrier-plot { position:relative; }
+ .barrier-column.current { position:static; }
+ .barrier-column.current::after { content:''; position:absolute; inset:0; }
+}
+
+/* Task Analysis keeps its domain names in view while its long chart scrolls. */
+.analysis-chart-scroll { max-height:calc(var(--app-height) - 72px); overflow:auto; }
+.analysis-chart thead th { position:sticky; top:0; z-index:2; box-shadow:0 1px 0 var(--form-line); }
+
+/* The scoring dialog: one frame, with previous / next always reachable. */
+#itemDialog { --pad:18px; padding:var(--pad); border-radius:18px; }
+#itemDialog .dialog-header { top:calc(var(--pad) * -1); align-items:center; }
+#itemBody .assessment-card { margin:0; padding:0; border:0; box-shadow:none; }
+#itemBody .card-title h3 { display:none; }
+.dialog-step { position:sticky; bottom:calc(var(--pad) * -1); z-index:1; display:flex; align-items:center; justify-content:space-between; gap:12px; margin:14px calc(var(--pad) * -1) calc(var(--pad) * -1); padding:8px var(--pad); background:#fff; border-top:1px solid var(--line); }
+[dir=ltr] .dialog-step svg { transform:scaleX(-1); }
+#itemCounter { font-size:14px; color:var(--muted); font-variant-numeric:tabular-nums; }
+
+.app-footer { padding:18px 16px; line-height:1.55; font-size:13px; color:var(--muted); }
+.app-footer strong { color:var(--ink); font-size:12px; letter-spacing:.03em; }
+.app-footer a { display:inline-block; padding:12px 4px; }
+
+@media(max-width:700px) {
+ .brand-credit { display:none; }
+ .brand { gap:8px; } .brand h1 { font-size:17px; } .header-actions #language { padding:0 7px; }
+ .header-actions { width:auto!important; }
+ #main { padding:14px 12px 32px; }
+ .section-tabs { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:thin; padding-bottom:4px; }
+ .section-tabs button { flex:none; white-space:nowrap; }
+ .toolbar > [data-score-summary] { flex:1 1 100%; font-size:14px; }
+ .protocol-heading h2,.protocol-band { margin-bottom:12px; font-size:17px; padding:10px 12px; }
+ .analysis-sheet .protocol-heading h2 { margin-bottom:12px; font-size:17px; }
+}
+@media(max-width:600px) { .report-controls .report-section-choice:last-child { width:100%; justify-self:stretch; } }
+@media(max-width:360px) { .app-header { padding-inline:6px; gap:4px; } .brand img { display:none; } .brand h1 { font-size:17px; } .header-actions { gap:0; } .header-actions #language { padding:0 6px; } }

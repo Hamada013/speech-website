@@ -78,24 +78,6 @@ const translations = {
       recording: "Recording...",
       clear: "Clear",
       infoDesc: "Learn more about the app and how to use it effectively to improve your fluency.",
-      appInfo: {
-        title: "About Fluency Flow",
-        purpose: "Fluency Flow is a comprehensive speech therapy tool designed to help individuals who stutter practice evidence-based fluency strategies in a structured and engaging way.",
-        howToUse: [{
-          title: "1. Choose a Strategy",
-          content: "Start by selecting one of the three main categories: Fluency Shaping, Stuttering Modification, or Breathing Techniques."
-        }, {
-          title: "2. Select a Practice Level",
-          content: "Each strategy offers different levels, from single sounds and words to full stories. Start simple and progress as you feel more confident."
-        }, {
-          title: "3. Use the Guided Practice",
-          content: "Press the Play button to start the visual guide. Follow the highlighted text or animations to time your speech with the selected technique."
-        }, {
-          title: "4. Adjust the Settings",
-          content: "Use the speed sliders or duration bars to match the practice to your current ability. Slower is often better when learning a new technique."
-        }],
-        tips: ["Consistency is key: 10 minutes of daily practice is better than one long session per week.", "Record yourself: Listening to your own speech can help you identify areas for improvement.", "Stay relaxed: Physical relaxation is the foundation of smooth speech."]
-      },
       plosives: "Plosives",
       lightContactInfo: {
         title: "Light Contact Strategy",
@@ -794,24 +776,6 @@ const translations = {
       recording: "جاري التسجيل...",
       clear: "مسح",
       infoDesc: "تعرف على المزيد حول التطبيق وكيفية استخدامه بفعالية لتحسين طلاقتك.",
-      appInfo: {
-        title: "عن تطبيق كلام وطلاقة",
-        purpose: "تطبيق كلام وطلاقة هو أداة شاملة لعلاج النطق مصممة لمساعدة الأشخاص الذين يعانون من التأتأة على ممارسة استراتيجيات الطلاقة القائمة على الأدلة بطريقة منظمة وجذابة.",
-        howToUse: [{
-          title: "١. اختر استراتيجية",
-          content: "ابدأ باختيار واحدة من الفئات الثلاث الرئيسية: تشكيل الطلاقة، أو تعديل التأتأة، أو تقنيات التنفس."
-        }, {
-          title: "٢. اختر مستوى التدريب",
-          content: "تقدم كل استراتيجية مستويات مختلفة، من الأصوات والكلمات المفردة إلى القصص الكاملة. ابدأ بالبسيط وتقدم كلما شعرت بمزيد من الثقة."
-        }, {
-          title: "٣. استخدم التدريب الموجه",
-          content: "اضغط على زر التشغيل لبدء الدليل المرئي. اتبع النص المميز أو الرسوم المتحركة لضبط توقيت كلامك مع التقنية المختارة."
-        }, {
-          title: "٤. اضبط الإعدادات",
-          content: "استخدم أشرطة تمرير السرعة أو أشرطة المدة لمطابقة التدريب مع قدرتك الحالية. البطء غالباً ما يكون أفضل عند تعلم تقنية جديدة."
-        }],
-        tips: ["الاستمرارية هي المفتاح: ١٠ دقائق من التدريب اليومي أفضل من جلسة واحدة طويلة في الأسبوع.", "سجل نفسك: الاستماع إلى كلامك الخاص يمكن أن يساعدك في تحديد مجالات التحسين.", "ابق مسترخياً: الاسترخاء الجسدي هو أساس الكلام السلس."]
-      },
       plosives: "الحروف الانفجارية",
       lightContactInfo: {
         title: "استراتيجية اللمس الخفيف",
@@ -1577,8 +1541,8 @@ Object.assign(translations.ar, {
 });
 translations.en.breathingInfo.tips.push('If you feel dizzy, stop and breathe normally.');
 translations.ar.breathingInfo.tips.push('إذا شعرت بدوار، توقف وتنفس بشكل طبيعي.');
-translations.en.appInfo.tips.push('Recordings stay on this device and are cleared when you leave the exercise.');
-translations.ar.appInfo.tips.push('تبقى التسجيلات على هذا الجهاز وتُمسح عند مغادرة التمرين.');
+translations.en.recordingNote = 'Recordings stay on this device and are cleared when you leave the exercise.';
+translations.ar.recordingNote = 'تبقى التسجيلات على هذا الجهاز وتُمسح عند مغادرة التمرين.';
 
 Object.assign(translations.en, {
   conversation: 'Conversation', situations: 'Real situations', talk: 'Talk and use your technique',
@@ -1594,7 +1558,7 @@ Object.assign(translations.en, {
   pathTitle: 'Speaking path', pathIntro: 'Move from short words toward everyday speech, at your own pace.',
   pathNote: 'Suggestions come from your own ratings: at least 5 ratings, with 70% easy. Your speech therapist can guide you differently.',
   suggestedNext: 'Suggested next', mostlyEasy: 'Mostly easy', historyTitle: 'Practice history', noHistory: 'Finished practice will appear here.',
-  copySummary: 'Copy summary for your therapist', copied: 'Copied', copyFailed: 'Could not copy. Your browser blocked it.',
+  shareSummary: 'Share summary', shared: 'Summary copied', shareFailed: 'Could not share. Your browser blocked it.',
   summaryNote: 'Ratings are the speaker\'s own view of effort. This is a practice record, not an assessment.',
   step_words: 'Words', step_sentences: 'Sentences', step_stories: 'Reading stories', step_conversation: 'Conversation', step_situations: 'Real situations'
 });
@@ -1618,7 +1582,7 @@ Object.assign(translations.ar, {
   pathTitle: 'مسار الكلام', pathIntro: 'انتقل من الكلمات القصيرة إلى الكلام اليومي، بالسرعة التي تناسبك.',
   pathNote: 'تعتمد الاقتراحات على تقييماتك: 5 تقييمات على الأقل، 70% منها سهل. يمكن لأخصائي النطق توجيهك بشكل مختلف.',
   suggestedNext: 'الخطوة المقترحة', mostlyEasy: 'سهل غالباً', historyTitle: 'سجل التدريب', noHistory: 'سيظهر هنا التدريب المكتمل.',
-  copySummary: 'نسخ ملخص لأخصائي النطق', copied: 'تم النسخ', copyFailed: 'تعذر النسخ. منع المتصفح ذلك.',
+  shareSummary: 'مشاركة الملخص', shared: 'تم نسخ الملخص', shareFailed: 'تعذرت المشاركة. منع المتصفح ذلك.',
   summaryNote: 'التقييمات هي رأي المتحدث في الجهد المبذول. هذا سجل تدريب وليس تقييماً.',
   step_words: 'كلمات', step_sentences: 'جمل', step_stories: 'قراءة قصص', step_conversation: 'محادثة', step_situations: 'مواقف حقيقية'
 });
@@ -1646,5 +1610,120 @@ translations.ar.practiceData.situations = [
   'تدرّب بصوت عالٍ، ثم جرّب ذلك في الواقع: اسأل شخصاً عن الطريق أو عن مكان شيء ما.', 'تدرّب بصوت عالٍ، ثم جرّب ذلك في الواقع: أجب عن سؤال في الصف أو في العمل.',
   'تدرّب بصوت عالٍ، ثم جرّب ذلك في الواقع: أخبر أحد أفراد عائلتك عن يومك على مائدة الطعام.', 'تدرّب بصوت عالٍ، ثم جرّب ذلك في الواقع: أخبر شخصاً يعرفك عن تأتأتك بكلماتك الخاصة.'
 ];
+
+Object.assign(translations.en, {
+  finished: 'Great try!', keepGoing: 'Keep going', stutter: 'Say it', touchPractice: 'Try it with your finger',
+  hint_fluency: 'Smooth, easy talking', hint_stuttering: 'Tools for tricky words', hint_breathing: 'Calm, slow breaths', hint_progress: 'My stars and my path',
+  hint_slower: 'Turtle talk', hint_onset: 'Start soft, like a breeze', hint_light: 'Touch soft, like a bubble',
+  hint_cancel: 'Stop, then say it again', hint_pull: 'Slide slowly out of the word', hint_prep: 'Get ready first',
+  touch_gentle: 'Slowly and gently. Try again',
+  touch_bubble: 'Say the word and tap the bubble very softly', touch_softer: 'Pop! A quicker, softer tap', touch_sayIt: 'Say the word, then tap here',
+  touch_holdPause: 'Press and hold while you pause', touch_keepHolding: 'Keep holding until it fills up', touch_sayAgain: 'Say it again softly, then tap here',
+  touch_slide: 'Slide slowly as you ease out of the word', touch_holdReady: 'Press and hold to get ready', touch_startSoft: 'Start the word softly, then tap here'
+});
+Object.assign(translations.ar, {
+  finished: 'أحسنت المحاولة!', keepGoing: 'تابع', stutter: 'قلها', touchPractice: 'جرّب بإصبعك',
+  hint_fluency: 'كلام سهل وسلس', hint_stuttering: 'أدوات للكلمات الصعبة', hint_breathing: 'أنفاس هادئة وبطيئة', hint_progress: 'نجومي ومساري',
+  hint_slower: 'كلام السلحفاة', hint_onset: 'ابدأ بنعومة مثل النسمة', hint_light: 'المس بخفة مثل الفقاعة',
+  hint_cancel: 'توقف ثم قلها مرة أخرى', hint_pull: 'اخرج من الكلمة ببطء', hint_prep: 'استعد أولاً',
+  touch_gentle: 'ببطء ولطف. حاول مرة أخرى',
+  touch_bubble: 'قل الكلمة والمس الفقاعة بخفة شديدة', touch_softer: 'فرقعت! المسها بخفة وسرعة أكثر', touch_sayIt: 'قل الكلمة، ثم اضغط هنا',
+  touch_holdPause: 'اضغط باستمرار وأنت تتوقف', touch_keepHolding: 'استمر بالضغط حتى تمتلئ', touch_sayAgain: 'قلها مرة أخرى بنعومة، ثم اضغط هنا',
+  touch_slide: 'حرّك ببطء وأنت تخرج من الكلمة', touch_holdReady: 'اضغط باستمرار لتستعد', touch_startSoft: 'ابدأ الكلمة بنعومة، ثم اضغط هنا'
+});
+
+// Plain, friendly wording on the screens. The information dialogs keep the clinical detail for adults.
+Object.assign(translations.en, {
+  subtitle: 'What shall we practice today?', fluencyIntro: 'Smooth, easy talking, one step at a time.',
+  stutteringIntro: 'Tools to help when a word gets stuck.', breathingIntro: 'Slow, calm breaths to relax your body.',
+  slowerRateIntro: 'Talk slowly like a turtle and take little pauses.', easyOnsetIntro: 'Start each word with a soft breath, like a breeze.',
+  lightContactIntro: 'Touch your lips or tongue very lightly, like touching a bubble.',
+  cancellationIntro: 'If a word gets stuck: finish it, stop, then say it again softly.',
+  pullOutIntro: 'If a word gets stuck: stay calm and slide out of it slowly.', prepSetIntro: 'Before a tricky word: get ready, then start softly.'
+});
+translations.en.units.stars = { one: '1 star', other: '{n} stars' };
+Object.assign(translations.ar, {
+  subtitle: 'ماذا نتدرب اليوم؟', fluencyIntro: 'كلام سهل وسلس، خطوة بخطوة.',
+  stutteringIntro: 'أدوات تساعدك عندما تعلق الكلمة.', breathingIntro: 'أنفاس بطيئة وهادئة تريح جسمك.',
+  slowerRateIntro: 'تكلّم ببطء مثل السلحفاة وخذ وقفات صغيرة.', easyOnsetIntro: 'ابدأ كل كلمة بنفس ناعم مثل النسمة.',
+  lightContactIntro: 'المس شفتيك أو لسانك بخفة، كأنك تلمس فقاعة.',
+  cancellationIntro: 'إذا علقت الكلمة: أكملها، توقف، ثم قلها مرة أخرى بنعومة.',
+  pullOutIntro: 'إذا علقت الكلمة: ابقَ هادئاً واخرج منها ببطء.', prepSetIntro: 'قبل الكلمة الصعبة: استعد، ثم ابدأ بنعومة.'
+});
+translations.ar.units.stars = { one: 'نجمة واحدة', two: 'نجمتان', few: '{n} نجوم', many: '{n} نجمة', other: '{n} نجمة' };
+
+Object.assign(translations.en, {
+  tabToday: 'Today', tabTraining: 'Training', tabTools: 'Tools', dailyTraining: 'Daily training', library: 'All techniques',
+  day: 'Day', minutesShort: 'min', startDay: 'Start', continueDay: 'Continue daily training', locked: 'locked', mascotBack: 'Welcome back! Ready for today?',
+  lockedDay: 'Finish the days before this one to open it.', lockedStep: 'Finish the step before this one first.',
+  dayDoneTitle: 'Day complete!', dayDoneText: 'You finished day {n}. See you tomorrow!', programDone: 'You finished the whole program. Be proud!',
+  programDoneShort: 'Program complete', programAgain: 'Start the program again', nextStep: 'Next step', stepDone: 'Step complete!', gotIt: 'Got it', done: 'Done',
+  program_lesson: 'Learn', program_affirmation: 'Kind words', program_selfRating: 'How was talking today?', program_board: 'Situation board', program_feared: 'My tricky sounds', program_tryOne: 'Try it for real',
+  hint_board: 'From easy to hard', hint_feared: 'Sounds and words', hint_affirmation: 'Read it aloud', hint_selfRating: 'Today\'s rating',
+  affirmRead1: 'Read it aloud: first time', affirmRead2: 'Read it aloud: second time', affirmRead3: 'Read it aloud: third time', affirmWrite: 'Now write your own', affirmPlaceholder: 'Write your kind words here…',
+  boardIntro: 'Tap each situation and choose how hard it feels. You can change it any time.', tryThis: 'Try this one today', triedIt: 'I tried it!',
+  level_none: 'Not sorted', level_1: 'Very easy', level_2: 'Easy', level_3: 'Medium', level_4: 'Hard', level_5: 'Very hard',
+  fearedIntro: 'Choose the sounds and words that feel tricky. They become your own practice.', fearedSounds: 'Sounds', fearedWords: 'Words', fearedAdd: 'Add a word', fearedWhere: 'Your words appear under My words in the stuttering exercises.', practiceLetter: 'Practice', myWords: 'My words',
+  selfQuestion: 'How was talking today?', selfNote: 'There is no wrong answer. This helps you and your speech therapist see how things change.', selfRecent: 'Recent days',
+  self_1: 'Very easy', self_2: 'Easy', self_3: 'Okay', self_4: 'Hard', self_5: 'Very hard'
+});
+Object.assign(translations.ar, {
+  tabToday: 'اليوم', tabTraining: 'البرنامج', tabTools: 'أدواتي', dailyTraining: 'التدريب اليومي', library: 'كل التقنيات',
+  day: 'اليوم', minutesShort: 'د', startDay: 'ابدأ', continueDay: 'متابعة التدريب اليومي', locked: 'مقفل', mascotBack: 'أهلاً بعودتك! جاهز لليوم؟',
+  lockedDay: 'أكمل الأيام السابقة لفتح هذا اليوم.', lockedStep: 'أكمل الخطوة السابقة أولاً.',
+  dayDoneTitle: 'اكتمل اليوم!', dayDoneText: 'أنهيت اليوم {n}. نراك غداً!', programDone: 'أنهيت البرنامج كله. كن فخوراً بنفسك!',
+  programDoneShort: 'اكتمل البرنامج', programAgain: 'ابدأ البرنامج من جديد', nextStep: 'الخطوة التالية', stepDone: 'اكتملت الخطوة!', gotIt: 'فهمت', done: 'تم',
+  program_lesson: 'تعلّم', program_affirmation: 'كلمات لطيفة', program_selfRating: 'كيف كان كلامك اليوم؟', program_board: 'لوحة المواقف', program_feared: 'أصواتي الصعبة', program_tryOne: 'جرّب في الواقع',
+  hint_board: 'من السهل إلى الصعب', hint_feared: 'أصوات وكلمات', hint_affirmation: 'اقرأها بصوت عالٍ', hint_selfRating: 'تقييم اليوم',
+  affirmRead1: 'اقرأها بصوت عالٍ: المرة الأولى', affirmRead2: 'اقرأها بصوت عالٍ: المرة الثانية', affirmRead3: 'اقرأها بصوت عالٍ: المرة الثالثة', affirmWrite: 'الآن اكتب كلماتك', affirmPlaceholder: 'اكتب كلماتك اللطيفة هنا…',
+  boardIntro: 'اضغط كل موقف واختر مدى صعوبته. يمكنك تغييره في أي وقت.', tryThis: 'جرّب هذا الموقف اليوم', triedIt: 'جرّبته!',
+  level_none: 'غير مصنّف', level_1: 'سهل جداً', level_2: 'سهل', level_3: 'متوسط', level_4: 'صعب', level_5: 'صعب جداً',
+  fearedIntro: 'اختر الأصوات والكلمات التي تشعر أنها صعبة، لتصبح تدريبك الخاص.', fearedSounds: 'أصوات', fearedWords: 'كلمات', fearedAdd: 'أضف كلمة', fearedWhere: 'تظهر كلماتك تحت «كلماتي» في تمارين تعديل التأتأة.', practiceLetter: 'تدرّب على', myWords: 'كلماتي',
+  selfQuestion: 'كيف كان كلامك اليوم؟', selfNote: 'لا توجد إجابة خاطئة. هذا يساعدك أنت وأخصائي النطق على رؤية التغيّر.', selfRecent: 'الأيام الأخيرة',
+  self_1: 'سهل جداً', self_2: 'سهل', self_3: 'عادي', self_4: 'صعب', self_5: 'صعب جداً'
+});
+
+Object.assign(translations.en, {
+  opensTomorrow: 'Opens tomorrow', mascotTomorrow: 'Well done! See you tomorrow for a new day.',
+  lockedTomorrow: 'Well done! This day opens tomorrow. Until then, you can repeat any finished step or practice from All techniques.',
+  unlockDay: 'Open this day (for parents and therapists)', relockDay: 'Lock this day again', gateHelpDay: 'Solve this sum to open or lock this day.'
+});
+Object.assign(translations.ar, {
+  opensTomorrow: 'يفتح غداً', mascotTomorrow: 'أحسنت! نراك غداً في يوم جديد.',
+  lockedTomorrow: 'أحسنت! يفتح هذا اليوم غداً. حتى ذلك الحين، يمكنك إعادة أي خطوة أنهيتها أو التدرب من «كل التقنيات».',
+  unlockDay: 'فتح هذا اليوم (للأهل والمختصين)', relockDay: 'إقفال هذا اليوم مرة أخرى', gateHelpDay: 'احسب الناتج لفتح هذا اليوم أو إقفاله.'
+});
+
+Object.assign(translations.en, {
+  menu: 'Menu', menuMain: 'Main', menuMore: 'More', tabTherapist: 'Therapist',
+  th_lockTitle: 'For the therapist', th_password: 'Password', th_unlock: 'Unlock', th_wrong: 'That password is not correct.',
+  th_title: 'Therapy plan', th_overall: 'Overall achievement', th_goalsMet: 'Goals achieved', th_longTerm: 'Long-term goal', th_shortTerm: 'Short-term goals',
+  th_allGoals: 'All goals', th_tapGoal: 'Tap a goal to see its graph.', th_chartTitle: 'Achievement over time', th_table: 'Show the numbers as a table', th_date: 'Date', th_percent: 'Achievement', th_until: 'To', th_noData: 'The graph appears after the first finished practice.',
+  th_notStarted: 'Not started', th_working: 'In progress', th_achieved: 'Achieved',
+  th_s: 'S · Subjective', th_o: 'O · Objective', th_a: 'A · Assessment', th_p: 'P · Plan',
+  th_lastSelf: 'Latest self-rating', th_noSelf: 'No self-rating yet.', th_effort: 'Effort during practice', th_fearedSounds: 'Tricky sounds', th_fearedWords: 'Tricky words', th_easiest: 'Easiest situation', th_hardest: 'Hardest situation',
+  th_total: 'Total practices', th_rate: 'Latest pace', th_tried: 'Real situations tried', th_method: 'The app records finished practice only. It does not hear speech.',
+  th_best: 'Most advanced', th_least: 'Least advanced', th_easyShare: 'Practice rated easy', th_caution: 'Each percentage starts from how much was practiced, not how fluent speech is. Type your own rating for any goal.', th_setPercent: 'Your rating', th_byTherapist: 'Set by therapist', th_useCount: 'Use the practice count again',
+  th_workingOn: 'Working on now', th_nothing: 'No practice in the last 7 days.', th_next: 'Suggested next goal', th_allMet: 'All goals achieved. Review new goals.', th_nextSituation: 'Next real situation', th_notes: 'Therapist notes'
+});
+Object.assign(translations.ar, {
+  menu: 'القائمة', menuMain: 'الرئيسية', menuMore: 'المزيد', tabTherapist: 'الأخصائي',
+  th_lockTitle: 'للأخصائي', th_password: 'كلمة المرور', th_unlock: 'فتح', th_wrong: 'كلمة المرور غير صحيحة.',
+  th_title: 'خطة العلاج', th_overall: 'الإنجاز العام', th_goalsMet: 'الأهداف المتحققة', th_longTerm: 'الهدف طويل المدى', th_shortTerm: 'الأهداف قصيرة المدى',
+  th_allGoals: 'كل الأهداف', th_tapGoal: 'اضغط هدفاً لرؤية رسمه البياني.', th_chartTitle: 'الإنجاز عبر الزمن', th_table: 'عرض الأرقام في جدول', th_date: 'التاريخ', th_percent: 'الإنجاز', th_until: 'حتى', th_noData: 'يظهر الرسم البياني بعد أول تدريب مكتمل.',
+  th_notStarted: 'لم يبدأ', th_working: 'قيد العمل', th_achieved: 'تحقق',
+  th_s: 'S · ذاتي', th_o: 'O · موضوعي', th_a: 'A · تقييم', th_p: 'P · خطة',
+  th_lastSelf: 'آخر تقييم ذاتي', th_noSelf: 'لا يوجد تقييم ذاتي بعد.', th_effort: 'الجهد أثناء التدريب', th_fearedSounds: 'الأصوات الصعبة', th_fearedWords: 'الكلمات الصعبة', th_easiest: 'أسهل موقف', th_hardest: 'أصعب موقف',
+  th_total: 'إجمالي التدريبات', th_rate: 'آخر سرعة', th_tried: 'مواقف حقيقية جُرّبت', th_method: 'يسجل التطبيق التدريب المكتمل فقط، ولا يسمع الكلام.',
+  th_best: 'الأكثر تقدماً', th_least: 'الأقل تقدماً', th_easyShare: 'التدريب المقيّم سهلاً', th_caution: 'تبدأ كل نسبة من مقدار التدريب، لا من مدى طلاقة الكلام. اكتب تقييمك لأي هدف.', th_setPercent: 'تقييمك', th_byTherapist: 'حدّدها الأخصائي', th_useCount: 'العودة إلى عدد التدريبات',
+  th_workingOn: 'يعمل الآن على', th_nothing: 'لا يوجد تدريب في آخر 7 أيام.', th_next: 'الهدف التالي المقترح', th_allMet: 'تحققت كل الأهداف. راجع أهدافاً جديدة.', th_nextSituation: 'الموقف الحقيقي التالي', th_notes: 'ملاحظات الأخصائي'
+});
+
+Object.assign(translations.en, {
+  turtle: 'Turtle walking with the words', touch_slideStop: 'Press when the ball reaches the star', touch_early: 'Wait, it is still at the start', touch_late: 'It passed the middle. Try again', touch_sayNow: 'Now say the word softly'
+});
+Object.assign(translations.ar, {
+  turtle: 'سلحفاة تمشي مع الكلمات', touch_slideStop: 'اضغط عندما تصل الكرة إلى النجمة', touch_early: 'انتظر، ما زالت في البداية', touch_late: 'تجاوزت الوسط. حاول مرة أخرى', touch_sayNow: 'قل الكلمة الآن بنعومة'
+});
 
 yb.createRoot(document.getElementById('root')).render(u.jsx(Y.StrictMode, { children: u.jsx(App, { translations }) }));

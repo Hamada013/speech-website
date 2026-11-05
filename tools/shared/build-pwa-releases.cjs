@@ -56,6 +56,22 @@ function lingInventory(root=ROOT){
  for(const file of release.files)if(sha(fs.readFileSync(path.join(base,file)))!==release.integrity[file])throw Error('Stale Ling shell: '+file);
  return [...release.files,'sw.js','release.js','release.json'].map(file=>prefix+file);
 }
+function asdAssessmentInventory(root=ROOT){
+ const files=[];
+ for(const app of ['BALF','M-CHAT']){
+  const prefix=`forms/ASD/${app}/`,base=path.join(root,prefix),context={self:{}};
+  vm.runInNewContext(fs.readFileSync(path.join(base,'assets/pwa-release.js'),'utf8'),context);
+  const release=context.self.ASSESSMENT_RELEASE;
+  for(const file of release.shell){
+   const relative=path.posix.normalize(prefix+file);
+   if(!relative.startsWith(prefix)&&!relative.startsWith('forms/ASD/assessment-shared/'))throw Error('Invalid ASD shell path');
+   if(release.integrity[file]!==sha(fs.readFileSync(path.join(root,relative))))throw Error(`Stale ASD shell: ${app}/${file}`);
+   files.push(relative);
+  }
+  files.push(prefix+'sw.js',prefix+'assets/pwa-release.js');
+ }
+ return [...new Set(files)];
+}
 function build(){
  cp.execFileSync(process.execPath,[path.join(__dirname,'sync-navigation.cjs')],{stdio:'inherit'});
  for(const app of APPS)cp.execFileSync(process.execPath,[path.join(ROOT,'tools',app,'scripts/build-pwa.cjs')],{stdio:'inherit'});
@@ -63,6 +79,8 @@ function build(){
  cp.execFileSync(process.execPath,[path.join(ROOT,'forms/aphasia/langiuage-cognitive/scripts/build-release.cjs')],{stdio:'inherit'});
  cp.execFileSync(process.execPath,[path.join(ROOT,'tools/follow-direction/scripts/build-pwa.cjs')],{stdio:'inherit'});
  cp.execFileSync(process.execPath,[path.join(ROOT,'forms/Hearing/ling_test/scripts/build-pwa.cjs')],{stdio:'inherit'});
+ cp.execFileSync(process.execPath,[path.join(ROOT,'forms/ASD/assessment-shared/build-pwa.cjs')],{stdio:'inherit'});
+ asdAssessmentInventory();
  followDirectionInventory();
  lingInventory();
  articulationInventory();
@@ -74,7 +92,7 @@ function stageSite(releases){
  // Tracked site files preserve all existing pages. Runtime inventories also
  // include new local app assets when checking a release before its first commit.
  const tracked=cp.execFileSync('git',['ls-files','-z'],{cwd:ROOT}).toString().split('\0').filter(Boolean);
- const files=new Set([...tracked,...articulationInventory(),...aphasiaInventory(),...followDirectionInventory(),...lingInventory(),...releases.flatMap(release=>release.files.map(file=>`tools/${release.app}/${file}`))]);
+ const files=new Set([...tracked,...articulationInventory(),...aphasiaInventory(),...followDirectionInventory(),...lingInventory(),...asdAssessmentInventory(),...releases.flatMap(release=>release.files.map(file=>`tools/${release.app}/${file}`))]);
  const omitted=new Set(['node_modules','.git','.github','.aws','.agents','.codex','.vscode','output','tmp','tests','scripts','__pycache__']);
  let total=0;
  for(const file of [...files].sort()){
@@ -96,13 +114,14 @@ function stageSite(releases){
  aphasiaInventory(destination);
  followDirectionInventory(destination);
  lingInventory(destination);
+ asdAssessmentInventory(destination);
  console.log(`Pages artifact: ${total} files in output/pages; every app shell and media revision verified.`);
  return destination;
 }
 if(require.main===module){
  const releases=process.argv.includes('--check')?APPS.map(app=>inventory(app)):build();
- if(process.argv.includes('--check')){articulationInventory();aphasiaInventory();followDirectionInventory();lingInventory();}
+ if(process.argv.includes('--check')){articulationInventory();aphasiaInventory();followDirectionInventory();lingInventory();asdAssessmentInventory();}
  if(process.argv.includes('--site'))stageSite(releases);
  console.log(JSON.stringify(releases.map(({files,...summary})=>summary),null,2));
 }
-module.exports={APPS,inventory,build,stageSite};
+module.exports={APPS,inventory,build,stageSite,asdAssessmentInventory};

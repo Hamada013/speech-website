@@ -1,8 +1,9 @@
 import { Y as React, u } from './vendor.js';
+import { Dialog } from './dialog.js';
 
 const copy = {
   en: {
-    title: 'Take Fluency Flow with you', install: 'Install app', installed: 'App installed',
+    close: 'Close', install: 'Download the app', installed: 'App installed',
     preparing: 'Preparing offline practice…', ready: 'Ready for offline practice',
     failed: 'Offline access is not ready. Reconnect and reopen the app to try again.',
     unavailable: 'Use the HTTPS website to enable installation and offline practice.',
@@ -14,7 +15,7 @@ const copy = {
     installError: 'The install prompt could not open. Use your browser’s install or home-screen menu.'
   },
   ar: {
-    title: 'استخدم «كلام وطلاقة» كتطبيق', install: 'تثبيت التطبيق', installed: 'التطبيق مثبت',
+    close: 'إغلاق', install: 'تنزيل التطبيق', installed: 'التطبيق مثبت',
     preparing: 'جارٍ تجهيز التدريب دون إنترنت…', ready: 'جاهز للتدريب دون إنترنت',
     failed: 'التدريب دون إنترنت غير جاهز. اتصل بالإنترنت وأعد فتح التطبيق للمحاولة مجدداً.',
     unavailable: 'افتح الموقع عبر HTTPS لتفعيل التثبيت والتدريب دون إنترنت.',
@@ -73,44 +74,67 @@ function initialize() {
 }
 initialize();
 
-export function PwaPanel({ lang, home, busy }) {
+function useSnapshot() {
   const [snapshot, setSnapshot] = React.useState(() => ({ ...state }));
-  const [showHelp, setShowHelp] = React.useState(false);
-  const [error, setError] = React.useState(false);
   React.useEffect(() => { subscribers.add(setSnapshot); setSnapshot({ ...state }); return () => subscribers.delete(setSnapshot); }, []);
+  return snapshot;
+}
+
+// One download icon. The browser's install prompt opens directly when it is available;
+// otherwise a short dialog gives the offline status and the steps for this device.
+export function PwaDownload({ lang }) {
+  const snapshot = useSnapshot();
+  const [open, setOpen] = React.useState(false);
+  const [error, setError] = React.useState(false);
   const t = copy[lang];
-  async function install() {
-    if (!snapshot.prompt) { setShowHelp(value => !value); return; }
+  async function press(event) {
+    event.currentTarget.focus();
+    if (!snapshot.prompt) { setOpen(true); return; }
     try {
       const prompt = snapshot.prompt;
       state.prompt = null; notify();
       await prompt.prompt();
       await prompt.userChoice;
-    } catch { setError(true); setShowHelp(true); }
+    } catch { setError(true); setOpen(true); }
   }
-  if (!home && !snapshot.waiting) return null;
+  if (snapshot.installed) return null;
+  return u.jsxs(React.Fragment, { children: [
+    u.jsx('button', {
+      id: 'pwa-install', type: 'button', className: 'ff-icon-button', 'aria-label': t.install, title: t.install, onClick: press,
+      children: u.jsxs('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true, children: [
+        u.jsx('path', { d: 'M12 3v12' }), u.jsx('path', { d: 'm7 10 5 5 5-5' }), u.jsx('path', { d: 'M4 21h16' })
+      ] })
+    }),
+    open && u.jsx(Dialog, { onClose: () => setOpen(false), label: t.install, children: u.jsxs('div', { className: 'ff-dialog-card ff-gate', children: [
+      u.jsxs('div', { className: 'ff-dialog-head', children: [
+        u.jsx('h2', { children: t.install }),
+        u.jsx('button', { type: 'button', className: 'ff-icon-button', 'aria-label': t.close, title: t.close, onClick: () => setOpen(false),
+          children: u.jsx('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', 'aria-hidden': true, children: u.jsx('path', { d: 'M6 6l12 12M18 6 6 18' }) }) })
+      ] }),
+      u.jsxs('div', { id: 'pwa-install-help', className: 'ff-dialog-body', children: [
+        u.jsx('p', { id: 'pwa-status', role: 'status', children: t[snapshot.status] }),
+        u.jsx('p', { children: t.iphone }), u.jsx('p', { children: t.android }),
+        error && u.jsx('p', { className: 'ff-alert', role: 'alert', children: t.installError })
+      ] })
+    ] }) })
+  ] });
+}
+
+// Shown only when a new release is ready. Updating never interrupts practice.
+export function PwaPanel({ lang, busy }) {
+  const snapshot = useSnapshot();
+  const t = copy[lang];
+  if (!snapshot.waiting) return null;
   return u.jsxs('section', {
     id: 'pwa-panel', className: 'ff-pwa', 'aria-labelledby': 'pwa-title',
-    children: [home && u.jsxs(React.Fragment, { children: [
-      u.jsx('h2', { id: 'pwa-title', children: t.title }),
-      u.jsx('p', { id: 'pwa-status', role: 'status', children: t[snapshot.status] }),
-      snapshot.installed ? u.jsx('p', { children: t.installed }) : u.jsx('button', {
-        id: 'pwa-install', type: 'button', onClick: install, 'aria-expanded': showHelp,
-        'aria-controls': 'pwa-install-help', children: t.install
-      }),
-      showHelp && u.jsxs('div', { id: 'pwa-install-help', children: [
-        u.jsx('h3', { children: t.help }), u.jsx('p', { children: t.iphone }), u.jsx('p', { children: t.android })
-      ] }),
-      error && u.jsx('p', { role: 'alert', children: t.installError })
-    ] }), snapshot.waiting && u.jsxs('div', { className: 'ff-pwa-update', children: [
-      !home && u.jsx('h2', { id: 'pwa-title', children: t.update }),
-      home && u.jsx('p', { role: 'status', children: t.update }),
+    children: [
+      u.jsx('h2', { id: 'pwa-title', children: t.update }),
       u.jsx('p', { children: t.updateHint }),
       u.jsx('button', { id: 'pwa-update', type: 'button', disabled: busy, onClick: () => {
         if (busy || !state.waiting) return;
         state.reload = true;
         state.waiting.postMessage({ type: 'ACTIVATE_UPDATE' });
       }, children: t.reload })
-    ] })]
+    ]
   });
 }

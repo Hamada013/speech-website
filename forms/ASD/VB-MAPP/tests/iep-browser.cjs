@@ -2,7 +2,10 @@ const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),
 const {chromium,webkit}=require(process.env.VBMAPP_PLAYWRIGHT||'playwright'),root=path.resolve(__dirname,'../../../..');
 const server=http.createServer((req,res)=>{const f=path.join(root,decodeURIComponent(req.url.split('?')[0]).replace(/\/$/,'/index.html'));fs.readFile(f,(e,b)=>{if(e)return res.writeHead(404).end();res.setHeader('Content-Type',({'.js':'text/javascript','.css':'text/css','.html':'text/html','.json':'application/json'})[path.extname(f)]||'application/octet-stream');res.end(b);});});
 server.listen(0,'127.0.0.1',async()=>{let browser;try{
- const engine=process.env.VBMAPP_ENGINE==='webkit'?webkit:chromium;browser=await engine.launch({headless:true,...(engine===chromium?{channel:'chrome'}:{})});const page=await browser.newPage({viewport:{width:1440,height:1050}}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);
+ const engine=process.env.VBMAPP_ENGINE==='webkit'?webkit:chromium;browser=await engine.launch({headless:true,...(engine===chromium?{channel:'chrome'}:{})});const page=await browser.newPage({viewport:{width:1440,height:1050}}),errors=[];
+ // Playwright WebKit crashes on a second reload after pushState, even on a blank page. navigation-browser.cjs covers Back/Forward.
+ if(engine===webkit)await page.addInitScript(()=>{history.pushState=history.replaceState;});
+page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(15000);
  await page.goto(`http://127.0.0.1:${server.address().port}/forms/ASD/VB-MAPP/`);await page.locator('#accountName').fill('IEP QA');await page.locator('#accountForm button').click();await page.waitForFunction(()=>window.VBApp?.snapshot().child.name==='IEP QA');
  await page.locator('nav [data-page=reference]').click();assert.equal(await page.locator('[data-child-goal]').count(),0);assert.equal(await page.locator('.iep-mapping,.iep-intro,.iep-level-tabs,#goalCards').count(),0);
  await page.evaluate(()=>{let s=VBApp.snapshot();s.lang='en';s.reportLang='en';for(const id of ['m1-1','t1-1'])VBModel.setScore(s,'milestones',VBModel.allMilestones(VB_DATA).find(i=>i.id===id),0);VBAccounts.save(VBAccounts.active().id,s);window.dispatchEvent(new StorageEvent('storage',{key:VBAccounts.KEY}));});

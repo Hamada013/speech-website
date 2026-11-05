@@ -2,7 +2,10 @@ const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),
 const {chromium,webkit}=require(process.env.VBMAPP_PLAYWRIGHT||'playwright'),root=path.resolve(__dirname,'../../../..');
 const server=http.createServer((req,res)=>{const file=path.join(root,decodeURIComponent(req.url.split('?')[0]).replace(/\/$/,'/index.html'));fs.readFile(file,(e,b)=>{if(e)return res.writeHead(404).end();res.setHeader('Content-Type',({'.js':'text/javascript','.css':'text/css','.html':'text/html'})[path.extname(file)]||'application/octet-stream');res.end(b);});});
 server.listen(0,'127.0.0.1',async()=>{let browser;try{
- const engine=process.env.VBMAPP_ENGINE==='webkit'?webkit:chromium;browser=await engine.launch({headless:true,...(engine===chromium?{channel:'chrome'}:{})});const page=await browser.newPage({viewport:{width:1440,height:1050}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const engine=process.env.VBMAPP_ENGINE==='webkit'?webkit:chromium;browser=await engine.launch({headless:true,...(engine===chromium?{channel:'chrome'}:{})});const page=await browser.newPage({viewport:{width:1440,height:1050}}),errors=[];
+ // Playwright WebKit crashes on a second reload after pushState, even on a blank page. navigation-browser.cjs covers Back/Forward.
+ if(engine===webkit)await page.addInitScript(()=>{history.pushState=history.replaceState;});
+page.on('pageerror',e=>errors.push(e.message));
  await page.clock.setFixedTime(new Date('2026-10-01T12:00:00Z'));
  await page.goto(`http://127.0.0.1:${server.address().port}/forms/ASD/VB-MAPP/`);await page.locator('#accountName').fill('Lifecycle child');await page.locator('#accountForm button').click();await page.waitForFunction(()=>VBApp.snapshot().child.name==='Lifecycle child');
  const first=await page.evaluate(()=>({id:VBApp.snapshot().assessmentId,date:VBApp.snapshot().date,account:VBAccounts.active().id}));

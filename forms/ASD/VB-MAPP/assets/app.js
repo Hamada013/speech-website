@@ -26,6 +26,10 @@
     if (child) { accountId = child.id; s = child.workspace ? M.normalize(child.workspace) : M.blank(); s.child.name = child.name; }
   } catch (_) { loadMessage = 'load-error'; }
 
+  const PAGES=['case','milestones','eesa','barriers','transitions','tasks','reference','report'];
+  // Each section is a history entry, so Back, Forward and reload stay inside the app.
+  const pageFromHistory=()=>PAGES.includes(history.state?.vbPage)?history.state.vbPage:null;
+  ui.page=pageFromHistory()||ui.page;
   if(s.completedAt)ui.page='report';
   if (!loadMessage&&!s.completedAt) { M.syncEchoic(s, D); M.syncTransitionTotals(s,D); }
   function save() {
@@ -43,6 +47,8 @@
     $('navigation').setAttribute('aria-label', tr('Assessment sections', 'أقسام التقييم'));
     document.title = 'VB-MAPP · ' + tr('Ahmad Ghanem', 'أحمد غانم');
     document.querySelector('[data-install]')?.setAttribute('aria-label', tr('Add to Home Screen', 'إضافة إلى الشاشة الرئيسية'));
+    document.querySelectorAll('[data-aria-en][data-aria-ar]').forEach(node => { const label=s.lang==='ar'?node.dataset.ariaAr:node.dataset.ariaEn; node.setAttribute('aria-label',label); if(node.hasAttribute('title'))node.title=label; });
+    $('headerChild').textContent=s.child.name||tr('Assessment, learning profile and planning','التقييم وملف المهارات والتخطيط');
     $('caseBadge').textContent='';
   }
   function heading(en, ar, description = '') { return `<div class="page-intro"><h2>${tr(en, ar)}</h2>${description ? `<p class="muted">${description}</p>` : ''}</div>`; }
@@ -82,7 +88,8 @@
   }
   function workflowPanel() {
     const old = M.previous(s);
-    return `<section class="panel followup-panel"><h3>${tr('Follow-up with the same child', 'متابعة الطفل نفسه')}</h3><div class="toolbar"><button type="button" data-followup-current>${tr('Start next assessment from this case', 'بدء التقييم التالي من هذه الحالة')}</button></div>${old ? `<p><strong>${tr('Previous assessment', 'التقييم السابق')}:</strong> <span dir="ltr">${esc(old.date)}</span> · ${tr('Assessment', 'التقييم')} ${esc(old.number)}${s.importSource ? ` · <bdi>${esc(s.importSource)}</bdi>` : ''}</p><p class="muted">${tr('Previous marks are visible in the grid. Only newly recorded scores count toward the current assessment.', 'تظهر الدرجات السابقة في الجدول. تدخل الدرجات المسجلة من جديد فقط في التقييم الحالي.')}</p>` : ''}${s.history.length ? `<details><summary>${tr('Previous visits and observations', 'الزيارات والملاحظات السابقة')} (${s.history.length})</summary>${s.history.map(record => `<div class="history-record"><h4>${esc(record.date)} · ${tr('Assessment', 'التقييم')} ${esc(record.number)}</h4><p>${tr('Milestones assessed', 'المعالم المقيمة')}: ${M.stats(record, getList('milestones'), 'milestones').assessed}/170</p><p dir="auto">${esc(record.clinical || tr('No observation summary recorded.', 'لم يُسجل ملخص للملاحظات.'))}</p>${record.recommendations ? `<p dir="auto">${esc(record.recommendations)}</p>` : ''}</div>`).join('')}</details>` : ''}</section>`;
+    if(!old&&!s.history.length)return '';
+    return `<section class="panel followup-panel"><h3>${tr('Follow-up with the same child', 'متابعة الطفل نفسه')}</h3>${old ? `<p><strong>${tr('Previous assessment', 'التقييم السابق')}:</strong> <span dir="ltr">${esc(old.date)}</span> · ${tr('Assessment', 'التقييم')} ${esc(old.number)}${s.importSource ? ` · <bdi>${esc(s.importSource)}</bdi>` : ''}</p><p class="muted">${tr('Previous marks are visible in the grid. Only newly recorded scores count toward the current assessment.', 'تظهر الدرجات السابقة في الجدول. تدخل الدرجات المسجلة من جديد فقط في التقييم الحالي.')}</p>` : ''}${s.history.length ? `<details><summary>${tr('Previous visits and observations', 'الزيارات والملاحظات السابقة')} (${s.history.length})</summary>${s.history.map(record => `<div class="history-record"><h4>${esc(record.date)} · ${tr('Assessment', 'التقييم')} ${esc(record.number)}</h4><p>${tr('Milestones assessed', 'المعالم المقيمة')}: ${M.stats(record, getList('milestones'), 'milestones').assessed}/170</p><p dir="auto">${esc(record.clinical || tr('No observation summary recorded.', 'لم يُسجل ملخص للملاحظات.'))}</p>${record.recommendations ? `<p dir="auto">${esc(record.recommendations)}</p>` : ''}</div>`).join('')}</details>` : ''}</section>`;
   }
   function taskList() {
     const old = M.previous(s);
@@ -146,12 +153,13 @@
       return `<td data-visit-number="${esc(visit?.number||index+1)}" class="${current?'visit-current':''}${fill?' score-filled':''}" ${fill?`style="${fill}"`:''} title="${esc(label)}">${current&&item&&!item.derivedFrom?`<button type="button" ${type==='milestones'?`data-edit="${item.id}"`:type==='tasks'?`data-task-edit="${item.id}"`:type==='eesa'?`data-eesa-edit="${item.id}"`:`data-barrier-edit="${item.id}" data-assessment-type="${type}"`} aria-label="${esc(M.itemText(item,s,s.lang)+' · '+label)}">${esc(value)}</button>`:`<span aria-label="${esc(label)}">${esc(value)}</span>`}</td>`;
     }).join('')}</tr></tbody></table>`;
   }
+  function metaOpen() { return ui.metaOpen??matchMedia('(min-width:701px)').matches; }
   function formHeading(title,type,items) {
     const visits=formVisits();
-    return `<header class="protocol-heading" data-header-type="${type}"><h2>${title}</h2><div class="protocol-meta"><dl><div><dt>${tr('Child','الطفل')}</dt><dd>${esc(s.child.name||'—')}</dd></div><div><dt>${tr('Date of birth','تاريخ الميلاد')}</dt><dd><bdi>${esc(s.child.dob||'—')}</bdi></dd></div><div><dt>${tr('Age at testing','العمر عند التقييم')}</dt><dd class="age-visits">${Array.from({length:4},(_,i)=>{const v=visits[i],age=v?M.ageOn(v.child.dob,v.date):null;return `<span><b>${esc(v?.number||i+1)}</b> ${age===null?'—':tr(Math.floor(age/12)+'y '+age%12+'m',Math.floor(age/12)+'س '+age%12+'ش')}</span>`;}).join('')}</dd></div></dl><div class="protocol-key-scroll"><table class="protocol-key"><thead><tr>${[tr('Assessment','التقييم'),tr('Score','الدرجة'),tr('Date','التاريخ'),tr('Color','اللون'),tr('Assessor','الفاحص')].map(t=>`<th scope="col">${t}</th>`).join('')}</tr></thead><tbody>${Array.from({length:4},(_,i)=>{
+    return `<header class="protocol-heading" data-header-type="${type}"><h2>${title}</h2><details class="protocol-meta-toggle" ${metaOpen()?'open':''}><summary>${tr('Child and visits','الطفل والزيارات')}</summary><div class="protocol-meta"><dl><div><dt>${tr('Child','الطفل')}</dt><dd>${esc(s.child.name||'—')}</dd></div><div><dt>${tr('Date of birth','تاريخ الميلاد')}</dt><dd><bdi>${esc(s.child.dob||'—')}</bdi></dd></div><div><dt>${tr('Age at testing','العمر عند التقييم')}</dt><dd class="age-visits">${Array.from({length:4},(_,i)=>{const v=visits[i],age=v?M.ageOn(v.child.dob,v.date):null;return `<span><b>${esc(v?.number||i+1)}</b> ${age===null?'—':tr(Math.floor(age/12)+'y '+age%12+'m',Math.floor(age/12)+'س '+age%12+'ش')}</span>`;}).join('')}</dd></div></dl><div class="protocol-key-scroll"><table class="protocol-key"><thead><tr>${[tr('Assessment','التقييم'),tr('Score','الدرجة'),tr('Date','التاريخ'),tr('Color','اللون'),tr('Assessor','الفاحص')].map(t=>`<th scope="col">${t}</th>`).join('')}</tr></thead><tbody>${Array.from({length:4},(_,i)=>{
       const v=visits[i],st=v?M.stats(v,items,type):null;
       return `<tr><th scope="row">${esc(v?.number||i+1)}</th><td>${st?.assessed?st.score:'—'}</td><td><bdi>${esc(v?.date||'—')}</bdi></td><td>${v?`<span class="visit-color" style="background:${M.validColor(v.color)}" aria-label="${esc(v.color)}"></span>`:'—'}</td><td>${esc(v?.child.tester||'—')}</td></tr>`;
-    }).join('')}</tbody></table></div></div></header>`;
+    }).join('')}</tbody></table></div></div></details></header>`;
   }
   function milestoneMaster() {
     const all=M.allMilestones(D),visits=formVisits(),order=['Mand','Tact','Listener','VP/MTS','Play','Social','Imitation','Echoic','Vocal','Reading','Writing','LRFFC','Intraverbal','Classroom','Linguistics','Math'];
@@ -171,7 +179,7 @@
     const categories=D.categories.filter(cat=>list.some(i=>i.category===cat));
     return `<div class="protocol-sheet milestone-task-sheet" style="${formLevelStyle(ui.level)}"><h2 class="protocol-band">${tr('Milestones assessment','تقييم المعالم')} · ${tr('Level','المستوى')} ${ui.level}</h2>${categories.map(cat=>{
       const group=list.filter(i=>i.category===cat),domain=M.allMilestones(D).filter(i=>i.level===ui.level&&i.category===cat);
-      return `<section class="protocol-domain"><header><h3>${esc(R.label(D,cat,s.lang))}</h3>${fourScores('milestones',domain,{total:true})}</header><div class="protocol-domain-body">${group.map(item=>`<div class="protocol-task-row" data-form-item="${item.id}">${fourScores('milestones',[item],{item})}<button type="button" class="protocol-task-text" data-edit="${item.id}"><bdi>${item.milestone}.</bdi> ${esc(M.itemText(item,s,s.lang))}</button></div>`).join('')}<div class="protocol-domain-notes">${noteField({id:'domain-'+ui.level+'-'+cat.replace(/[^a-z]/gi,'')})}</div></div></section>`;
+      return `<section class="protocol-domain"><header><h3>${esc(R.label(D,cat,s.lang))}</h3>${fourScores('milestones',domain,{total:true})}</header><div class="protocol-domain-body">${group.map(item=>`<div class="protocol-task-row" data-form-item="${item.id}">${fourScores('milestones',[item],{item})}<button type="button" class="protocol-task-text" data-edit="${item.id}"><bdi dir="${s.lang==='ar'?'rtl':'ltr'}">${item.milestone}.</bdi> ${esc(M.itemText(item,s,s.lang))}</button></div>`).join('')}<div class="protocol-domain-notes">${noteField({id:'domain-'+ui.level+'-'+cat.replace(/[^a-z]/gi,'')})}</div></div></section>`;
     }).join('')||`<p>${tr('No matching items.','لا توجد بنود مطابقة.')}</p>`}</div>`;
   }
   function eesaForm() {
@@ -183,7 +191,7 @@
   function milestonePage() {
     const list = taskList(), old = M.previous(s);
     return heading('Milestones', 'المعالم النمائية') +
-      (old ? `<div class="followup-banner"><p><strong>${tr('Previous', 'السابق')}: ${esc(old.date)} · ${tr('Current', 'الحالي')}: ${esc(s.date)}</strong></p><p>${tr('Earlier marks remain in the boxes as a reference. Tap a box to record a new result, including zero if the child no longer meets the criterion.', 'تبقى الدرجات السابقة في الخانات مرجعاً. المس الخانة لتسجيل نتيجة جديدة، بما فيها الصفر إذا لم يعد الطفل يحقق المعيار.')}</p><div class="section-tabs">${[['all','All tasks','كل البنود'],['previous','Previously scored','مقيم سابقاً'],['retest','Awaiting retest','بانتظار إعادة التقييم'],['new','New / previously unassessed','جديد / غير مقيم سابقاً']].map(([key,en,ar]) => `<button type="button" data-task-filter="${key}" aria-pressed="${ui.filter === key}">${tr(en,ar)}</button>`).join('')}</div></div>` : '') +
+      (old ? `<div class="followup-banner"><p><strong>${tr('Previous', 'السابق')}: ${esc(old.date)} · ${tr('Current', 'الحالي')}: ${esc(s.date)}</strong></p><details class="followup-help"><summary>${tr('How previous marks work','كيف تعمل الدرجات السابقة')}</summary><p>${tr('Earlier marks remain in the boxes as a reference. Tap a box to record a new result, including zero if the child no longer meets the criterion.', 'تبقى الدرجات السابقة في الخانات مرجعاً. المس الخانة لتسجيل نتيجة جديدة، بما فيها الصفر إذا لم يعد الطفل يحقق المعيار.')}</p></details><div class="section-tabs">${[['all','All tasks','كل البنود'],['previous','Previously scored','مقيم سابقاً'],['retest','Awaiting retest','بانتظار إعادة التقييم'],['new','New / previously unassessed','جديد / غير مقيم سابقاً']].map(([key,en,ar]) => `<button type="button" data-task-filter="${key}" aria-pressed="${ui.filter === key}">${tr(en,ar)}</button>`).join('')}</div></div>` : '') +
       `<div class="toolbar">${scopeSummary('milestones')}<button type="button" data-view="grid" aria-pressed="${ui.view === 'grid'}">${tr('Grid', 'جدول')}</button><button type="button" data-view="cards" aria-pressed="${ui.view === 'cards'}">${tr('Tasks', 'بنود')}</button></div>` +
       (ui.view === 'grid' ? `<div class="panel screen-grid">${milestoneMaster()}</div>` : `<div class="section-tabs">${[1,2,3].map(level => `<button type="button" class="level-tab" style="${formLevelStyle(level)}" data-level="${level}" aria-pressed="${ui.level === level}">${tr('Level', 'المستوى')} ${level}</button>`).join('')}</div><div class="section-tabs"><button type="button" data-category="all" aria-pressed="${ui.category === 'all'}">${tr('All domains', 'كل المجالات')}</button>${D.categories.map(cat => `<button type="button" data-category="${cat}" aria-pressed="${ui.category === cat}">${esc(R.label(D, cat, s.lang))}</button>`).join('')}</div><label for="taskSearch">${tr('Search tasks', 'البحث في البنود')}</label><input id="taskSearch" type="search" value="${esc(ui.search)}"><div class="protocol-task-list" id="taskCards">${milestoneTaskForms(list)}</div>`);
   }
@@ -191,7 +199,7 @@
     return M.previous(s)?`<details class="protocol-previous"><summary>${tr('Previous assessment details','تفاصيل التقييم السابق')}</summary>${earlierResult(type,item)}</details>`:'';
   }
   function barrierCard(item) {
-    return `<article class="assessment-card barrier-task protocol-assessment-item" data-card-id="${item.id}"><header class="protocol-item-head"><h3><bdi>${item.id.split('-').pop()}.</bdi> ${esc(text(item.name))}</h3>${fourScores('barriers',[item],{item})}</header><div class="protocol-item-body">${formPrevious('barriers',item)}${pendingResult('barriers',item)}<ol class="barrier-criteria" start="0">${item.criteria.map(c=>`<li value="${c.score}">${esc(text(c))}</li>`).join('')}</ol>${scoreControls('barriers',item)}${noteField(item)}</div></article>`;
+    return `<article class="assessment-card barrier-task protocol-assessment-item" data-card-id="${item.id}"><header class="protocol-item-head"><h3><bdi dir="${s.lang==='ar'?'rtl':'ltr'}">${item.id.split('-').pop()}.</bdi> ${esc(text(item.name))}</h3>${fourScores('barriers',[item],{item})}</header><div class="protocol-item-body">${formPrevious('barriers',item)}${pendingResult('barriers',item)}<ol class="barrier-criteria" start="0">${item.criteria.map(c=>`<li value="${c.score}">${esc(text(c))}</li>`).join('')}</ol>${scoreControls('barriers',item)}${noteField(item)}</div></article>`;
   }
   function barrierVisits() { return [...s.history.slice(-3),s]; }
   function barrierGrid(type='barriers') {
@@ -214,7 +222,7 @@
   }
   function transitionCard(item) {
     const setup=M.needsCriteria(item)?`<details class="transition-verify"><summary>${tr('Verify protocol criteria','التحقق من معايير البروتوكول')}</summary>${field(item.id,'Item description','وصف البند',s.customCriteria[item.id]?.text||text(item.name),'textarea','criterionText')}${field(item.id,'Verified Protocol criteria (1–5)','معايير البروتوكول المتحقق منها (1–5)',s.customCriteria[item.id]?.scoring||'','textarea','criterionScoring')}</details>`:'';
-    return `<article class="assessment-card transition-task protocol-assessment-item" data-card-id="${item.id}"><header class="protocol-item-head"><h3><bdi>${item.id.split('-').pop()}.</bdi> ${esc(text(item.name))}</h3>${fourScores('transitions',[item],{item})}</header><div class="protocol-item-body">${formPrevious('transitions',item)}${pendingResult('transitions',item)}<div class="transition-guidance">${item.guidance.map(g=>`<p class="transition-score-row" data-transition-score="${esc(g.label.en)}"><strong>${esc(text(g.label))}.</strong><span>${esc(text(g.text))}</span></p>`).join('')}</div>${setup}${item.derivedFrom?`<p class="derived-score-note">${tr('Calculated from this visit’s complete assessment.','تُحسب من التقييم المكتمل لهذه الزيارة.')}</p>`:scoreControls('transitions',item)}${noteField(item)}</div></article>`;
+    return `<article class="assessment-card transition-task protocol-assessment-item" data-card-id="${item.id}"><header class="protocol-item-head"><h3><bdi dir="${s.lang==='ar'?'rtl':'ltr'}">${item.id.split('-').pop()}.</bdi> ${esc(text(item.name))}</h3>${fourScores('transitions',[item],{item})}</header><div class="protocol-item-body">${formPrevious('transitions',item)}${pendingResult('transitions',item)}<div class="transition-guidance">${item.guidance.map(g=>`<p class="transition-score-row" data-transition-score="${esc(g.label.en)}"><strong>${esc(text(g.label))}.</strong><span>${esc(text(g.text))}</span></p>`).join('')}</div>${setup}${item.derivedFrom?`<p class="derived-score-note">${tr('Calculated from this visit’s complete assessment.','تُحسب من التقييم المكتمل لهذه الزيارة.')}</p>`:scoreControls('transitions',item)}${noteField(item)}</div></article>`;
   }
   function transitionsPage() {
     const notesLabel=tr('Transition assessment notes','ملاحظات تقييم الانتقال');
@@ -360,9 +368,35 @@
     if(!loadMessage&&!s.completedAt) M.syncTransitionTotals(s,D);
     translateShell();
     const pages = { case: ['Case', 'الحالة'], milestones: typeNames.milestones, eesa: typeNames.eesa, barriers: typeNames.barriers, transitions: typeNames.transitions, tasks: typeNames.tasks, reference: ['IEP', 'الخطة التربوية الفردية'], report: ['Report', 'التقرير'] };
+    const navScroll=$('navigation').scrollLeft;
+    $('navigation').hidden=Boolean(s.completedAt);
     $('navigation').innerHTML = Object.entries(s.completedAt?{report:pages.report}:pages).map(([page, names]) => `<button type="button" data-page="${page}" ${ui.page === page ? 'aria-current="page"' : ''}>${tr(...names)}</button>`).join('');
     $('main').innerHTML = ui.page === 'case' ? casePage() : ui.page === 'milestones' ? milestonePage() : ui.page === 'report' ? reportPage() : ui.page === 'reference' ? referencePage() : otherPage(ui.page);
+    $('navigation').scrollLeft=navScroll;
+    keepActiveTabsVisible();
+    syncRoute();
     updatePreview();
+  }
+  // Scrolling tab rows are rebuilt on render, so bring the chosen tab back into view.
+  function keepActiveTabsVisible() {
+    const reveal=(row,tab)=>{
+      if(!row)return;
+      // Safari keeps an old offset after rotating, which can strand tabs off-screen.
+      if(row.scrollWidth<=row.clientWidth){row.scrollLeft=0;return;}
+      if(!tab)return;
+      const r=row.getBoundingClientRect(),b=tab.getBoundingClientRect();
+      if(b.left<r.left+8||b.right>r.right-8)row.scrollLeft+=(b.left+b.right)/2-(r.left+r.right)/2;
+    };
+    reveal($('navigation'),$('navigation').querySelector('[aria-current="page"]'));
+    document.querySelectorAll('#main .section-tabs').forEach(row=>reveal(row,row.querySelector('[aria-pressed="true"]')));
+  }
+  function syncRoute(push=false) {
+    // Browsers rate-limit history calls; that must never stop a section from opening.
+    try{if(history.state?.vbPage!==ui.page)history[push?'pushState':'replaceState']({vbPage:ui.page},'');}catch{}
+  }
+  function renderFocus(attribute,value) {
+    render();
+    document.querySelector(`[${attribute}="${CSS.escape(String(value))}"]`)?.focus({preventScroll:true});
   }
   function updatePreview() {
     const preview=$('reportPreview');if(!preview)return;
@@ -380,7 +414,7 @@
   function closeDialog(id) {
     const dialog = $(id); if (typeof dialog.close === 'function') dialog.close(); else dialog.removeAttribute('open');
     if (!document.querySelector('dialog[open]')) document.body.classList.remove('modal-open');
-    const previous = focusBefore.get(id); if (previous?.node.isConnected && !previous.node.closest('dialog:not([open])')) previous.node.focus(); else if (previous?.itemId) document.querySelector(`[data-edit="${previous.itemId}"]`)?.focus();
+    const previous = focusBefore.get(id); if (previous?.node?.isConnected && !previous.node.closest('dialog:not([open])')) previous.node.focus(); else if (previous?.itemId) document.querySelector(`[data-edit="${previous.itemId}"]`)?.focus();
     else if(previous?.barrierId) document.querySelector(`[data-barrier-edit="${previous.barrierId}"]`)?.focus();
     else if(previous?.eesaId) document.querySelector(`[data-eesa-edit="${previous.eesaId}"]`)?.focus();
     else if(previous?.taskId) document.querySelector(`[data-task-edit="${previous.taskId}"]`)?.focus();
@@ -388,11 +422,34 @@
     if(id==='goalBankDialog')document.querySelector('[data-goal-bank]')?.focus();
     if(id==='goalEditDialog')Array.from(document.querySelectorAll('[data-goal-edit]')).find(n=>n.dataset.goalEdit===goalEditor?.key)?.focus();
   }
-  function editItem(id) {
-    const item = getItem('milestones', id); if (!item) return;
-    ui.activeItem = id; $('itemTitle').textContent = `${R.label(D, item.category, s.lang)} ${item.milestone}`;
-    $('itemBody').innerHTML = card('milestones', item, true); openDialog('itemDialog');
+  function itemOrder(type) {
+    if(type==='milestones')return ui.page==='milestones'&&ui.view==='cards'?taskList():M.allMilestones(D);
+    if(type==='tasks')return ui.page==='tasks'?analysisItems():getList('tasks');
+    return getList(type);
   }
+  function showItem(type,id) {
+    const item=getItem(type,id);if(!item)return;
+    ui.activeItem=id;ui.dialogItem={type,id};
+    const titles={milestones:()=>`${R.label(D,item.category,s.lang)} ${item.milestone}`,eesa:()=>tr('EESA item','بند التقليد الصوتي')+' '+item.id,tasks:()=>tr('Task Analysis','تحليل المهام')+' · '+item.code,barriers:()=>text(item.name),transitions:()=>text(item.name)};
+    const bodies={milestones:()=>card('milestones',item,true),eesa:()=>card('eesa',item,true),tasks:()=>analysisCard(item),barriers:()=>barrierCard(item),transitions:()=>transitionCard(item)};
+    $('itemTitle').textContent=titles[type]();$('itemBody').innerHTML=bodies[type]();
+    const list=itemOrder(type),index=list.findIndex(entry=>entry.id===id),step=$('itemStep');
+    step.hidden=index<0||list.length<2;
+    if(!step.hidden){
+      $('itemCounter').textContent=`${index+1} / ${list.length}`;
+      step.querySelector('[data-item-step="-1"]').disabled=index===0;
+      step.querySelector('[data-item-step="1"]').disabled=index===list.length-1;
+    }
+    const dialog=$('itemDialog');
+    if(dialog.open){
+      // After stepping, closing the dialog should return to the item last shown.
+      const key={milestones:'itemId',barriers:'barrierId',transitions:'barrierId',eesa:'eesaId',tasks:'taskId'}[type];
+      focusBefore.set('itemDialog',{node:null,[key]:id});
+      dialog.scrollTop=0;
+      if(document.activeElement?.disabled||!document.activeElement?.closest('#itemStep'))step.querySelector('button:not(:disabled)')?.focus();
+    } else openDialog('itemDialog');
+  }
+  function editItem(id) { showItem('milestones',id); }
   function refreshScores(type, id) {
     M.syncTransitionTotals(s,D);
     const item = getItem(type, id);
@@ -469,24 +526,24 @@
     if (a.bankPage) {bankFilters.page+=Number(a.bankPage);$('goalBankResults').innerHTML=bankResults();$('goalBankSearch').focus();return;}
     if (a.bankAdd) {const entry=window.VBGoalBank.entries(D).find(e=>e.id===a.bankAdd);if(entry&&!Object.values(s.goals).some(g=>g.bankId===entry.id)){const plan=window.VBGoalBank.fromEntry(s,D,entry);if(plan){s.goals['bank-'+entry.id]=plan;save();render();$('goalBankResults').innerHTML=bankResults();$('goalBankResults').querySelector('[data-bank-add]:not(:disabled)')?.focus();}}return;}
     if ('analysisNotes' in a) {button.focus();showAnalysisNotes();return;}
-    if (a.analysisView) {ui.analysisView=a.analysisView;render();return;}
-    if (a.analysisLevel) {ui.analysisLevel=Number(a.analysisLevel);ui.analysisCategory='all';render();return;}
-    if (a.analysisCategory) {ui.analysisCategory=a.analysisCategory;render();return;}
-    if (a.taskEdit) {button.focus();const item=getItem('tasks',a.taskEdit);if(!item)return;$('itemTitle').textContent=tr('Task Analysis','تحليل المهام')+' · '+item.code;$('itemBody').innerHTML=analysisCard(item);openDialog('itemDialog');return;}
+    if (a.analysisView) {ui.analysisView=a.analysisView;renderFocus('data-analysis-view',a.analysisView);return;}
+    if (a.analysisLevel) {ui.analysisLevel=Number(a.analysisLevel);ui.analysisCategory='all';renderFocus('data-analysis-level',a.analysisLevel);return;}
+    if (a.analysisCategory) {ui.analysisCategory=a.analysisCategory;renderFocus('data-analysis-category',a.analysisCategory);return;}
+    if (a.itemStep) {const {type,id}=ui.dialogItem||{};if(!type)return;const list=itemOrder(type),next=list[list.findIndex(entry=>entry.id===id)+Number(a.itemStep)];if(next){showItem(type,next.id);if(button.disabled)$('itemStep').querySelector('button:not(:disabled)')?.focus();}return;}
+    if (a.taskEdit) {button.focus();showItem('tasks',a.taskEdit);return;}
     if ('transitionNotes' in a) { button.focus(); showBarrierNotes('transitions'); return; }
-    if (a.transitionView) { ui.transitionView=a.transitionView; render(); return; }
+    if (a.transitionView) { ui.transitionView=a.transitionView; renderFocus('data-transition-view',a.transitionView); return; }
     if ('barrierNotes' in a) { button.focus(); showBarrierNotes(); return; }
-    if (a.barrierView) { ui.barrierView=a.barrierView; render(); return; }
-    if (a.barrierEdit) { button.focus(); const type=a.assessmentType||'barriers',item=getItem(type,a.barrierEdit); if(!item)return; $('itemTitle').textContent=text(item.name); $('itemBody').innerHTML=type==='transitions'?transitionCard(item):barrierCard(item); openDialog('itemDialog'); return; }
+    if (a.barrierView) { ui.barrierView=a.barrierView; renderFocus('data-barrier-view',a.barrierView); return; }
+    if (a.barrierEdit) { button.focus(); showItem(a.assessmentType||'barriers',a.barrierEdit); return; }
     if (a.close) { closeDialog(a.close); return; }
-    if ('followupCurrent' in a) {button.focus();askLifecycle('new');return;}
-    if(a.taskFilter){ui.filter=a.taskFilter;ui.view='cards';render();return;}
-    if (a.page) { ui.page = a.page; status(''); render(); $('main').focus({ preventScroll: true }); return; }
-    if (a.view) { ui.view = a.view; render(); return; }
-    if (a.level) { ui.level = Number(a.level); render(); return; }
-    if (a.category) { ui.category = a.category; render(); return; }
-    if (a.group) { ui.group = Number(a.group); render(); if(ui.page==='eesa') $('eesa-form-group-'+ui.group)?.scrollIntoView({block:'start'}); return; }
-    if (a.eesaEdit) { button.focus(); const item=getItem('eesa',a.eesaEdit); $('itemTitle').textContent=tr('EESA item','بند التقليد الصوتي')+' '+item.id; $('itemBody').innerHTML=card('eesa',item,true); openDialog('itemDialog'); return; }
+    if(a.taskFilter){ui.filter=a.taskFilter;ui.view='cards';renderFocus('data-task-filter',a.taskFilter);return;}
+    if (a.page) { ui.page = a.page; status(''); syncRoute(true); render(); window.scrollTo({top:0,behavior:'instant'}); $('main').focus({ preventScroll: true }); return; }
+    if (a.view) { ui.view = a.view; renderFocus('data-view',a.view); return; }
+    if (a.level) { ui.level = Number(a.level); renderFocus('data-level',a.level); return; }
+    if (a.category) { ui.category = a.category; renderFocus('data-category',a.category); return; }
+    if (a.group) { ui.group = Number(a.group); renderFocus('data-group',a.group); if(ui.page==='eesa') $('eesa-form-group-'+ui.group)?.scrollIntoView({block:'start'}); return; }
+    if (a.eesaEdit) { button.focus(); showItem('eesa',a.eesaEdit); return; }
     if (a.edit) { button.focus(); editItem(a.edit); return; }
     if (a.score !== undefined) { try { M.setScore(s, a.type, getItem(a.type, a.id), Number(a.score)); if (a.type === 'eesa') M.syncEchoic(s, D); refreshScores(a.type, a.id); } catch (error) { status(tr('Add and verify this item’s criteria before scoring.', 'أضف معايير هذا البند وتحقق منها قبل التسجيل.')); } return; }
     if (a.clearScore) { M.clearScore(s, a.type, a.clearScore); if (a.type === 'eesa') M.syncEchoic(s, D); refreshScores(a.type, a.clearScore); return; }
@@ -542,8 +599,19 @@
     if (event.key === 'Escape') closeDialog(dialog.id);
     if (event.key === 'Tab') { const controls = [...dialog.querySelectorAll('button:not(:disabled),input,textarea,select,a[href]')]; const first = controls[0], last = controls.at(-1); if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); } else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); } }
   });
+  window.addEventListener('popstate',()=>{
+    const page=pageFromHistory();if(!page)return;
+    document.querySelectorAll('dialog[open]').forEach(dialog=>{if(dialog.id!=='accountDialog'&&dialog.id!=='parent-gate')closeDialog(dialog.id);});
+    if(page===ui.page)return;
+    ui.page=page;status('');render();$('main').focus({preventScroll:true});
+  });
+  document.querySelector('.skip-link').addEventListener('click',event=>{event.preventDefault();$('main').focus();});
+  document.addEventListener('toggle',event=>{if(event.target.matches?.('.protocol-meta-toggle'))ui.metaOpen=event.target.open;},true);
+  // An installed app has no browser chrome to return from the forms directory.
+  if(matchMedia('(display-mode: standalone)').matches||navigator.standalone===true)$('backToForms').hidden=true;
   function viewport() { document.documentElement.style.setProperty('--app-height', `${window.visualViewport?.height || window.innerHeight}px`); }
   window.visualViewport?.addEventListener('resize', viewport); window.addEventListener('resize', viewport); viewport();
+  window.addEventListener('resize', keepActiveTabsVisible);
   window.addEventListener('pagehide', save);
   render();
   if (!loadMessage) save();

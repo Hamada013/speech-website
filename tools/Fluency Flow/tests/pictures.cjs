@@ -37,7 +37,7 @@ async function run(engine,name){
     if(width===390)await page.screenshot({path:`/private/tmp/fluency-picture-${name}-${ar?'ar':'en'}.png`,fullPage:true});
    }
    await page.setViewportSize({width:390,height:844});
-   if(ar){await click(page,'تقليل العناصر');await click(page,'التالي');assert.ok(await page.locator('[data-picture-word]').count());}
+   if(ar){await click(page,'التالي');assert.ok(await page.locator('[data-picture-word]').count());}
    await toggle.focus();await page.keyboard.press('Space');assert.equal(await toggle.getAttribute('aria-pressed'),'false');assert.match(await page.locator('.ff-practice-card').textContent(),ar?/أرنب/:/apple/);
    await click(page,ar?'رجوع':'Back');await click(page,ar?'رجوع':'Back');
   }

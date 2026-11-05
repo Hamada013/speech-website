@@ -37,7 +37,16 @@ async function offline(context, name, value) {
   if (!value && !server.listening) await new Promise(resolve => server.listen(port, '127.0.0.1', resolve));
 }
 async function ready(page) {
-  await page.waitForFunction(() => navigator.serviceWorker.controller && document.getElementById('pwa-status')?.textContent.match(/جاهز|Ready/), null, { timeout: 20000 });
+  try {
+    // Safari can keep reporting a claimed worker as activating after it has finished, so this does not check .state.
+    await page.waitForFunction(() => navigator.serviceWorker.controller && document.querySelector('[data-screen]'), null, { timeout: 20000 });
+  } catch {
+    const state = await page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.getRegistration();
+      return { controller: navigator.serviceWorker.controller?.state, active: registration?.active?.state, waiting: registration?.waiting?.state, installing: registration?.installing?.state, app: Boolean(document.querySelector('[data-screen]')) };
+    });
+    throw new Error(`The app did not become ready: ${JSON.stringify(state)}`);
+  }
 }
 const click = (page, name) => page.getByRole('button', { name, exact: true }).click();
 async function run(type, name) {
@@ -91,6 +100,7 @@ async function run(type, name) {
     if (name === 'webkit') {
       await page.locator('#pwa-install').click();
       assert.match(await page.locator('#pwa-install-help').textContent(), /iPhone.*Share/);
+      await page.keyboard.press('Escape');
     }
     await page.evaluate(() => {
       const event = new Event('beforeinstallprompt', { cancelable: true });

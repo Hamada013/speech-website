@@ -7,13 +7,13 @@ export function Dialog({ children, onClose, label, className }) {
   React.useEffect(() => {
     const previousFocus = document.activeElement;
     const node = ref.current;
-    const surfaces = [...document.querySelectorAll('header, main, footer, #pwa-panel, .ff-status')];
+    const surfaces = [...document.querySelectorAll('header, main, #pwa-panel, .ff-status, .ff-tabbar')];
     const priorInert = surfaces.map(surface => surface.inert);
     surfaces.forEach(surface => { surface.inert = true; });
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const focusables = () => [...node.querySelectorAll('button:not(:disabled), input:not(:disabled), a[href], [tabindex="0"]')].filter(el => el.getClientRects().length);
-    (focusables()[0] || node).focus({ preventScroll: true });
+    const focusables = () => [...node.querySelectorAll('button:not(:disabled), input:not(:disabled), textarea:not(:disabled), summary, a[href], [tabindex="0"]')].filter(el => el.getClientRects().length);
+    (node.querySelector('[data-autofocus]') || focusables()[0] || node).focus({ preventScroll: true });
     function onKey(event) {
       if (event.key === 'Escape') { event.preventDefault(); closeRef.current(); }
       if (event.key !== 'Tab') return;
