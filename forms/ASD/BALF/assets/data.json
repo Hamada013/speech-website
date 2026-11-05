@@ -1,0 +1,644 @@
+{
+  "revision": "2026-11-02",
+  "defaultLanguage": "ar",
+  "kind": "blaf",
+  "name": {
+    "ar": "ملاحظة مهارات التواصل",
+    "en": "Communication Skills Observation"
+  },
+  "shortName": "BLAF",
+  "version": "Local BLAF adaptation · 12 domains · 1–5",
+  "copyright": "Based on Sundberg & Partington (1998). Local adaptation; no claim of official endorsement or standardized validation.",
+  "sources": [
+    {
+      "title": "BLAF — reference form and guidance",
+      "url": "https://ksdetasn.org/resources/2663"
+    }
+  ],
+  "items": [
+    {
+      "id": "cooperation",
+      "title": {
+        "ar": "التعاون مع الكبار",
+        "en": "Cooperation with Adults"
+      },
+      "question": {
+        "ar": "هل يتعامل الطفل مع الكبار بسهولة؟",
+        "en": "Does the child cooperate with adults easily?"
+      },
+      "options": [
+        {
+          "score": 1,
+          "text": {
+            "ar": "دائما غير متعاون، ويتجنب العمل مع الكبار مع استخدام سلوك سلبي",
+            "en": "Always uncooperative, avoids working with adults, and exhibits negative behavior"
+          }
+        },
+        {
+          "score": 2,
+          "text": {
+            "ar": "استجابة واحدة سهلة مقابل مكافأة محببة جداً.",
+            "en": "One easy response for a highly preferred reward."
+          }
+        },
+        {
+          "score": 3,
+          "text": {
+            "en": "Completes five responses without disruptive behavior.",
+            "ar": "ينفذ خمس استجابات دون سلوك معيق."
+          }
+        },
+        {
+          "score": 4,
+          "text": {
+            "ar": "سيقوم بتنفيذ نشاط لمدة خمسة دقائق بدون ان يبدي الضيق",
+            "en": "Engages in an activity for 5 minutes without showing distress"
+          }
+        },
+        {
+          "score": 5,
+          "text": {
+            "ar": "سيعمل لمدة 10 دقائق في نشاط علي الطاولة بدون ان يبدي مظاهر ضيق او سلوك سلبي",
+            "en": "Works for 10 minutes on a table activity without showing signs of distress or negative behavior"
+          }
+        }
+      ],
+      "label": {
+        "en": "Working together",
+        "ar": "المشاركة في النشاط"
+      }
+    },
+    {
+      "id": "mand",
+      "title": {
+        "ar": "الطلب (Mand)",
+        "en": "Request (Mand)"
+      },
+      "question": {
+        "ar": "كيف يقوم الطفل بطلب احتياجاته وكيف يوصل احتياجاته للاخرين؟",
+        "en": "How does the child request their needs and communicate them to others?"
+      },
+      "options": [
+        {
+          "score": 1,
+          "text": {
+            "ar": "لا يمكنه طلب المعززات المختلفة، ويقوم بعمل سلوك سلبي",
+            "en": "Cannot request various reinforcers and exhibits negative behavior"
+          }
+        },
+        {
+          "score": 2,
+          "text": {
+            "en": "Leads someone, points, or waits near a desired item.",
+            "ar": "يقود شخصاً أو يشير أو يقف قرب ما يريده."
+          }
+        },
+        {
+          "score": 3,
+          "text": {
+            "ar": "يستخدم من 1 الي 5 اشارات او كلمات او صور للتعبير عن احتياجاته ورغباته",
+            "en": "Uses 1 to 5 signs, words, or pictures to express needs and desires"
+          }
+        },
+        {
+          "score": 4,
+          "text": {
+            "ar": "يستخدم من 5 الي 10 اشارات او كلمات او صور للتعبير عن احتياجاته ورغباته",
+            "en": "Uses 5 to 10 signs, words, or pictures to express needs and desires"
+          }
+        },
+        {
+          "score": 5,
+          "text": {
+            "ar": "يطلب الاشياء بتلقائية ويستخدم أكثر من 10 كلمات او صور او اشارات للتعبير عن احتياجاته ورغباته",
+            "en": "Requests things spontaneously and uses more than 10 words, pictures, or signs to express needs and desires"
+          }
+        }
+      ],
+      "label": {
+        "en": "Asking for needs",
+        "ar": "طلب الاحتياجات"
+      }
+    },
+    {
+      "id": "motor_imitation",
+      "title": {
+        "ar": "التقليد الحركي",
+        "en": "Motor Imitation"
+      },
+      "question": {
+        "ar": "هل يقوم الطفل بتقليد الاشخاص البالغين حركيا؟",
+        "en": "Does the child imitate adults motorically?"
+      },
+      "options": [
+        {
+          "score": 1,
+          "text": {
+            "ar": "لا يمكنه تقليد حركات اي شخص",
+            "en": "Cannot imitate anyone's movements"
+          }
+        },
+        {
+          "score": 2,
+          "text": {
+            "ar": "يقوم بتقليد قليل من الحركات الكبري للاخرين",
+            "en": "Imitates a few gross motor movements of others"
+          }
+        },
+        {
+          "score": 3,
+          "text": {
+            "ar": "يقوم بتقليد كثير من الحركات الكبري للاخرين بناءا علي طلبهم",
+            "en": "Imitates many gross motor movements of others upon request"
+          }
+        },
+        {
+          "score": 4,
+          "text": {
+            "ar": "يقوم بتقليد كثير من الحركات الكبري والصغري للاخرين بناءا علي طلبهم",
+            "en": "Imitates many gross and fine motor movements of others upon request"
+          }
+        },
+        {
+          "score": 5,
+          "text": {
+            "ar": "بسهولة يقوم بتقليد الحركات الصغري والكبري للاخرين تلقائيا",
+            "en": "Easily imitates fine and gross motor movements of others spontaneously"
+          }
+        }
+      ],
+      "label": {
+        "en": "Copying actions",
+        "ar": "تقليد الحركات"
+      }
+    },
+    {
+      "id": "vocal_play",
+      "title": {
+        "ar": "نطق الاصوات (Vocal Play)",
+        "en": "Vocal Play"
+      },
+      "question": {
+        "ar": "هل يقوم الطفل بنطق الاصوات الكلامية؟",
+        "en": "Does the child produce speech sounds?"
+      },
+      "options": [
+        {
+          "score": 1,
+          "text": {
+            "ar": "لا ينطق اي من الاصوات الكلامية",
+            "en": "Does not produce any speech sounds"
+          }
+        },
+        {
+          "score": 2,
+          "text": {
+            "ar": "أصوات كلام قليلة وبمعدل منخفض.",
+            "en": "A few speech sounds, infrequently."
+          }
+        },
+        {
+          "score": 3,
+          "text": {
+            "ar": "يقوم بنطق العديد من الاصوات مع وضعها في نغمات صوتية",
+            "en": "Produces many sounds with varied vocal tones"
+          }
+        },
+        {
+          "score": 4,
+          "text": {
+            "ar": "أصوات متكررة ومتنوعة مع كلمات قليلة.",
+            "en": "Frequent varied vocalizations and a few words."
+          }
+        },
+        {
+          "score": 5,
+          "text": {
+            "ar": "أصوات متكررة وكلمات واضحة كثيرة.",
+            "en": "Frequent vocalizations and many clear words."
+          }
+        }
+      ],
+      "label": {
+        "en": "Spontaneous sounds and words",
+        "ar": "الأصوات والكلمات التلقائية"
+      }
+    },
+    {
+      "id": "vocal_imitation",
+      "title": {
+        "ar": "التقليد الصوتي (Echoic)",
+        "en": "Vocal Imitation (Echoic)"
+      },
+      "question": {
+        "ar": "هل سيقوم الطفل بترديد الاصوات او الكلمات؟",
+        "en": "Will the child repeat sounds or words?"
+      },
+      "options": [
+        {
+          "score": 1,
+          "text": {
+            "ar": "لا يكرر أصواتاً أو كلمات.",
+            "en": "Does not repeat sounds or words."
+          }
+        },
+        {
+          "score": 2,
+          "text": {
+            "ar": "يكرر أصواتاً أو كلمات محددة قليلة.",
+            "en": "Repeats a few specific sounds or words."
+          }
+        },
+        {
+          "score": 3,
+          "text": {
+            "ar": "يكرر أو يقارب عدة أصوات أو كلمات.",
+            "en": "Repeats or approximates several sounds or words."
+          }
+        },
+        {
+          "score": 4,
+          "text": {
+            "ar": "يكرر أو يقارب كلمات متنوعة كثيرة.",
+            "en": "Repeats or approximates many different words."
+          }
+        },
+        {
+          "score": 5,
+          "text": {
+            "ar": "يكرر بوضوح أي كلمة أو عبارة بسيطة.",
+            "en": "Clearly repeats any word or simple phrase."
+          }
+        }
+      ],
+      "label": {
+        "en": "Repeating sounds and words",
+        "ar": "تكرار الأصوات والكلمات"
+      }
+    },
+    {
+      "id": "match_to_sample",
+      "title": {
+        "ar": "المطابقة لمثال (Match to Sample)",
+        "en": "Match to Sample"
+      },
+      "question": {
+        "ar": "هل الطفل يقوم بمطابقة الصور، الاشياء، الرسوم التي أمثلة لها؟",
+        "en": "Does the child match pictures, objects, or drawings to their samples?"
+      },
+      "options": [
+        {
+          "score": 1,
+          "text": {
+            "ar": "لا يمكنه مطابقة صورة او شئ الي مثيل له",
+            "en": "Cannot match a picture or object to its sample"
+          }
+        },
+        {
+          "score": 2,
+          "text": {
+            "ar": "يمكنه مطابقة عدد من 1 الي 2 صورة او شئ الي مثيله",
+            "en": "Can match 1 to 2 pictures or objects to their samples"
+          }
+        },
+        {
+          "score": 3,
+          "text": {
+            "ar": "يمكنه مطابقة عدد من 5 الي 10 صورة او شئ الي مثيله",
+            "en": "Can match 5 to 10 pictures or objects to their samples"
+          }
+        },
+        {
+          "score": 4,
+          "text": {
+            "ar": "يمكنه مطابقة من 5 الي 10 الوان، اشكال هندسية، او رسم ما الي مثيله",
+            "en": "Can match 5 to 10 colors, geometric shapes, or drawings to their samples"
+          }
+        },
+        {
+          "score": 5,
+          "text": {
+            "ar": "يطابق معظم العناصر وتصاميم من ٢–٤ مكعبات.",
+            "en": "Matches most items and 2–4 block designs."
+          }
+        }
+      ],
+      "label": {
+        "en": "Matching objects and pictures",
+        "ar": "مطابقة الأشياء والصور"
+      }
+    },
+    {
+      "id": "receptive",
+      "title": {
+        "ar": "فهم اللغة (Receptive)",
+        "en": "Receptive Language"
+      },
+      "question": {
+        "ar": "هل يفهم الطفل معظم الكلمات التي توجه اليه او الاوامر اللفظية؟",
+        "en": "Does the child understand most words or verbal commands addressed to them?"
+      },
+      "options": [
+        {
+          "score": 1,
+          "text": {
+            "ar": "لا يفهم الطفل اي من الكلمات او الاوامر اللفظية الموجهه اليه",
+            "en": "Does not understand any words or verbal commands addressed to them"
+          }
+        },
+        {
+          "score": 2,
+          "text": {
+            "ar": "يتبع بعض التعليمات المعروفة له في روتينه اليومي",
+            "en": "Follows some familiar instructions in their daily routine"
+          }
+        },
+        {
+          "score": 3,
+          "text": {
+            "ar": "يمكنه ان يتبع بعض التعليمات لعمل حركة او لمس شئ ما",
+            "en": "Can follow some instructions to perform an action or touch something"
+          }
+        },
+        {
+          "score": 4,
+          "text": {
+            "ar": "من الممكن ان يفهم التعليمات البسيطة ويشير الي 25 شئ",
+            "en": "Can understand simple instructions and point to 25 items"
+          }
+        },
+        {
+          "score": 5,
+          "text": {
+            "ar": "يشير إلى ١٠٠ عنصر أو فعل أو شخص أو صفة على الأقل.",
+            "en": "Points to 100+ objects, actions, people or adjectives."
+          }
+        }
+      ],
+      "label": {
+        "en": "Understanding words and directions",
+        "ar": "فهم الكلمات والتعليمات"
+      }
+    },
+    {
+      "id": "labeling",
+      "title": {
+        "ar": "التسمية (Tacts)",
+        "en": "Labeling (Tacts)"
+      },
+      "question": {
+        "ar": "هل سيقوم الطفل بالتعبير عن وتسمية الاشياء والافعال؟",
+        "en": "Will the child express and name objects and actions?"
+      },
+      "options": [
+        {
+          "score": 1,
+          "text": {
+            "ar": "لا يمكنه تسمية الاشياء والافعال مطلقا",
+            "en": "Cannot name objects and actions at all"
+          }
+        },
+        {
+          "score": 2,
+          "text": {
+            "ar": "يقوم بتسمية من 1 الي 5 اشياء او افعال",
+            "en": "Names 1 to 5 objects or actions"
+          }
+        },
+        {
+          "score": 3,
+          "text": {
+            "ar": "يقوم بتسمية من 6 الي 15 شئ او فعل",
+            "en": "Names 6 to 15 objects or actions"
+          }
+        },
+        {
+          "score": 4,
+          "text": {
+            "ar": "يقوم بتسمية من 16 الي 50 شئ او فعل",
+            "en": "Names 16 to 50 objects or actions"
+          }
+        },
+        {
+          "score": 5,
+          "text": {
+            "ar": "يقوم بتسمية اكثر من 100 شئ او فعل ويمكنه استخدام قليل من الجمل القصيرة",
+            "en": "Names more than 100 objects or actions and can use a few short sentences"
+          }
+        }
+      ],
+      "label": {
+        "en": "Naming things and actions",
+        "ar": "تسمية الأشياء والأفعال"
+      }
+    },
+    {
+      "id": "receptive_ffc",
+      "title": {
+        "ar": "فهم اللغة من خلال الوظيفة والفئة والمستقبل (FFC)",
+        "en": "Receptive by Function, Feature, and Class (FFC)"
+      },
+      "question": {
+        "ar": "هل سيتعرف الطفل علي الاشياء عندما تعطية مواصفات الشئ؟",
+        "en": "Will the child identify objects when given their characteristics?"
+      },
+      "options": [
+        {
+          "score": 1,
+          "text": {
+            "ar": "لا يمكنه ان يتعرف علي الاشياء من خلال صفاتها",
+            "en": "Cannot identify objects through their characteristics"
+          }
+        },
+        {
+          "score": 2,
+          "text": {
+            "ar": "يمكنه ان يتعرف علي بعض الاشياء القليلة من خلال وصف وظيفتها",
+            "en": "Can identify a few objects by describing their function"
+          }
+        },
+        {
+          "score": 3,
+          "text": {
+            "en": "Identifies 10 items from one of three function/feature cues.",
+            "ar": "يحدد ١٠ عناصر من تلميح واحد ضمن ثلاث وظائف أو خصائص."
+          }
+        },
+        {
+          "score": 4,
+          "text": {
+            "ar": "يحدد ٢٥ عنصراً بأربع وظائف أو خصائص أو فئات.",
+            "en": "Identifies 25 items using four functions, features or classes."
+          }
+        },
+        {
+          "score": 5,
+          "text": {
+            "ar": "يحدد ١٠٠ عنصر بخمس وظائف أو خصائص أو فئات.",
+            "en": "Identifies 100 items using five functions, features or classes."
+          }
+        }
+      ],
+      "label": {
+        "en": "Understanding descriptions",
+        "ar": "فهم أوصاف الأشياء"
+      }
+    },
+    {
+      "id": "conversation",
+      "title": {
+        "ar": "مهارات المحادثة (Intraverbal)",
+        "en": "Conversation Skills (Intraverbal)"
+      },
+      "question": {
+        "ar": "هل يستطيع الطفل ان يجيب علي الاسئلة او يملئ الكلمات المفقودة؟",
+        "en": "Can the child answer questions or fill in missing words?"
+      },
+      "options": [
+        {
+          "score": 1,
+          "text": {
+            "ar": "لا يمكنه استكمال اغنية او الكلمات الناقصة بالجمله",
+            "en": "Cannot complete a song or missing words in a sentence"
+          }
+        },
+        {
+          "score": 2,
+          "text": {
+            "en": "Completes a few phrases or supplies animal sounds.",
+            "ar": "يكمل عبارات قليلة أو يصدر أصوات حيوانات."
+          }
+        },
+        {
+          "score": 3,
+          "text": {
+            "ar": "يمكنه ان يملئ فراغات في 10 جمل غير محببة اليه او يجيب علي 10 اسئلة",
+            "en": "Can fill in blanks in 10 sentences or answer 10 questions"
+          }
+        },
+        {
+          "score": 4,
+          "text": {
+            "ar": "يمكنه ان يملئ فراغات 20 جملة او يجيب علي 20 سؤال مختلف",
+            "en": "Can fill in blanks in 20 sentences or answer 20 different questions"
+          }
+        },
+        {
+          "score": 5,
+          "text": {
+            "ar": "يمكنه ان يملئ فراغات 30 جملة او يجيب علي 30 سؤال مختلف",
+            "en": "Can fill in blanks in 30 sentences or answer 30 different questions"
+          }
+        }
+      ],
+      "label": {
+        "en": "Answering and completing phrases",
+        "ar": "الإجابة وإكمال العبارات"
+      }
+    },
+    {
+      "id": "letters_numbers",
+      "title": {
+        "ar": "الارقام والحروف",
+        "en": "Letters & Numbers"
+      },
+      "question": {
+        "ar": "هل يستطيع الطفل التعرف علي الارقام او الحروف الهجائية او الكلمات المكتوبة؟",
+        "en": "Can the child identify numbers, the alphabet, or written words?"
+      },
+      "options": [
+        {
+          "score": 1,
+          "text": {
+            "ar": "لا يمكنه التعرف علي اي من الحروف او الارقام او الكلمات المكتوبة",
+            "en": "Cannot identify any letters, numbers, or written words"
+          }
+        },
+        {
+          "score": 2,
+          "text": {
+            "ar": "يتعرف علي 3 احرف او ارقام علي الاقل",
+            "en": "Identifies at least 3 letters or numbers"
+          }
+        },
+        {
+          "score": 3,
+          "text": {
+            "ar": "يتعرف علي 15 رقم او حرف علي الاقل",
+            "en": "Identifies at least 15 numbers or letters"
+          }
+        },
+        {
+          "score": 4,
+          "text": {
+            "ar": "يتعرف علي 5 كلمات مكتوبة وعلي الاقل 5 ارقام",
+            "en": "Identifies 5 written words and at least 5 numbers"
+          }
+        },
+        {
+          "score": 5,
+          "text": {
+            "ar": "يتعرف علي 25 كلمة مكتوبة ويتعرف علي 10 ارقام",
+            "en": "Identifies 25 written words and 10 numbers"
+          }
+        }
+      ],
+      "label": {
+        "en": "Letters, numbers and reading",
+        "ar": "الحروف والأرقام والقراءة"
+      }
+    },
+    {
+      "id": "social_interaction",
+      "title": {
+        "ar": "التفاعل الاجتماعي",
+        "en": "Social Interaction"
+      },
+      "question": {
+        "ar": "هل يشرع الطفل علي التفاعل الاجتماعي مع الاخرين؟",
+        "en": "Does the child initiate social interaction with others?"
+      },
+      "options": [
+        {
+          "score": 1,
+          "text": {
+            "ar": "لا يقوم الطفل بالتحرك الي القيام بالتفاعل الاجتماعي مع الاخرين",
+            "en": "The child does not move to initiate social interaction with others"
+          }
+        },
+        {
+          "score": 2,
+          "text": {
+            "ar": "يقترب جسديا من الاخرين لحثهم عل التفاعل",
+            "en": "Physically approaches others to prompt interaction"
+          }
+        },
+        {
+          "score": 3,
+          "text": {
+            "ar": "بسهولة يسأل الاخرين عن المعزز",
+            "en": "Easily asks others for a reinforcer"
+          }
+        },
+        {
+          "score": 4,
+          "text": {
+            "ar": "يتفاعل كلامياً مع الأقران عند التلقين.",
+            "en": "Talks with peers when prompted."
+          }
+        },
+        {
+          "score": 5,
+          "text": {
+            "en": "Starts and maintains spoken interaction with peers.",
+            "ar": "يبدأ تفاعلاً كلامياً مع الأقران ويحافظ عليه."
+          }
+        }
+      ],
+      "label": {
+        "en": "Interacting with others",
+        "ar": "التفاعل مع الآخرين"
+      }
+    }
+  ]
+}

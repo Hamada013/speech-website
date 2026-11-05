@@ -2,6 +2,10 @@
 
 Arabic/English assessment with local saving, follow-up visits, stimulus presentation and A4 PDF reports. Serve the repository through HTTPS or localhost and open `forms/ASD/VB-MAPP/`. Production uses only local static files.
 
+## Navigation and layout
+
+One compact header holds the back link, the active child and the account, install and language controls. A single section menu stays on screen while scrolling. Each section is a browser history entry, so Back/Forward and reload stay in place. The Playwright WebKit 2215 build crashes on a second reload after any `pushState`, even on a blank page, so WebKit test runs replace `pushState` where a test needs repeated reloads. Completed profiles have no menu and stay on the report. The scoring dialog has previous/next controls that never change a score. On touch and narrow screens the whole cell or chart is the target for the current visit. The style comes from this assessment's own identity (three level colours, teal brand, protocol forms), not the Taffaha default. Run `npm run test:navigation`.
+
 ## Assessment lifecycle
 
 Each child keeps one in-progress assessment with its original start date across reloads and account switches. Use the check icon on the report and confirm completion when the assessment is finished. Completed profiles reopen in report-only mode; recorded results remain immutable. The plus icon asks for confirmation before starting a fresh assessment and preserving the completed snapshot in that child's history. Existing saved assessments remain in progress until explicitly completed.
@@ -115,7 +119,7 @@ Each child has a separate device-local account in `vb-mapp-children-v1`. Scores,
 
 Hamada is a fixed, protected administrator. Type `Hamada` in the account name entry to sign in; it stays hidden from saved-child search and lists otherwise. Only the active Hamada account can delete another child, after confirmation. Deletion affects VB-MAPP only, and stale tabs cannot restore deleted accounts. Child avatars and the accessible search/sort menu follow VOC's controls.
 
-The former assessment file export/import/new-case panel is removed. Start a new child's work by adding an account. Start another visit using the saved child's follow-up button. Existing named workspaces migrate once; the original `vb-mapp-workspace-v2` and older legacy data are left untouched. Unnamed existing work is attached to the first account created.
+The former assessment file export/import/new-case panel is removed. Start a new child's work by adding an account. Start another visit with the plus icon on the child's completed report. Existing named workspaces migrate once; the original `vb-mapp-workspace-v2` and older legacy data are left untouched. Unnamed existing work is attached to the first account created.
 
 Accounts use this device's browser storage. The website and its installed shortcut use whichever storage their browser/platform provides; separate browser profiles, isolated installations and other devices do not automatically share or synchronize records. No cloud account service is configured.
 The manual-backed criterion revision is recorded with new scores. Earlier scores remain valid where the task and thresholds are unchanged. Scores affected by corrected criteria remain visible as pending and can be re-scored directly using the enabled buttons. When only a half-point rule changed, compatible full scores are retained; earlier gaps need review. They are not silently converted to results under a different criterion. Unassessed is distinct from an explicit zero. Imported invalid half points are excluded until a valid score is recorded.
@@ -160,9 +164,9 @@ node forms/ASD/VB-MAPP/scripts/build-pwa.cjs
 npm test --prefix forms/ASD/VB-MAPP
 ```
 
-For browser checks, install the declared Playwright development dependency and WebKit, then run `npm run test:browser` from this directory. `VBMAPP_PLAYWRIGHT` can point to an existing Playwright module; `VBMAPP_ENGINE=chromium` or `webkit` selects one engine. `VBMAPP_REPORT_ONLY=1` imports a synthetic scored fixture for faster report/saved-case regression checks. Chromium uses the installed Google Chrome channel. `npm run build:icons` regenerates PNGs from the SVG app mark; run the PWA builder afterward.
+For browser checks, install the declared Playwright development dependency and WebKit, then run `npm run test:browser` from this directory. `VBMAPP_PLAYWRIGHT` can point to an existing Playwright module; `VBMAPP_ENGINE=chromium` or `webkit` selects one engine. Chromium uses the installed Google Chrome channel. `npm run build:icons` regenerates PNGs from the SVG app mark; run the PWA builder afterward.
 
-Tests use synthetic records. The model checks cover all 170 milestones and scoring/report invariants. Account tests cover migration, isolated progress, protected Hamada, deletion authorization and stale-save rejection. The current browser suite verifies account creation/switching, notes, scoring, follow-up history, report/PDF generation, parent gate, sorting, deletion and offline reopening on a phone viewport. `tests/browser.cjs` retains the earlier file-import workflow regression as historical coverage; the account-based flow uses `tests/accounts-browser.cjs`.
+Tests use synthetic records. The model checks cover all 170 milestones and scoring/report invariants. Account tests cover migration, isolated progress, protected Hamada, deletion authorization and stale-save rejection. The current browser suite verifies account creation/switching, notes, scoring, follow-up history, report/PDF generation, parent gate, sorting, deletion and offline reopening on a phone viewport. The account-based flow uses `tests/accounts-browser.cjs`.
 
 
 ## Barriers assessment — supplied chapter update (2026-10-29)

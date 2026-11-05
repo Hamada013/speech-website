@@ -29,11 +29,12 @@ async function run(engine,name,origin){
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   await page.locator('#active-profile').click();await visible(page,'#profiles-view');
   const profile=page.locator('#profile-form');
-  await profile.locator('[name=childId]').fill('QA-ONE');await profile.locator('[name=childName]').fill('طفل تجريبي');await profile.locator('[name=birthDate]').fill('2022-01-10');
+  const firstId=await profile.locator('[name=childId]').inputValue();assert.match(firstId,/^CH-[A-F0-9]{12}$/);assert.equal(await profile.locator('[name=childId]').isEditable(),false);await profile.locator('[name=childName]').fill('طفل تجريبي');await profile.locator('[name=birthDate]').fill('2022-01-10');
   await profile.locator('[type=submit]').click();await visible(page,'#dashboard-view');
   await page.locator('[data-start=receptive]').click();await visible(page,'#setup-view');
   assert.equal(await page.locator('#setup-form [name=childName]').inputValue(),'طفل تجريبي');
   assert.equal(await page.locator('#setup-form [name=childId]').isEditable(),false);
+  assert.equal(await page.locator('#setup-form [name=childId]').inputValue(),firstId);
   assert.deepEqual(await page.locator('[name=sampling] option').evaluateAll(options=>options.map(o=>o.value)),['50']);
   await page.locator('[name=scope]').selectOption('A',{force:true});
   await page.waitForFunction(()=>document.querySelector('#plan-summary').textContent.startsWith('50 كلمة'));
@@ -59,22 +60,23 @@ async function run(engine,name,origin){
   await profile.locator('[name=childName]').fill('الاسم المعدّل');await profile.locator('[type=submit]').click();await visible(page,'#dashboard-view');
   const oldName=await page.evaluate(async()=>{const{getSessions}=await import('./storage.js');return(await getSessions())[0].metadata.childName;});
   assert.equal(oldName,'طفل تجريبي','Editing a profile preserves historical metadata');
+  assert.equal(await page.evaluate(async()=>{const{getProfiles}=await import('./storage.js');return(await getProfiles()).find(p=>p.childName==='الاسم المعدّل').childId;}),firstId);
   await page.locator('#active-profile').click();await visible(page,'#profiles-view');
-  await page.locator('#new-profile').click();await profile.locator('[name=childId]').fill('QA-TWO');await profile.locator('[name=childName]').fill('طفل ثان');await profile.locator('[type=submit]').click();await visible(page,'#dashboard-view');
+  await page.locator('#new-profile').click();const secondId=await profile.locator('[name=childId]').inputValue();assert.match(secondId,/^CH-[A-F0-9]{12}$/);assert.notEqual(firstId,secondId);await profile.locator('[name=childName]').fill('طفل ثان');await profile.locator('[type=submit]').click();await visible(page,'#dashboard-view');
   await page.locator('nav [data-route=history]').click();await visible(page,'#history-view');
   assert.equal(await page.locator('#draft-card').isVisible(),false);assert.equal(await page.locator('.session-row').count(),0);
-  await page.evaluate(async()=>{
+  await page.evaluate(async({firstId,secondId})=>{
    const{saveSession,saveSetting}=await import('./storage.js'),{createIndex,buildChecklist}=await import('./validation.js');
    const data=await(await fetch('data/vocabulary.json')).json(), index=createIndex(data.items), check=await buildChecklist(index,'receptive','A','50');
    function fixture(id,childId,date,correct){
     const records=check.plan.map((entry,i)=>{const item=index.byId.get(entry.id),options=index.matrix(item.id),outcome=i<correct?'target':'semantic',selected=options.find(o=>o.role===outcome);return{targetId:item.id,label:item.label,itemRevision:item.revision,folder:item.folder,cohort:entry.cohort,outcome,selectedId:selected.id,selectedLabel:index.byId.get(selected.id).label,latencyMs:1000,audioPlays:1,audioPlayed:true,options};});
     return{schemaVersion:1,id,mode:'receptive',scope:'A',sampling:'50',audioMode:'spoken-prompt',status:'complete',metadata:{childId,childName:'طفل تجريبي',birthDate:'2022-01-10',assessmentDate:date,languages:'العربية / اللهجة السورية',examiner:'QA',notes:''},startedAt:date+'T10:00:00Z',updatedAt:date+'T11:00:00Z',finishedAt:date+'T11:00:00Z',dataVersion:data.version,configVersion:'cohorts-2',...check,missingMediaCount:0,records};
    }
-   await saveSession(fixture('qa-old','QA-ONE','2026-10-01',30));await saveSession(fixture('qa-current','QA-ONE','2026-11-02',40));await saveSession(fixture('qa-peer','QA-TWO','2026-11-01',20));await saveSession(fixture('qa-peer-older','QA-TWO','2026-10-15',10));await saveSetting('active-child','qa-one');
-  });
+   await saveSession(fixture('qa-old',firstId,'2026-10-01',30));await saveSession(fixture('qa-current',firstId,'2026-11-02',40));await saveSession(fixture('qa-peer',secondId,'2026-11-01',20));await saveSession(fixture('qa-peer-older',secondId,'2026-10-15',10));await saveSetting('active-child',firstId.toLowerCase());
+  },{firstId,secondId});
   await page.reload();await page.waitForFunction(()=>!document.querySelector('[data-start]').disabled);
   await page.locator('nav [data-route=history]').click();await visible(page,'#history-view');
-  await page.locator('.session-row').first().getByRole('button',{name:'فتح التقرير'}).click();await visible(page,'#report-view');
+  await page.locator('.session-row').filter({hasText:'80.0%'}).getByRole('button',{name:'فتح التقرير'}).click();await visible(page,'#report-view');
   assert.match(await page.locator('#panel-summary').textContent(),/80.0%/);
   await page.locator('[data-report-tab=progress]').click();assert.equal(await page.locator('.trend-chart').isVisible(),true);assert.match(await page.locator('.trend-summary').textContent(),/\+20.0/);
   await page.locator('[data-report-tab=peers]').click();assert.match(await page.locator('#panel-peers').textContent(),/40.0%/);assert.match(await page.locator('#panel-peers .metric-grid').textContent(),/1/);

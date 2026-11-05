@@ -1,0 +1,281 @@
+{
+  "revision": "2026-11-02",
+  "defaultLanguage": "ar",
+  "kind": "mchat",
+  "name": {
+    "ar": "سجل الملاحظة M-CHAT",
+    "en": "M-CHAT Observation Record"
+  },
+  "shortName": "M-CHAT",
+  "version": "Original M-CHAT · 23 items · not M-CHAT-R/F",
+  "copyright": "M-CHAT™ © 1999 Diana Robins, Deborah Fein & Marianne Barton. Existing locally adapted wording; not an official instrument or an independently validated translation.",
+  "sources": [
+    {
+      "title": "Original M-CHAT — current scoring guidance",
+      "url": "https://www.mchatscreen.com/m-chat/scoring-2/"
+    },
+    {
+      "title": "Original form and Follow-Up interview",
+      "url": "https://www.mchatscreen.com/m-chat/"
+    },
+    {
+      "title": "Current M-CHAT-R/F and permissions",
+      "url": "https://www.mchatscreen.com/mchat-rf/"
+    }
+  ],
+  "items": [
+    {
+      "id": "1",
+      "question": {
+        "en": "Does your child enjoy being swung on your knee?",
+        "ar": "هل يستمتع طفلك بالآرجحة على ركبتك أو عندما تحضنه؟"
+      },
+      "label": {
+        "en": "Interactive play / Social anticipation.",
+        "ar": "التفاعل الجسدي."
+      }
+    },
+    {
+      "id": "2",
+      "question": {
+        "en": "Is your child interested in other children?",
+        "ar": "هل لطفلك اهتمام بالأطفال الآخرين؟"
+      },
+      "label": {
+        "en": "Interest in peers.",
+        "ar": "الاهتمام الاجتماعي."
+      }
+    },
+    {
+      "id": "3",
+      "question": {
+        "en": "Does your child like climbing on things (e.g. stairs)?",
+        "ar": "هل يحب طفلك التسلق على الأشياء مثل صعود الدرج؟"
+      },
+      "label": {
+        "en": "Motor development.",
+        "ar": "اللعب الحركي."
+      }
+    },
+    {
+      "id": "4",
+      "question": {
+        "en": "Does your child enjoy playing peek-a-boo?",
+        "ar": "هل يستمتع طفلك بلعبة الاختباء (الغميضة)؟"
+      },
+      "label": {
+        "en": "Social play.",
+        "ar": "اللعب الاجتماعي."
+      }
+    },
+    {
+      "id": "5",
+      "question": {
+        "en": "Does your child pretend (e.g. talk on phone, feed dolls)?",
+        "ar": "هل يتظاهر طفلك بالحديث بالهاتف أو اللعب بالدمى؟"
+      },
+      "label": {
+        "en": "Imaginative play.",
+        "ar": "اللعب التظاهري."
+      }
+    },
+    {
+      "id": "6",
+      "question": {
+        "en": "Does your child use their index finger to point to ask for something?",
+        "ar": "هل يستخدم طفلك سبابته للإشارة أو السؤال عن شيء؟"
+      },
+      "label": {
+        "en": "Proto-imperative pointing.",
+        "ar": "طلب الاحتياجات."
+      }
+    },
+    {
+      "id": "7",
+      "question": {
+        "en": "Does your child use their index finger to point to indicate interest?",
+        "ar": "هل يستخدم طفلك سبابته للإشارة للتعبير عن اهتمامه بشيء؟"
+      },
+      "label": {
+        "en": "Proto-declarative pointing (Joint Attention).",
+        "ar": "الانتباه المشترك."
+      }
+    },
+    {
+      "id": "8",
+      "question": {
+        "en": "Does your child play properly with small toys (cars, blocks)?",
+        "ar": "هل يلعب طفلك كما يجب باللعب الصغيرة (سيارات، مكعبات)؟"
+      },
+      "label": {
+        "en": "Functional play.",
+        "ar": "اللعب الوظيفي."
+      }
+    },
+    {
+      "id": "9",
+      "question": {
+        "en": "Does your child bring things to you to show you something?",
+        "ar": "هل يحاول طفلك أن يجلب أشياء لكي يريك شيء ما؟"
+      },
+      "label": {
+        "en": "Showing (Joint Attention).",
+        "ar": "المشاركة."
+      }
+    },
+    {
+      "id": "10",
+      "question": {
+        "en": "Can your child look you in the eye for more than a second?",
+        "ar": "هل يمكن لطفلك أن يحدق في عينيك لاكثر من ثانية؟"
+      },
+      "label": {
+        "en": "Eye contact.",
+        "ar": "التواصل البصري."
+      }
+    },
+    {
+      "id": "11",
+      "question": {
+        "en": "Does your child seem sensitive to noise (e.g. covers ears)?",
+        "ar": "هل يبدو طفلك حساساً للضوضاء (يغلق أذنيه)؟"
+      },
+      "label": {
+        "en": "Sensory sensitivity.",
+        "ar": "المعالجة الحسية."
+      }
+    },
+    {
+      "id": "12",
+      "question": {
+        "en": "Does your child smile in response to your face or smile?",
+        "ar": "هل يتجاوب طفلك لابتسامتك بابتسامه؟"
+      },
+      "label": {
+        "en": "Social smiling.",
+        "ar": "الابتسام الاجتماعي."
+      }
+    },
+    {
+      "id": "13",
+      "question": {
+        "en": "Does your child imitate you (e.g. make faces)?",
+        "ar": "هل يقلدك طفلك (وجهك أو حركاتك)؟"
+      },
+      "label": {
+        "en": "Imitation.",
+        "ar": "التقليد."
+      }
+    },
+    {
+      "id": "14",
+      "question": {
+        "en": "Does your child respond/turn when you call his/her name?",
+        "ar": "هل يستجيب الطفل عندما تناديه باسمه؟"
+      },
+      "label": {
+        "en": "Response to name.",
+        "ar": "الاستجابة للاسم."
+      }
+    },
+    {
+      "id": "15",
+      "question": {
+        "en": "If you point at a toy across the room, does your child look at it?",
+        "ar": "عندما تشير إلى لعبة بعيدة، هل ينظر طفلك إليها؟"
+      },
+      "label": {
+        "en": "Responding to joint attention.",
+        "ar": "تتبع الإشارة."
+      }
+    },
+    {
+      "id": "16",
+      "question": {
+        "en": "Does your child walk?",
+        "ar": "هل يمشي طفلك؟"
+      },
+      "label": {
+        "en": "Motor milestone.",
+        "ar": "المشي."
+      }
+    },
+    {
+      "id": "17",
+      "question": {
+        "en": "Does your child look at things you are looking at?",
+        "ar": "هل ينظر طفلك إلى الأشياء التي تنظر إليها؟"
+      },
+      "label": {
+        "en": "Following gaze.",
+        "ar": "تتبع النظر."
+      }
+    },
+    {
+      "id": "18",
+      "question": {
+        "en": "Does your child make unusual finger movements near his/her face?",
+        "ar": "هل يقوم طفلك بحركات غير اعتيادية بأصبعه أمام وجهه؟"
+      },
+      "label": {
+        "en": "Stereotyped motor mannerisms.",
+        "ar": "حركات نمطية."
+      }
+    },
+    {
+      "id": "19",
+      "question": {
+        "en": "Does your child try to attract your attention to his/her activity?",
+        "ar": "هل يحاول طفلك جذب انتباهك إلى ما يفعله؟"
+      },
+      "label": {
+        "en": "Sharing enjoyment.",
+        "ar": "جذب الانتباه."
+      }
+    },
+    {
+      "id": "20",
+      "question": {
+        "en": "Have you ever wondered if your child is deaf?",
+        "ar": "هل تساءلت يوما إذا كان طفلك أصم (لايسمع)؟"
+      },
+      "label": {
+        "en": "Hearing concern.",
+        "ar": "السمع."
+      }
+    },
+    {
+      "id": "21",
+      "question": {
+        "en": "Does your child understand what people say?",
+        "ar": "هل يفهم طفلك مايقوله الآخرون؟"
+      },
+      "label": {
+        "en": "Receptive language.",
+        "ar": "اللغة الاستقبالية."
+      }
+    },
+    {
+      "id": "22",
+      "question": {
+        "en": "Does your child stare at nothing or wander with no purpose?",
+        "ar": "هل يحدق طفلك أحيانا في الفراغ أو يتجول بدون هدف؟"
+      },
+      "label": {
+        "en": "Visual staring / Aimless wandering.",
+        "ar": "السرحان."
+      }
+    },
+    {
+      "id": "23",
+      "question": {
+        "en": "Does your child look at your face to check your reaction to new things?",
+        "ar": "هل ينظر طفلك إلى وجهك لمعرفة ردة فعلك تجاه الأشياء الجديدة؟"
+      },
+      "label": {
+        "en": "Social referencing.",
+        "ar": "المرجعية الاجتماعية."
+      }
+    }
+  ]
+}

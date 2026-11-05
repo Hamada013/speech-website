@@ -22,6 +22,12 @@
     window.ChildAccountGate = { request() {
         if (pending) return pending;
         if (!dialog) init();
+        const english = document.documentElement.lang === 'en', tr = (en, ar) => english ? en : ar;
+        dialog.dir = english ? 'ltr' : 'rtl';
+        dialog.querySelector('#parent-gate-title').textContent = tr('For parents', 'للأهل');
+        dialog.querySelector('#parent-gate-help').textContent = tr('Solve this to open the accounts', 'حلّوا المسألة لفتح الحسابات');
+        dialog.querySelector('.parent-gate-close').setAttribute('aria-label', tr('Cancel', 'إلغاء'));
+        dialog.querySelector('.parent-gate-choices').setAttribute('aria-label', tr('Choose the answer', 'اختر الإجابة'));
         let left = 1 + Math.floor(Math.random()*9), right = 1 + Math.floor(Math.random()*9);
         const subtraction = Math.random() < .5;
         if (subtraction && left < right) [left,right] = [right,left];
@@ -38,7 +44,7 @@
             const button=document.createElement('button');button.type='button';button.dataset.answer=value;button.textContent=value;
             button.onclick=()=>{
                 if(value===expected)finish(true);
-                else {dialog.querySelector('[role=status]').textContent='جرّبوا مرة تانية 🌱';button.setAttribute('aria-invalid','true');}
+                else {dialog.querySelector('[role=status]').textContent=tr('Try again','جرّبوا مرة تانية 🌱');button.setAttribute('aria-invalid','true');}
             };choices.append(button);
         });
         pending = new Promise(resolve => { resolvePending = resolve; });
