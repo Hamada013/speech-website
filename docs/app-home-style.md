@@ -22,7 +22,7 @@ Each builder app (كلمة, جملة, مقطع) shows one compact download icon 
 
 Use the local `assets/updates.js` and `assets/updates.css` pattern to check for a new complete service-worker release on app opening. Offer «تحديث الآن» and «لاحقًا» in a separate modal. Keep the existing release active when postponed; reload all open app windows after acceptance. Check the published site rather than GitHub commits, since a commit may not have deployed yet. Regenerate release manifests for every publication.
 
-Each builder repository has `tests/standalone-browser.cjs`. It serves the app under its GitHub Pages path and verifies the app's own launch logo, no name prompt, no links out of the app, the single learner, the download through the home header icon, cache isolation and offline reopening (`APP_ENGINE=webkit` for Safari's engine).
+Each builder repository has `tests/standalone-browser.cjs`. It serves the app under its GitHub Pages path and verifies the app's own launch logo, the first child's name at launch, the app's own accounts, no links out of the app, the download through the home header icon, cache isolation and offline reopening (`APP_ENGINE=webkit` for Safari's engine).
 
 `tools/shared/updates.js` also owns the worker-readiness helper used by app downloads. An early download tap waits for the app's own worker; failed installation leaves a usable retry in the same tab. The two sound apps sync their copies from `tools/shared`; each builder app keeps its own copy. The browser check covers early taps and failed-install retries; use `APP_FULL_CATALOG=1` to verify complete production catalogs, or `APP_ENGINE=webkit` for Safari's browser engine.
 
@@ -32,7 +32,7 @@ The split sound apps (`tools/arabicsounds` and `tools/auditory-rehabilitation`) 
 
 For activity-screen redesigns, the user also selected Taffaha as the layout and interaction reference: calm cards, compact icon-only controls with accessible labels, and minimal routine status/instruction text. Respect an activity's requested automatic flow.
 
-The builder apps (كلمة, جملة, مقطع) are standalone: no app picker, no transitions to another app, and no links back to this website. Reports cover the app's own learner only.
+The builder apps (كلمة, جملة, مقطع) are standalone: no app picker, no transitions to another app, and no links back to this website. Reports cover this app's children only.
 
 ## Shared account controls
 
@@ -40,7 +40,7 @@ The builder apps (كلمة, جملة, مقطع) are standalone: no app picker, n
 
 Use styled dropdowns for new or edited option controls across the website. Match the app's rounded white cards, pale borders, dark blue text, clear outline chevron, soft shadow, and green selected row with a check. Keep triggers and options at least 44px tall. Use custom option lists so Safari also receives the intended styling; keep the underlying select's value and input/change events when enhancing a form field. Support associated labels, combobox/listbox semantics, arrow keys, Home/End, Enter/Space, Escape, Tab, and outside dismissal. Fit lists inside the dialog and viewport on phones and short screens. The reusable source is `tools/shared/styled-dropdowns.js/css`; Ling includes local copies in its offline shell.
 
-Each builder app has its own startup screen (`assets/welcome.js` and `welcome.css`). A direct opening or manual reload animates that app's own logo and name, then types «مرحبا». It never asks for a child's name: there are no child accounts, and one learner per device is created automatically.
+Each builder app has its own startup screen (`assets/welcome.js` and `welcome.css`). A direct opening or manual reload animates that app's own logo and name, then types «مرحبا». When no account exists yet it asks for the child's name and creates the first account in this app.
 
 Internal activity links, report pages, browser back/forward and automatic update reloads skip startup. Automatic reloads use both session storage and a history-state fallback. Never use a permanent “seen” flag. The update offer waits until welcome finishes; service-worker setup and downloads run independently.
 
@@ -90,7 +90,7 @@ Verify these flows with `node tools/tests/automation-layout-browser.cjs` (also `
 
 VOC standalone games and tests share the same compact, viewport-fitted layout as the automatic path: stars, card choices and icon-only pause/replay controls, with routine headings, counters and instructional text hidden. Keep required setup selections, accessible labels and actionable error feedback. The expressive game's metronome is a white frame like Taffaha's: pressing the frame plays every beat in order; individual circles play one beat. Stop and clear all beat highlights when pausing, replaying speech, grading or changing cards.
 
-The builder apps have no child accounts and no Hamada account; one learner per device is created automatically on first launch.
+Each builder app has its own child accounts (added or switched from the accounts button beside the therapist button); they are not shared with other apps.
 
 Sound-app account grid sources are `tools/shared/sound-accounts.js` and `tools/shared/flow-ui.css`; each app supplies its native account/report actions. Validate with `node tools/tests/compact-games-accounts-browser.cjs` (also `APP_ENGINE=webkit`), then sync and rebuild the affected offline releases.
 

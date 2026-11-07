@@ -40,6 +40,6 @@ Serve apps over HTTPS or localhost. The build writes forwarding pages for the ol
 
 ## Verification
 
-Each builder app has its own browser check, `npm run test:browser` in its repository: launch logo, no name prompt, no links out, single learner, download through the home header icon, cache isolation and offline reopening (`APP_ENGINE=webkit` for Safari's engine). The tools (including the two sound apps) are checked in the `Hamada013/tools` repository.
+Each builder app has its own browser check, `npm run test:browser` in its repository: launch logo, first child's name at launch, the app's own accounts, no links out, download through the home header icon, cache isolation and offline reopening (`APP_ENGINE=webkit` for Safari's engine). The tools (including the two sound apps) are checked in the `Hamada013/tools` repository.
 
 In the tools repository, `node tools/tests/update-readiness.cjs` and `node tools/tests/update-activation.cjs` cover worker readiness, immediate feedback, queued downloads, duplicate taps, failed messages, activation timeouts, and returning shortcuts. Browser checks use Playwright from `npm install` at the repository root.
