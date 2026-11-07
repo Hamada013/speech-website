@@ -30,4 +30,4 @@ The generator edits only the twelve paths declared in `site-pages.cjs`. It never
 
 Generated site artifacts and app-test screenshots belong in ignored `output/` and `tmp/` folders. Unreferenced GIFs, old homepage effects and obsolete root assets were removed; media inside apps is outside this cleanup's scope. Do not move app directories to reorganize the main website.
 
-The existing GitHub Pages workflow publishes pushes to `main`. It stages tracked website assets through `tools/shared/build-pwa-releases.cjs --site` and retains independent app release checks.
+The existing GitHub Pages workflow publishes pushes to `main`. It stages tracked website assets through `scripts/build-pwa-releases.cjs --site` and retains independent app release checks.

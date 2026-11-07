@@ -1,5 +1,7 @@
 # Default app home style
 
+> Paths under `tools/` in this guide (`tools/shared/…`, `tools/tests/…`, `tools/arabicsounds`, `tools/auditory-rehabilitation`) refer to the `Hamada013/tools` repository (local folder `../tools`). كلمة, جملة, مقطع, كلام وطلاقة, Follow Direction, VB-MAPP and Aural Rehabilitation each have their own repository. This website only links to them.
+
 The user selected the Syllables Builder (مقطع, formerly `tools/VSS/taffaha`) home-screen style as the project default for future apps. It now lives in its own repository, `Hamada013/syllables-builder` (local folder `../syllables-builder` next to this website). Other examples are `../vocabulary-builder/index.html` (كلمة) and `../sentences-builder/index.html` (جملة).
 
 - Use a light background (`#f8fafc`) with soft green and blue radial washes. Use dark blue text (`#22445a`), muted secondary text (`#5c7285`), and pale borders (`#dceaf4`).
@@ -24,7 +26,7 @@ Each builder repository has `tests/standalone-browser.cjs`. It serves the app un
 
 `tools/shared/updates.js` also owns the worker-readiness helper used by app downloads. An early download tap waits for the app's own worker; failed installation leaves a usable retry in the same tab. The two sound apps sync their copies from `tools/shared`; each builder app keeps its own copy. The browser check covers early taps and failed-install retries; use `APP_FULL_CATALOG=1` to verify complete production catalogs, or `APP_ENGINE=webkit` for Safari's browser engine.
 
-For GitHub Pages publication, use `.github/workflows/pages.yml` and `node tools/shared/build-pwa-releases.cjs --site` to rebuild the two sound app manifests and verify the staged website before deployment. Select GitHub Actions as the Pages source once; see `docs/app-publication.md`. `node tools/tests/update-readiness.cjs` also verifies Safari's already-claimed activating worker, correct controller identity, failed setup and retry. The builder apps publish from their own repositories with the same GitHub Actions approach.
+For GitHub Pages publication, use `.github/workflows/pages.yml` and `node tools/shared/build-pwa-releases.cjs --site` in the tools repository to rebuild the two sound app manifests and verify the staged website before deployment. Select GitHub Actions as the Pages source once; see `docs/app-publication.md`. `node tools/tests/update-readiness.cjs` also verifies Safari's already-claimed activating worker, correct controller identity, failed setup and retry. The builder apps publish from their own repositories with the same GitHub Actions approach.
 
 The split sound apps (`tools/arabicsounds` and `tools/auditory-rehabilitation`) use the same home/download/update conventions. Their five-action home grids use compact spacing, while each app retains its own activity engine, media catalog, manifest, logo, icons, and scoped caches. The old `tools/aswati` entry handles saved-link migration only.
 
