@@ -1,5 +1,5 @@
 /* Cache this form's shell only. Answers and reports never enter this cache. */
-const CACHE = 'aghanem-adult-history-shell-v1';
+const CACHE = 'aghanem-adult-history-shell-v2';
 const SHELL = ['./', './index.html', './assets/styles.css', './assets/data.js', './assets/model.js', './assets/app.js', './manifest.webmanifest', './assets/icon.svg', './assets/icon-192.png', './assets/icon-512.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));

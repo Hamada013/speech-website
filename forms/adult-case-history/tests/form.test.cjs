@@ -27,6 +27,7 @@ function app(initial = null) {
   const window = { AdultHistoryData: data, AdultHistoryModel: M, addEventListener(type, fn) { events.set(`window:${type}`, fn); }, print() { printed++; events.get('window:beforeprint')?.(); } };
   vm.runInNewContext(script, {
     window, document, navigator: {}, location: { protocol: 'file:' }, console,
+    setTimeout: fn => fn(),
     localStorage: {
       getItem(key) { if (storageFails) throw Error('unavailable'); return storage.get(key); },
       setItem(key, value) { if (storageFails) throw Error('unavailable'); storage.set(key, value); },

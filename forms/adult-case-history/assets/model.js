@@ -39,9 +39,13 @@
     if (assessment.day < Math.min(birth.day, monthEnd)) months--;
     return { years: Math.floor(months / 12), months: months % 12 };
   }
+  const arabicYears=n=>n===0?'':n===1?'سنة واحدة':n===2?'سنتان':n<=10?`${n} سنوات`:`${n} سنة`,arabicMonths=n=>n===0?'':n===1?'شهر واحد':n===2?'شهران':n<=10?`${n} أشهر`:`${n} شهراً`;
   function ageLabel(answers) {
     const age = ageAt(answers);
-    return age ? pair(`${age.years} years, ${age.months} months at assessment`, `${age.years} سنة و${age.months} شهر عند التقييم`) : null;
+    if (!age) return null;
+    const unit = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+    const arabic = [arabicYears(age.years), arabicMonths(age.months)].filter(Boolean).join(' و') || '0 شهر';
+    return pair(`${unit(age.years, 'year')}, ${unit(age.months, 'month')} at assessment`, `${arabic} عند التقييم`);
   }
   function choiceChange(field, current, key, checked) {
     if (!field.options.some(o => o.key === key)) return current;
@@ -84,6 +88,25 @@
     return typeof value === 'string' ? value.trim() : '';
   }
   function countAnswers(answers) { return fields.filter(field => !!valueText(field, answers)).length; }
+  // Reported answers only: a blank is never read as normal, and nothing here is a finding.
+  const includes = (answers, id, key) => { const value = answers[id]; return Array.isArray(value) ? value.includes(key) : value === key; };
+  // Each rule fires when any listed answer was given; `all` adds answers that must also be present.
+  const attentionRules = [
+    { any: [['onsetPattern', 'sudden']], all: [['medicalReview', 'no']], label: pair('Sudden onset, not yet seen by a doctor', 'بداية مفاجئة ولم يراجع طبيباً بعد') },
+    { any: [['course', 'worsening']], label: pair('Worsening since onset', 'تزداد سوءاً منذ البداية') },
+    { any: [['swallowing', 'cough'], ['swallowing', 'wet'], ['swallowing', 'breathing']], label: pair('Possible swallowing signs with meals', 'علامات بلع محتملة أثناء الوجبات') },
+    { any: [['nutritionConcerns', 'weight'], ['nutritionConcerns', 'hydration'], ['nutritionConcerns', 'chest']], label: pair('Weight, hydration or chest infection concerns', 'مخاوف الوزن أو الإماهة أو التهابات الصدر') },
+    { any: [['nutritionRoute', 'ng'], ['nutritionRoute', 'gastrostomy'], ['nutritionRoute', 'iv']], label: pair('Non-oral nutrition', 'تغذية غير فموية') },
+    { any: [['procedures', 'tracheostomy']], label: pair('Tracheostomy', 'فغر الرغامى') },
+    { any: [['voiceDuration', 'over4']], label: pair('Voice problem for over 4 weeks', 'مشكلة الصوت منذ أكثر من 4 أسابيع') },
+    { any: [['hearing', 'concern'], ['hearing', 'loss']], label: pair('Hearing difficulty', 'صعوبة في السمع') },
+    { any: [['conditions', 'seizures']], label: pair('Seizures', 'نوبات') },
+    { any: [['mood', 'low']], label: pair('Low mood', 'مزاج منخفض') },
+    { any: [['cognition', 'orientation']], label: pair('Orientation changes', 'تغيرات في التوجه') }
+  ];
+  function attentionItems(answers) { return attentionRules.filter(rule => rule.any.some(([id, key]) => includes(answers, id, key)) && (rule.all || []).every(([id, key]) => includes(answers, id, key))).map(rule => rule.label); }
+  const snapshotFields = ['informant', 'concerns', 'concernWords', 'onsetDate', 'onsetPattern', 'course', 'medicalReview', 'selfRating', 'diagnoses', 'languages', 'communicationModes', 'intelligibility', 'hearing', 'assessmentPlan'];
+  const snapshotTitle = pair('Clinician snapshot', 'ملخص سريع للفاحص'), attentionTitle = pair('Follow up first (as reported)', 'للمتابعة أولاً (حسب الإفادة)');
   const reportTitle = pair('Adult speech & language case history', 'تاريخ حالة النطق واللغة للبالغين');
   const reportNote = pair('Patient / care partner history and clinician notes. Unanswered items are not negative findings. This report supports clinical assessment; it does not generate a diagnosis or determine swallowing safety.', 'إفادات المريض / شريك الرعاية وملاحظات الفاحص. البنود غير المجاب عنها لا تعني غياب المشكلة. يدعم التقرير التقييم السريري؛ ولا يولّد تشخيصاً أو يحدد سلامة البلع.');
   const notRecorded = pair('Not recorded', 'غير مسجل');
@@ -102,6 +125,8 @@
     const age = ageLabel(answers);
     const missing = fields.length - countAnswers(answers);
     let html = `<div class="report-heading"><div class="eyebrow">${translated(pair('Initial assessment · Case history', 'التقييم الأولي · تاريخ الحالة'))}</div><h1>${translated(reportTitle)}</h1><p class="patient-name"><strong>${name}</strong></p>${age ? `<p>${translated(age)}</p>` : ''}</div><div class="report-note">${translated(reportNote)}<p>${translated(pair(`${missing} fields not recorded.`, `${missing} حقلاً غير مسجل.`))}</p></div>`;
+    const snapshotRows = snapshotFields.map(id => fields.find(field => field.id === id)).filter(field => valueText(field, answers, lang)), flags = attentionItems(answers);
+    if (snapshotRows.length || flags.length) html += `<section class="report-snapshot"><h3>${translated(snapshotTitle)}</h3>${flags.length ? `<div class="attention"><strong>${translated(attentionTitle)}</strong><ul>${flags.map(flag => `<li>${translated(flag)}</li>`).join('')}</ul></div>` : ''}<dl>${snapshotRows.map(field => `<div class="report-row"><dt>${translated(field.label)}</dt><dd>${valueHTML(field)}</dd></div>`).join('')}</dl></section>`;
     for (const section of sections) {
       const recorded = section.fields.filter(field => valueText(field, answers, lang));
       const rows = settings.includeEmpty ? section.fields : recorded;
@@ -114,6 +139,12 @@
     const translated = labels => settings.bilingual ? `${labels[lang]} / ${labels[1 - lang]}` : labels[lang];
     const age = ageLabel(answers);
     const parts = [translated(reportTitle), age ? translated(age) : '', translated(reportNote)];
+    const snapshotRows = snapshotFields.map(id => fields.find(field => field.id === id)).filter(field => valueText(field, answers, lang)), flags = attentionItems(answers);
+    if (snapshotRows.length || flags.length) {
+      parts.push(`\n${translated(snapshotTitle)}\n${'─'.repeat(36)}`);
+      if (flags.length) parts.push(`${translated(attentionTitle)}:`, ...flags.map(flag => '- ' + translated(flag)));
+      for (const field of snapshotRows) parts.push(`${translated(field.label)}: ${valueText(field, answers, lang)}`);
+    }
     for (const section of sections) {
       const rows = section.fields.filter(field => settings.includeEmpty || valueText(field, answers, lang));
       parts.push(`\n${translated(section.title)}\n${'─'.repeat(36)}`);
@@ -132,5 +163,5 @@
     parts.push('\n' + footer.map(translated).join('\n') + '\nslp.ahmadghanem@gmail.com');
     return parts.filter(Boolean).join('\n\n');
   }
-  return { fields, esc, digits, today, parseDate, dateError, ageAt, ageLabel, choiceChange, sanitizeAnswers, valueText, countAnswers, reportHTML, reportText };
+  return { fields, esc, digits, today, parseDate, dateError, ageAt, ageLabel, choiceChange, sanitizeAnswers, valueText, countAnswers, reportHTML, reportText, attentionItems, attentionRules };
 });

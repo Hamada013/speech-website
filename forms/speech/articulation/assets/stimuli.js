@@ -1032,10 +1032,10 @@ const SOUNDS = [
         "position": "آخر الكلمة",
         "word": "وجه",
         "image": "64.webp",
-        "spoken": "وشّ",
-        "reference": "wəʃʃ",
-        "targetIPA": null,
-        "referenceNote": "الصوت المدرج غير موجود في هذه الصيغة الشامية؛ لا يُصحح كخطأ. اختر كلمة بديلة مناسبة أو تجاوز البند.",
+        "spoken": "وجه",
+        "reference": "wadʒh",
+        "targetIPA": "h",
+        "referenceNote": "المرجع المختار وجه /wadʒh/. إذا كانت وشّ مقبولة في لهجة الأسرة، سجّلها كنطق لهجي أو عدّل المرجع.",
         "gloss": "face"
       }
     ]
@@ -1073,9 +1073,9 @@ const SOUNDS = [
         "word": "دلو",
         "image": "67.webp",
         "spoken": "دلو",
-        "reference": "dalu",
-        "targetIPA": null,
-        "referenceNote": "الصوت المدرج غير موجود في هذه الصيغة الشامية؛ لا يُصحح كخطأ. اختر كلمة بديلة مناسبة أو تجاوز البند.",
+        "reference": "dalw",
+        "targetIPA": "w",
+        "referenceNote": "المرجع المختار دلو /dalw/. إذا كانت دلو /dalu/ مقبولة في لهجة الأسرة، سجّلها كنطق لهجي أو عدّل المرجع.",
         "gloss": "bucket"
       }
     ]
@@ -1090,10 +1090,10 @@ const SOUNDS = [
         "position": "أول الكلمة",
         "word": "يد",
         "image": "22.webp",
-        "spoken": "إيد",
-        "reference": "ʔiːd",
-        "targetIPA": null,
-        "referenceNote": "الصوت المدرج غير موجود في هذه الصيغة الشامية؛ لا يُصحح كخطأ. اختر كلمة بديلة مناسبة أو تجاوز البند.",
+        "spoken": "يد",
+        "reference": "jad",
+        "targetIPA": "j",
+        "referenceNote": "المرجع المختار يد /jad/. إذا كانت إيد مقبولة في لهجة الأسرة، سجّلها كنطق لهجي أو عدّل المرجع.",
         "gloss": "hand"
       },
       {

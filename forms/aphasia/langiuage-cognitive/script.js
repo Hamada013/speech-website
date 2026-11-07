@@ -21,6 +21,8 @@ const subsectionTitles = {
   '12sub1': 'الذاكرة الفورية', '12sub2': 'سرد قصة', '12sub3': 'الذاكرة الحديثة', '12sub4': 'الذاكرة طويلة المدى',
   '13sub1': 'البارافازيا', '13sub2': 'السرد ووصف الصور', '13sub3': 'الصوت'
 };
+// Added tasks carry their own titles and observation type.
+if (globalThis.AphasiaAdded) for (const [group, added] of Object.entries(AphasiaAdded.ADDED)) subsectionTitles[group] = added.title;
 const statusTitles = { correct: 'صحيح', incorrect: 'غير صحيح', dontknow: 'لا يعرف / لم يستجب', skip: 'لم يُطبّق / مستبعد', present: 'موجود', absent: 'غير ملاحظ', unanswered: 'لم يُقيّم' };
 const patientFields = {
   name: 'الاسم', age: 'العمر', currentDate: 'تاريخ التقييم', incidentDate: 'تاريخ الحادث',
@@ -63,6 +65,24 @@ function addNote(section) {
 }
 
 const reportEnglishItems = {
+  // Added tasks (see assets/added-items.js).
+  'البنت تدفع الولد': 'The girl pushes the boy',
+  'الولد يلحق البنت': 'The boy chases the girl',
+  'الولد الذي دفعته البنت وقع': 'The boy whom the girl pushed fell',
+  'باب': 'Door',
+  'شبّاك': 'Window',
+  'طاولة': 'Table',
+  'مستشفى': 'Hospital',
+  'كَمْبيل': 'kambeel (nonword)',
+  'فَرْتوس': 'fartoos (nonword)',
+  'شمس': 'Sun',
+  'الولد يشرب الحليب': 'The boy drinks the milk',
+  'الجو حار اليوم': 'It is hot today',
+  'أرني كيف تمشط شعرك': 'Show me how you comb your hair',
+  'أرني كيف تشرب من كوب': 'Show me how you drink from a cup',
+  'أرني كيف تفتح باباً بمفتاح': 'Show me how you open a door with a key',
+  'تلمّس حركات الفم: محاولات واضحة لإيجاد وضع الشفاه أو اللسان': 'Groping: visible effort to find the lip or tongue position',
+  'أخطاء صوتية غير ثابتة في الكلمة نفسها عند تكرارها': 'Inconsistent sound errors on the same word when repeated',
   "2": "2",
   "13": "13",
   "165": "165",
@@ -115,7 +135,7 @@ const reportEnglishItems = {
   "إذا كان سعر الطماطم 150 للكيلو واشتريت 2 كيلو، كم أنفقت على الطماطم؟": "Tomatoes cost 150 per kilogram. You buy 2 kilograms. How much did you spend?",
   "إذا ذهبت إلى المتجر ومعك 3000 وعدت ومعك 1000، كم أنفقت؟": "You go to the shop with 3000 and return with 1000. How much did you spend?",
   "إذا معك تفاحة واعطيتك 12 تفاحة كم تفاحة معك الآن؟": "You have one apple and I give you 12 apples. How many apples do you have now?",
-  "إذا كان سعر فرشاة الأسنان 5000 ولديك 1000، كم فرشاة أسنان يمكنك شراؤها؟": "A toothbrush costs 5000 and you have 1000. How many toothbrushes can you buy?",
+  "إذا كان سعر فرشاة الأسنان 1000 ولديك 5000، كم فرشاة أسنان يمكنك شراؤها؟": "A toothbrush costs 1000 and you have 5000. How many toothbrushes can you buy?",
   "إذا كان لديك موعد مع الطبيب الساعة 10:30 ويستغرق الوصول 30 دقيقة، متى يجب أن تغادر؟": "Your doctor's appointment is at 10:30 and the journey takes 30 minutes. When should you leave?",
   "قرب جسدي غير مناسب": "Inappropriate physical proximity",
   "تلامس جسدي غير مناسب": "Inappropriate physical contact",
@@ -222,8 +242,8 @@ const reportEnglishItems = {
   "مطر، مكتب، سلم، حصان، كعكة": "Rain, desk, ladder, horse, cake",
   "وُجدت المفاتيح تحت الطاولة": "The keys were found under the table",
   "هو دائمًا يقرأ الجريدة قبل الإفطار": "He always reads the newspaper before breakfast",
-  "بعد انتصارهم، تناول فريق البيسبول البيتزا وشاهدوا فيلمًا": "After their victory, the baseball team ate pizza and watched a film",
-  "احتفلت هيلين بعيد ميلادها في حديقة الحيوانات الأليفة. حضر عشرة من أصدقائها.ضحك جميع الأطفال عندما وجدوا ماعزًا يأكل الكعكة والآيس": "Helen celebrated her birthday at a petting zoo. Ten of her friends attended. All the children laughed when they found a goat eating the cake and the ice… [source prompt is incomplete]",
+  "بعد انتصارهم، تناول فريق كرة القدم البيتزا وشاهدوا فيلمًا": "After their victory, the football team ate pizza and watched a film",
+  "احتفلت هيلين بعيد ميلادها في حديقة الحيوانات الأليفة. حضر عشرة من أصدقائها.ضحك جميع الأطفال عندما وجدوا ماعزًا يأكل الكعكة والآيس كريم": "Helen celebrated her birthday at a petting zoo. Ten of her friends attended. All the children laughed when they found a goat eating the cake and the ice… [source prompt is incomplete] ice cream.",
   "احتفلت ليلى بعيد ميلادها في حديقة الطيور الملونة. حضر اثنا عشر صديقًا. تعجب الأطفال عندما رأوا ببغاءً يسرق قطعة البيتزا من الطاولة!": "Layla celebrated her birthday in a colorful bird park. Twelve friends attended. The children were surprised when they saw a parrot stealing a piece of pizza from the table!",
   "ماذا تناولت على الإفطار؟": "What did you have for breakfast?",
   "ماذا فعلت بعد العشاء الليلة الماضية؟": "What did you do after dinner last night?",
@@ -276,7 +296,7 @@ const reportEnglishSubsections = {
   '7subA': 'Correcting illogical sentences', '7subB': 'Interpreting meaning', '7subC': 'Semantic language',
   '9subA': 'Odd word out', '9subB': 'Following written commands', '9subC': 'Reading comprehension', '9subD': 'Clock drawing', '9subE': 'Visual attention', '9subF': 'Writing',
   '12sub1': 'Immediate memory', '12sub2': 'Story recall', '12sub3': 'Recent memory', '12sub4': 'Long-term memory',
-  '13sub1': 'Paraphasia', '13sub2': 'Narrative and picture description', '13sub3': 'Voice'
+  '13sub1': 'Paraphasia', '13sub2': 'Narrative and picture description', '2subE': 'Sentences with reversible roles', '6subF': 'Word repetition', '6subG': 'Nonword repetition', '9subG': 'Reading aloud', '9subH': 'Writing to dictation', '13sub4': 'Gestures on request', '13sub5': 'Motor speech observations', '13sub3': 'Voice'
 };
 const reportEnglishStatuses = { correct: 'Correct', incorrect: 'Incorrect', dontknow: 'Does not know / no response', skip: 'Not administered / excluded', present: 'Present', absent: 'Not observed', unanswered: 'Not assessed' };
 const reportEnglishPatientFields = {
@@ -483,7 +503,7 @@ function initialize() {
     const label = card.querySelector('label')?.textContent.trim();
     if (!match || !label) throw new Error('Assessment card requires a group and label.');
     const group = match[1], section = Number(group.match(/^\d+/)[0]);
-    const observation = group === '11' || group === '13sub1' || group === '13sub3';
+    const observation = group === '11' || group === '13sub1' || group === '13sub3' || !!globalThis.AphasiaAdded?.ADDED[group]?.observation;
     const id = `item-${group}-${items.filter(item => item.group === group).length + 1}`;
     card.dataset.itemId = id;
     const row = existing.parentElement;

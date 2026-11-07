@@ -16,6 +16,8 @@ Static, dependency-free adult speech and language intake, styled to match the ch
 
 Nine sections cover interview/source details; referral, onset and priorities; medical, hearing and vision history; languages and communication; speech, fluency and voice; cognition and access; swallowing and oral history; daily roles and services; clinician summary and plan. Medication names/doses and clinical synthesis remain free text to preserve exact information.
 
+The report opens with a clinician snapshot: key answers plus a short “follow up first” list. It is built only from answers actually given (`attentionRules` in `assets/model.js`), so a blank never raises or clears anything.
+
 The report separates reported history from direct observations and clinician synthesis. It never infers normal findings, a diagnosis, swallowing safety, or a diet recommendation from blank answers. Report and screen footers include Ahmad Ghanem, Speech and Language Pathology, Latakia - Syria, and slp.ahmadghanem@gmail.com.
 
 History domains were checked against ASHA’s [Aphasia case-history guidance](https://www.asha.org/practice-portal/clinical-topics/aphasia/) and [Adult Dysphagia assessment guidance](https://www.asha.org/practice-portal/clinical-topics/adult-dysphagia/). This custom intake is not a standardized assessment instrument.

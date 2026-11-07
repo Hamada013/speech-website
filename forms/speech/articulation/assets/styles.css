@@ -594,8 +594,13 @@ option { background:white; color:#203e4b; }
 .reference-target { margin-top:14px; background:#f1fbf5; }
 .note-panel { background:#f0fbf4; border-radius:22px; }
 .phoneme-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(82px,1fr)); gap:12px; margin:20px 0; }
-.phoneme-button { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:91px; padding:10px; border-radius:22px; background:linear-gradient(#f1fbff,#e7f5fe); border-color:#b4d3e5; }
-.phoneme-button:nth-child(3n) { background:linear-gradient(#f3fcf6,#e4f5ea); border-color:#afd1ba; }
+.phoneme-button { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:91px; padding:10px; border-radius:22px; background:#fff; border:1px solid #dfe8ee; box-shadow:none; }
+.phoneme-button:hover { background:#f8fafc; }
+.phoneme-button.common-sound { background:#ffe6cf; border-color:#f4bd8c; }
+.phoneme-button.common-sound:hover { background:#ffdcbc; }
+.common-legend { display:flex; align-items:center; gap:8px; margin:6px 0 0; font-size:13px; color:#5c7285; }
+.common-legend[hidden] { display:none; }
+.common-legend span { width:16px; height:16px; border-radius:6px; background:#ffe6cf; border:1px solid #f4bd8c; }
 .phoneme-button span { font-size:28px; }
 .phoneme-button b { font-family:Arial,sans-serif; font-size:17px; font-weight:550; }
 #soundDialog { max-width:850px; }

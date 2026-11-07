@@ -16,7 +16,9 @@ for(const page of pages){
  }
  for(const section of page.sections)for(const card of section.cards){assert(symbols.has(card.icon),'Card icon '+card.icon);assert(card.ar&&card.arDescription,'Bilingual card required');}
 }
-assert.deepEqual(fs.readFileSync(path.join(root,'assets/site/brand/logo.webp')),fs.readFileSync(path.join(root,'tools/VSS/voc/images/logo.webp')),'Main site uses the VOC artwork');
+// VOC now has its own repository; compare when it is checked out next to this one.
+const vocLogo=path.resolve(root,process.env.VOC_SOURCE||'../vocabulary-builder','images/logo.webp');
+if(fs.existsSync(vocLogo))assert.deepEqual(fs.readFileSync(path.join(root,'assets/site/brand/logo.webp')),fs.readFileSync(vocLogo),'Main site uses the VOC artwork');
 const context={self:{}};vm.runInNewContext(fs.readFileSync(path.join(root,'assets/site/pwa-release.js'),'utf8'),context);const release=context.self.SPEECH_SITE_RELEASE;
 for(const file of release.shell){assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,file))).digest('hex'),release.integrity[file],'Offline file integrity: '+file);assert(!/^(tools|forms)\//.test(file)||pages.some(p=>p.path===file),'Only directory pages belong in the root cache');}
 const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.webmanifest'),'utf8'));assert.equal(manifest.scope,'./');assert.equal(manifest.display,'standalone');for(const icon of manifest.icons)assert(fs.existsSync(path.join(root,icon.src)));

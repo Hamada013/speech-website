@@ -81,11 +81,11 @@ These are editable urban Syrian examples, not norms for all Syrian dialects. Con
 | ن | آخر الكلمة | حصان | /ħsˤaːn/ | /n/ | 15.webp |
 | ه | أول الكلمة | هلال | /hlaːl/ | /h/ | 62.webp |
 | ه | وسط الكلمة | مهر | /məhr/ | /h/ | 63.webp |
-| ه | آخر الكلمة | وشّ | /wəʃʃ/ | Absent in this form / غير موجود | 64.webp |
+| ه | آخر الكلمة | وجه | /wadʒh/ | /h/ (record وشّ as dialect) | 64.webp |
 | و | أول الكلمة | وردة | /warde/ | /w/ | 65.webp |
 | و | وسط الكلمة | دوا | /dawa/ | /w/ | 66.webp |
-| و | آخر الكلمة | دلو | /dalu/ | Absent in this form / غير موجود | 67.webp |
-| ي | أول الكلمة | إيد | /ʔiːd/ | Absent in this form / غير موجود | 22.webp |
+| و | آخر الكلمة | دلو | /dalw/ | /w/ (record /dalu/ as dialect) | 67.webp |
+| ي | أول الكلمة | يد | /jad/ | /j/ (record إيد as dialect) | 22.webp |
 | ي | وسط الكلمة | سيّارة | /sajjaːra/ | /j/ | 68.webp |
 | ي | آخر الكلمة | شاي | /ʃaːj/ | /j/ | 69.webp |
 

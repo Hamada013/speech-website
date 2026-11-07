@@ -5,7 +5,7 @@ try{const uid=localStorage.getItem('articulation-cloud-owner');if(uid)CASE_KEY='
 const caseId=()=>globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
 const copyCase=value=>JSON.parse(JSON.stringify(value));
 function emptyCases(){return {version:2,children:[],activeChild:null,activeAssessment:null};}
-function readCases(){const raw=localStorage.getItem(CASE_KEY);if(!raw)return emptyCases();const value=JSON.parse(raw);if(value.version!==2||!Array.isArray(value.children))throw Error('Invalid case store');return value;}
+function readCases(){const raw=localStorage.getItem(CASE_KEY);if(!raw)return emptyCases();const value=JSON.parse(raw);if(value.version!==2||!Array.isArray(value.children))throw Error('Invalid case store');for(const child of value.children)for(const item of child.assessments||[])repairAbsentTargets(item.state?.trials);return value;}
 let cases=emptyCases(),caseStorageBlocked=false;
 function caseFailure(){caseStorageBlocked=true;$('message').textContent='تعذر حفظ بيانات الحالة على الجهاز. أبقِ التطبيق مفتوحاً وصدّر التقرير قبل المغادرة.';}
 function writeCases(next){try{localStorage.setItem(CASE_KEY,JSON.stringify(next));cases=next;caseStorageBlocked=false;window.dispatchEvent(new Event('articulation-cases-saved'));return true;}catch{caseFailure();return false;}}

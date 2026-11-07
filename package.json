@@ -1,0 +1,8 @@
+{
+  "name": "speech-website",
+  "private": true,
+  "description": "Development tools for local checks. The published site needs no installation.",
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}

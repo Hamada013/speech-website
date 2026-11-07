@@ -13,7 +13,6 @@ node forms/speech/articulation/scripts/research-server.mjs
 Keep that process running. Open:
 
 - Articulation: http://127.0.0.1:8876/forms/speech/articulation/
-- Language/cognitive: http://127.0.0.1:8876/forms/aphasia/langiuage-cognitive/
 - Ling: http://127.0.0.1:8876/forms/Hearing/ling_test/
 
 In a child's report, press the share icon. It immediately updates the local workbook and shows success only after Excel and the cumulative dataset are saved. Press the workbook icon in that dialog to download/open the current file. To include names/identifiers, select that option and press update again. They are omitted by default; free-text notes remain as entered.
@@ -21,7 +20,6 @@ In a child's report, press the share icon. It immediately updates the local work
 Files on this computer:
 
 - Articulation: `forms/speech/articulation/research/arabic-speech-research.xlsx` and `dataset.json`.
-- Language/cognitive: `forms/aphasia/langiuage-cognitive/research/language-cognitive-research.xlsx` and `dataset.json`.
 - Ling: `forms/Hearing/ling_test/research/ling-research.xlsx` and `dataset.json`.
 
 Re-sharing replaces the same assessment/case IDs rather than appending duplicates. Other submitted cases are retained. The JSON datasets drive rebuilding; keep them alongside the workbooks and back up both. Manual edits to generated Excel files are replaced at the next share. Deleting a case from the app does not remove a previously exported local record. Generated records and workbooks are ignored by Git and omitted from offline caches and publication.
@@ -47,3 +45,5 @@ Accuracy includes scored responses only. Dialect-appropriate, unelicited, skippe
 ## Retired online integration
 
 The Ali-owned articulation workbook was permanently deleted at the user's request on 2026-10-27 and deletion was verified by Drive readback. Both apps' online spreadsheet links, upload transports, bound-script sources and deployment instructions have been removed. Language/cognitive also discards its old saved endpoint/token/automatic-upload settings on startup. This source change does not revoke independently deployed external services or remove unrelated files from Google accounts. Previously installed app versions need the rebuilt release before using the local-only behavior.
+
+The language-cognitive assessment now has its own collector: see `forms/aphasia/langiuage-cognitive/research/SETUP.md`.

@@ -14,11 +14,9 @@ Child deletion requires confirmation and removes that child's assessments. It ne
 
 The screener retains 28 written-letter groups, 84 editable word-position probes and 69 local pictures. Entering the test opens a viewport-fitted workplace. Its corner expand/shrink icon toggles between the focused stage and the surrounding form. The sound, word position and picture index stay at the right.
 
-- Under the picture: correct, substitution, omission, distortion and addition.
-- Physical right: independent naming, imitation, contextual elicitation and reference editor.
-- Physical left: dialect-appropriate, not elicited/unfamiliar and skipped.
-- Lower left: note and clear-recording icons. Navigation arrows remain below the picture.
-- Info icon: the workplace symbols and meanings, including stimulability controls.
+- Under the picture: labelled correct, substitution, omission, distortion and addition, between the navigation arrows.
+- More menu (three dots): elicitation mode, dialect/not elicited/skipped, note, reference editor, clear, expand and the symbol guide. Non-default choices show as chips under the picture.
+- Substitution picker: white sound buttons, with likely replacements for the current target in orange (`COMMON_SUBSTITUTIONS` in `assets/phonology.js`, a draft for clinician review).
 
 Controls retain accessible names, keyboard focus and pressed states. Sound/phoneme choices retain their actual letter/IPA content. Form menus use styled comboboxes with keyboard navigation. Reduced-motion, visual viewport, short landscape and safe-area handling are included. Changing a word/reference invalidates its previous judgment. Substitution/addition saves after choosing a phoneme; cancelling preserves the preceding record.
 
@@ -46,9 +44,9 @@ node forms/speech/articulation/scripts/build-pwa.cjs --check
 node forms/speech/articulation/tests/screener.test.cjs
 node forms/speech/articulation/tests/dropdowns.test.cjs
 node forms/speech/articulation/tests/browser.test.cjs
-ARTICULATION_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node forms/speech/articulation/tests/cases-browser.cjs
-APP_ENGINE=webkit ARTICULATION_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node forms/speech/articulation/tests/cases-browser.cjs
-ARTICULATION_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node forms/speech/articulation/tests/pwa-browser.cjs
+node forms/speech/articulation/tests/cases-browser.cjs
+APP_ENGINE=webkit node forms/speech/articulation/tests/cases-browser.cjs
+node forms/speech/articulation/tests/pwa-browser.cjs
 ```
 
 The suites use installed Chrome/Chromium and WebKit. They check isolation, autosave/reload, history, comparison, complete reports, PDF output, deletion, storage failure, cross-tab deletion, five viewport sizes, manifest/installability, every offline asset, all 84 pictures, updates and failed-release recovery. Also check native installation, print/share and pagination on intended devices.
@@ -71,8 +69,8 @@ Additional checks:
 ```sh
 node forms/speech/articulation/tests/research.test.cjs
 node forms/speech/articulation/tests/research-server.test.cjs
-ARTICULATION_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node forms/speech/articulation/tests/research-browser.cjs
-APP_ENGINE=webkit ARTICULATION_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node forms/speech/articulation/tests/research-browser.cjs
+node forms/speech/articulation/tests/research-browser.cjs
+APP_ENGINE=webkit node forms/speech/articulation/tests/research-browser.cjs
 ```
 
 ## Optional Google account and device syncing

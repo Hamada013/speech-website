@@ -27,8 +27,8 @@ assert.equal(run("allProbes.find(p=>p.id==='s1-2').reference"),'maːʔ');
 assert.equal(run("allProbes.find(p=>p.id==='s1-2').gloss"),'water');
 assert.equal(run("allProbes.find(p=>p.id==='s1-2').image"),'3.webp');
 
-assert.equal(run("allProbes.find(p=>p.id==='s28-0').spoken"),'إيد');
-assert.equal(run("allProbes.find(p=>p.id==='s28-0').targetIPA"),null);
+assert.equal(run("allProbes.find(p=>p.id==='s28-0').spoken"),'يد');
+assert.equal(run("allProbes.filter(p=>!p.targetIPA).length"),0);assert.equal(run("allProbes.find(p=>p.id==='s28-0').targetIPA"),'j');for(const target of new Set(run("Object.values(COMMON_SUBSTITUTIONS).flat()")))assert(run(`Boolean(phoneme(${JSON.stringify(target)}))`),'Unknown common substitution '+target);
 assert.equal(run("allProbes.find(p=>p.id==='s21-0').targetIPA"),'ʔ');
 assert.equal(run('aggregate().scored'),0);assert.equal(run('processAnalysis().results.length'),0);
 assert.equal((el('trials').innerHTML.match(/class="trial play-card workplace"/g)||[]).length,1);
@@ -48,7 +48,7 @@ assert.equal(run("processAnalysis().results.find(r=>r.id==='fronting'&&r.mode===
 run("recordScore('s12-0','substitution');useSound('t');recordScore('s10-0','substitution');useSound('w');recordScore('s13-0','substitution');useSound('s');recordScore('s14-0','substitution');useSound('s');recordScore('s2-2','omission')");
 for(const id of ['stopping','gliding','depalatalization','deemphasis','finalDeletion'])assert.ok(run(`processAnalysis().results.some(r=>r.id==='${id}')`),id);
 run("recordScore('s4-0','dialect')");assert.equal(run('aggregate().dialect'),1);
-const count=run('aggregate().scored');run("recordScore('s28-0','omission')");assert.equal(run('aggregate().scored'),count);assert.equal(run("state.trials['s28-0']?.status"),undefined);
+run("state.trials['s28-0']={word:'إيد',expected:'ʔiːd',targetIPA:null,status:'skipped',note:'x'};repairAbsentTargets(state.trials)");assert.equal(run("expectedTarget(allProbes.find(p=>p.id==='s28-0'))"),'j');assert.equal(run("state.trials['s28-0'].status"),'skipped');assert.equal(run("state.trials['s28-0'].word"),undefined);run("state.trials['s28-0']={targetIPA:null,targetAbsentChosen:true};repairAbsentTargets(state.trials)");assert.equal(run("expectedTarget(allProbes.find(p=>p.id==='s28-0'))"),null);const count=run('aggregate().scored');run("recordScore('s28-0','omission')");assert.equal(run('aggregate().scored'),count);assert.equal(run("state.trials['s28-0'].status"),undefined);run("delete state.trials['s28-0']");
 run("recordScore('s2-0','substitution');useSound('an unlisted sound','custom')");
 assert.ok(run("processAnalysis().pending.some(p=>p.id==='s2-0'&&p.reason==='replacement')"));
 run("recordScore('s4-1','substitution');useSound('s')");

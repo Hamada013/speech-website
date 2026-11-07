@@ -22,11 +22,11 @@ let browser;
  await page.locator('[data-page="screen"]').first().click();
  await page.locator('[data-score="correct"]').click();
  await page.locator('#nextPicture').click();await page.locator('[data-score="substitution"]').click();await page.locator('[data-phoneme="0"]').click();
- await page.locator('[data-note]').click();await page.locator('#trialNoteEditor [data-prop="note"]').fill('ملاحظة محفوظة');await page.locator('[data-close="trialNoteDialog"]').click();
+ await page.locator('#workplaceMoreButton').click();await page.locator('[data-note]').click();await page.locator('#trialNoteEditor [data-prop="note"]').fill('ملاحظة محفوظة');await page.locator('[data-close="trialNoteDialog"]').click();
  await page.reload();await page.locator('#welcomeLaunch').waitFor({state:'hidden'});
  assert.equal(await page.evaluate(()=>selectedProbe),1);assert.equal(await page.evaluate(()=>state.trials['s1-0'].status),'correct');assert.equal(await page.evaluate(()=>state.trials['s1-1'].note),'ملاحظة محفوظة');
- await page.locator('#continueAssessment').click();await page.locator('#workplaceHelp').click();assert.equal(await page.locator('.workplace-legend svg').count(),22);await page.locator('[data-close="workplaceInfo"]').click();
- await page.locator('#toggleWorkplace').click();assert.equal(await page.locator('body').evaluate(el=>el.classList.contains('workplace-focused')),false);await page.locator('#toggleWorkplace').click();
+ await page.locator('#continueAssessment').click();await page.locator('#workplaceMoreButton').click();await page.locator('#workplaceHelp').click();assert.equal(await page.locator('.workplace-legend svg').count(),23);await page.locator('[data-close="workplaceInfo"]').click();
+ await page.locator('#workplaceMoreButton').click();await page.locator('#toggleWorkplace').click();assert.equal(await page.locator('body').evaluate(el=>el.classList.contains('workplace-focused')),false);await page.locator('#workplaceMoreButton').click();await page.locator('#toggleWorkplace').click();
  for(const viewport of [{width:320,height:740},{width:390,height:844},{width:844,height:390},{width:768,height:1024},{width:1280,height:800}]){
   await page.setViewportSize(viewport);await page.waitForFunction(()=>Math.abs(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--app-height'))-innerHeight)<2);
   const fit=await page.evaluate(()=>{const stage=document.querySelector('.workplace-stage').getBoundingClientRect(),image=document.querySelector('.picture-frame').getBoundingClientRect(),controls=[...document.querySelectorAll('.workplace button')].filter(b=>!b.hidden&&b.getClientRects().length).map(b=>{const r=b.getBoundingClientRect();return r.width>=43&&r.height>=43&&r.left>=0&&r.right<=innerWidth+1&&r.top>=0&&r.bottom<=innerHeight+1;});return {overflow:document.documentElement.scrollWidth>innerWidth,controls:controls.every(Boolean),image:image.height>50&&image.bottom<=stage.bottom+1};});
@@ -38,7 +38,7 @@ let browser;
  assert.equal(await page.evaluate(()=>activeChild().assessments.length),2);assert.equal(await page.evaluate(()=>Object.keys(state.trials).length),0);assert.equal(await page.locator('#childName').inputValue(),'ليان <طفلة>');
  await page.locator('[data-page="screen"]').first().click();await page.locator('[data-score="omission"]').click();await page.locator('#nextPicture').click();await page.locator('[data-score="correct"]').click();
  // A changed elicitation mode must be excluded from the paired change score.
- await page.locator('[data-setting="mode"][data-value="imitation"]').click();
+ await page.locator('#workplaceMoreButton').click();await page.locator('[data-setting="mode"][data-value="imitation"]').click();
  await page.locator('.workplace [data-page="home"]').click();await page.locator('#homeReports').click();
  assert.equal(await page.locator('#reportHistory button').count(),2);assert.equal(await page.locator('#reportPreview .assessment-table').count(),0);
  assert.deepEqual(await page.locator('#reportPreview .process-table th').allTextContents(),['العملية الفونولوجية','الكلمة المستهدفة','التغير الصوتي']);

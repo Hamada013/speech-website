@@ -1,5 +1,4 @@
 const fs=require('node:fs/promises'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict'),{spawn}=require('node:child_process'),vm=require('node:vm'),schema=require('../assets/research-schema.js');
-const {validateAphasia}=require('../scripts/aphasia-research-model.cjs');
 let child;
 (async()=>{
  const dataDir=await fs.mkdtemp(path.join(os.tmpdir(),'articulation-collector-'));
@@ -18,19 +17,10 @@ let child;
  const saved=JSON.parse(await fs.readFile(path.join(dataDir,'dataset.json'),'utf8'));assert.equal(saved.findingRows.length,168);assert((await fs.stat(path.join(dataDir,'arabic-speech-research.xlsx'))).size>10000);
  assert.equal((await fetch(base+'/research/dataset.json')).status,403);
  const workbook=await fetch(base+'/api/research/workbook');assert.equal(workbook.status,200);assert.match(workbook.headers.get('content-disposition'),/arabic-speech-research.xlsx/);assert.equal(Buffer.from(await workbook.arrayBuffer()).subarray(0,2).toString(),'PK');
- const aphasia={version:1,case:{id:'case-a',name:'Local fixture',assessments:[{id:'visit-a',createdAt:'2026-10-27',state:{fields:{currentDate:'2026-10-27',clinicalImpression:'=NOT_A_FORMULA()'},responses:{'item-1-1':'correct','item-11-1':'present'},comments:{},notes:{},supports:{}}}]},catalog:[{id:'item-1-1',section:1,group:'1',observation:false,label:'Task'},{id:'item-11-1',section:11,group:'11',observation:true,label:'Observation'}]};
- assert.equal(validateAphasia(aphasia).case.id,'case-a');assert.throws(()=>validateAphasia({...aphasia,catalog:[]}));
- const postA=async data=>fetch(base+'/api/aphasia/share',{method:'POST',headers:{Origin:base,'Content-Type':'application/json'},body:JSON.stringify(data)});
- for(let i=0;i<2;i++){const result=await postA(aphasia);assert.equal(result.status,200);assert.deepEqual(await result.json(),{cases:1,assessments:1,items:2,caseId:'case-a'});}
- aphasia.case.assessments.push({...aphasia.case.assessments[0],id:'visit-b'});let result=await postA(aphasia);assert.equal(result.status,200);assert.equal((await result.json()).assessments,2);
- const secondCase=JSON.parse(JSON.stringify(aphasia));secondCase.case.id='case-b';secondCase.case.assessments.forEach(a=>a.id+='-b');result=await postA(secondCase);assert.equal((await result.json()).assessments,4);
- const localA=await fetch(base+'/api/aphasia/workbook');assert.equal(localA.status,200);assert.equal(Buffer.from(await localA.arrayBuffer()).subarray(0,2).toString(),'PK');assert.equal((await fetch(base+'/forms/aphasia/langiuage-cognitive/')).status,200);assert.equal((await fetch(base+'/forms/aphasia/langiuage-cognitive/research/dataset.json')).status,403);
- const savedA=JSON.parse(await fs.readFile(path.join(dataDir,'aphasia/dataset.json'),'utf8'));assert.equal(savedA.length,2);assert.equal(savedA[0].case.assessments.length,2);
  const reset=async(app,confirm=app,origin=base)=>fetch(base+'/api/'+app+'/reset',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({confirm})});
  assert.equal((await reset('research','aphasia')).status,400);assert.equal((await reset('research','research','https://unrelated.example')).status,403);
- result=await reset('research');assert.equal(result.status,200);assert.deepEqual(await result.json(),{reset:'research'});assert.equal(JSON.parse(await fs.readFile(path.join(dataDir,'dataset.json'),'utf8')).caseRows.length,0);assert.deepEqual(JSON.parse(await fs.readFile(path.join(dataDir,'aphasia/dataset.json'),'utf8')),savedA);
- result=await reset('aphasia');assert.equal(result.status,200);assert.deepEqual(JSON.parse(await fs.readFile(path.join(dataDir,'aphasia/dataset.json'),'utf8')),[]);assert.equal((await fetch(base+'/api/aphasia/workbook')).status,200);
+ result=await reset('research');assert.equal(result.status,200);assert.deepEqual(await result.json(),{reset:'research'});assert.equal(JSON.parse(await fs.readFile(path.join(dataDir,'dataset.json'),'utf8')).caseRows.length,0);
  // Export after reset starts a new collection and remains idempotent.
- result=await post(fixture);assert.equal((await result.json()).assessments,2);assert.equal(JSON.parse(await fs.readFile(path.join(dataDir,'aphasia/dataset.json'),'utf8')).length,0);
- console.log('PASS: both local collectors write/download real XLSX files, upsert without duplication, retain other cases, reject unapproved origins and hide raw records.');
+ result=await post(fixture);assert.equal((await result.json()).assessments,2);
+ console.log('PASS: the local collector write/download real XLSX files, upsert without duplication, retain other cases, reject unapproved origins and hide raw records.');
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(()=>child?.kill());

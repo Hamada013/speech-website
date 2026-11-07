@@ -24,6 +24,7 @@ const APP_ICONS = {
  report:'<path d="M14 2H4v20h16V8ZM14 2v6h6M8 17v-4m4 4V9m4 8v-6"/>',
  compare:'<path d="M12 3v18M4 20V10h4v10m8 0V5h4v15"/>',
  download:'<path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/>',
+ more:'<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>',
  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/>',
  expand:'<path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/>',
  shrink:'<path d="M3 8h5V3m13 5h-5V3M8 21v-5H3m13 5v-5h5"/>',
@@ -43,5 +44,6 @@ const APP_ICONS = {
 const RESULT_ICONS={correct:'check',substitution:'swap',omission:'minus',distortion:'wave',addition:'plus',dialect:'dialect',unelicited:'question',skipped:'skip'};
 function appIcon(name){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${APP_ICONS[name]||APP_ICONS.info}</svg>`;}
 function iconButton(name,label,attributes='',classes=''){return `<button type="button" class="icon-button ${classes}" aria-label="${escapeHTML(label)}" title="${escapeHTML(label)}" ${attributes}>${appIcon(name)}</button>`;}
+function labelButton(name,label,attributes='',classes='',short=label){return `<button type="button" class="label-button ${classes}" aria-label="${escapeHTML(label)}" title="${escapeHTML(label)}" ${attributes}>${appIcon(name)}<span>${escapeHTML(short)}</span></button>`;}
 function setButtonIcon(button,name,label){if(!button)return;button.classList.add('icon-button');button.setAttribute('aria-label',label);button.title=label;button.innerHTML=appIcon(name);}
 function contactLinks(){return '<a href="mailto:slp.ahmadghanem@gmail.com">slp.ahmadghanem@gmail.com</a><a href="https://wa.me/963988451245" target="_blank" rel="noopener" dir="ltr">WhatsApp +963 988 451 245</a>';}

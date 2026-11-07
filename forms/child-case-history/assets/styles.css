@@ -461,3 +461,11 @@ dialog::backdrop {
   :root { background: white; }
   .report-note { border-radius: 0; }
 }
+.field[hidden]{display:none}
+.report-snapshot{border:1px solid #d7e6dc;background:#f6fbf8;border-radius:14px;padding:14px 16px;margin:14px 0 20px;break-inside:avoid}
+.report-snapshot h3{margin-top:0}
+.report-snapshot .attention{background:#fff4e8;border:1px solid #f4c9a0;border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.report-snapshot .attention ul{margin:6px 0 0;padding-inline-start:20px}
+/* Keep short numeric answers aligned with the other answers in each report language. */
+html[dir=rtl] .report dd{text-align:right}
+html[dir=ltr] .report dd{text-align:left}

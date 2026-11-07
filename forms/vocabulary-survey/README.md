@@ -2,7 +2,7 @@
 
 Arabic receptive and expressive checklists, child profiles, and reports saved in IndexedDB on the current device. No backend or child-data upload. Existing sessions migrate into reusable profiles; switching between tests fills the same child's details. Edits affect future tests; historical metadata remains a snapshot. Child codes are generated randomly by default and kept read-only; users enter the child’s name. Existing codes remain unchanged. Codes are stable, case-insensitive identifiers. Device/browser storage deletion removes records; JSON/CSV exports provide portable copies, and importing a session restores its child profile.
 
-Serve the repository root: `python3 -m http.server 8000`, then open `/forms/vocabulary-survey/`. Deploy the repository with its existing `tools/VSS/voc` images and audio at the same relative paths. Other apps and their caches are independent.
+Serve the repository root: `python3 -m http.server 8000`, then open `/forms/vocabulary-survey/`. The pictures and recordings are this survey's own copies in `media/` (taken from the Vocabulary Builder app). `node scripts/build-data.cjs` reads the word labels from the Vocabulary Builder repository next to this one (`VOC_SOURCE` to override); the data version changes only when words or media revisions change. Other apps and their caches are independent.
 
 ## Word lists
 
@@ -31,11 +31,11 @@ Installing saves the local shell. The download icon offers installation plus an 
 ## Checks
 
 - `npm test --prefix forms/vocabulary-survey`: strict matrices, bank counts, nested 50/100 membership, scoring, imports, exports, matched-word progress/decline, peer exclusions and PWA integrity.
-- `SURVEY_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" SURVEY_SMOKE=1 node forms/vocabulary-survey/tests/browser.cjs`: Chromium + WebKit smoke checks; omit `SURVEY_SMOKE` for complete media-download/offline validation.
-- `SURVEY_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node forms/vocabulary-survey/tests/profiles-browser.cjs`: profile edits/linking/reload/isolation, report tabs, repeat/peer graphs, responsive layout, screenshots and offline profile reopening.
+- `SURVEY_SMOKE=1 node forms/vocabulary-survey/tests/browser.cjs`: Chromium + WebKit smoke checks; omit `SURVEY_SMOKE` for complete media-download/offline validation.
+- `node forms/vocabulary-survey/tests/profiles-browser.cjs`: profile edits/linking/reload/isolation, report tabs, repeat/peer graphs, responsive layout, screenshots and offline profile reopening.
 
 The browser regressions use synthetic records only. `SURVEY_ENGINE=chromium` or `webkit` selects one engine. The original five-trial smoke fixtures inject a test-only sample option; production setup exposes only 50 (receptive) or 50/100 (expressive).
 
 ## App artwork
 
-`assets/logo-source.jpg` is the supplied Language Test artwork. The header, home, browser favicons, Apple touch icon, manifest and shortcut use local exports in `icons/`. Maskable exports fit the complete artwork within the central safe circle. Regenerate with `SURVEY_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" npm run build:icons --prefix forms/vocabulary-survey`, refresh install screenshots with `SURVEY_SCREENSHOTS=1 SURVEY_ENGINE=chromium` on the profile browser check, then rebuild the PWA release.
+`assets/logo-source.jpg` is the supplied Language Test artwork. The header, home, browser favicons, Apple touch icon, manifest and shortcut use local exports in `icons/`. Maskable exports fit the complete artwork within the central safe circle. Regenerate with `npm run build:icons --prefix forms/vocabulary-survey`, refresh install screenshots with `SURVEY_SCREENSHOTS=1 SURVEY_ENGINE=chromium` on the profile browser check, then rebuild the PWA release.

@@ -20,6 +20,7 @@ try {
     state = {...freshState(),...stored.state,meta:{...freshState().meta,...stored.state.meta}};
     if (!Array.isArray(state.patterns)) state.patterns=[];
     if (!Array.isArray(state.recommendations)) state.recommendations=[];
+    repairAbsentTargets(state.trials);
     // Preserve older records; do not silently reinterpret them using the new dialect baseline.
     for(const probe of allProbes){const record=state.trials[probe.id];if(record?.status&&!hasOwn(record,'targetIPA')){record.targetIPA='';record.word=record.word||probe.word;record.expected=record.expected||'';record.referenceNeedsReview=true;}}
     saving = true;
@@ -128,7 +129,9 @@ function recordScore(id,status){
 }
 function openSoundPicker(id,prop,status=null){
  soundPicker={id,prop,status};$('soundDialogTitle').textContent=prop==='targetIPA'?'اختر الصوت المرجعي المستهدف':'اختر الصوت الذي نطق به الطفل';
- $('phonemeGrid').innerHTML=PHONEMES.map((p,i)=>`<button type="button" data-phoneme="${i}" class="phoneme-button ${p.letter.length>2?'long-label':''}"><span>${escapeHTML(p.letter)}</span><b dir="ltr">/${escapeHTML(p.ipa)}/</b></button>`).join('');
+ const probe=allProbes.find(p=>p.id===id),common=prop==='actual'&&(status||trialFor(id).status)==='substitution'?commonSubstitutions(expectedTarget(probe)):[];
+ $('phonemeGrid').innerHTML=PHONEMES.map((p,i)=>{const likely=common.includes(p.ipa);return `<button type="button" data-phoneme="${i}" class="phoneme-button ${p.letter.length>2?'long-label':''} ${likely?'common-sound':''}" ${likely?`aria-label="${escapeHTML(p.letter)} /${escapeHTML(p.ipa)}/، إبدال شائع"`:''}><span>${escapeHTML(p.letter)}</span><b dir="ltr">/${escapeHTML(p.ipa)}/</b></button>`;}).join('');
+ $('soundDialogHelp').hidden=!common.length;
  $('customSoundForm').hidden=true;$('customSound').value='';$('soundPickerError').textContent='';$('absentTarget').hidden=prop!=='targetIPA';openDialog($('soundDialog'));
 }
 function useSound(value,source='picker'){
@@ -142,6 +145,7 @@ function useSound(value,source='picker'){
    let rebuilt='',offset=0;
    while(offset<fullWord.length){const token=tokens.find(t=>fullWord.startsWith(t,offset));if(token){rebuilt+=(token===current?(value||''):token);offset+=token.length;}else{rebuilt+=fullWord[offset];offset++;}}
    r={word:r.word||probe.spoken,expected:current?rebuilt:fullWord,targetIPA:value};
+   if(value===null)r.targetAbsentChosen=true;
   }
  }else{
   r=snapshotReference(id);r.actual=value;r.actualIPA=phoneme(value)?.ipa||null;r.actualSource=source;

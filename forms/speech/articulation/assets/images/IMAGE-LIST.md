@@ -67,10 +67,10 @@ The Arabic labels and IPA below are editable urban Syrian drafts; confirm the ch
 - `61.webp` — grapes — عنب — /ʕənab/
 - `62.webp` — crescent moon — هلال — /hlaːl/
 - `63.webp` — foal / young horse — مهر — /məhr/
-- `64.webp` — face — وشّ — /wəʃʃ/
+- `64.webp` — face — وجه — /wadʒh/
 - `65.webp` — rose — وردة — /warde/
 - `66.webp` — medicine — دوا — /dawa/
-- `67.webp` — bucket — دلو — /dalu/
+- `67.webp` — bucket — دلو — /dalw/
 - `68.webp` — car — سيّارة — /sajjaːra/
 - `69.webp` — tea — شاي — /ʃaːj/
 

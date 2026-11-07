@@ -14,8 +14,8 @@ After editing the main website:
 node scripts/build-site.cjs
 node scripts/build-site.cjs --check
 node tests/site.test.cjs
-SITE_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node tests/site-browser.cjs
-SITE_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node tests/site-pwa.cjs
+node tests/site-browser.cjs
+node tests/site-pwa.cjs
 ```
 
 Use `SITE_ENGINE=webkit` with either browser suite to check Safari's engine. The layout suite visits all twelve directories at desktop, phone, small-phone and short-landscape sizes, in English and Arabic. It checks every paginated item, drawer direction, launch motion, reduced motion and keyboard dismissal.

@@ -10,7 +10,7 @@ const now = new Date(2026, 9, 8, 12);
 
 test('all nine sections and every option have unique stable keys and two labels', () => {
   assert.equal(sections.length, 9);
-  assert.equal(M.fields.length, 71);
+  assert.equal(M.fields.length, 75);
   assert.equal(new Set(M.fields.map(f => f.id)).size, M.fields.length);
   for (const f of M.fields) {
     assert.equal(f.label.length, 2);
@@ -86,7 +86,7 @@ test('blank reports never invent normal findings or a clinical summary', () => {
   assert.equal((html.match(/class="report-section"/g) || []).length, 9);
   assert.doesNotMatch(html, /Normal quality|Usually understood|No concern reported/);
   assert.doesNotMatch(html, /Clinician’s synthesis of relevant history/);
-  assert.match(html, /71 fields not recorded/);
+  assert.match(html, /75 fields not recorded/);
   assert.match(html, /Unanswered items are not negative findings/);
 });
 
@@ -110,10 +110,11 @@ test('bilingual reports translate labels and options, retaining free text only o
   assert.match(html, /lang="ar" dir="rtl"/); assert.match(html, /lang="en" dir="ltr"/);
   assert.match(html, /Stroke/); assert.match(html, /سكتة دماغية/);
   assert.match(html, /Not recorded/); assert.match(html, /غير مسجل/);
-  assert.equal((html.match(/تفاصيل خاصة/g) || []).length, 1);
-  assert.equal((text.match(/تفاصيل خاصة/g) || []).length, 1);
+  // Once in the clinician snapshot and once in its section, never once per language.
+  assert.equal((html.match(/تفاصيل خاصة/g) || []).length, 2);
+  assert.equal((text.match(/تفاصيل خاصة/g) || []).length, 2);
   assert.match(text, /سكتة دماغية \/ Stroke/);
-  assert.equal((html.match(/class="report-row(?: long-row)?"/g) || []).length, M.fields.length);
+  assert.equal((html.replace(/<section class="report-snapshot">[\s\S]*?<\/section>/, '').match(/class="report-row(?: long-row)?"/g) || []).length, M.fields.length);
 });
 
 test('the entry point and offline manifest reference existing local files in load order', () => {
@@ -124,4 +125,21 @@ test('the entry point and offline manifest reference existing local files in loa
   const manifest = JSON.parse(fs.readFileSync(path.join(root, 'manifest.webmanifest'), 'utf8'));
   assert.equal(manifest.scope, './');
   for (const icon of manifest.icons) assert.ok(fs.existsSync(path.join(root, icon.src)));
+});
+
+test('clinician snapshot flags only explicit answers and every rule uses a real option', () => {
+  for (const rule of M.attentionRules) for (const [id, key] of [...rule.any, ...(rule.all || [])]) {
+    const field = M.fields.find(item => item.id === id);
+    assert.ok(field, id);
+    assert.ok(field.options.some(option => option.key === key), `${id}: ${key}`);
+  }
+  assert.equal(M.attentionItems({}).length, 0);
+  assert.doesNotMatch(M.reportHTML({}, { lang: 0 }), /report-snapshot/);
+  assert.equal(M.attentionItems({ onsetPattern: 'sudden' }).length, 0, 'Sudden onset alone does not claim a missing medical review');
+  assert.equal(M.attentionItems({ onsetPattern: 'sudden', medicalReview: 'yes' }).length, 0);
+  assert.equal(M.attentionItems({ onsetPattern: 'sudden', medicalReview: 'no' })[0][0], 'Sudden onset, not yet seen by a doctor');
+  assert.equal(M.attentionItems({ swallowing: ['none'], hearing: ['none'] }).length, 0);
+  assert.equal(M.attentionItems({ swallowing: ['cough', 'wet'], nutritionRoute: ['gastrostomy'] }).length, 2);
+  assert.match(M.reportHTML({ concernWords: '<b>صوتي</b>' }, { lang: 0 }), /&lt;b&gt;صوتي/);
+  assert.match(M.reportText({ swallowing: ['cough'] }, { lang: 0 }), /Possible swallowing signs/);
 });

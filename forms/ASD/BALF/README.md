@@ -20,9 +20,9 @@ From the repository root:
 node forms/ASD/assessment-shared/build-pwa.cjs
 node forms/ASD/assessment-shared/build-pwa.cjs --check
 node forms/ASD/assessment-shared/model.test.mjs
-ASD_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node forms/ASD/assessment-shared/installability.test.cjs
-ASD_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node forms/ASD/assessment-shared/pwa.test.cjs
-ASD_PLAYWRIGHT="$PWD/tools/VSS/voc/node_modules/playwright" node forms/ASD/assessment-shared/browser.test.cjs
+node forms/ASD/assessment-shared/installability.test.cjs
+node forms/ASD/assessment-shared/pwa.test.cjs
+node forms/ASD/assessment-shared/browser.test.cjs
 ```
 
 Build both releases after changing shared files. Publish both app folders and assessment-shared together; every worker verifies its complete shell before replacing the previous release. Public electronic M-CHAT distribution needs the authors' licensing agreement; this change does not establish one.

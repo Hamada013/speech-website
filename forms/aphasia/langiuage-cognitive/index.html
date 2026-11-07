@@ -1612,7 +1612,7 @@
     </div>
 
     <div class="card">
-      <label>إذا كان سعر فرشاة الأسنان 5000 ولديك 1000، كم فرشاة أسنان يمكنك شراؤها؟</label>
+      <label>إذا كان سعر فرشاة الأسنان 1000 ولديك 5000، كم فرشاة أسنان يمكنك شراؤها؟</label>
       <div class="button-row">
         <button class="btn-correct" onclick="score('10','correct',this)">+</button>
         <button class="btn-dontknow" onclick="score('10','dontknow',this)">/</button>
@@ -1975,7 +1975,7 @@
       </div>
     </div>
     <div class="card">
-      <label>بعد انتصارهم، تناول فريق البيسبول البيتزا وشاهدوا فيلمًا</label>
+      <label>بعد انتصارهم، تناول فريق كرة القدم البيتزا وشاهدوا فيلمًا</label>
       <div class="button-row">
         <button class="btn-correct" onclick="score('12sub1','correct',this)">+</button>
         <button class="btn-dontknow" onclick="score('12sub1','dontknow',this)">/</button>
@@ -1987,7 +1987,7 @@
   <h3> سرد قصة </h3>
   <div class="card-row">
     <div class="card">
-      <label>احتفلت هيلين بعيد ميلادها في حديقة الحيوانات الأليفة. حضر عشرة من أصدقائها.ضحك جميع الأطفال عندما وجدوا ماعزًا يأكل الكعكة والآيس</label>
+      <label>احتفلت هيلين بعيد ميلادها في حديقة الحيوانات الأليفة. حضر عشرة من أصدقائها.ضحك جميع الأطفال عندما وجدوا ماعزًا يأكل الكعكة والآيس كريم</label>
       <div class="button-row">
         <button class="btn-correct" onclick="score('12sub2','correct',this)">+</button>
         <button class="btn-dontknow" onclick="score('12sub2','dontknow',this)">/</button>
@@ -2362,15 +2362,15 @@
 <!-- التقرير النهائي -->
 
 </div><div class="workspace-navigation"><button data-action="previous" data-icon="back" aria-label="البند السابق"></button><span id="itemPosition" aria-live="polite"></span><button data-action="next" data-icon="arrow" aria-label="البند التالي"></button></div></main>
-<main id="reportView" class="report-view" hidden><div class="report-toolbar"><button data-action="history" data-icon="back" aria-label="عودة إلى تقارير الحالة"></button><h1 id="reportHeading">التقرير</h1><button id="reportLanguage" data-action="report-language" data-icon="language" aria-label="تقرير باللغة الإنجليزية" aria-pressed="false"></button><button data-action="print" data-icon="print" aria-label="طباعة وحفظ PDF"></button><button data-action="copy" data-icon="copy" aria-label="نسخ التقرير"></button><button data-action="share" data-icon="share" aria-label="إرسال إلى المصنف"></button></div><p id="reportStatus" role="status"></p><div id="reportPreview" class="report-document"></div><details hidden><summary>النص</summary><textarea id="report" readonly></textarea></details></main>
+<main id="reportView" class="report-view" hidden><div class="report-toolbar"><button data-action="history" data-icon="back" aria-label="عودة إلى تقارير الحالة"></button><h1 id="reportHeading">التقرير</h1><button id="reportLanguage" data-action="report-language" data-icon="language" aria-label="تقرير باللغة الإنجليزية" aria-pressed="false"></button><button data-action="print" data-icon="print" aria-label="طباعة وحفظ PDF"></button><button data-action="copy" data-icon="copy" aria-label="نسخ التقرير"></button><button data-action="share" data-icon="sheet" aria-label="إرسال إلى ملف البحث" title="إرسال إلى ملف البحث"></button></div><p id="reportStatus" role="status"></p><div id="reportPreview" class="report-document"></div><details hidden><summary>النص</summary><textarea id="report" readonly></textarea></details></main>
 <dialog id="accountsDialog" aria-labelledby="accountsTitle"><div class="dialog-heading"><h2 id="accountsTitle">الحالات على الجهاز</h2><button data-close data-icon="close" aria-label="إغلاق"></button></div><form id="createCaseForm"><label for="caseName">اسم الحالة</label><div class="input-action"><input id="caseName" maxlength="200" required autocomplete="off"><button type="submit" data-icon="plus" aria-label="إنشاء حالة"></button></div></form><label for="caseSearch">بحث</label><input id="caseSearch" type="search"><div id="caseList" class="case-list"></div><div class="dialog-actions"><button data-action="backup" data-icon="download" aria-label="نسخة احتياطية لكل الحالات"></button><label class="icon-button" title="استعادة نسخة احتياطية"><span data-icon="upload"></span><span class="sr-only">استعادة نسخة احتياطية</span><input id="restoreBackup" type="file" accept="application/json" hidden></label></div></dialog>
 <dialog id="sectionsDialog" aria-labelledby="sectionsTitle"><div class="dialog-heading"><h2 id="sectionsTitle">أقسام التقييم</h2><button data-close data-icon="close" aria-label="إغلاق"></button></div><nav id="sectionButtons" class="section-list" aria-label="أقسام التقييم"></nav></dialog>
 <dialog id="historyDialog" aria-labelledby="historyTitle"><div class="dialog-heading"><h2 id="historyTitle">تقارير الحالة</h2><button data-close data-icon="close" aria-label="إغلاق"></button></div><div id="historyProgress"></div><p class="muted">اختر تقريرين للمقارنة؛ التقرير التاريخي لا يبدّل الفحص الجاري.</p><div id="historyList"></div><div class="dialog-actions"><button data-action="compare" data-icon="compare" aria-label="مقارنة التقريرين المحددين"></button><button data-action="new" data-icon="plus" aria-label="تقييم جديد"></button></div></dialog>
 <dialog id="confirmDialog" aria-labelledby="confirmTitle"><h2 id="confirmTitle"></h2><p id="confirmText"></p><div class="dialog-actions"><button id="confirmYes" class="text-button">تأكيد</button><button data-close class="text-button">إلغاء</button></div></dialog>
-<dialog id="shareDialog" aria-labelledby="shareTitle"><div class="dialog-heading"><h2 id="shareTitle">ملف Excel المحلي</h2><button data-close data-icon="close" aria-label="إغلاق"></button></div><p>يُحدّث الملف على هذا الكمبيوتر عند الضغط على أيقونة المشاركة.</p><label><input id="shareIdentifiers" type="checkbox"> تضمين الاسم والبيانات التعريفية عند التحديث التالي</label><div class="dialog-actions"><a id="openWorkbook" class="icon-button" target="_blank" rel="noopener" aria-label="فتح ملف Excel المحلي"><span data-icon="sheet"></span></a><button data-action="send-sheet" data-icon="upload" aria-label="تحديث ملف Excel المحلي"></button><button data-action="export-case" data-icon="download" aria-label="تنزيل JSON على هذا الجهاز"></button></div><p id="sheetStatus" role="status" aria-live="polite"></p></dialog>
+<dialog id="shareDialog" aria-labelledby="shareTitle"><div class="dialog-heading"><h2 id="shareTitle">إرسال إلى ملف البحث</h2><button data-close data-icon="close" aria-label="إغلاق"></button></div><p>يُرسل رمز الشخص والعمر والنتائج فقط إلى ملف Excel على هذا الكمبيوتر. لا يُرسل الاسم أو الطبيب أو الفاحص أو التواريخ الكاملة أو الملاحظات.</p><form id="researchForm"><div id="researchFields" class="research-fields"></div><label class="research-consent"><input id="researchConsent" type="checkbox"> وافق الشخص (أو من يمثله) على استخدام هذه البيانات في البحث</label></form><p id="sheetStatus" role="status" aria-live="polite"></p><div class="dialog-actions"><button data-action="send-sheet" data-icon="upload" aria-label="إرسال إلى ملف البحث"></button><a id="openWorkbook" class="icon-button" target="_blank" rel="noopener" aria-label="فتح ملف Excel المحلي"><span data-icon="sheet"></span></a><button data-action="export-case" data-icon="download" aria-label="تنزيل نسخة احتياطية JSON"></button></div></dialog>
 <dialog class="floating-box" id="floatingBox" aria-label="معلومات التقييم"></dialog>
 <div id="printArea" class="report-document" lang="ar" dir="rtl"></div>
 
-<script src="assets/model.js"></script><script src="assets/icons.js"></script><script src="script.js"></script><script src="assets/workbook-reset.js"></script><script src="assets/app.js"></script><script src="assets/pwa.js"></script>
+<script src="assets/model.js"></script><script src="assets/icons.js"></script><script src="assets/research.js"></script><script src="assets/added-items.js"></script><script src="script.js"></script><script src="assets/workbook-reset.js"></script><script src="assets/app.js"></script><script src="assets/pwa.js"></script>
 </body>
 </html>

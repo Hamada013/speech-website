@@ -84,18 +84,31 @@
  $id('restoreBackup').onchange=async e=>{try{const file=e.target.files[0];if(!file)return;if(file.size>25e6)throw Error('large');const restored=M.validate(JSON.parse(await file.text()));confirmAction('استعادة نسخة احتياطية','ستستبدل هذه النسخة حالات هذا التطبيق على الجهاز. نزّل نسختك الحالية أولاً عند الحاجة.',()=>{try{const raw=localStorage.getItem(M.KEY),rev=raw?JSON.parse(raw).revision:0;restored.revision=Number.isInteger(rev)?rev:0;db=restored;blocked=false;if(commit()){if(active())apply(active().state);else apply(initial);refreshHome();showView('appHome');}}catch(err){error('تعذرت الاستعادة؛ احتفظ بنسختك وحاول مجدداً.');}});}catch(err){error('ملف النسخة غير صالح أو أكبر من الحد المسموح. لم نغيّر الحالات.');}finally{e.target.value='';}};
  // Retire stored online collector URLs, tokens and automatic-upload settings.
  try{localStorage.removeItem('aphasia-sheet-settings-v1');}catch{}
- const bridge=['localhost','127.0.0.1'].includes(location.hostname)?location.origin:'http://127.0.0.1:8876';
+ // This app's own collector. Opened from it, use the same origin; otherwise reach it on this computer.
+ const bridge=location.port==='8878'&&['localhost','127.0.0.1'].includes(location.hostname)?location.origin:'http://127.0.0.1:8878';
  $id('openWorkbook').href=bridge+'/api/aphasia/workbook';
  WorkbookReset.attach({anchor:$id('openWorkbook'),app:'aphasia',label:'اللغة والمعرفة',bridge});
- function payload(){const c=M.clone(activeCase());if(!$id('shareIdentifiers').checked){c.name='Case '+c.id.slice(0,8);for(const a of c.assessments)for(const key of ['name','treatingDoctor','examinerName'])a.state.fields[key]='';}return {version:1,case:c,catalog,revision:db.revision};}
+ const R=AphasiaResearch;
+ const researchChoices=[['group','المجموعة',[['control','شخص سليم (مجموعة المقارنة)'],['aphasia','حبسة'],['other','حالة عصبية أخرى']]],['sex','الجنس',[['female','أنثى'],['male','ذكر']]],['handedness','اليد المستخدمة',[['right','اليمنى'],['left','اليسرى'],['both','كلتاهما']]],['etiology','السبب',[['none','لا يوجد'],['stroke','سكتة دماغية'],['tbi','إصابة دماغية رضّية'],['tumour','ورم'],['progressive','مرض تنكسي'],['other','أخرى']]],['hearing','السمع',[['normal','طبيعي'],['corrected','مصحّح بمعينة'],['impaired','ضعيف']]],['vision','البصر',[['normal','طبيعي'],['corrected','مصحّح بنظارة'],['impaired','ضعيف']]],['dialect','اللهجة',[['syrian','سورية'],['levantine','شامية أخرى'],['other','أخرى']]],['otherLanguages','يستخدم لغة أخرى',[['no','لا'],['yes','نعم']]]];
+ const researchNumbers=[['age','العمر بالسنوات',18,110],['educationYears','سنوات التعليم',0,30],['monthsPostOnset','الأشهر منذ بداية المشكلة',0,600]];
+ function researchForm(){const r=activeCase()?.research||{};$id('researchFields').innerHTML=researchChoices.map(([k,label,list])=>`<fieldset class="research-chips"><legend>${label}</legend><div>${list.map(([v,l])=>`<label><input type="radio" name="r-${k}" value="${v}" ${r[k]===v?'checked':''}><span>${l}</span></label>`).join('')}</div></fieldset>`).join('')+`<div class="research-numbers">${researchNumbers.map(([k,label,min,max])=>`<label>${label}<input type="text" inputmode="numeric" dir="ltr" name="r-${k}" data-min="${min}" data-max="${max}" value="${r[k]??''}"></label>`).join('')}</div>`;$id('researchConsent').checked=false;$id('sheetStatus').textContent='';}
+ function readResearch(){const f=$id('researchForm'),out={};for(const [k] of researchChoices)out[k]=f.querySelector(`[name="r-${k}"]:checked`)?.value||'';for(const [k] of researchNumbers)out[k]=f.querySelector(`[name="r-${k}"]`).value;return R.cleanResearch(out);}
+ const reportedAssessment=()=>{const c=activeCase();return c?.assessments.find(a=>a.id===(viewRecord||active())?.id)||active();};
+ function researchPacket(){const c=activeCase(),a=reportedAssessment();return {record:R.record({caseCode:c.researchCode,assessmentId:a.id,visitDate:dated(a),research:c.research,state:a.state,catalog}),catalog};}
  let sending=false;
  async function sendSheet(){
-  if(sending||!activeCase()||!save())return;sending=true;$id('sheetStatus').textContent='جارٍ تحديث ملف Excel المحلي…';
-  try{const response=await fetch(bridge+'/api/aphasia/share',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload()),signal:AbortSignal.timeout(120000)}),receipt=await response.json();if(!response.ok||receipt.caseId!==activeCase().id||!Number.isInteger(receipt.assessments))throw Error('Unverified receipt');$id('sheetStatus').textContent=`تم تحديث ملف Excel المحلي: ${receipt.assessments} فحص.`;}
-  catch{$id('sheetStatus').textContent='تعذر تحديث Excel. افتح التطبيق من الخادم المحلي على الكمبيوتر. تبقى الحالات محفوظة؛ يمكنك تنزيل JSON.';}
+  if(sending||!activeCase()||!save())return;
+  const research=readResearch(),missing=R.missingResearch(research);
+  if(!$id('researchConsent').checked){$id('sheetStatus').textContent='لا تُرسل البيانات دون موافقة.';return;}
+  if(missing.length){$id('sheetStatus').textContent='أكمل كل الخيارات، لأن المعايير والمقارنة تعتمد عليها.';return;}
+  // A random code, kept with the case, identifies the person in the file instead of their name.
+  if(!mutate(()=>{const c=activeCase();c.research=research;c.researchCode=c.researchCode||'P-'+uid().replace(/-/g,'').slice(0,8).toUpperCase();}))return;
+  sending=true;$id('sheetStatus').textContent='جارٍ الإرسال إلى ملف البحث…';const packet=researchPacket();
+  try{const response=await fetch(bridge+'/api/aphasia/share',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(packet),signal:AbortSignal.timeout(60000)}),receipt=await response.json();if(!response.ok)throw Error(receipt.error||'failed');$id('sheetStatus').textContent=`حُفظت في ملف البحث · ${receipt.assessments} زيارة`;}
+  catch{download(packet,`aphasia-${packet.record.caseCode}-${packet.record.visitMonth}.json`);$id('sheetStatus').textContent='خادم الملف غير مشغّل على هذا الجهاز، فنُزّلت البيانات كملف لإضافتها لاحقاً من الكمبيوتر.';}
   finally{sending=false;}
  }
- function share(){if(!activeCase())return;$id('shareIdentifiers').checked=false;dialog('shareDialog');sendSheet();}
+ function share(){if(!activeCase())return;researchForm();dialog('shareDialog');}
  function info(){
   const groups=[
    ['التنقل والحالات',[['home','الرئيسية','العودة إلى شاشة التطبيق الرئيسية.'],['people','الحالات','إنشاء حالة أو اختيار حالة محفوظة على هذا الجهاز.'],['menu','الأقسام','الانتقال إلى قسم من أقسام التقييم.'],['play','متابعة','متابعة التقييم الحالي أو فتح فحص محفوظ للتعديل.'],['plus','إضافة','إنشاء حالة أو فحص جديد بحسب النافذة.'],['report','التقارير / ملاحظة القسم','في الشريط العلوي: التقارير. بجانب المهمة: كتابة ملاحظة للقسم.'],['chart','المتابعة','عرض تقارير الحالة ورسوم التقدم.']]],

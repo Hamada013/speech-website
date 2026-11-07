@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
-const playwright=require('../../../../tools/VSS/voc/node_modules/playwright'),root=path.resolve(__dirname,'..'),engine=process.env.APP_ENGINE||'chromium';
+const playwright=require(process.env.APP_PLAYWRIGHT||'playwright'),root=path.resolve(__dirname,'..'),engine=process.env.APP_ENGINE||'chromium';
 (async()=>{
  const server=http.createServer((req,res)=>{const relative=new URL(req.url,'http://localhost').pathname,file=path.resolve(root,'.'+(relative==='/'?'/index.html':relative));if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}fs.readFile(file,(err,body)=>{if(err){res.writeHead(404).end();return;}res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json'})[path.extname(file)]||'application/octet-stream');res.end(body);});});
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));let browser;

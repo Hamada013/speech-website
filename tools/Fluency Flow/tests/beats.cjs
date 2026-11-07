@@ -38,9 +38,13 @@ function translations() {
   assert.deepEqual([...words].filter(word => !listed.has(word)), [], 'Arabic words without a checked beat count');
 
   // Shared words agree with VOC's checked counts.
-  const voc = JSON.parse(fs.readFileSync(path.join(app, '../VSS/voc/assets/production-counts.json'), 'utf8'));
-  const disagree = Object.values(voc).filter(entry => listed.has(clean(entry.name)) && listed.get(clean(entry.name)) !== entry.count).map(entry => entry.name);
-  assert.deepEqual(disagree, [], 'Counts that differ from VOC');
+  // VOC now lives in its own repository; compare when it is checked out next to this one.
+  const vocCounts = path.resolve(app, process.env.VOC_SOURCE || '../../../vocabulary-builder', 'assets/production-counts.json');
+  if (fs.existsSync(vocCounts)) {
+    const voc = JSON.parse(fs.readFileSync(vocCounts, 'utf8'));
+    const disagree = Object.values(voc).filter(entry => listed.has(clean(entry.name)) && listed.get(clean(entry.name)) !== entry.count).map(entry => entry.name);
+    assert.deepEqual(disagree, [], 'Counts that differ from VOC');
+  }
 
   // Punctuation and vowel marks do not change a count; the board uses the listed value.
   assert.equal(countSyllables('شجرة'), 3); assert.equal(countSyllables('شمس'), 1); assert.equal(countSyllables('باب'), 1);

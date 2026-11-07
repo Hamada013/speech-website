@@ -147,6 +147,7 @@
       if (input.checked && input.value === 'other') toggleNote(id, true);
     } else answers[id] = input.value;
     dirty = true; save(); updateCompletion();
+    if (input.dataset.part && !M.dateError(id, answers)) validateDates();
     if (messageState === 'dates' && !validateDates()) { messageState = ''; updateStatus(); }
   }
   function go(nextStep) {
@@ -174,7 +175,11 @@
   }
   $('history').addEventListener('input', event => { if (!['checkbox', 'radio'].includes(event.target.type)) updateAnswer(event.target); });
   $('history').addEventListener('change', event => { if (['checkbox', 'radio'].includes(event.target.type)) updateAnswer(event.target); });
-  $('history').addEventListener('focusout', event => { if (event.target.dataset.part) validateDates(); });
+  // Validate after the tap lands: a message appearing or clearing moves the page, and a moved target loses the tap.
+  $('history').addEventListener('focusout', event => {
+    if (!event.target.dataset.part || event.relatedTarget?.dataset?.field === event.target.dataset.field) return;
+    setTimeout(validateDates, 250);
+  });
   $('history').addEventListener('submit', event => event.preventDefault());
   $('history').addEventListener('click', event => {
     const noteButton = event.target.closest('[data-note-toggle]'), clearButton = event.target.closest('[data-clear-choice]');

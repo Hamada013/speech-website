@@ -18,6 +18,29 @@ const PHONEMES = [
  ['ياء مد','iː','vowel','vowel',true],['ضمة','u','vowel','vowel',true],['واو مد','uː','vowel','vowel',true],
  ['إي','e','vowel','vowel',true],['إي مد','eː','vowel','vowel',true],['أو','o','vowel','vowel',true],['أو مد','oː','vowel','vowel',true],['حركة مركزية','ə','vowel','vowel',true]
 ].map(([letter,ipa,place,manner,voiced,emphatic=false])=>({letter,ipa,place,manner,voiced,emphatic}));
+// Likely replacements per target, highlighted in the sound picker only. Draft from common
+// developmental patterns (stopping, fronting, gliding, de-emphasis, voicing); clinician-editable.
+const COMMON_SUBSTITUTIONS = {
+ 'ʔ':['ʕ','h'],b:['p','m','d'],t:['d','k','tˤ'],'θ':['s','t','f'],'ʒ':['z','d','ʃ'],'dʒ':['ʒ','d','z'],
+ 'ħ':['h','ʕ','x'],x:['k','h','ħ'],d:['t','ɡ','dˤ'],'ð':['z','d','θ'],r:['l','w','j','ɣ'],'ɾ':['l','w','j','ɣ'],
+ z:['s','ð','d'],s:['θ','ʃ','t'],'ʃ':['s','tʃ','t'],'sˤ':['s','θ','tˤ'],'dˤ':['d','ðˤ','tˤ'],'tˤ':['t','d','dˤ'],
+ 'zˤ':['z','s','ðˤ'],'ðˤ':['ð','z','dˤ'],'ʕ':['ʔ','ħ','ɣ'],'ɣ':['x','ɡ','ʕ'],f:['p','b','θ'],q:['k','ʔ','ɡ'],
+ k:['t','ʔ','ɡ'],l:['j','w','r'],m:['b','n'],n:['m','l','d'],h:['ʔ','ħ'],w:['b','j','l'],j:['w','l'],
+ 'ɡ':['d','k'],p:['b','t'],v:['f','b'],'tʃ':['ʃ','t']
+};
+function commonSubstitutions(target){return COMMON_SUBSTITUTIONS[phoneme(target)?.ipa]||[];}
+// These three items once had no target and locked their score buttons. Drop the saved empty
+// target so they use the current reference; keep a choice made with the "no target" button.
+const REPAIRED_REFERENCES = {'s26-2':['وشّ','wəʃʃ'],'s27-2':['دلو','dalu'],'s28-0':['إيد','ʔiːd']};
+function repairAbsentTargets(trials){
+ for(const [id,[word,expected]] of Object.entries(REPAIRED_REFERENCES)){
+  const record=trials?.[id];
+  if(!record||record.targetIPA!==null||record.targetAbsentChosen)continue;
+  delete record.targetIPA;
+  if(record.word===word)delete record.word;
+  if(record.expected===expected)delete record.expected;
+ }
+}
 function phoneme(value) {
  const ipa=String(value||'').trim().replace(/^[/\[]|[/\]]$/g,'').replaceAll('g','ɡ').replaceAll('ˁ','ˤ');
  return PHONEMES.find(p=>p.ipa===ipa)||null;

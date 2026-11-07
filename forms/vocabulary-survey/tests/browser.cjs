@@ -22,7 +22,7 @@ const server = http.createServer(async (request, response) => {
     }
     const filename = path.resolve(repo, `.${pathname.endsWith('/') ? pathname + 'index.html' : pathname}`);
     if (!filename.startsWith(repo + path.sep)) { response.writeHead(403).end(); return; }
-    const isMedia = /\/tools\/VSS\/voc\/(images|sounds)\/\d+\//.test(pathname);
+    const isMedia = /\/forms\/vocabulary-survey\/media\/(images|sounds)\/\d+\//.test(pathname);
     requests.push(pathname);
     if (isMedia) {
         mediaActive++; mediaMax = Math.max(mediaMax, mediaActive);
@@ -238,7 +238,7 @@ async function run(name, engine, origin) {
         await page.locator('#report-view').waitFor({ state: 'visible' });
         assert.match(await page.locator('#report-content').textContent(), /جزئي/);
         const range = await page.evaluate(async () => {
-            const response = await fetch('../../tools/VSS/voc/sounds/1/1.m4a', { headers: { Range: 'bytes=0-99' } });
+            const response = await fetch('media/sounds/1/1.m4a', { headers: { Range: 'bytes=0-99' } });
             return { status: response.status, length: (await response.arrayBuffer()).byteLength };
         });
         assert.deepEqual(range, { status: 206, length: 100 });
