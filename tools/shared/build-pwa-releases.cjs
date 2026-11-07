@@ -68,7 +68,7 @@ function build(){
 // replacement worker moves open offline copies there; saved accounts stay (same origin).
 // Old VSS pages (and the older tools/voc|senb|taffaha addresses) forward page by page.
 const VOC_PAGES=['index.html','games.html','matching.html','memory.html','rapid.html','report.html','test.html'];
-const MOVED=[['tools/follow-direction/','/follow-direction/'],
+const MOVED=[['tools/follow-direction/','/follow-direction/'],['tools/Fluency Flow/','/fluency-flow/'],
  ['tools/VSS/voc/','/vocabulary-builder/',VOC_PAGES],['tools/VSS/senb/','/sentences-builder/'],['tools/VSS/taffaha/','/syllables-builder/'],
  ['tools/voc/','/vocabulary-builder/',VOC_PAGES],['tools/senb/','/sentences-builder/'],['tools/taffaha/','/syllables-builder/']];
 const forwardPage=(target,keepPath)=>`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=${target}"><link rel="canonical" href="${target}"><title>انتقل التطبيق · App moved</title><script>location.replace(${JSON.stringify(target)}${keepPath?'+location.search+location.hash':''})</script></head><body><p><a href="${target}">${target}</a></p></body></html>\n`;
@@ -95,7 +95,7 @@ self.addEventListener('fetch',event=>{const url=new URL(event.request.url);if(ev
 function writeMovedApps(destination){
  writeRetiredVSS(destination);
  for(const [dir,to,pages=['index.html']] of MOVED){
-  const from='/speech-website/'+dir,target='https://hamada013.github.io'+to,out=path.join(destination,dir);fs.mkdirSync(out,{recursive:true});
+  const from=encodeURI('/speech-website/'+dir),target='https://hamada013.github.io'+to,out=path.join(destination,dir);fs.mkdirSync(out,{recursive:true});
   for(const page of pages)fs.writeFileSync(path.join(out,page),forwardPage(target+(page==='index.html'?'':page),true));
   fs.writeFileSync(path.join(out,'sw.js'),`'use strict';
 const FROM=${JSON.stringify(from)},TO=${JSON.stringify(to)};
