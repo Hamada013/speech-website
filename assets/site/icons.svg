@@ -24,6 +24,7 @@
 <symbol id="branch" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="6" rx="2"/><rect x="2" y="16" width="7" height="6" rx="2"/><rect x="15" y="16" width="7" height="6" rx="2"/><path d="M12 8v4H5v4m7-4h7v4"/></symbol>
 <symbol id="steps" viewBox="0 0 24 24"><path d="M2 21h6v-6h6V9h6V3h2M2 16h2m4-6h2m4-6h2"/></symbol>
 <symbol id="music" viewBox="0 0 24 24"><path d="M9 18V5l12-3v13M9 9l12-3"/><ellipse cx="5.5" cy="18.5" rx="3.5" ry="2.5"/><ellipse cx="17.5" cy="15.5" rx="3.5" ry="2.5"/></symbol>
+<symbol id="reports" viewBox="0 0 24 24"><path d="M9 3H5a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-4M9 2h6v4H9zM8 16v-3m4 3V9m4 7v-5"/></symbol>
 <symbol id="chart" viewBox="0 0 24 24"><path d="M3 3v18h18M8 17v-5m5 5V8m5 9V5"/></symbol>
 <symbol id="headphones" viewBox="0 0 24 24"><path d="M3 13V11a9 9 0 0 1 18 0v2"/><rect x="2" y="12" width="5" height="9" rx="2"/><rect x="17" y="12" width="5" height="9" rx="2"/></symbol>
 <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol>
