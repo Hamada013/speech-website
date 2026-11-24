@@ -62,3 +62,6 @@
  if('serviceWorker' in navigator&&(location.protocol==='https:'||['localhost','127.0.0.1'].includes(location.hostname))){navigator.serviceWorker.register(new URL('sw.js',siteRoot),{scope:siteRoot.pathname,updateViaCache:'none'}).then(()=>navigator.serviceWorker.ready).then(()=>{offlineReady=true;offlineStatus();}).catch(()=>{offlineFailed=true;offlineStatus();});}
  renderLanguage();
 })();
+
+// Links that open another app's page pass this page as ?back= so its back arrow returns here.
+document.querySelectorAll('a[data-return-here]').forEach(link=>{const url=new URL(link.href);url.searchParams.set('back',location.href.split('#')[0]);link.href=url.href;});
