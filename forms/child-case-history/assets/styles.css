@@ -469,3 +469,8 @@ dialog::backdrop {
 /* Keep short numeric answers aligned with the other answers in each report language. */
 html[dir=rtl] .report dd{text-align:right}
 html[dir=ltr] .report dd{text-align:left}
+
+/* Apps the child is sent to with «Save to reports». */
+.send-apps{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 0}.send-apps span{font-weight:700}
+.send-apps button{min-height:40px;padding:6px 14px;border:1.5px solid #dbe7ee;border-radius:999px;background:#fff;color:inherit;font:inherit;font-weight:700;cursor:pointer}
+.send-apps button[aria-pressed=true]{border-color:#2f7a52;background:#eaf7ef;color:#1f6b45}
