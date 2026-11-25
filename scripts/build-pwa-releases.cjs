@@ -56,9 +56,10 @@ const VOC_PAGES=['index.html','games.html','matching.html','memory.html','rapid.
 const MOVED=[['tools/follow-direction/','/follow-direction/'],['tools/Fluency Flow/','/fluency-flow/'],
  ['tools/VSS/voc/','/vocabulary-builder/',VOC_PAGES],['tools/VSS/senb/','/sentences-builder/'],['tools/VSS/taffaha/','/syllables-builder/'],
  ['tools/voc/','/vocabulary-builder/',VOC_PAGES],['tools/senb/','/sentences-builder/'],['tools/taffaha/','/syllables-builder/'],
-// The tools repository publishes each tool at hamada013.github.io/tools/<tool>/.
- ['tools/arabicsounds/','/tools/arabicsounds/',['index.html','matching.html','memory.html']],
- ['tools/auditory-rehabilitation/','/tools/auditory-rehabilitation/',['index.html','detection.html','discrimination.html','duration.html','identification.html','memory.html']],
+// The tools repository publishes each tool at hamada013.github.io/tools/<tool>/; the two sound apps have their own
+// repositories since 2026-11-25, so their old addresses here forward straight to them.
+ ['tools/arabicsounds/','/arabic-sounds/',['index.html','matching.html','memory.html']],
+ ['tools/auditory-rehabilitation/','/non-speech-sounds-rehab/',['index.html','detection.html','discrimination.html','duration.html','identification.html','memory.html']],
  ['tools/ihki-hilou/','/tools/ihki-hilou/'],['tools/seq/','/tools/seq/'],['tools/verb/','/tools/verb/'],['tools/aswati/','/tools/aswati/'],
  ['tools/articulation/','/tools/articulation/',['syllable/matching.html','syllable/syllable.html']],
  ['forms/ASD/VB-MAPP/','/vb-mapp/'],
@@ -113,7 +114,6 @@ function stageSite(){
  for(const file of [...files].sort()){
   const parts=file.split('/'),name=parts.at(-1);
   if(parts.some(part=>omitted.has(part))||name==='.DS_Store'||name==='AGENTS.md'||name.startsWith('.env')||name==='package-lock.json'||name==='package.json')continue;
-  if(file.startsWith('forms/speech/articulation/cloud/')&&file!=='forms/speech/articulation/cloud/config.json')continue;
   if(file.startsWith('forms/Hearing/ling_test/research/'))continue;
   if(file.startsWith('forms/speech/articulation/research/'))continue;
   if(file.startsWith('forms/aphasia/langiuage-cognitive/research/')&&file!=='forms/aphasia/langiuage-cognitive/research/SETUP.md')continue;
