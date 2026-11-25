@@ -1,7 +1,9 @@
 'use strict';
 // Independent local cases. Write a child record only; never clear another app's data.
 let CASE_KEY='articulation-cases-v2';
-try{const uid=localStorage.getItem('articulation-cloud-owner');if(uid)CASE_KEY='articulation-cases-google-'+uid;}catch{}
+// Google sync was removed on 2026-11-25: cases kept for a signed-in Google account are merged back into this device's
+// own store once (assets/retired-sync.js). Only if that cannot be saved does the app keep reading the account's space.
+try{if(!globalThis.ArticulationRetiredSync?.mergeAccountSpaces(localStorage)){const uid=localStorage.getItem('articulation-cloud-owner');if(uid)CASE_KEY='articulation-cases-google-'+uid;}}catch{}
 const caseId=()=>globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
 const copyCase=value=>JSON.parse(JSON.stringify(value));
 function emptyCases(){return {version:2,children:[],activeChild:null,activeAssessment:null};}

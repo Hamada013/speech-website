@@ -9,12 +9,16 @@
  const bridgeReady=localHost?fetch('/api/research/status',{cache:'no-store',signal:AbortSignal.timeout(3000)}).then(async response=>{if(response.ok&&(await response.json()).service==='local-research-workbooks')bridge=location.origin;}).catch(()=>{}):Promise.resolve();
  for(const id of ['openResearchLocal','openWorkbookButton'])$(id).disabled=true;
  bridgeReady.finally(()=>{for(const id of ['openResearchLocal','openWorkbookButton'])$(id).disabled=false;});
+ // Where a case came from. Google sync was removed (2026-11-25), so every case is this device's own; the device id
+ // is the one used before, so research rows from this device keep matching.
+ function caseSource(){let id='';try{id=localStorage.getItem('articulation-source-device')||'';if(!id){id=caseId();localStorage.setItem('articulation-source-device',id);}}catch{}
+  return {accountId:'guest-'+id,email:'',signIn:'guest',deviceId:id,origin:location.origin,verified:false};}
  function status(text,error=false){$('researchShareStatus').textContent=error?'':text;$('researchShareError').textContent=error?text:'';}
  function payload(){
   const child=activeChild();if(!child)throw Error('اختر حالة أولاً.');
   const records=child.assessments.filter(record=>record.state.meta.researchConsent!=='no');
   if(!records.length)throw Error('مشاركة البحث مرفوضة في فحوصات هذه الحالة.');
-  return ArticulationResearch.createPayload({...child,assessments:records},allProbes,{identifiers:$('researchIdentifiers').checked,source:ArticulationCloud.source(),diagnose:record=>diagnosticImpression(record,'ar')});
+  return ArticulationResearch.createPayload({...child,assessments:records},allProbes,{identifiers:$('researchIdentifiers').checked,source:caseSource(),diagnose:record=>diagnosticImpression(record,'ar')});
  }
  async function saveLocal(){
   if(busy)return;busy=true;$('saveResearchLocal').disabled=true;status('جارٍ تحديث ملف Excel على هذا الكمبيوتر…');

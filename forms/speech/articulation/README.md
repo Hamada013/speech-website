@@ -73,8 +73,6 @@ node forms/speech/articulation/tests/research-browser.cjs
 APP_ENGINE=webkit node forms/speech/articulation/tests/research-browser.cjs
 ```
 
-## Optional Google account and device syncing
+## Cases stay on the device
 
-The launch dialog can be skipped; the home cloud icon opens it again. Firebase Google sign-in, independent local account spaces, private per-assessment cloud syncing, offline retry and concurrent-edit preservation are implemented in `assets/cloud.js` / `cloud-model.js`. The `cloud/` directory contains the public Firebase configuration and private per-user Firestore rules. The online research collector has been removed. Source identity columns and the `Accounts` research tab distinguish where submissions came from.
-
-The public `cloud/config.json` now identifies Firebase project `speech-apps-5d3b0`. Live sign-in and syncing still require the project's authentication providers, authorized domains, Firestore database and deployed rules; see [cloud setup](cloud/SETUP.md). These console settings and real-device syncing have not been verified. Report sharing uses local Excel only and is independent of personal Google account syncing.
+Google sign-in and cloud syncing (Firebase project `speech-apps-5d3b0`) were removed on 2026-11-25; the project is no longer used. Cases are saved on the device only; reports and research sharing use local Excel. A device that was signed in kept its cases in a separate space per Google account: on the first launch after the update, `assets/retired-sync.js` merges every such space back into the device's own store once (newer copy wins, nothing is deleted, the account spaces stay as a backup). Research rows record every case as this device's own.
