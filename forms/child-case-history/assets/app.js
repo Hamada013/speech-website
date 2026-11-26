@@ -303,8 +303,7 @@ $('review').onclick=showReport;$('closeReport').onclick=()=>$('reportDialog').cl
 $('textExport').onclick=()=>{const blob=new Blob(['\ufeff'+reportText()],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(String(answers.childName||'child').replace(/[<>:"/\\|?*\u0000-\u001f]/g,'_').slice(0,70))+'-history.txt';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 $('pdfExport').onclick=()=>{$('printArea').innerHTML=reportHTML();const originalTitle=document.title;document.title=(answers.childName||'Child')+' - Case History';const restore=()=>{document.title=originalTitle;window.removeEventListener('afterprint',restore);};window.addEventListener('afterprint',restore);window.print();};
 // The apps this child should appear in (on the reports page the therapist then sets how long the account lasts).
-[...(document.querySelectorAll?.('[data-send-app]')||[])].forEach(chip=>{const sync=()=>chip.setAttribute('aria-pressed',String((answers.cloudApps||[]).includes(chip.dataset.sendApp)));sync();
- chip.onclick=()=>{const apps=new Set(answers.cloudApps||[]);apps.has(chip.dataset.sendApp)?apps.delete(chip.dataset.sendApp):apps.add(chip.dataset.sendApp);answers.cloudApps=[...apps];save();sync();};});
+// Children are added only on the reports page; this form saves the case to a child already there (2026-11-26).
 // «حفظ في التقارير»: saves this case history to the clinic's database (forms/speech-cloud.js) under the right child, so it
 // shows on the reports page by itself. The first save asks for the clinic's Google account; later saves update the same
 // assessment. Without internet the same report is downloaded as a child file (forms/child-file.js) instead.
@@ -312,7 +311,7 @@ $('childFileExport').onclick=async()=>{const field=id=>allFields.find(f=>f.id===
  const name=String(answers.childName||'').trim();status.textContent='';if(!name){status.textContent=t(pair('Add the child’s name first.','أضف اسم الطفل أولاً.'));return;}
  const details={form:'child-case-history',title:t(pair('Child case history','دراسة حالة الطفل')),date:valueText(field('assessmentDate'))||null,examiner:String(answers.examiner||''),
   child:{id:answers.cloudChildId||undefined,name,birth:valueText(field('dob'))||undefined,gender:valueText(field('sex'))||undefined},assessmentId:answers.cloudAssessmentId||undefined,
-  sections:reportData().map(section=>({title:section.title,items:section.rows})),apps:answers.cloudApps||[]};
+  sections:reportData().map(section=>({title:section.title,items:section.rows}))};
  button.disabled=true;status.textContent=t(pair('Saving…','جارٍ الحفظ…'));
  try{if(!await SpeechCloud.user()){status.textContent=t(pair('Choose the clinic’s Google account in the window that opens.','اختر حساب Google الخاص بالعيادة في النافذة التي تفتح.'));if(!await SpeechCloud.signIn())return;}
   const saved=await SpeechCloud.saveAssessment(details);answers.cloudChildId=saved.child.id;answers.cloudAssessmentId=saved.assessmentId;save();
