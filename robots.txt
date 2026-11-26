@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://hamada013.github.io/speech-website/sitemap.xml

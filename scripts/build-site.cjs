@@ -1,6 +1,14 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..'),pages=require('./site-pages.cjs');
+// Search engines (2026-11-27): the site's address for canonical links, social previews and the sitemap, and the
+// clinic's details as structured data on the home page (name, profession, city; no phone or street address).
+const SITE='https://hamada013.github.io/speech-website/';
+const CLINIC={'@context':'https://schema.org','@type':'MedicalBusiness',name:'Ahmad Ghanem · Speech-Language Pathologist',alternateName:'أحمد غانم · أخصائي النطق واللغة',
+ description:'Speech and language therapy for children and adults in Latakia, Syria, and online: assessments, therapy apps and telepractice, in Arabic and English.',
+ medicalSpecialty:'SpeechPathology',url:SITE,image:SITE+'assets/site/brand/icon-512.png',email:'mailto:slp.ahmadghanem@gmail.com',
+ address:{'@type':'PostalAddress',addressLocality:'Latakia',addressCountry:'SY'},areaServed:['Latakia','Syria','Online'],availableLanguage:['ar','en'],
+ founder:{'@type':'Person',name:'Ahmad Ghanem',jobTitle:'Speech-Language Pathologist',url:'https://hamada013.github.io/slp.ahmadghanem/'},sameAs:['https://hamada013.github.io/slp.ahmadghanem/']};
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const bilingual=(en,ar,tag='span',attrs='')=>`<${tag} data-en="${escape(en)}" data-ar="${escape(ar)}"${attrs?' '+attrs:''}>${escape(en)}</${tag}>`;
 function render(page){
@@ -27,7 +35,7 @@ function render(page){
  `:'';
  return `<!doctype html>
 <!-- Main site directory. Edit scripts/site-pages.cjs, then run node scripts/build-site.cjs. -->
-<html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f8fafc"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="${escape(page.description)}"><title>${escape(page.title)} | Ahmad Ghanem SLP</title><link rel="manifest" href="${url('manifest.webmanifest')}"><link rel="apple-touch-icon" href="${url('assets/site/brand/icon-192.png')}"><link rel="icon" type="image/webp" href="${url('assets/site/brand/logo.webp')}"><link rel="stylesheet" href="${url('assets/site/app.css')}"><script src="${url('assets/site/site.js')}" defer></script></head>
+<html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f8fafc"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="${escape(page.seo||page.description)}"><title>${escape(page.seoTitle||page.title+' | Ahmad Ghanem SLP')}</title><link rel="canonical" href="${SITE}${page.path==='index.html'?'':page.path}"><meta property="og:type" content="website"><meta property="og:site_name" content="Ahmad Ghanem · Speech-Language Pathologist"><meta property="og:title" content="${escape(page.seoTitle||page.title)}"><meta property="og:description" content="${escape(page.seo||page.description)}"><meta property="og:url" content="${SITE}${page.path==='index.html'?'':page.path}"><meta property="og:image" content="${SITE}assets/site/brand/icon-512.png"><meta name="twitter:card" content="summary">${page.home?`<script type="application/ld+json">${JSON.stringify(CLINIC)}</script>`:''}<link rel="manifest" href="${url('manifest.webmanifest')}"><link rel="apple-touch-icon" href="${url('assets/site/brand/icon-192.png')}"><link rel="icon" type="image/webp" href="${url('assets/site/brand/logo.webp')}"><link rel="stylesheet" href="${url('assets/site/app.css')}"><script src="${url('assets/site/site.js')}" defer></script></head>
 <body${page.home?' class="home-page"':''}><a class="skip-link" href="#main" data-en="Skip to content" data-ar="الانتقال إلى المحتوى">Skip to content</a>
 <header class="site-header"><div class="header-inner"><button id="menu-toggle" class="icon-button menu-toggle" type="button" aria-controls="navigation-drawer" aria-expanded="false" aria-haspopup="dialog" aria-label="Open navigation" data-label-en="Open navigation" data-label-ar="فتح التنقل">${icon('menu')}</button><a class="brand" href="${url('index.html')}"><img src="${url('assets/site/brand/logo.webp')}" width="48" height="48" alt=""><span><strong data-en="Ahmad Ghanem" data-ar="أحمد غانم">Ahmad Ghanem</strong><small data-en="Speech-Language Pathologist" data-ar="أخصائي أمراض النطق واللغة">Speech-Language Pathologist</small></span></a><div class="header-controls"><button id="install-app" class="icon-button" type="button" aria-label="Install app" data-label-en="Install app" data-label-ar="تثبيت التطبيق">${icon('download')}</button><button id="language-toggle" type="button" class="language-button" aria-label="Switch to Arabic">${icon('globe')}<span lang="ar">العربية</span></button></div></div></header>
 <main id="main" class="site-main${page.home?' home-main':''}" tabindex="-1">${content}</main>
@@ -35,6 +43,8 @@ function render(page){
 }
 let stale=false;
 for(const page of pages){const output=render(page).replace(/[\t ]+$/gm,''),file=path.join(root,page.path);if(process.argv.includes('--check')){if(fs.readFileSync(file,'utf8')!==output){console.error('Stale directory: '+page.path);stale=true;}}else fs.writeFileSync(file,output);}
+const sitemap=`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map(p=>`  <url><loc>${SITE}${p.path==='index.html'?'':p.path}</loc></url>`).join('\n')}\n</urlset>\n`,robots=`User-agent: *\nAllow: /\nSitemap: ${SITE}sitemap.xml\n`;
+for(const [file,text] of [['sitemap.xml',sitemap],['robots.txt',robots]]){const full=path.join(root,file);if(process.argv.includes('--check')){if(!fs.existsSync(full)||fs.readFileSync(full,'utf8')!==text){console.error('Stale '+file);stale=true;}}else fs.writeFileSync(full,text);}
 if(stale)process.exitCode=1;
 const crypto=require('node:crypto'),shell=[...pages.map(p=>p.path),'manifest.webmanifest','assets/site/site.css','assets/site/app.css','assets/site/site.js','assets/site/icons.svg','assets/site/brand/logo.webp','assets/site/brand/icon-192.png','assets/site/brand/icon-512.png'];
 const integrity=Object.fromEntries(shell.map(file=>[file,crypto.createHash('sha256').update(fs.readFileSync(path.join(root,file))).digest('hex')]));
